@@ -46,6 +46,24 @@ bnn train --epochs 3 --seed 42
 bnn eval-suite
 ```
 
+### Optimise a model (product verb)
+
+```bat
+bnn optimise --policy auto --report results\optimise_report.json
+```
+
+Python:
+
+```python
+from bnn.optimise import optimise_model, OptimiseConfig
+# see docs/tutorials/07_OPTIMISER_QUICKSTART.md
+```
+
+- Tutorial: [`docs/tutorials/07_OPTIMISER_QUICKSTART.md`](docs/tutorials/07_OPTIMISER_QUICKSTART.md)
+- HF path: [`docs/tutorials/08_HF_OPTIMISER.md`](docs/tutorials/08_HF_OPTIMISER.md)
+- ADR: [`docs/adr/0001_public_optimiser_api.md`](docs/adr/0001_public_optimiser_api.md)
+- License: [`LICENSE`](LICENSE) (MIT)
+
 ### Vision + audio
 
 ```bat
@@ -97,16 +115,20 @@ Full tree: [`docs/18_DECISION_TREE_AND_COMPLETE_ROADMAP.md`](docs/18_DECISION_TR
 
 ## Wrapping existing models
 
+**Preferred:** `bnn optimise` (schema `bnn_optimise_report_v1`).  
+**Legacy:** `bnn wrap` / `bnn wrap --ultra`.
+
 **Short answer:** yes for **INT4/FP8/GGUF** (production); **partial** for
 binary/ternary (size easy; accuracy + speed need QAT and real kernels).
 
 ```bat
+bnn optimise --policy auto --qat-steps 40 --force
 bnn wrap --mode binary_xnor --hidden 4096 --batch 32
 bnn wrap --ultra --policy auto --qat-steps 40 --force
 ```
 
 - Legacy wrap demo: **32×** compression; binary PTQ cosine ~0.28 without QAT.
-- Ultra wrap: hybrid FFN + calib → binary cosine ~0.71; ternary/auto → ~0.99;
+- Ultra / optimise: hybrid FFN + calib → binary cosine ~0.71; ternary/auto → ~0.99;
   OpenMP gemm_only on wide FFN ~**4×** vs torch (see `docs/33_ULTRA_WRAP_LAYER.md`).
 
 Deep dive: [`docs/12_WRAPPER_AND_EXISTING_MODELS.md`](docs/12_WRAPPER_AND_EXISTING_MODELS.md)

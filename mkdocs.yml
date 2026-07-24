@@ -1,0 +1,34 @@
+site_name: Binary Neural Network Optimiser
+site_description: Honest packed binary/ternary CPU/edge optimiser lab
+repo_url: https://github.com/KanakMalpani/Binary-Neural-Networks
+repo_name: Binary-Neural-Networks
+
+# Stub site config (W9.T05). Autodoc publish = W9.T06.
+# Build (optional): pip install mkdocs-material && mkdocs build
+# Note: root README / ROADMAP are linked from docs pages, not duplicated here.
+
+theme:
+  name: material
+  palette:
+    primary: blue grey
+    accent: teal
+
+nav:
+  - Docs index: README.md
+  - Optimiser quickstart: tutorials/07_OPTIMISER_QUICKSTART.md
+  - HF optimiser: tutorials/08_HF_OPTIMISER.md
+  - API overview: api/README.md
+  - ADRs: adr/README.md
+  - Semver policy: SEMVER_AND_DEPRECATION.md
+  - World-class roadmap: 37_WORLD_CLASS_BNN_OPTIMISER_ROADMAP.md
+
+docs_dir: docs
+
+markdown_extensions:
+  - admonition
+  - tables
+  - toc:
+      permalink: true
+
+plugins:
+  - search

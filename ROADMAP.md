@@ -161,9 +161,9 @@ Audit date: **2026-07-25**. Status legend: `[x] DONE` · `[~] PARTIAL` · `[ ] T
 | Area | Status | Evidence (paths) | Gap to world-class |
 |------|--------|------------------|--------------------|
 | Packaging / version | `[x]` | `pyproject.toml` 0.2.0, `bnn/_version.py`, console script | Semver policy doc; PyPI publish |
-| CLI surface | `[x]` | `bnn/cli.py` — repro, wrap, encode/decode, train-*, profile, … | Unified `optimise` verb; HF load |
+| CLI surface | `[x]` | `bnn optimise` + wrap/encode/… | HF load verb optional |
 | STE layers / models | `[x]` | `bnn/ste.py`, `layers.py`, `models.py` | Broader zoo (ResNet-BiReal full, BitLinear LLM toy) |
-| Native binary GEMM | `[~]` | `bnn/kernels/binary_gemm.c`, OpenMP, MSVC DLL; NumPy fallback | Linux/macOS/ARM native; AVX-512 |
+| Native binary GEMM | `[~]` | MSVC DLL + Linux GCC `.so` path; NumPy fallback | macOS/ARM; AVX-512; harden CI |
 | Ternary kernels | `[~]` | `ternary_pack.py`, `ternary_gemm.py` / C bitplanes | Cross-platform polish; bitnet.cpp handoff clarity |
 | Wrap / ultra wrap | `[~]` | `bnn/wrap/*`, `wrapper.py`, `ultra_wrap_demo.py` | Stable public optimiser API; sensitivity search |
 | Calibrate / QAT | `[~]` | `wrap/calibrate.py`, `wrap/qat.py`, distill sketch | Full recipes; distill integration |
@@ -177,12 +177,12 @@ Audit date: **2026-07-25**. Status legend: `[x] DONE` · `[~] PARTIAL` · `[ ] T
 | Repro / goldens | `[x]` | `scripts/repro_all.py`, `golden_floors.json`, `REPRODUCIBILITY.md`, `AGENTS.md` | Broader OS matrix |
 | CI | `[~]` | `.github/workflows/ci.yml` Win+Linux | macOS; py3.11/3.13 matrix; native Linux compile |
 | Docs research 00–36 | `[x]` | `docs/` | MkDocs site; fewer conflicting “master” claims |
-| API reference | `[~]` | `docs/api/README.md` stub | Autodoc |
-| Tutorials | `[x]` | `docs/tutorials/01`–`06` | Optimiser + HF end-to-end tutorial |
+| API reference | `[~]` | docs/api + MkDocs stub | Autodoc (W9.T06) |
+| Tutorials | `[x]` | `docs/tutorials/01`–`08` | Keep green |
 | Bridges GPU/BitNet | `[~]` | `docs/23`–`24`, `scripts/bridges/*` | First-class CLI `bnn bridge …` |
-| HF integration | `[~]` | extra `[hf]`, `hf_tiny_wrap_demo.py` | Product UX + tests |
-| Community OSS | `[~]` | `CONTRIBUTING.md`, `CHANGELOG.md` | LICENSE file, templates, CODEOWNERS, COC, SECURITY |
-| Security | `[~]` | `bnn/paths.py`, `weights_only=True` in codec | SECURITY.md, dependency audit, SBOM |
+| HF integration | `[x]` | tutorial 08 + optional hf tests | deeper calib recipes |
+| Community OSS | `[x]` | LICENSE, templates, COC, SECURITY, CODEOWNERS, CONTRIBUTING | Discussions / launch checklist |
+| Security | `[~]` | SECURITY.md + paths/weights_only | dependency audit, SBOM |
 | Releases | `[ ]` | version in pyproject only | GitHub Releases, attestations, SBOM |
 | Papers / research series | `[~]` | `docs/32`, local `C:\00 Research Papers\…` | Publication plan + citation CITATION.cff |
 | Compatibility matrix | `[~]` | requires-python ≥3.11; torch pin | Explicit tested matrix doc + CI |
@@ -190,7 +190,7 @@ Audit date: **2026-07-25**. Status legend: `[x] DONE` · `[~] PARTIAL` · `[ ] T
 | WASM | `[ ]` | — | Optional moonshot |
 | ONNX / safetensors | `[ ]` | — | Export paths |
 | Leaderboard protocol | `[ ]` | machine-local results | Fair multi-machine protocol |
-| Model cards / ethics | `[ ]` | honesty in README | Formal MODEL_CARD + limitations |
+| Model cards / ethics | `[x]` | MODEL_CARD.md | Expand ethics essay optional |
 
 ### 2.1 Inventory snapshot (what exists)
 
@@ -268,13 +268,13 @@ Acceptance: every task that touches metrics must keep `bnn repro` green unless e
 
 | ID | Task | Est | Deps | Status |
 |----|------|-----|------|--------|
-| W1.T01 | ADR: public API surface (`optimise_model`, reports, codec) | S | — | `[ ]` |
-| W1.T02 | Semver + deprecation policy doc | S | W1.T01 | `[ ]` |
-| W1.T03 | Freeze `bnn.wrap.api` exports in `__all__` / `docs/api` | M | W1.T01 | `[~]` partial today |
-| W1.T04 | Compatibility tests for public symbols | M | W1.T03 | `[ ]` |
-| W1.T05 | CLI `bnn optimise` (alias to ultra wrap + encode) | M | W1.T01 | `[ ]` |
-| W1.T06 | JSON report schema v1 (versioned) | M | W1.T05 | `[~]` WrapReport exists |
-| W1.T07 | Deprecation warnings for legacy-only paths | S | W1.T02 | `[ ]` |
+| W1.T01 | ADR: public API surface (`optimise_model`, reports, codec) | S | — | `[x]` |
+| W1.T02 | Semver + deprecation policy doc | S | W1.T01 | `[x]` |
+| W1.T03 | Freeze `bnn.wrap.api` exports in `__all__` / `docs/api` | M | W1.T01 | `[x]` |
+| W1.T04 | Compatibility tests for public symbols | M | W1.T03 | `[x]` |
+| W1.T05 | CLI `bnn optimise` (alias to ultra wrap + encode) | M | W1.T01 | `[x]` |
+| W1.T06 | JSON report schema v1 (versioned) | M | W1.T05 | `[x]` `bnn_optimise_report_v1` |
+| W1.T07 | Deprecation warnings for legacy-only paths | S | W1.T02 | `[x]` |
 | W1.T08 | PyPI package description / classifiers polish | S | W8 | `[x]` mostly done |
 
 **Acceptance tests:** import stable symbols; `bnn optimise --help`; schema validates demo JSON; `bnn repro`.  
@@ -290,8 +290,8 @@ Acceptance: every task that touches metrics must keep `bnn repro` green unless e
 | ID | Task | Est | Deps | Status |
 |----|------|-----|------|--------|
 | W2.T01 | Document current OpenMP MSVC path + thread API | S | — | `[x]` C + docs/34 |
-| W2.T02 | Linux GCC/Clang `.so` compile path | L | W2.T01 | `[ ]` |
-| W2.T03 | CI job: build + `validate-native` on Linux | M | W2.T02 | `[ ]` |
+| W2.T02 | Linux GCC/Clang `.so` compile path | L | W2.T01 | `[x]` `compile_native` |
+| W2.T03 | CI job: build + `validate-native` on Linux | M | W2.T02 | `[~]` CI soft |
 | W2.T04 | ARM NEON spike (Apple Silicon or aarch64 Linux) | L | W2.T02 | `[ ]` |
 | W2.T05 | AVX2 / AVX-512 optional dispatch | XL | W2.T02 | `[ ]` |
 | W2.T06 | WASM SIMD prototype (optional) | XL | W2.T02 | `[ ]` |
@@ -342,7 +342,7 @@ Acceptance: every task that touches metrics must keep `bnn repro` green unless e
 | W4.T05 | ResNet-BiReal reference (CIFAR or tiny) | L | W4.T02 | `[ ]` |
 | W4.T06 | BitLinear / BitNet-style block pedagogy | M | — | `[~]` docs + bridges |
 | W4.T07 | Diffusion note (prefer INT8/FP8) | S | — | `[x]` decision tree |
-| W4.T08 | Zoo registry JSON (name → build → recipe) | M | W4.* | `[ ]` |
+| W4.T08 | Zoo registry JSON (name → build → recipe) | M | W4.* | `[x]` |
 
 **Acceptance tests:** each zoo entry has train or wrap smoke + doc link.  
 **Follow when lost:** W4.T08 → W4.T05 → W4.T06.
@@ -358,8 +358,8 @@ Acceptance: every task that touches metrics must keep `bnn repro` green unless e
 |----|------|-----|------|--------|
 | W5.T01 | `.bnnpack` v1 encode/decode | M | — | `[x]` |
 | W5.T02 | Security: `weights_only` load | S | — | `[x]` |
-| W5.T03 | HF tiny wrap demo | M | hf extra | `[~]` |
-| W5.T04 | HF optimiser tutorial + CI-optional test | L | W5.T03, W1 | `[ ]` |
+| W5.T03 | HF tiny wrap demo | M | hf extra | `[x]` |
+| W5.T04 | HF optimiser tutorial + CI-optional test | L | W5.T03, W1 | `[x]` |
 | W5.T05 | `.bnnpack` v2 design (ternary, meta, hashes) | L | W5.T01 | `[ ]` |
 | W5.T06 | safetensors export of packed tensors | L | W5.T05 | `[ ]` |
 | W5.T07 | ONNX export spike (or explicit defer) | XL | W5.T05 | `[ ]` |
@@ -381,7 +381,7 @@ Acceptance: every task that touches metrics must keep `bnn repro` green unless e
 | W6.T01 | MNIST loader (no torchvision required) | S | — | `[x]` |
 | W6.T02 | CIFAR HF/proxy path | M | — | `[x]` |
 | W6.T03 | Audio synthetic lane | M | — | `[x]` |
-| W6.T04 | Dataset cards (MNIST/CIFAR/synth audio) | M | — | `[ ]` |
+| W6.T04 | Dataset cards (MNIST/CIFAR/synth audio) | M | — | `[x]` |
 | W6.T05 | Seq reverse-task card | S | — | `[~]` in docs/36 |
 | W6.T06 | Training recipes index | M | W4, W9 | `[ ]` |
 | W6.T07 | ImageNet folder protocol only | S | — | `[x]` stub |
@@ -399,7 +399,7 @@ Acceptance: every task that touches metrics must keep `bnn repro` green unless e
 | ID | Task | Est | Deps | Status |
 |----|------|-----|------|--------|
 | W7.T01 | Keep golden floors / committed results | — | — | `[x]` |
-| W7.T02 | Document allowed bench shapes (forbid inventing) | S | — | `[~]` AGENTS.md |
+| W7.T02 | Document allowed bench shapes (forbid inventing) | S | — | `[x]` docs/BENCH_SHAPES.md |
 | W7.T03 | Pareto JSON: accuracy, compression, latency, energy-proxy | M | W1.T06 | `[ ]` |
 | W7.T04 | Plot script (optional mpl extra) | M | W7.T03 | `[ ]` |
 | W7.T05 | Fair protocol doc (warmup, threads, CPU model) | M | W7.T02 | `[ ]` |
@@ -440,13 +440,13 @@ Acceptance: every task that touches metrics must keep `bnn repro` green unless e
 
 | ID | Task | Est | Deps | Status |
 |----|------|-----|------|--------|
-| W9.T01 | Optimiser quickstart tutorial | M | W1.T05 | `[ ]` |
+| W9.T01 | Optimiser quickstart tutorial | M | W1.T05 | `[x]` |
 | W9.T02 | Make this ROADMAP the single “when lost” entry | S | — | `[x]` this PR |
-| W9.T03 | Sync README / docs/README pointers | S | W9.T02 | `[ ]` in same PR |
+| W9.T03 | Sync README / docs/README pointers | S | W9.T02 | `[x]` |
 | W9.T04 | Keep tutorials 01–06 green | — | — | `[x]` |
-| W9.T05 | MkDocs or Sphinx decision ADR | S | — | `[ ]` (21 chose MD; revisit) |
+| W9.T05 | MkDocs or Sphinx decision ADR | S | — | `[x]` MkDocs stub |
 | W9.T06 | Autodoc API reference | L | W9.T05 | `[ ]` |
-| W9.T07 | Architecture Decision Records index | M | docs/08 | `[~]` |
+| W9.T07 | Architecture Decision Records index | M | docs/08 | `[x]` docs/adr |
 | W9.T08 | “When to use BNN vs INT4” cookbook | M | docs/18 | `[~]` |
 | W9.T09 | Troubleshooting runbook expand | M | REPRODUCIBILITY | `[~]` |
 | W9.T10 | GIF/asciinema optional demos | S | — | `[ ]` |
@@ -462,10 +462,10 @@ Acceptance: every task that touches metrics must keep `bnn repro` green unless e
 
 | ID | Task | Est | Deps | Status |
 |----|------|-----|------|--------|
-| W10.T01 | MODEL_CARD.md / limitations | M | — | `[ ]` |
-| W10.T02 | SECURITY.md + vuln reporting | S | — | `[ ]` |
+| W10.T01 | MODEL_CARD.md / limitations | M | — | `[x]` |
+| W10.T02 | SECURITY.md + vuln reporting | S | — | `[x]` |
 | W10.T03 | Path traversal + pickle policy tests | M | — | `[~]` |
-| W10.T04 | Ethics: dual-use / deployment notes | S | — | `[ ]` |
+| W10.T04 | Ethics: dual-use / deployment notes | S | — | `[x]` MODEL_CARD |
 | W10.T05 | Dependency audit in CI (pip-audit) | M | W8 | `[ ]` |
 | W10.T06 | Codec untrusted-file warnings | S | W5 | `[~]` |
 
@@ -480,16 +480,16 @@ Acceptance: every task that touches metrics must keep `bnn repro` green unless e
 
 | ID | Task | Est | Deps | Status |
 |----|------|-----|------|--------|
-| W11.T01 | Add `LICENSE` file (MIT) | S | — | `[ ]` **critical gap** |
-| W11.T02 | Issue templates (bug / feature / thesis-violation) | S | — | `[ ]` |
-| W11.T03 | PR template (repro checklist) | S | — | `[ ]` |
-| W11.T04 | CODEOWNERS | S | — | `[ ]` |
-| W11.T05 | CODE_OF_CONDUCT.md | S | — | `[ ]` |
+| W11.T01 | Add `LICENSE` file (MIT) | S | — | `[x]` |
+| W11.T02 | Issue templates (bug / feature / thesis-violation) | S | — | `[x]` |
+| W11.T03 | PR template (repro checklist) | S | — | `[x]` |
+| W11.T04 | CODEOWNERS | S | — | `[x]` |
+| W11.T05 | CODE_OF_CONDUCT.md | S | — | `[x]` |
 | W11.T06 | Enable Discussions (manual) | S | — | `[ ]` |
 | W11.T07 | Public launch checklist execution | M | W8, W9, W10 | `[ ]` |
 | W11.T08 | Good first issues labeled | M | W11.T02 | `[ ]` |
-| W11.T09 | CONTRIBUTING keep synced to ROADMAP | S | — | `[~]` |
-| W11.T10 | CITATION.cff | S | W12 | `[ ]` |
+| W11.T09 | CONTRIBUTING keep synced to ROADMAP | S | — | `[x]` |
+| W11.T10 | CITATION.cff | S | W12 | `[x]` |
 
 **Follow when lost:** W11.T01 → W11.T02 → W11.T03.
 
@@ -538,7 +538,7 @@ Acceptance: every task that touches metrics must keep `bnn repro` green unless e
 
 | ID | Task | Est | Deps | Status |
 |----|------|-----|------|--------|
-| W14.T01 | Document OS × arch × Python × torch matrix | M | — | `[ ]` |
+| W14.T01 | Document OS × arch × Python × torch matrix | M | — | `[x]` |
 | W14.T02 | CI Python 3.11–3.13 | M | W8.T03 | `[ ]` |
 | W14.T03 | Torch upper-bound policy | S | pyproject | `[~]` pin exists |
 | W14.T04 | Windows MSVC Build Tools runbook | S | — | `[x]` REPRODUCIBILITY |
@@ -642,7 +642,7 @@ flowchart TD
 
 ### 7.4 Default active phase
 
-As of 2026-07-25: **Phase A** (API freeze), with **W11.T01 LICENSE** allowed in parallel as a blocker for launch ethics.
+As of 2026-07-25 (updated): **Phase A+B largely complete**; next focus **Phase C** (multi-arch polish, Pareto, py matrix) + remaining Phase D launch tags.
 
 ---
 
@@ -650,11 +650,11 @@ As of 2026-07-25: **Phase A** (API freeze), with **W11.T01 LICENSE** allowed in 
 
 ### v0.3 — Optimiser preview
 
-- [ ] `bnn optimise` CLI + schema v1
-- [ ] LICENSE file present
-- [ ] Issue/PR templates
-- [ ] HF tutorial draft
-- [ ] `bnn repro` PASS
+- [x] `bnn optimise` CLI + schema v1
+- [x] LICENSE file present
+- [x] Issue/PR templates
+- [x] HF tutorial draft
+- [x] `bnn repro` PASS
 - [ ] CHANGELOG + tag `v0.3.0`
 
 ### v0.4 — Cross-platform runtime
@@ -719,35 +719,35 @@ Pre-checked from 2026-07-25 audit. **Agents: flip `[ ]` → `[x]` or `[~]` in PR
 
 ### 10.2 Phase A — API freeze
 
-- [ ] W1.T01 ADR public optimiser API
-- [ ] W1.T02 Semver / deprecation policy
-- [ ] W1.T05 `bnn optimise`
-- [ ] W1.T06 Report schema v1 frozen
-- [ ] W1.T04 Compatibility tests for exports
+- [x] W1.T01 ADR public optimiser API
+- [x] W1.T02 Semver / deprecation policy
+- [x] W1.T05 `bnn optimise`
+- [x] W1.T06 Report schema v1 frozen
+- [x] W1.T04 Compatibility tests for exports
 
 ### 10.3 Phase B — HF UX
 
-- [ ] W5.T04 HF optimiser tutorial + test
-- [ ] W9.T01 Optimiser quickstart
-- [ ] W4.T08 Zoo registry
-- [ ] W6.T04 Dataset cards
+- [x] W5.T04 HF optimiser tutorial + test
+- [x] W9.T01 Optimiser quickstart
+- [x] W4.T08 Zoo registry
+- [x] W6.T04 Dataset cards
 - [ ] W3.T05 Layer-wise sensitivity (can slip to C)
 
 ### 10.4 Phase C — Kernels
 
-- [ ] W2.T02 Linux `.so`
-- [ ] W2.T03 Linux native CI
+- [x] W2.T02 Linux `.so`
+- [~] W2.T03 Linux native CI (soft continue-on-error)
 - [ ] W2.T04 ARM NEON spike
-- [ ] W14.T01 Compat matrix doc
+- [x] W14.T01 Compat matrix doc
 - [ ] W8.T03 Python version matrix
 - [ ] W7.T03 Pareto JSON
 - [ ] W13.T02 Flamegraph howto
 
 ### 10.5 Phase D — Launch
 
-- [ ] W11.T01 LICENSE
-- [ ] W11.T02–T05 Templates / COC / CODEOWNERS / SECURITY
-- [ ] W10.T01 Model card
+- [x] W11.T01 LICENSE
+- [x] W11.T02–T05 Templates / COC / CODEOWNERS / SECURITY
+- [x] W10.T01 Model card
 - [ ] W8.T05–T06 Release + SBOM
 - [ ] W11.T07 Launch checklist executed
 
@@ -755,7 +755,7 @@ Pre-checked from 2026-07-25 audit. **Agents: flip `[ ]` → `[x]` or `[~]` in PR
 
 - [ ] W12.T02 Publication plan
 - [ ] W12.T03 Figure pipeline
-- [ ] W11.T10 CITATION.cff
+- [x] W11.T10 CITATION.cff
 
 ### 10.7 Phase F — Ecosystem
 
@@ -804,11 +804,11 @@ Pre-checked from 2026-07-25 audit. **Agents: flip `[ ]` → `[x]` or `[~]` in PR
 
 ### 11.2 Top 5 next actions (execution resume)
 
-1. **W11.T01** — Add root `LICENSE` (MIT).
-2. **W1.T01** — ADR for public optimiser API.
-3. **W1.T05** — Implement `bnn optimise` CLI.
-4. **W5.T04 / W9.T01** — HF (or local) end-to-end optimiser tutorial.
-5. **W11.T02–T03** — Issue + PR templates with repro checklist.
+1. ~~**W11.T01** — Add root `LICENSE` (MIT).~~ **DONE**
+2. ~~**W1.T01** — ADR for public optimiser API.~~ **DONE**
+3. ~~**W1.T05** — Implement `bnn optimise` CLI.~~ **DONE**
+4. ~~**W5.T04 / W9.T01** — HF (or local) end-to-end optimiser tutorial.~~ **DONE**
+5. ~~**W11.T02–T03** — Issue + PR templates with repro checklist.~~ **DONE**
 
 ---
 

@@ -2,6 +2,20 @@
 
 ## Unreleased
 
+### Phase A/B — optimiser product + OSS hygiene
+
+- **LICENSE** (MIT) at repo root; `SECURITY.md`, `CODE_OF_CONDUCT.md`,
+  `.github` issue/PR templates, `CODEOWNERS`, `CITATION.cff`, `MODEL_CARD.md`.
+- **Public optimiser API:** `bnn.optimise.optimise_model` + ADR
+  `docs/adr/0001_public_optimiser_api.md`; semver policy
+  `docs/SEMVER_AND_DEPRECATION.md`; report schema `bnn_optimise_report_v1`.
+- **CLI:** `bnn optimise` (preferred over `bnn wrap --ultra`); legacy wrap warns.
+- **Tutorials:** `07_OPTIMISER_QUICKSTART`, `08_HF_OPTIMISER`; optional
+  `tests/test_hf_optimiser.py` (`hf`/`slow`).
+- **DX:** MkDocs stub (`mkdocs.yml` + ADR 0002), zoo registry
+  `bnn/zoo_registry.json`, dataset cards, compatibility matrix.
+- **Tests:** `tests/test_public_api.py` locks public exports.
+
 ### World-class optimiser roadmap
 
 - **Canonical plan:** root `ROADMAP.md` + twin `docs/37_WORLD_CLASS_BNN_OPTIMISER_ROADMAP.md`

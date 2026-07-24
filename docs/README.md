@@ -25,11 +25,19 @@ Start here if you are new to the repo.
 | 04 | [`tutorials/04_image_cifar.md`](tutorials/04_image_cifar.md) |
 | 05 | [`tutorials/05_audio.md`](tutorials/05_audio.md) |
 | 06 | [`tutorials/06_encoder_decoder.md`](tutorials/06_encoder_decoder.md) |
+| 07 | [`tutorials/07_OPTIMISER_QUICKSTART.md`](tutorials/07_OPTIMISER_QUICKSTART.md) |
+| 08 | [`tutorials/08_HF_OPTIMISER.md`](tutorials/08_HF_OPTIMISER.md) |
 
 ## Latest lane
 
 | Doc | Why |
 |-----|-----|
+| [`37_WORLD_CLASS_BNN_OPTIMISER_ROADMAP.md`](37_WORLD_CLASS_BNN_OPTIMISER_ROADMAP.md) | Canonical world-class plan (twin of root `ROADMAP.md`) |
+| [`38_ROADMAP_EXECUTION_LOG.md`](38_ROADMAP_EXECUTION_LOG.md) | Session execution log |
+| [`SEMVER_AND_DEPRECATION.md`](SEMVER_AND_DEPRECATION.md) | Public API semver policy |
+| [`adr/README.md`](adr/README.md) | Architecture Decision Records |
+| [`DATASET_CARDS.md`](DATASET_CARDS.md) | MNIST / CIFAR / synth audio cards |
+| [`COMPATIBILITY_MATRIX.md`](COMPATIBILITY_MATRIX.md) | OS × Python × torch matrix |
 | [`36_ENCODER_DECODER_AND_NEXT.md`](36_ENCODER_DECODER_AND_NEXT.md) | Encoder/Decoder, `.bnnpack` codec, wrap-transformer, profile, bridges |
 
 ## Research & architecture (read order)

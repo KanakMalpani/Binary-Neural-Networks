@@ -7,6 +7,7 @@ Version: `import bnn; print(bnn.__version__)` · CLI: `bnn --version`
 
 | Symbol | Role |
 |--------|------|
+| `optimise_model`, `OptimiseConfig`, `OptimiseResult` | **Preferred** optimiser API |
 | `BinaryLinear`, `BinaryConv2d`, `BiRealBlock`, `TernaryLinear` | STE training layers |
 | `binary_sign`, `ternary_weight`, `clip_weights_` | Estimators / clip |
 | `build_model`, `count_parameters` | MNIST zoo |
@@ -18,9 +19,15 @@ Version: `import bnn; print(bnn.__version__)` · CLI: `bnn --version`
 ```python
 import bnn
 from bnn import BinaryLinear, wrap_model, set_repro_seed
+from bnn.optimise import optimise_model, OptimiseConfig
 
 set_repro_seed(0, deterministic=True, force_cpu=True)
 ```
+
+CLI: `bnn optimise` · schema `bnn_optimise_report_v1` (`bnn.wrap.schema`).
+
+Semver / deprecation: [`docs/SEMVER_AND_DEPRECATION.md`](../SEMVER_AND_DEPRECATION.md) ·
+ADR: [`docs/adr/0001_public_optimiser_api.md`](../adr/0001_public_optimiser_api.md).
 
 ## Kernels (`bnn.kernels`)
 
