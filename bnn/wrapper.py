@@ -370,3 +370,127 @@ def model_param_bytes(model: nn.Module) -> dict:
     p_bytes = sum(p.numel() * p.element_size() for p in model.parameters())
     b_bytes = sum(b.numel() * b.element_size() for b in model.buffers())
     return {"param_bytes": p_bytes, "buffer_bytes": b_bytes, "total_bytes": p_bytes + b_bytes}
+
+
+class PackedBinaryConv2d(nn.Module):
+    """Inference Conv2d with packed ±1 weights (size win).
+
+    Forward uses dequant + ``F.conv2d`` — there is **no** native binary-conv DLL
+    yet (unlike Linear XNOR GEMM). Honest: compression is real; speed is not a
+    32× claim. Prefer wrapping large Linear/FFN for CPU speedups.
+    """
+
+    def __init__(
+        self,
+        weight: Tensor,
+        bias: Tensor | None = None,
+        *,
+        stride: int = 1,
+        padding: int = 0,
+        alpha: Tensor | None = None,
+    ):
+        super().__init__()
+        out_c, in_c, kh, kw = weight.shape
+        self.in_channels = in_c
+        self.out_channels = out_c
+        self.kernel_size = (kh, kw)
+        self.stride = stride
+        self.padding = padding
+        w_pm1 = sign_pm1(weight.detach().float().cpu()).numpy().astype(np.float32)
+        flat = w_pm1.reshape(out_c, -1)
+        packed, n = pack_binary_pm1(flat, axis=1)
+        self._n = n
+        self._wp_np = np.ascontiguousarray(packed)
+        self.register_buffer("weight_pm1", torch.from_numpy(w_pm1))
+        if alpha is None:
+            a = weight.detach().abs().mean(dim=(1, 2, 3)).clamp(min=1e-4).float().cpu()
+        else:
+            a = alpha.detach().float().reshape(-1).cpu()
+            if a.numel() == 1:
+                a = a.expand(out_c)
+        self.register_buffer("alpha", a.contiguous().clone())
+        if bias is not None:
+            self.register_buffer("bias", bias.detach().float().cpu().clone())
+        else:
+            self.bias = None  # type: ignore[assignment]
+
+    def extra_repr(self) -> str:
+        return (
+            f"in={self.in_channels}, out={self.out_channels}, "
+            f"k={self.kernel_size}, mode=binary_conv_packed_dequant"
+        )
+
+    def forward(self, x: Tensor) -> Tensor:
+        w = self.weight_pm1.to(x.device) * self.alpha.view(-1, 1, 1, 1).to(x.device)
+        # Sign activations for binary-act inference (matches BinaryConv2d sim)
+        x_b = torch.where(x > 0, torch.ones_like(x), -torch.ones_like(x))
+        return F.conv2d(
+            x_b,
+            w,
+            None if self.bias is None else self.bias.to(x.device),
+            stride=self.stride,
+            padding=self.padding,
+        )
+
+    def packed_weight_bytes(self) -> int:
+        return int(self._wp_np.nbytes)
+
+
+def wrap_conv_modules(
+    model: nn.Module,
+    *,
+    skip_name_substr: Iterable[str] = ("stem", "head", "skip"),
+    min_weight_elems: int = 256,
+    inplace: bool = True,
+) -> tuple[nn.Module, WrapReport]:
+    """Replace ``nn.Conv2d`` / ``BinaryConv2d`` with packed-weight ``PackedBinaryConv2d``.
+
+    Compression is real (~32× on weights). Speed is **not** claimed — forward is
+    dequant + FP conv. Use for size demos / export; Linear wrap for CPU speed.
+    """
+    from .layers import BinaryConv2d  # local import avoids cycle at module load
+
+    report = WrapReport(mode="binary_xnor", native_kernel=False)
+    to_replace: list[tuple[str, nn.Module]] = []
+    for name, mod in model.named_modules():
+        if isinstance(mod, BinaryConv2d):
+            pass
+        elif isinstance(mod, nn.Conv2d) and mod.groups == 1:
+            pass
+        else:
+            continue
+        if _should_skip(name, skip_name_substr):
+            report.skipped.append(f"{name} (skip list)")
+            continue
+        w = mod.weight
+        if w.numel() < min_weight_elems:
+            report.skipped.append(f"{name} (too small)")
+            continue
+        to_replace.append((name, mod))
+
+    def _set_module(root: nn.Module, path: str, new: nn.Module) -> None:
+        parts = path.split(".")
+        parent = root
+        for p in parts[:-1]:
+            parent = getattr(parent, p)
+        setattr(parent, parts[-1], new)
+
+    for name, mod in to_replace:
+        w = mod.weight.data
+        b = mod.bias.data if getattr(mod, "bias", None) is not None else None
+        stride = getattr(mod, "stride", 1)
+        padding = getattr(mod, "padding", 0)
+        if isinstance(stride, tuple):
+            stride = stride[0]
+        if isinstance(padding, tuple):
+            padding = padding[0]
+        alpha = getattr(mod, "alpha", None)
+        if alpha is not None:
+            alpha = alpha.detach().reshape(-1)
+        new = PackedBinaryConv2d(w, b, stride=stride, padding=padding, alpha=alpha)
+        report.replaced.append(name)
+        report.fp32_weight_bytes_replaced += int(w.numel() * 4)
+        report.packed_weight_bytes += new.packed_weight_bytes()
+        if inplace:
+            _set_module(model, name, new)
+    return model, report

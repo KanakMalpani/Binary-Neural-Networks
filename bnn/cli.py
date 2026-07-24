@@ -60,6 +60,48 @@ def cmd_train_cifar(args: argparse.Namespace) -> int:
     return _run_script("train_cifar10_proxy.py", extra)
 
 
+def cmd_train_image(args: argparse.Namespace) -> int:
+    extra = [
+        "--epochs",
+        str(args.epochs),
+        "--train-subset",
+        str(args.subset),
+        "--batch-size",
+        str(args.batch_size),
+        "--channels",
+        str(args.channels),
+    ]
+    if args.approx_sign:
+        extra.append("--approx-sign")
+    if args.include_vit:
+        extra.append("--include-vit")
+    if args.out:
+        extra += ["--out", str(args.out)]
+    return _run_script("train_image.py", extra)
+
+
+def cmd_train_audio(args: argparse.Namespace) -> int:
+    extra = [
+        "--epochs",
+        str(args.epochs),
+        "--batch-size",
+        str(args.batch_size),
+        "--n-train",
+        str(args.n_train),
+        "--n-test",
+        str(args.n_test),
+        "--n-classes",
+        str(args.n_classes),
+        "--channels",
+        str(args.channels),
+    ]
+    if args.approx_sign:
+        extra.append("--approx-sign")
+    if args.out:
+        extra += ["--out", str(args.out)]
+    return _run_script("train_audio.py", extra)
+
+
 def cmd_wrap(args: argparse.Namespace) -> int:
     extra = [
         "--mode",
@@ -120,11 +162,32 @@ def build_parser() -> argparse.ArgumentParser:
     t.add_argument("--threads", type=int, default=None)
     t.set_defaults(func=cmd_train)
 
-    c = sub.add_parser("train-cifar", help="CIFAR-10 Bi-Real proxy")
+    c = sub.add_parser("train-cifar", help="CIFAR-10 Bi-Real proxy (legacy script)")
     c.add_argument("--epochs", type=int, default=5)
     c.add_argument("--subset", type=int, default=20000)
     c.add_argument("--batch-size", type=int, default=128)
     c.set_defaults(func=cmd_train_cifar)
+
+    img = sub.add_parser("train-image", help="Image lane: CIFAR-10 FP vs Bi-Real (+ optional ViT)")
+    img.add_argument("--epochs", type=int, default=8)
+    img.add_argument("--subset", type=int, default=30000, help="0 = full 50k")
+    img.add_argument("--batch-size", type=int, default=128)
+    img.add_argument("--channels", type=int, default=64)
+    img.add_argument("--approx-sign", action="store_true")
+    img.add_argument("--include-vit", action="store_true")
+    img.add_argument("--out", type=Path, default=None)
+    img.set_defaults(func=cmd_train_image)
+
+    aud = sub.add_parser("train-audio", help="Audio lane: synthetic tone spectrograms FP vs binary")
+    aud.add_argument("--epochs", type=int, default=5)
+    aud.add_argument("--batch-size", type=int, default=64)
+    aud.add_argument("--n-train", type=int, default=800)
+    aud.add_argument("--n-test", type=int, default=200)
+    aud.add_argument("--n-classes", type=int, default=8)
+    aud.add_argument("--channels", type=int, default=32)
+    aud.add_argument("--approx-sign", action="store_true")
+    aud.add_argument("--out", type=Path, default=None)
+    aud.set_defaults(func=cmd_train_audio)
 
     w = sub.add_parser("wrap", help="Wrap demo MLP with packed Linears")
     w.add_argument(
