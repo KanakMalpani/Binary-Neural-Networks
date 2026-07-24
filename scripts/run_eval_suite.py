@@ -39,13 +39,29 @@ def main() -> int:
         steps.append(
             [
                 sys.executable,
-                "scripts/train_cifar10_proxy.py",
+                "scripts/train_image.py",
                 "--epochs",
                 "1",
                 "--train-subset",
                 "2000",
                 "--channels",
                 "32",
+            ]
+        )
+        steps.append(
+            [
+                sys.executable,
+                "scripts/train_audio.py",
+                "--epochs",
+                "1",
+                "--n-train",
+                "64",
+                "--n-test",
+                "32",
+                "--n-classes",
+                "4",
+                "--channels",
+                "16",
             ]
         )
 

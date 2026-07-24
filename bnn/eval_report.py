@@ -112,18 +112,50 @@ def render_summary(results_dir: Path | None = None) -> str:
     else:
         lines.append("_No train_results.json — run `bnn train`._")
 
-    lines += ["", "## CIFAR-10 proxy", ""]
-    if cifar:
-        cres = cifar.get("results") or []
-        fp = next((r for r in cres if "fp32" in r.get("model", "")), None)
-        bn = next((r for r in cres if "binary" in r.get("model", "")), None)
+    image = _load("image_cifar.json") or cifar
+    audio = _load("audio_synth.json") or {}
+
+    lines += ["", "## Image (CIFAR-10 Bi-Real)", ""]
+    if image:
+        cres = image.get("results") or []
+        fp = next((r for r in cres if "fp32" in str(r.get("model", "")).lower()), None)
+        bn = next(
+            (
+                r
+                for r in cres
+                if "binary" in str(r.get("model", "")).lower()
+                and "vit" not in str(r.get("model", "")).lower()
+            ),
+            None,
+        )
         if fp and bn:
-            lines.append(f"- FP32: **{fp['test_acc']:.2f}%**")
+            lines.append(f"- FP32 CNN: **{fp['test_acc']:.2f}%**")
             lines.append(f"- Binary Bi-Real: **{bn['test_acc']:.2f}%**")
-            lines.append(f"- Gap: **{cifar.get('acc_gap_pp', fp['test_acc']-bn['test_acc']):.2f} pp**")
-        lines.append("Source: `cifar10_proxy.json`.")
+            gap = image.get("acc_gap_pp_fp_vs_binary_cnn", image.get("acc_gap_pp"))
+            if gap is None:
+                gap = fp["test_acc"] - bn["test_acc"]
+            lines.append(f"- Gap: **{gap:.2f} pp**")
+        src = "image_cifar.json" if (_load("image_cifar.json")) else "cifar10_proxy.json"
+        lines.append(f"Source: `{src}`. Tutorial: `docs/tutorials/04_image_cifar.md`.")
     else:
-        lines.append("_No cifar10_proxy.json — run `bnn train-cifar`._")
+        lines.append("_No image results — run `bnn train-image`._")
+
+    lines += ["", "## Audio (synthetic tones)", ""]
+    if audio:
+        ares = audio.get("results") or []
+        fp = next((r for r in ares if "fp32" in str(r.get("model", "")).lower()), None)
+        bn = next((r for r in ares if "binary" in str(r.get("model", "")).lower()), None)
+        if fp and bn:
+            lines.append(f"- FP32 CNN: **{fp['test_acc']:.2f}%**")
+            lines.append(f"- Binary CNN: **{bn['test_acc']:.2f}%**")
+            lines.append(f"- Gap: **{audio.get('acc_gap_pp', fp['test_acc']-bn['test_acc']):.2f} pp**")
+        lines.append(
+            "Source: `audio_synth.json`. "
+            "**Not production ASR** — INT8 Whisper/ORT for real speech. "
+            "Tutorial: `docs/tutorials/05_audio.md`."
+        )
+    else:
+        lines.append("_No audio_synth.json — run `bnn train-audio`._")
 
     lines += ["", "## Wrap / energy / robustness", ""]
     if wrap:
@@ -152,7 +184,9 @@ def render_summary(results_dir: Path | None = None) -> str:
         "",
         "Do not advertise \\(R_{arith}\\) as wall-clock.",
         "",
-        "Gap closure: `docs/19_GAP_CLOSURE_REPORT.md`. Completion: `docs/22_COMPLETION_REPORT.md`.",
+        "Gap closure: `docs/19_GAP_CLOSURE_REPORT.md`. "
+        "Image+audio: `docs/23_IMAGE_AUDIO_COMPLETION.md`. "
+        "Final: `docs/24_FINAL_COMPLETION.md`.",
         "",
     ]
     return "\n".join(lines)
