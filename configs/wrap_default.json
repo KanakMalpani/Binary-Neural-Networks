@@ -1,0 +1,16 @@
+{
+  "policy": "hybrid_ffn",
+  "mode": "binary_xnor",
+  "min_in_features": 64,
+  "skip_name_substr": [
+    "embed",
+    "attn",
+    "lm_head",
+    "classifier",
+    "stem",
+    "head",
+    "norm",
+    "qkv"
+  ],
+  "note": "Keep embed/attn/head FP; wrap FFN Linears only. PTQ without QAT will hurt quality."
+}

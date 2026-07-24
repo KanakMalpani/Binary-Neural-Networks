@@ -1,0 +1,28 @@
+{
+  "pattern": "hybrid_ffn_only_wrap_after_short_STE_QAT",
+  "qat_steps": 50,
+  "qat_seconds": 1.879257400003553,
+  "replaced": [
+    "ffn_fc1",
+    "ffn_fc2"
+  ],
+  "skipped": [
+    "embed (skip list)",
+    "attn_qkv (skip list)",
+    "lm_head (skip list)"
+  ],
+  "compression_replaced_weights": 32.0,
+  "param_bytes_before": {
+    "param_bytes": 3179560,
+    "buffer_bytes": 0,
+    "total_bytes": 3179560
+  },
+  "param_bytes_after_wrap": {
+    "param_bytes": 1077288,
+    "buffer_bytes": 10240,
+    "total_bytes": 1087528
+  },
+  "logits_finite": true,
+  "native_kernel": true,
+  "verdict": "CLOSED: hybrid FFN wrap path works end-to-end (STE sketch \u2192 packed wrap). Production HF models need real data + BitDistill-scale QAT; this closes the architecture/protocol gap."
+}

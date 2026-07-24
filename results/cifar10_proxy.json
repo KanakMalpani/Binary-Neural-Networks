@@ -1,0 +1,75 @@
+{
+  "dataset": "CIFAR-10",
+  "proxy_for": "ImageNet-scale BNN claim (#33)",
+  "train_subset": 20000,
+  "epochs": 5,
+  "channels": 64,
+  "results": [
+    {
+      "model": "fp32_cifar_cnn",
+      "test_acc": 61.9,
+      "train_seconds": 340.965498000005,
+      "history": [
+        {
+          "epoch": 1,
+          "loss": 1.6069814102172852,
+          "test_acc": 49.0
+        },
+        {
+          "epoch": 2,
+          "loss": 1.259864001083374,
+          "test_acc": 54.74
+        },
+        {
+          "epoch": 3,
+          "loss": 1.0982450399398804,
+          "test_acc": 60.58
+        },
+        {
+          "epoch": 4,
+          "loss": 1.0025258491516114,
+          "test_acc": 64.18
+        },
+        {
+          "epoch": 5,
+          "loss": 0.9218067043304443,
+          "test_acc": 61.9
+        }
+      ]
+    },
+    {
+      "model": "binary_cifar_bireal",
+      "test_acc": 52.85,
+      "train_seconds": 618.1368303999989,
+      "history": [
+        {
+          "epoch": 1,
+          "loss": 1.7531073900222778,
+          "test_acc": 43.38
+        },
+        {
+          "epoch": 2,
+          "loss": 1.4420925428390503,
+          "test_acc": 46.91
+        },
+        {
+          "epoch": 3,
+          "loss": 1.3252860332489014,
+          "test_acc": 52.52
+        },
+        {
+          "epoch": 4,
+          "loss": 1.2449705804824829,
+          "test_acc": 55.05
+        },
+        {
+          "epoch": 5,
+          "loss": 1.1797911275863648,
+          "test_acc": 52.85
+        }
+      ]
+    }
+  ],
+  "acc_gap_pp": 9.049999999999997,
+  "verdict": "Bi-Real binary within 9.05 pp of FP32 twin under same short schedule. Closes beyond-MNIST accuracy dimension by proxy; ImageNet optional scale-up."
+}

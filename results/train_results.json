@@ -1,0 +1,172 @@
+[
+  {
+    "model": "fp32_mlp",
+    "device": "cpu",
+    "epochs": 3,
+    "test_acc": 97.67,
+    "train_seconds": 8.446312599997327,
+    "sim_infer_batch_seconds": 0.002477874999931373,
+    "sim_images_per_sec": 206628.66367923334,
+    "params": {
+      "total_params": 671754,
+      "binary_or_ternary_weight_params": 0,
+      "fp_params": 671754,
+      "theoretical_weight_bytes_if_packed": 2687016,
+      "fp32_weight_bytes": 2687016
+    },
+    "history": [
+      {
+        "epoch": 1,
+        "train_loss": 0.1731552253762881,
+        "test_acc": 97.13
+      },
+      {
+        "epoch": 2,
+        "train_loss": 0.07019764465590318,
+        "test_acc": 97.58
+      },
+      {
+        "epoch": 3,
+        "train_loss": 0.045971369529763856,
+        "test_acc": 97.67
+      }
+    ],
+    "checkpoint": "C:\\Users\\mrkan\\CRAZZY\\Binary Neural Network\\checkpoints\\fp32_mlp.pt"
+  },
+  {
+    "model": "binary_mlp",
+    "device": "cpu",
+    "epochs": 3,
+    "test_acc": 96.36,
+    "train_seconds": 14.15038949999871,
+    "sim_infer_batch_seconds": 0.0047512200000710434,
+    "sim_images_per_sec": 107761.79591606876,
+    "params": {
+      "total_params": 935434,
+      "binary_or_ternary_weight_params": 524288,
+      "fp_params": 411146,
+      "theoretical_weight_bytes_if_packed": 1710120,
+      "fp32_weight_bytes": 3741736
+    },
+    "history": [
+      {
+        "epoch": 1,
+        "train_loss": 0.2443917746424675,
+        "test_acc": 95.25
+      },
+      {
+        "epoch": 2,
+        "train_loss": 0.12458701075116793,
+        "test_acc": 96.66
+      },
+      {
+        "epoch": 3,
+        "train_loss": 0.08914933913548788,
+        "test_acc": 96.36
+      }
+    ],
+    "checkpoint": "C:\\Users\\mrkan\\CRAZZY\\Binary Neural Network\\checkpoints\\binary_mlp.pt"
+  },
+  {
+    "model": "ternary_mlp",
+    "device": "cpu",
+    "epochs": 3,
+    "test_acc": 97.16,
+    "train_seconds": 13.488951700001053,
+    "sim_infer_batch_seconds": 0.004051795000123093,
+    "sim_images_per_sec": 126363.74742168483,
+    "params": {
+      "total_params": 934410,
+      "binary_or_ternary_weight_params": 524288,
+      "fp_params": 410122,
+      "theoretical_weight_bytes_if_packed": 1706024,
+      "fp32_weight_bytes": 3737640
+    },
+    "history": [
+      {
+        "epoch": 1,
+        "train_loss": 0.17767842568159103,
+        "test_acc": 96.81
+      },
+      {
+        "epoch": 2,
+        "train_loss": 0.0744523234128952,
+        "test_acc": 97.47
+      },
+      {
+        "epoch": 3,
+        "train_loss": 0.05116106420556704,
+        "test_acc": 97.16
+      }
+    ],
+    "checkpoint": "C:\\Users\\mrkan\\CRAZZY\\Binary Neural Network\\checkpoints\\ternary_mlp.pt"
+  },
+  {
+    "model": "fp32_cnn",
+    "device": "cpu",
+    "epochs": 3,
+    "test_acc": 96.61,
+    "train_seconds": 115.50288759999967,
+    "sim_infer_batch_seconds": 0.07876986500014027,
+    "sim_images_per_sec": 6499.94766398404,
+    "params": {
+      "total_params": 28842,
+      "binary_or_ternary_weight_params": 0,
+      "fp_params": 28842,
+      "theoretical_weight_bytes_if_packed": 115368,
+      "fp32_weight_bytes": 115368
+    },
+    "history": [
+      {
+        "epoch": 1,
+        "train_loss": 1.0247379817485809,
+        "test_acc": 93.41
+      },
+      {
+        "epoch": 2,
+        "train_loss": 0.2709697497288386,
+        "test_acc": 95.33
+      },
+      {
+        "epoch": 3,
+        "train_loss": 0.16865378954410554,
+        "test_acc": 96.61
+      }
+    ],
+    "checkpoint": "C:\\Users\\mrkan\\CRAZZY\\Binary Neural Network\\checkpoints\\fp32_cnn.pt"
+  },
+  {
+    "model": "binary_cnn",
+    "device": "cpu",
+    "epochs": 3,
+    "test_acc": 94.79,
+    "train_seconds": 238.68446949999998,
+    "sim_infer_batch_seconds": 0.22409541500001068,
+    "sim_images_per_sec": 2284.7410778126614,
+    "params": {
+      "total_params": 77354,
+      "binary_or_ternary_weight_params": 73728,
+      "fp_params": 3626,
+      "theoretical_weight_bytes_if_packed": 23720,
+      "fp32_weight_bytes": 309416
+    },
+    "history": [
+      {
+        "epoch": 1,
+        "train_loss": 0.7530208275953929,
+        "test_acc": 89.53
+      },
+      {
+        "epoch": 2,
+        "train_loss": 0.23467606295744578,
+        "test_acc": 88.14
+      },
+      {
+        "epoch": 3,
+        "train_loss": 0.17487779835065206,
+        "test_acc": 94.79
+      }
+    ],
+    "checkpoint": "C:\\Users\\mrkan\\CRAZZY\\Binary Neural Network\\checkpoints\\binary_cnn.pt"
+  }
+]

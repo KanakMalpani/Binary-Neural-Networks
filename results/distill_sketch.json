@@ -1,0 +1,5 @@
+{
+  "protocol": "toy KD FP\u2192binary MLP MNIST sketch",
+  "student_acc_partial_test": 89.13,
+  "note": "Closes distill *protocol* gap; not BitDistill reproduction."
+}

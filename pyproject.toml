@@ -1,0 +1,41 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "bnn"
+version = "0.1.0"
+description = "Extreme low-bit inference lab: packed binary/ternary CPU kernels + STE training"
+readme = "README.md"
+requires-python = ">=3.11"
+license = { text = "MIT" }
+authors = [{ name = "Binary Neural Network Lab" }]
+dependencies = [
+  "torch>=2.1",
+  "numpy>=1.24",
+]
+
+[project.optional-dependencies]
+dev = ["pytest>=7.4", "pytest-timeout>=2.2"]
+hf = ["transformers>=4.40", "datasets>=2.18", "huggingface_hub>=0.22"]
+all = ["bnn[dev,hf]"]
+
+[project.scripts]
+bnn = "bnn.cli:main"
+
+[project.urls]
+Homepage = "https://github.com/local/binary-neural-network"
+Documentation = "docs/21_E2E_ROADMAP_COMPLETE_REPO.md"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["bnn*"]
+
+[tool.setuptools.package-data]
+bnn = ["kernels/*.c", "kernels/*.py"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["."]
+addopts = "-q"
+filterwarnings = ["ignore::DeprecationWarning"]

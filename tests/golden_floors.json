@@ -1,0 +1,11 @@
+{
+  "native_err_max": 0.0,
+  "compression_min": 30.0,
+  "compression_target": 32.0,
+  "speedup_vs_numpy_min_n4096": 2.0,
+  "speedup_vs_numpy_floor_4096_recorded": 3.0,
+  "mnist_binary_mlp_min_acc": 95.0,
+  "mnist_fp_for_gate": 97.0,
+  "mnist_gap_max_pp": 3.0,
+  "notes": "Floors from docs/21 Done Definition + results/ golden run"
+}

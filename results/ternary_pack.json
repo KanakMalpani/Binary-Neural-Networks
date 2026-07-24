@@ -1,0 +1,12 @@
+{
+  "shape": [
+    1024,
+    4096
+  ],
+  "pack_roundtrip_errors": 0,
+  "fp32_weight_bytes": 16777216,
+  "ternary_2bit_bytes": 1048576,
+  "compression_vs_fp32": 16.0,
+  "dequant_gemm_max_err": 0.0,
+  "note": "CLOSED ternary pack path: 2-bit store + unpack verified. Inference speed still requires a dedicated ternary/bitnet kernel (this path alone = size win; dequant GEMM is not faster)."
+}

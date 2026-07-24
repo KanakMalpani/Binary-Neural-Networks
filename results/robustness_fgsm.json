@@ -1,0 +1,20 @@
+{
+  "protocol": "FGSM Linf on MNIST (quick 2-epoch models)",
+  "results": [
+    {
+      "model": "fp32_mlp",
+      "clean_acc": 97.08,
+      "fgsm_acc": 62.99,
+      "drop_pp": 34.09,
+      "eps": 0.1
+    },
+    {
+      "model": "binary_mlp",
+      "clean_acc": 95.96,
+      "fgsm_acc": 60.38,
+      "drop_pp": 35.58,
+      "eps": 0.1
+    }
+  ],
+  "note": "CLOSED-BY-PROXY: both degrade under FGSM; binary drop measurable. Not a full robustness paper."
+}

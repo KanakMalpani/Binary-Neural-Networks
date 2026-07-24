@@ -1,0 +1,89 @@
+{
+  "device_note": "CPU; weights pre-packed (inference). Native MSVC popcount when available.",
+  "results": [
+    {
+      "shape": {
+        "batch": 128,
+        "in_features": 2048,
+        "out_features": 2048
+      },
+      "native_kernel": true,
+      "max_abs_error_vs_fp32": 0.0,
+      "seconds": {
+        "numpy_fp32_gemm": 0.03356980000050195,
+        "binary_compute_only_prepacked": 0.00553573333309032,
+        "binary_e2e_with_act_pack": 0.007907699999729326,
+        "torch_fp32_linear": 0.005197766666242387,
+        "torch_fake_binary_sign_linear": 0.007671100000152364
+      },
+      "speedup_compute_vs_numpy_fp32": 6.064201069772562,
+      "speedup_e2e_vs_numpy_fp32": 4.245204041839096,
+      "speedup_compute_vs_torch_fp32": 0.9389481670246455,
+      "fake_binary_vs_torch_fp32": 1.475845395287438,
+      "theoretical": {
+        "fp32_macs": 536870912,
+        "binary_word_xnor_popcount": 8388608,
+        "theoretical_word_reduction": 64.0,
+        "weight_bytes_fp32": 16777216,
+        "weight_bytes_binary": 524288,
+        "weight_compression": 32.0
+      }
+    },
+    {
+      "shape": {
+        "batch": 64,
+        "in_features": 4096,
+        "out_features": 4096
+      },
+      "native_kernel": true,
+      "max_abs_error_vs_fp32": 0.0,
+      "seconds": {
+        "numpy_fp32_gemm": 0.026827066666252602,
+        "binary_compute_only_prepacked": 0.012510466665844433,
+        "binary_e2e_with_act_pack": 0.01164513333545377,
+        "torch_fp32_linear": 0.013229366665958272,
+        "torch_fake_binary_sign_linear": 0.02407823333245081
+      },
+      "speedup_compute_vs_numpy_fp32": 2.144369781144517,
+      "speedup_e2e_vs_numpy_fp32": 2.3037148561087943,
+      "speedup_compute_vs_torch_fp32": 1.0574638835876964,
+      "fake_binary_vs_torch_fp32": 1.8200594133057615,
+      "theoretical": {
+        "fp32_macs": 1073741824,
+        "binary_word_xnor_popcount": 16777216,
+        "theoretical_word_reduction": 64.0,
+        "weight_bytes_fp32": 67108864,
+        "weight_bytes_binary": 2097152,
+        "weight_compression": 32.0
+      }
+    },
+    {
+      "shape": {
+        "batch": 32,
+        "in_features": 8192,
+        "out_features": 8192
+      },
+      "native_kernel": true,
+      "max_abs_error_vs_fp32": 0.0,
+      "seconds": {
+        "numpy_fp32_gemm": 0.11951966666674707,
+        "binary_compute_only_prepacked": 0.02132016666776811,
+        "binary_e2e_with_act_pack": 0.023068333333261155,
+        "torch_fp32_linear": 0.06097963333255999,
+        "torch_fake_binary_sign_linear": 0.0919881999992261
+      },
+      "speedup_compute_vs_numpy_fp32": 5.605944293457952,
+      "speedup_e2e_vs_numpy_fp32": 5.1811140813722005,
+      "speedup_compute_vs_torch_fp32": 2.860185583105651,
+      "fake_binary_vs_torch_fp32": 1.5085069386619143,
+      "theoretical": {
+        "fp32_macs": 2147483648,
+        "binary_word_xnor_popcount": 33554432,
+        "theoretical_word_reduction": 64.0,
+        "weight_bytes_fp32": 268435456,
+        "weight_bytes_binary": 8388608,
+        "weight_compression": 32.0
+      }
+    }
+  ]
+}

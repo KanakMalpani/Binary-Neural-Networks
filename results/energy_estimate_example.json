@@ -1,0 +1,9 @@
+{
+  "latency_s": 0.0126,
+  "power_w": 25.0,
+  "energy_j": 0.315,
+  "energy_mj": 315.0,
+  "baseline_energy_j": 0.7385,
+  "energy_reduction_factor": 2.3444444444444446,
+  "note": "If binary lowers both P and t, E drops multiplicatively. BitNet.cpp reports ~55\u201382% energy reduction on CPU (literature)."
+}
