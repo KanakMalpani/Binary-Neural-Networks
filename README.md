@@ -8,6 +8,7 @@ kernels — *not* `sign()` in PyTorch pretending to be 32× on GPU.
 |--|--|
 | **Reproduce** | [`REPRODUCIBILITY.md`](REPRODUCIBILITY.md) · `bnn repro` |
 | **AI agents** | [`AGENTS.md`](AGENTS.md) |
+| **Roadmap (when lost)** | [`ROADMAP.md`](ROADMAP.md) · [`docs/37_…`](docs/37_WORLD_CLASS_BNN_OPTIMISER_ROADMAP.md) |
 | **Docs index** | [`docs/README.md`](docs/README.md) |
 | **One-pager** | [`docs/25_ONEPAGER.md`](docs/25_ONEPAGER.md) |
 
@@ -159,5 +160,6 @@ CLI: `bnn --help` · `bnn --version` · `python -m bnn repro`
 ## Contributing & quality
 
 - [`CONTRIBUTING.md`](CONTRIBUTING.md) · [`CHANGELOG.md`](CHANGELOG.md)
+- **World-class optimiser plan:** [`ROADMAP.md`](ROADMAP.md) (Phases A→F; workstreams W1–W14)
 - [`docs/31_QUALITY_UPGRADE.md`](docs/31_QUALITY_UPGRADE.md)
 - CI: Windows + Linux (`.github/workflows/ci.yml`) — pytest, export-check, repro gates

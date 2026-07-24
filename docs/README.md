@@ -44,12 +44,14 @@ Start here if you are new to the repo.
 
 | Doc | Content |
 |-----|---------|
-| [`21_E2E_ROADMAP_COMPLETE_REPO.md`](21_E2E_ROADMAP_COMPLETE_REPO.md) | Master E2E plan |
+| [`../ROADMAP.md`](../ROADMAP.md) | **Canonical** world-class BNN optimiser plan (follow when lost) |
+| [`37_WORLD_CLASS_BNN_OPTIMISER_ROADMAP.md`](37_WORLD_CLASS_BNN_OPTIMISER_ROADMAP.md) | Identical twin of root `ROADMAP.md` |
+| [`21_E2E_ROADMAP_COMPLETE_REPO.md`](21_E2E_ROADMAP_COMPLETE_REPO.md) | Historical lab COMPLETE (D1–D12); superseded for forward work |
 | [`22_COMPLETION_REPORT.md`](22_COMPLETION_REPORT.md) | D1–D12 evidence |
 | [`28_IMAGE_AUDIO_COMPLETION.md`](28_IMAGE_AUDIO_COMPLETION.md) | Vision + audio gates |
 | [`29_FINAL_COMPLETION.md`](29_FINAL_COMPLETION.md) | Final done criteria |
 | [`30_REPRO_FOR_OTHER_AIS.md`](30_REPRO_FOR_OTHER_AIS.md) | Third-party repro note |
-| [`../ROADMAP.md`](../ROADMAP.md) | Root roadmap pointer |
+| [`10_ROADMAP.md`](10_ROADMAP.md) | Thin pointer → root `ROADMAP.md` |
 
 ## Ecosystem bridges
 

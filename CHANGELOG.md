@@ -2,6 +2,13 @@
 
 ## Unreleased
 
+### World-class optimiser roadmap
+
+- **Canonical plan:** root `ROADMAP.md` + twin `docs/37_WORLD_CLASS_BNN_OPTIMISER_ROADMAP.md`
+  (audit scorecard, W1–W14 workstreams, phases A–F, agent protocol).
+- Pointers updated: `docs/21` (historical COMPLETE), `docs/10`, README, `docs/README`,
+  `CONTRIBUTING`, `AGENTS.md`.
+
 ### Encoder / Decoder + codec (next lane)
 
 - **Seq models:** `bnn.seq` — Binary Transformer Encoder/Decoder, Seq2Seq reverse

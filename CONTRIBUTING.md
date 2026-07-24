@@ -38,5 +38,8 @@ Add a bullet under `## Unreleased` in [`CHANGELOG.md`](CHANGELOG.md).
 
 ## Roadmap tasks
 
-Optional: pick an unchecked item from [`docs/21_E2E_ROADMAP_COMPLETE_REPO.md`](docs/21_E2E_ROADMAP_COMPLETE_REPO.md)
-with dependencies met; mark `[x]` when done.
+Pick an unchecked item from the canonical plan — [`ROADMAP.md`](ROADMAP.md)
+(twin: [`docs/37_WORLD_CLASS_BNN_OPTIMISER_ROADMAP.md`](docs/37_WORLD_CLASS_BNN_OPTIMISER_ROADMAP.md)) —
+with dependencies met; mark `[x]` when done (keep both files identical).
+
+Historical lab COMPLETE checklist: [`docs/21_E2E_ROADMAP_COMPLETE_REPO.md`](docs/21_E2E_ROADMAP_COMPLETE_REPO.md).

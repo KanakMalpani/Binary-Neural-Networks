@@ -18,6 +18,7 @@ You are reproducing or extending **Binary Neural Networks**
 8. Read `REPRODUCIBILITY.md` for hardware notes and full regen.
 9. **Thesis lock:** do not claim GPU 32× from `sign()`; packed CPU kernels + honest STE sim.
 10. Do **not** commit `data/` datasets or force-push.
+11. **When lost on product direction:** read root [`ROADMAP.md`](ROADMAP.md) (§0 → §7 → current phase → lowest unchecked TODO). Do not invent alternate benches.
 
 ## Modes
 

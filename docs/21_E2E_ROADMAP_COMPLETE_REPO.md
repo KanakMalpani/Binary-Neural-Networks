@@ -1,13 +1,17 @@
 # E2E Roadmap — Complete Repository
 
-**Canonical master plan** for finishing this repo relative to the perfected thesis.  
-**Supersedes** the thin checklist in `docs/10_ROADMAP.md` (that file now points here).  
+> **Superseded for forward execution (world-class optimiser phase).**  
+> Agents: follow **[`ROADMAP.md`](../ROADMAP.md)** / [`37_WORLD_CLASS_BNN_OPTIMISER_ROADMAP.md`](37_WORLD_CLASS_BNN_OPTIMISER_ROADMAP.md).  
+> This file remains the **historical** lab COMPLETE plan (D1–D12 / P0–P6). Do not treat unchecked P7 stretch items here as the primary backlog.
+
+**Historical master plan** for finishing the *lab* relative to the perfected thesis.  
+**Supersedes** the thin checklist in `docs/10_ROADMAP.md` for the COMPLETE-lab era; **`docs/10` now points at `ROADMAP.md` / `docs/37`**.  
 **Aligns with:** `docs/05`, `07`, `08`, `09`, `18`, `19`, `00`.
 
 | Field | Value |
 |-------|-------|
 | Created | 2026-07-23 |
-| Status | Active execution plan |
+| Status | **COMPLETE (lab)** — archived execution plan; forward work → root `ROADMAP.md` |
 | Science gaps | **0 material OPEN** (`docs/09`, `docs/19`) — do not reopen as blockers |
 | Thesis lock | Extreme low-bit **inference** on **CPU/edge** with **real** packed kernels |
 
@@ -643,4 +647,5 @@ bnn eval-suite --skip-pytest
 
 ---
 
-*End of master E2E roadmap. Repo COMPLETE per D1–D12 (`docs/22_COMPLETION_REPORT.md`).*
+*End of historical E2E lab roadmap. Repo COMPLETE per D1–D12 (`docs/22_COMPLETION_REPORT.md`).  
+**Forward work:** root [`ROADMAP.md`](../ROADMAP.md) / [`docs/37_WORLD_CLASS_BNN_OPTIMISER_ROADMAP.md`](37_WORLD_CLASS_BNN_OPTIMISER_ROADMAP.md).*

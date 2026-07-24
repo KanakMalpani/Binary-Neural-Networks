@@ -1,12 +1,15 @@
 # Roadmap (pointer)
 
-**Canonical end-to-end plan:** [`docs/21_E2E_ROADMAP_COMPLETE_REPO.md`](21_E2E_ROADMAP_COMPLETE_REPO.md)
+**Canonical living plan (world-class BNN optimiser):**
 
-That document is the master execution roadmap (phases P0–P7, task IDs, acceptance gates, progress checkboxes). **Do not maintain a second conflicting checklist here.**
+- Root: [`../ROADMAP.md`](../ROADMAP.md)
+- Docs twin: [`37_WORLD_CLASS_BNN_OPTIMISER_ROADMAP.md`](37_WORLD_CLASS_BNN_OPTIMISER_ROADMAP.md)
 
-**Quick status:** research map closed (`19`); engineering **COMPLETE** per D1–D12 — see [`docs/22_COMPLETION_REPORT.md`](22_COMPLETION_REPORT.md).
+**When lost:** read root `ROADMAP.md` §0 → §7 → current phase → lowest unchecked TODO. Run `bnn repro`. Do not invent benches.
 
-## Historical MVP checklist (superseded detail → see `21`)
+**Historical lab COMPLETE plan:** [`21_E2E_ROADMAP_COMPLETE_REPO.md`](21_E2E_ROADMAP_COMPLETE_REPO.md) (D1–D12 evidence in [`22_COMPLETION_REPORT.md`](22_COMPLETION_REPORT.md)).
+
+## Historical MVP checklist (superseded detail → see `21`, then `ROADMAP.md`)
 
 - [x] First-principles + SOTA + failure docs
 - [x] Perfected concept (kill naive 32× pitch)
@@ -17,4 +20,4 @@ That document is the master execution roadmap (phases P0–P7, task IDs, accepta
 - [x] Train/bench/export scripts
 - [x] Linear wrap + hybrid FFN sketch + CIFAR proxy + energy/FGSM proxies
 
-**Next:** start at **P0.T1** in `docs/21` (`pyproject.toml`).
+**Next:** Phase A in root [`ROADMAP.md`](../ROADMAP.md) (API freeze / `bnn optimise`); parallel **W11.T01** LICENSE.
