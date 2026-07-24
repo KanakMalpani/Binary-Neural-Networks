@@ -6,6 +6,7 @@ kernels — *not* `sign()` in PyTorch pretending to be 32× on GPU.
 
 | | |
 |--|--|
+| **User Guide (E2E)** | [`docs/GUIDE_E2E.md`](docs/GUIDE_E2E.md) — zero → optimiser results |
 | **Reproduce** | [`REPRODUCIBILITY.md`](REPRODUCIBILITY.md) · `bnn repro` |
 | **AI agents** | [`AGENTS.md`](AGENTS.md) |
 | **Roadmap (when lost)** | [`ROADMAP.md`](ROADMAP.md) · [`docs/37_…`](docs/37_WORLD_CLASS_BNN_OPTIMISER_ROADMAP.md) |
@@ -59,6 +60,7 @@ from bnn.optimise import optimise_model, OptimiseConfig
 # see docs/tutorials/07_OPTIMISER_QUICKSTART.md
 ```
 
+- **User Guide:** [`docs/GUIDE_E2E.md`](docs/GUIDE_E2E.md)
 - Tutorial: [`docs/tutorials/07_OPTIMISER_QUICKSTART.md`](docs/tutorials/07_OPTIMISER_QUICKSTART.md)
 - HF path: [`docs/tutorials/08_HF_OPTIMISER.md`](docs/tutorials/08_HF_OPTIMISER.md)
 - ADR: [`docs/adr/0001_public_optimiser_api.md`](docs/adr/0001_public_optimiser_api.md)

@@ -2,6 +2,18 @@
 
 ## Unreleased
 
+### Docs — master E2E User Guide
+
+- **`docs/GUIDE_E2E.md`** primary user guide (zero → optimiser results); linked from
+  README, `docs/README.md`, `AGENTS.md`.
+- Tutorials 01–08 cross-linked; prefer `bnn optimise` over `bnn wrap --ultra`.
+- Completion note: `docs/39_GUIDE_E2E_COMPLETION.md`; ROADMAP W9.T08/T09 done.
+
+### Fix — NumPy 1.x popcount
+
+- **`bnn.kernels.popcount.bitwise_count`:** LUT fallback when `np.bitwise_count`
+  is missing (NumPy &lt; 2.0). Restores `bnn repro` on NumPy 1.26.
+
 ### Phase A/B — optimiser product + OSS hygiene
 
 - **LICENSE** (MIT) at repo root; `SECURITY.md`, `CODE_OF_CONDUCT.md`,

@@ -75,6 +75,8 @@ def pack_ternary_bitplanes(q: np.ndarray) -> tuple[np.ndarray, np.ndarray, int]:
 
 def precompute_bitplane_pops(wp: np.ndarray, wn: np.ndarray) -> tuple[np.ndarray, np.ndarray]:
     """Row-wise popcounts for ternary bitplanes (int32 length M)."""
-    pop_p = np.bitwise_count(wp).sum(axis=1).astype(np.int32)
-    pop_n = np.bitwise_count(wn).sum(axis=1).astype(np.int32)
+    from .popcount import bitwise_count  # local: avoid import cycle with packed
+
+    pop_p = bitwise_count(wp).sum(axis=1).astype(np.int32)
+    pop_n = bitwise_count(wn).sum(axis=1).astype(np.int32)
     return pop_p, pop_n

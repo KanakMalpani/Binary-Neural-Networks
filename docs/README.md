@@ -6,6 +6,7 @@ Start here if you are new to the repo.
 
 | Doc | Why |
 |-----|-----|
+| [`GUIDE_E2E.md`](GUIDE_E2E.md) | **Primary User Guide** — zero → optimiser results (follow this) |
 | [`../REPRODUCIBILITY.md`](../REPRODUCIBILITY.md) | Exact repro commands, goldens, troubleshooting |
 | [`../AGENTS.md`](../AGENTS.md) | Ordered steps for coding agents |
 | [`25_ONEPAGER.md`](25_ONEPAGER.md) | Executive decision tree (honest) |
@@ -17,10 +18,12 @@ Start here if you are new to the repo.
 
 ## Tutorials
 
+Ordered path (also nested inside [`GUIDE_E2E.md`](GUIDE_E2E.md)):
+
 | # | Tutorial |
 |---|----------|
 | 01 | [`tutorials/01_mnist_binary.md`](tutorials/01_mnist_binary.md) |
-| 02 | [`tutorials/02_wrap_linear.md`](tutorials/02_wrap_linear.md) |
+| 02 | [`tutorials/02_wrap_linear.md`](tutorials/02_wrap_linear.md) — prefer `bnn optimise` |
 | 03 | [`tutorials/03_cifar_bireal.md`](tutorials/03_cifar_bireal.md) |
 | 04 | [`tutorials/04_image_cifar.md`](tutorials/04_image_cifar.md) |
 | 05 | [`tutorials/05_audio.md`](tutorials/05_audio.md) |
@@ -32,6 +35,8 @@ Start here if you are new to the repo.
 
 | Doc | Why |
 |-----|-----|
+| [`GUIDE_E2E.md`](GUIDE_E2E.md) | Master end-to-end user guide |
+| [`39_GUIDE_E2E_COMPLETION.md`](39_GUIDE_E2E_COMPLETION.md) | E2E guide smoke confirmation |
 | [`37_WORLD_CLASS_BNN_OPTIMISER_ROADMAP.md`](37_WORLD_CLASS_BNN_OPTIMISER_ROADMAP.md) | Canonical world-class plan (twin of root `ROADMAP.md`) |
 | [`38_ROADMAP_EXECUTION_LOG.md`](38_ROADMAP_EXECUTION_LOG.md) | Session execution log |
 | [`SEMVER_AND_DEPRECATION.md`](SEMVER_AND_DEPRECATION.md) | Public API semver policy |

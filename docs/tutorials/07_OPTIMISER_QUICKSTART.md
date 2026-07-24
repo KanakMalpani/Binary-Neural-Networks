@@ -1,5 +1,7 @@
 # 07 — Optimiser quickstart
 
+**Master guide:** [`../GUIDE_E2E.md`](../GUIDE_E2E.md) · **Prev:** [06](06_encoder_decoder.md) · **Next:** [08](08_HF_OPTIMISER.md)
+
 **Goal:** take an FP toy model → auto/hybrid wrap → versioned JSON report → optional `.bnnpack`.  
 **Time:** < 10 minutes. **Thesis:** compression ≠ wall-clock; no GPU 32× from `sign()`.
 
@@ -67,6 +69,7 @@ print(result.payload["compression_replaced_weights"], result.payload["status"])
 
 ## Next
 
+- Full narrative: [`../GUIDE_E2E.md`](../GUIDE_E2E.md)
 - HF models: [08_HF_OPTIMISER.md](08_HF_OPTIMISER.md)
 - ADR: [`docs/adr/0001_public_optimiser_api.md`](../adr/0001_public_optimiser_api.md)
 - Roadmap: [`ROADMAP.md`](../../ROADMAP.md)

@@ -61,13 +61,16 @@ Interpretation:
 ## CLI
 
 ```bat
-:: Ultra suite (hybrid + ternary + wide efficiency probe)
+:: Preferred product verb (same ultra suite)
+bnn optimise --policy auto --qat-steps 40 --batch 32 --force --report results/optimise_report.json
+
+:: Legacy alias of the same path
 bnn wrap --ultra --policy auto --qat-steps 40 --batch 32 --force --report results/ultra_wrap.json
 
 :: Explicit accurate-first
-bnn wrap --ultra --policy ternary_wo --qat-steps 20
+bnn optimise --policy ternary_wo --qat-steps 20
 
-:: Legacy wide MLP microbench (unchanged)
+:: Legacy wide MLP microbench (unchanged; prefer optimise for product demos)
 bnn wrap --mode binary_xnor --hidden 4096 --batch 32
 ```
 

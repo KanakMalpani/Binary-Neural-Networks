@@ -1,5 +1,7 @@
 # Tutorial 01 — MNIST binary train + bench (≈15 min)
 
+**Master guide:** [`../GUIDE_E2E.md`](../GUIDE_E2E.md) · **Next:** [02_wrap_linear.md](02_wrap_linear.md)
+
 ## Goal
 
 Train a binary MLP on MNIST and confirm packed kernel correctness/speed.
@@ -13,7 +15,7 @@ bnn validate-native
 bnn export-check
 bnn train --epochs 3 --seed 42 --model binary_mlp
 bnn bench --reps 5
-# Or verify committed goldens without retraining:
+:: Or verify committed goldens without retraining:
 bnn repro
 ```
 

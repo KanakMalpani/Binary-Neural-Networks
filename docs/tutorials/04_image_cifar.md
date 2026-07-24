@@ -1,5 +1,7 @@
 # Tutorial 04 — Image lane (CIFAR-10 Bi-Real)
 
+**Master guide:** [`../GUIDE_E2E.md`](../GUIDE_E2E.md) · **Prev:** [03](03_cifar_bireal.md) · **Next:** [05](05_audio.md)
+
 **Goal:** Train FP vs Bi-Real binary CNNs on CIFAR-10, write results, understand honesty limits.
 
 ## Quick run
@@ -32,7 +34,7 @@ Default: clipped Sign STE. Pass `--approx-sign` for Bi-Real ApproxSign backward 
 
 ## Packed inference note
 
-- **Linear / ViT FFN:** use `bnn.wrapper.wrap_model` / `PackedBinaryXNORLinear` for real CPU XNOR speedups.
+- **Linear / ViT FFN:** use `bnn.optimise` / `wrap_model` / `PackedBinaryXNORLinear` for real CPU XNOR speedups.
 - **Conv:** `wrap_conv_modules` packs weights (~32× size) but forward is **dequant + FP conv** — no native binary-conv DLL yet. Do not claim 32× wall-clock for Conv.
 
 ## ImageNet

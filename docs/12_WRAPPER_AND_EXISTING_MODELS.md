@@ -160,7 +160,8 @@ This maximizes \(f\) under quantization while protecting quality-critical ops.
 | Policies | `hybrid_ffn` \| `aggressive` \| `ternary_wo` \| `auto` |
 
 ```bat
-bnn wrap --ultra --policy auto --qat-steps 40 --force
+bnn optimise --policy auto --qat-steps 40 --force
+:: legacy alias: bnn wrap --ultra --policy auto --qat-steps 40 --force
 ```
 
 ### Measured (`ternary_weight_only`, same shape, batch=64)

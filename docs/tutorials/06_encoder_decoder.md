@@ -1,5 +1,7 @@
 # Tutorial 06 — Encoder / Decoder + `.bnnpack`
 
+**Master guide:** [`../GUIDE_E2E.md`](../GUIDE_E2E.md) · **Prev:** [05](05_audio.md) · **Next:** [07](07_OPTIMISER_QUICKSTART.md)
+
 Short path from STE Encoder–Decoder to a portable packed weight file.
 
 ## 1. Train reverse seq2seq
@@ -29,5 +31,6 @@ Writes `results/tiny_transformer_wrap.json` (agreement, compression, native flag
 
 ## Next
 
+- Optimiser product path: [07_OPTIMISER_QUICKSTART.md](07_OPTIMISER_QUICKSTART.md)
 - [`../36_ENCODER_DECODER_AND_NEXT.md`](../36_ENCODER_DECODER_AND_NEXT.md)
 - [`02_wrap_linear.md`](02_wrap_linear.md)

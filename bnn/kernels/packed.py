@@ -20,6 +20,8 @@ from pathlib import Path
 
 import numpy as np
 
+from .popcount import bitwise_count
+
 _NATIVE = None
 _NATIVE_PATH = Path(__file__).with_name("_binary_gemm_native")
 _THREADS_APPLIED: int | None = None
@@ -247,7 +249,7 @@ def binary_gemm_numpy_prepacked(
     # Row-at-a-time to keep temporaries small and cache-friendly
     for b in range(B):
         xor = np.bitwise_xor(xp[b : b + 1], wp)  # (M, words) via broadcast
-        dist = np.bitwise_count(xor).sum(axis=1).astype(np.int32)
+        dist = bitwise_count(xor).sum(axis=1).astype(np.int32)
         out[b] = n - 2 * dist
     return out
 

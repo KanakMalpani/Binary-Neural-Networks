@@ -3,6 +3,10 @@
 You are reproducing or extending **Binary Neural Networks**
 (https://github.com/KanakMalpani/Binary-Neural-Networks).
 
+**Human-equivalent path:** follow [`docs/GUIDE_E2E.md`](docs/GUIDE_E2E.md)
+(install → `bnn repro` → `bnn optimise` → encode/decode → modalities → metrics).
+Prefer `bnn optimise` over legacy `bnn wrap --ultra` in new docs and demos.
+
 ## Do this in order (do not invent new benches)
 
 1. `cd` to the repo root.
@@ -19,6 +23,7 @@ You are reproducing or extending **Binary Neural Networks**
 9. **Thesis lock:** do not claim GPU 32× from `sign()`; packed CPU kernels + honest STE sim.
 10. Do **not** commit `data/` datasets or force-push.
 11. **When lost on product direction:** read root [`ROADMAP.md`](ROADMAP.md) (§0 → §7 → current phase → lowest unchecked TODO). Do not invent alternate benches.
+12. **User / human path:** [`docs/GUIDE_E2E.md`](docs/GUIDE_E2E.md) — same conclusions as this file’s verify steps, written as a complete narrative.
 
 ## Modes
 

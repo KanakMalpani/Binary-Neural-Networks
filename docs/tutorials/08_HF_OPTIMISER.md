@@ -1,5 +1,7 @@
 # 08 — Hugging Face optimiser path
 
+**Master guide:** [`../GUIDE_E2E.md`](../GUIDE_E2E.md) · **Prev:** [07](07_OPTIMISER_QUICKSTART.md)
+
 **Goal:** load a tiny HF model → hybrid wrap → report (optional encode).  
 **Requires:** `pip install -e ".[hf]"`. Network needed for first download.
 
@@ -47,6 +49,9 @@ print(report.policy_reason)
 For the full `optimise_model` path on a **plain** `nn.Module` with tensor inputs,
 see [07_OPTIMISER_QUICKSTART.md](07_OPTIMISER_QUICKSTART.md). HF models that only
 accept dict kwargs should use `wrap_model` (+ optional encode of packed Linears).
+
+Prefer `bnn optimise` for the local toy / ultra demo path (not `bnn wrap --ultra`
+in new docs).
 
 ## Optional pytest
 

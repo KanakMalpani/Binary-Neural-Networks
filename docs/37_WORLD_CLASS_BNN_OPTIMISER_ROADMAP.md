@@ -447,8 +447,8 @@ Acceptance: every task that touches metrics must keep `bnn repro` green unless e
 | W9.T05 | MkDocs or Sphinx decision ADR | S | — | `[x]` MkDocs stub |
 | W9.T06 | Autodoc API reference | L | W9.T05 | `[ ]` |
 | W9.T07 | Architecture Decision Records index | M | docs/08 | `[x]` docs/adr |
-| W9.T08 | “When to use BNN vs INT4” cookbook | M | docs/18 | `[~]` |
-| W9.T09 | Troubleshooting runbook expand | M | REPRODUCIBILITY | `[~]` |
+| W9.T08 | “When to use BNN vs INT4” cookbook | M | docs/18 | `[x]` GUIDE_E2E §8 + docs/18 |
+| W9.T09 | Troubleshooting runbook expand | M | REPRODUCIBILITY | `[x]` GUIDE_E2E §11 + REPRO |
 | W9.T10 | GIF/asciinema optional demos | S | — | `[ ]` |
 
 **Follow when lost:** W9.T03 → W9.T01 → W9.T06.
@@ -713,6 +713,9 @@ Pre-checked from 2026-07-25 audit. **Agents: flip `[ ]` → `[x]` or `[~]` in PR
 - [x] Profile CLI
 - [x] Repro + golden floors + CI Win/Linux
 - [x] Tutorials 01–06
+- [x] Tutorials 07–08 + master [`docs/GUIDE_E2E.md`](docs/GUIDE_E2E.md)
+- [x] W9.T08 BNN vs INT4 cookbook (GUIDE_E2E §8)
+- [x] W9.T09 Troubleshooting expand (GUIDE_E2E §11)
 - [x] Bridges docs + recipe scripts
 - [x] CONTRIBUTING + CHANGELOG
 - [x] This world-class ROADMAP created
@@ -778,6 +781,7 @@ Pre-checked from 2026-07-25 audit. **Agents: flip `[ ]` → `[x]` or `[~]` in PR
 - [x] WC-R1 repro
 - [~] WC-R2–R4
 - [~] WC-D1–D5
+- [x] WC-D1 tutorials + GUIDE_E2E master path
 - [~] WC-P1–P2
 
 ---

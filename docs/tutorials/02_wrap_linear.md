@@ -1,14 +1,24 @@
 # Tutorial 02 — Wrap existing Linears
 
+**Master guide:** [`../GUIDE_E2E.md`](../GUIDE_E2E.md) · **Prev:** [01](01_mnist_binary.md) · **Next:** [03](03_cifar_bireal.md) · **Prefer:** [07 optimiser](07_OPTIMISER_QUICKSTART.md)
+
 ## Goal
 
 Replace FFN/MLP `nn.Linear` layers with packed XNOR or ternary weight-only modules.
 
+**Preferred CLI (product verb):**
+
 ```bat
-:: Legacy wide-MLP microbench
+bnn optimise --policy auto --qat-steps 40 --force --report results\optimise_report.json
+```
+
+Legacy equivalents (still work):
+
+```bat
+:: Legacy wide-MLP microbench (emits DeprecationWarning — prefer optimise)
 bnn wrap --mode binary_xnor --hidden 4096 --batch 32
 
-:: Ultra wrap (hybrid policy + calib + effectiveness gate)
+:: Ultra wrap alias of the optimiser path
 bnn wrap --ultra --policy auto --qat-steps 40 --batch 32 --force
 ```
 
@@ -42,6 +52,9 @@ model, report = wrap_model(
 )
 print(report.replaced, report.compression, report.policy_reason)
 ```
+
+For the versioned optimiser report API (`optimise_model` / schema
+`bnn_optimise_report_v1`), see [07_OPTIMISER_QUICKSTART.md](07_OPTIMISER_QUICKSTART.md).
 
 ## Honest expectation
 

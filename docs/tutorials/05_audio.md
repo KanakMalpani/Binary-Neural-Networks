@@ -1,5 +1,7 @@
 # Tutorial 05 — Audio lane (synthetic spectrograms)
 
+**Master guide:** [`../GUIDE_E2E.md`](../GUIDE_E2E.md) · **Prev:** [04](04_image_cifar.md) · **Next:** [06](06_encoder_decoder.md)
+
 **Goal:** Prove STE + binary CNN pattern on **audio features**, offline-friendly.
 
 ## Honest scope

@@ -19,6 +19,7 @@ from .packed import (
     pack_binary_pm1,
     ternary_native_available,
 )
+from .popcount import bitwise_count
 from .ternary_pack import (
     pack_ternary_2bit,
     pack_ternary_bitplanes,
@@ -58,8 +59,8 @@ def ternary_bitplane_gemm_numpy(
         pop_p, pop_n = precompute_bitplane_pops(wp, wn)
     out = np.empty((B, M), dtype=np.float32)
     for b in range(B):
-        and_p = np.bitwise_count(xp[b : b + 1] & wp).sum(axis=1).astype(np.int32)
-        and_n = np.bitwise_count(xp[b : b + 1] & wn).sum(axis=1).astype(np.int32)
+        and_p = bitwise_count(xp[b : b + 1] & wp).sum(axis=1).astype(np.int32)
+        and_n = bitwise_count(xp[b : b + 1] & wn).sum(axis=1).astype(np.int32)
         out[b] = scale * (pop_p - 2 * and_p - pop_n + 2 * and_n).astype(np.float32)
     return out
 

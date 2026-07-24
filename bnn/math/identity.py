@@ -42,6 +42,8 @@ from typing import Any
 
 import numpy as np
 
+from bnn.kernels.popcount import bitwise_count
+
 from .packing import pack_pm1_uint64
 
 
@@ -86,10 +88,10 @@ def xor_popcount_dot(x_bits: np.ndarray, w_bits: np.ndarray, n: int) -> float:
     rem = n % 64
     dist = 0
     if full:
-        dist += int(np.bitwise_count(xor[:full]).sum())
+        dist += int(bitwise_count(xor[:full]).sum())
     if rem:
         mask = np.uint64((1 << rem) - 1)
-        dist += int(np.bitwise_count(xor[full] & mask))
+        dist += int(bitwise_count(xor[full] & mask))
     return hamming_to_dot(n, dist)
 
 
