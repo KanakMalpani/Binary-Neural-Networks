@@ -13,6 +13,7 @@ Start here if you are new to the repo.
 | [`31_QUALITY_UPGRADE.md`](31_QUALITY_UPGRADE.md) | Latest quality leap changelog |
 | [`34_COMPUTE_SPEEDUP.md`](34_COMPUTE_SPEEDUP.md) | OpenMP / pack / ternary speedups + thread curve |
 | [`35_BINARY_MATH_EFFECTIVENESS.md`](35_BINARY_MATH_EFFECTIVENESS.md) | XNOR↔dot proofs, STE math, when binary loses |
+| [`36_ENCODER_DECODER_AND_NEXT.md`](36_ENCODER_DECODER_AND_NEXT.md) | Encoder/Decoder + `.bnnpack` + bridges |
 
 ## Tutorials
 
@@ -23,6 +24,13 @@ Start here if you are new to the repo.
 | 03 | [`tutorials/03_cifar_bireal.md`](tutorials/03_cifar_bireal.md) |
 | 04 | [`tutorials/04_image_cifar.md`](tutorials/04_image_cifar.md) |
 | 05 | [`tutorials/05_audio.md`](tutorials/05_audio.md) |
+| 06 | [`tutorials/06_encoder_decoder.md`](tutorials/06_encoder_decoder.md) |
+
+## Latest lane
+
+| Doc | Why |
+|-----|-----|
+| [`36_ENCODER_DECODER_AND_NEXT.md`](36_ENCODER_DECODER_AND_NEXT.md) | Encoder/Decoder, `.bnnpack` codec, wrap-transformer, profile, bridges |
 
 ## Research & architecture (read order)
 
@@ -52,6 +60,7 @@ Start here if you are new to the repo.
 | [`23_BITNET_CPP_BRIDGE.md`](23_BITNET_CPP_BRIDGE.md) | bitnet.cpp |
 | [`24_GPU_INT4_FP8_LANE.md`](24_GPU_INT4_FP8_LANE.md) | GPU INT4/FP8 |
 | [`20_NPU_VENDOR_CLOSURE.md`](20_NPU_VENDOR_CLOSURE.md) | Phone NPUs |
+| [`../scripts/bridges/`](../scripts/bridges/) | Concrete torchao / llama.cpp / bitnet recipes (JSON) |
 
 ## Thesis lock (never reopen as a “win”)
 

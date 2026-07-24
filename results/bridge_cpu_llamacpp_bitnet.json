@@ -1,0 +1,22 @@
+{
+  "lane": "cpu-llm",
+  "thesis": "CPU chat LLMs \u2192 GGUF Q4_K_M (llama.cpp) or BitNet \u2192 bitnet.cpp. Not sign()+torch.",
+  "llama_cpp_gguf": [
+    "git clone https://github.com/ggerganov/llama.cpp",
+    "cmake -B build -DGGML_NATIVE=ON && cmake --build build --config Release",
+    "# Convert HF \u2192 GGUF (upstream convert scripts) then:",
+    "./llama-quantize model-f16.gguf model-Q4_K_M.gguf Q4_K_M",
+    "./llama-cli -m model-Q4_K_M.gguf -p 'Hello' -n 64"
+  ],
+  "bitnet_cpp": [
+    "git clone https://github.com/microsoft/BitNet",
+    "# Follow upstream setup_env / build for your OS",
+    "# Use native BitNet checkpoints \u2014 do not absmean-PTQ a chat Llama and ship",
+    "docs/23_BITNET_CPP_BRIDGE.md"
+  ],
+  "this_repo_shims": [
+    "bnn recommend --goal cpu-llm",
+    "bnn encode / bnn decode \u2192 .bnnpack for lab packed Linear artifacts",
+    "TernaryLinear + ternary_pack = pedagogy/size; speed for BitNet = bitnet.cpp"
+  ]
+}

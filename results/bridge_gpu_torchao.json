@@ -1,0 +1,21 @@
+{
+  "lane": "gpu-server",
+  "thesis": "Commodity NVIDIA \u2192 INT4/FP8 (torchao / AWQ / vLLM). Not classic BNN 32x CUDA.",
+  "torchao_weight_only_int4": [
+    "pip install torchao  # on a CUDA machine",
+    "from torchao.quantization import quantize_, int4_weight_only",
+    "quantize_(model, int4_weight_only())",
+    "# Serve with vLLM / TensorRT-LLM for throughput"
+  ],
+  "awq": [
+    "pip install autoawq  # CUDA",
+    "# Follow AutoAWQ docs: calibrate \u2192 save \u2192 load with vLLM AWQ"
+  ],
+  "this_repo": [
+    "bnn recommend --goal gpu-server",
+    "docs/24_GPU_INT4_FP8_LANE.md",
+    "Use bnn wrap only for CPU packed binary/ternary pedagogy + edge"
+  ],
+  "torchao_installed": false,
+  "note": "Install torchao on CUDA hosts; skip on CPU-only lab machines"
+}

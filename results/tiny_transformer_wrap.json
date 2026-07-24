@@ -1,0 +1,56 @@
+{
+  "model": "TinyTransformer",
+  "d_model": 128,
+  "ff": 512,
+  "depth": 2,
+  "policy": "hybrid_ffn",
+  "qat_steps": 20,
+  "qat_seconds": 1.6373703999997815,
+  "replaced": [
+    "blocks.0.ffn_fc1",
+    "blocks.0.ffn_fc2",
+    "blocks.1.ffn_fc1",
+    "blocks.1.ffn_fc2"
+  ],
+  "skipped": [
+    "embed (not FFN allowlist)",
+    "blocks.0.attn_qkv (not FFN allowlist)",
+    "blocks.0.attn_proj (not FFN allowlist)",
+    "blocks.1.attn_qkv (not FFN allowlist)",
+    "blocks.1.attn_proj (not FFN allowlist)",
+    "lm_head (not FFN allowlist)"
+  ],
+  "compression_replaced": 32.0,
+  "fp32_weight_bytes_replaced": 1048576,
+  "packed_weight_bytes": 32768,
+  "native_kernel": true,
+  "agreement": {
+    "cosine": 0.9075151681900024,
+    "kl_div": 0.311361163854599,
+    "top1_agreement": 0.96875,
+    "n_samples": 32,
+    "drop_in_threshold": 0.85,
+    "drop_in_ok": true,
+    "notes": "Meets drop-in cosine threshold"
+  },
+  "bytes_before": {
+    "param_bytes": 1624616,
+    "buffer_bytes": 0,
+    "total_bytes": 1624616
+  },
+  "bytes_after": {
+    "param_bytes": 570920,
+    "buffer_bytes": 43008,
+    "total_bytes": 613928
+  },
+  "wrapped_forward_ms": 8.01837999970303,
+  "bnnpack": "C:\\Users\\mrkan\\CRAZZY\\Binary Neural Network\\results\\_tiny_transformer.bnnpack",
+  "codec_roundtrip": {
+    "max_abs_err": 0.0,
+    "compression": 32.0,
+    "native": 1.0,
+    "packed_bytes": 8192.0,
+    "fp32_bytes": 262144.0
+  },
+  "thesis": "hybrid_ffn wrap; attn FP; packed CPU binary \u2014 not fake GPU 32x"
+}

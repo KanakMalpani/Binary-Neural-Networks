@@ -13,9 +13,20 @@ For **ternary / 1.58-bit LLMs**, production CPU inference is **bitnet.cpp** (Mic
 
 - `TernaryLinear` + `ternary_pack` = **pedagogy / size**
 - Speed for LLMs = **bitnet.cpp** (or custom Hexagon kernels on Snapdragon)
+- Portable lab artifacts: `bnn encode` / `bnn decode` (`.bnnpack`) — not a
+  llama.cpp replacement
+
+## Concrete recipe script
+
+```bat
+python scripts\bridges\llamacpp_bitnet_recipe.py
+```
+
+Writes `results/bridge_cpu_llamacpp_bitnet.json` with clone/build/quantize steps.
 
 ## Related
 
 - `docs/12_WRAPPER_AND_EXISTING_MODELS.md`
 - `docs/20_NPU_VENDOR_CLOSURE.md` (no stock HTP ternary)
+- `docs/36_ENCODER_DECODER_AND_NEXT.md`
 - `bnn recommend --goal cpu-llm`

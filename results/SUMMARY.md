@@ -1,6 +1,6 @@
 # Results summary (this workspace)
 
-_Regenerated: 2026-07-24T13:27:10.113341+00:00_
+_Regenerated: 2026-07-24T18:42:08.973871+00:00_
 _Machine: Windows-11-10.0.26200-SP0 | torch 2.12.0+cpu | CUDA=False_
 
 ## Kernel (CPU packed XNOR)

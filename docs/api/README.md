@@ -52,6 +52,14 @@ Synthetic tones only — not production ASR.
 | `bnn.paths.resolve_under` | Reject path traversal outside a root |
 | `bnn.logutil.info/warn/error` | Flushing stdout/stderr conventions |
 
+## Seq + codec
+
+| Module | Role |
+|--------|------|
+| `bnn.seq` | `BinaryTransformerEncoder`, `BinaryTransformerDecoder`, `BinarySeq2Seq`, `BinaryAutoEncoder` |
+| `bnn.codec` | `encode_linear_state`, `decode_to_packed_linear`, `encode_file` / `.bnnpack` |
+| `bnn.profile` | `profile_packed_linear` pack/gemm/overhead breakdown |
+
 ## CLI
 
 ```bat
@@ -62,6 +70,7 @@ bnn compile-native
 bnn validate-native       # exit 2 if DLL missing
 bnn export-check
 bnn bench | train | train-image | train-audio | wrap
+bnn train-seq2seq | encode | decode | wrap-transformer | profile
 bnn eval-suite | recommend --goal edge-vision
 ```
 

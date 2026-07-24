@@ -194,6 +194,128 @@ def cmd_recommend(args: argparse.Namespace) -> int:
     return _run_script("recommend_stack.py", ["--goal", args.goal])
 
 
+def cmd_encode(args: argparse.Namespace) -> int:
+    """Encode toy MLP BinaryLinear layers or a random Linear into ``.bnnpack``."""
+    import torch
+
+    from bnn.codec import encode_file, encode_linear_state, save_bnnpack
+    from bnn.models import build_model
+
+    out = Path(args.out)
+    meta = {"source": args.source, "cli": "bnn encode"}
+    if args.source == "mlp":
+        model = build_model("binary_mlp", hidden=args.hidden)
+        # Only BinaryLinear (not FP stem/head) — thesis-aligned
+        encode_file(
+            model,
+            out,
+            meta=meta,
+            min_in_features=args.min_width,
+            include_binary_linear=True,
+            include_fp_linear=False,
+            include_packed=True,
+        )
+    elif args.source == "random":
+        w = torch.randn(args.out_features, args.in_features)
+        blob = encode_linear_state(w, name="linear")
+        save_bnnpack({"linear": blob}, out, meta=meta)
+    else:
+        print(f"ERROR unknown source {args.source}", file=sys.stderr)
+        return 2
+    from bnn.codec import load_bnnpack
+
+    payload = load_bnnpack(out)
+    fp = sum(int(b["fp32_bytes"]) for b in payload["layers"].values())
+    pk = sum(int(b["packed_bytes"]) for b in payload["layers"].values())
+    print(
+        f"Wrote {out} layers={len(payload['layers'])} "
+        f"fp32_bytes={fp} packed_bytes={pk} compression={fp / max(pk, 1):.2f}x"
+    )
+    return 0
+
+
+def cmd_decode(args: argparse.Namespace) -> int:
+    """Load ``.bnnpack`` and assert each layer GEMM matches ±1 FP (err=0)."""
+    from bnn.codec import decode_file, packed_module_fp_err
+
+    path = Path(args.pack)
+    modules, meta = decode_file(path)
+    print(f"Loaded {path} layers={list(modules)} meta_keys={list(meta)}")
+    max_err = 0.0
+    for name, mod in modules.items():
+        err = packed_module_fp_err(mod, batch=4, seed=0)
+        comp = (mod.in_features * mod.out_features * 4) / max(mod.packed_weight_bytes(), 1)
+        print(f"  {name}: fp_err={err} compression~{comp:.2f}x")
+        max_err = max(max_err, err)
+    if max_err > 0:
+        print(f"ERROR non-zero packed vs FP err={max_err}", file=sys.stderr)
+        return 1
+    print("DECODE: PASS")
+    return 0
+
+
+def cmd_profile(args: argparse.Namespace) -> int:
+    import json
+
+    from bnn.profile import profile_packed_linear
+
+    br = profile_packed_linear(
+        m=args.batch,
+        n=args.in_features,
+        k=args.out_features,
+        reps=args.reps,
+        warmup=args.warmup,
+    )
+    d = br.to_dict()
+    print(json.dumps(d, indent=2))
+    if args.out:
+        Path(args.out).parent.mkdir(parents=True, exist_ok=True)
+        Path(args.out).write_text(json.dumps(d, indent=2), encoding="utf-8")
+    return 0
+
+
+def cmd_train_seq2seq(args: argparse.Namespace) -> int:
+    extra = [
+        "--task",
+        args.task,
+        "--ffn",
+        args.ffn,
+        "--steps",
+        str(args.steps),
+        "--batch",
+        str(args.batch),
+        "--seq-len",
+        str(args.seq_len),
+        "--dim",
+        str(args.dim),
+        "--seed",
+        str(args.seed),
+    ]
+    if args.out:
+        extra += ["--out", str(args.out)]
+    return _run_script("train_seq2seq.py", extra)
+
+
+def cmd_wrap_transformer(args: argparse.Namespace) -> int:
+    extra = [
+        "--d-model",
+        str(args.d_model),
+        "--ff",
+        str(args.ff),
+        "--depth",
+        str(args.depth),
+        "--batch",
+        str(args.batch),
+        "--qat-steps",
+        str(args.qat_steps),
+        "--policy",
+        args.policy,
+    ]
+    if args.out:
+        extra += ["--out", str(args.out)]
+    return _run_script("tiny_transformer_wrap_demo.py", extra)
+
+
 def cmd_version(_: argparse.Namespace) -> int:
     print(f"bnn {__version__}")
     return 0
@@ -350,11 +472,59 @@ def build_parser() -> argparse.ArgumentParser:
     )
     r.set_defaults(func=cmd_recommend)
 
+    enc = sub.add_parser("encode", help="Encode Linear weights → portable .bnnpack")
+    enc.add_argument("--source", choices=("mlp", "random"), default="mlp")
+    enc.add_argument("--out", type=Path, default=ROOT / "results" / "model.bnnpack")
+    enc.add_argument("--hidden", type=int, default=256)
+    enc.add_argument("--min-width", type=int, default=1)
+    enc.add_argument("--in-features", type=int, default=512)
+    enc.add_argument("--out-features", type=int, default=512)
+    enc.set_defaults(func=cmd_encode)
+
+    dec = sub.add_parser("decode", help="Load .bnnpack and verify GEMM round-trip err=0")
+    dec.add_argument("--pack", type=Path, required=True)
+    dec.set_defaults(func=cmd_decode)
+
+    pr = sub.add_parser("profile", help="Pack / GEMM / overhead breakdown vs torch FP32")
+    pr.add_argument("--batch", type=int, default=64)
+    pr.add_argument("--in-features", type=int, default=4096)
+    pr.add_argument("--out-features", type=int, default=4096)
+    pr.add_argument("--reps", type=int, default=20)
+    pr.add_argument("--warmup", type=int, default=5)
+    pr.add_argument("--out", type=Path, default=None)
+    pr.set_defaults(func=cmd_profile)
+
+    s2s = sub.add_parser(
+        "train-seq2seq",
+        help="Binary Encoder–Decoder reverse task (+ optional autoencoder)",
+    )
+    s2s.add_argument("--task", choices=("seq2seq", "ae", "both"), default="seq2seq")
+    s2s.add_argument("--ffn", choices=("binary", "ternary", "fp"), default="binary")
+    s2s.add_argument("--steps", type=int, default=80)
+    s2s.add_argument("--batch", type=int, default=32)
+    s2s.add_argument("--seq-len", type=int, default=8)
+    s2s.add_argument("--dim", type=int, default=64)
+    s2s.add_argument("--seed", type=int, default=0)
+    s2s.add_argument("--out", type=Path, default=None)
+    s2s.set_defaults(func=cmd_train_seq2seq)
+
+    wt = sub.add_parser(
+        "wrap-transformer",
+        help="Tiny Transformer hybrid_ffn wrap + QAT + metrics JSON",
+    )
+    wt.add_argument("--d-model", type=int, default=128)
+    wt.add_argument("--ff", type=int, default=512)
+    wt.add_argument("--depth", type=int, default=2)
+    wt.add_argument("--batch", type=int, default=32)
+    wt.add_argument("--qat-steps", type=int, default=40)
+    wt.add_argument("--policy", default="hybrid_ffn")
+    wt.add_argument("--out", type=Path, default=None)
+    wt.set_defaults(func=cmd_wrap_transformer)
+
     ver = sub.add_parser("version", help="Print package version")
     ver.set_defaults(func=cmd_version)
 
     return p
-
 
 def main(argv: list[str] | None = None) -> int:
     parser = build_parser()

@@ -40,7 +40,8 @@ Thumbs.db
 .idea/
 .vscode/
 
-# Local repro / logs
+# Local packs / repro logs
+*.bnnpack
 results/_*.txt
 results/_repro_smoke_*.json
 results/_repro_run.log

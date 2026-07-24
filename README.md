@@ -110,17 +110,32 @@ bnn wrap --ultra --policy auto --qat-steps 40 --force
 
 Deep dive: [`docs/12_WRAPPER_AND_EXISTING_MODELS.md`](docs/12_WRAPPER_AND_EXISTING_MODELS.md)
 
+### Encoder / Decoder + weight codec
+
+```bat
+bnn train-seq2seq --task both --steps 80
+bnn encode --source random --in-features 512 --out-features 512 --out results\demo.bnnpack
+bnn decode --pack results\demo.bnnpack
+bnn wrap-transformer --qat-steps 40
+bnn profile --batch 64 --in-features 4096 --out-features 4096
+```
+
+Details: [`docs/36_ENCODER_DECODER_AND_NEXT.md`](docs/36_ENCODER_DECODER_AND_NEXT.md) ·
+tutorial [`docs/tutorials/06_encoder_decoder.md`](docs/tutorials/06_encoder_decoder.md)
+
 ---
 
 ## Package layout
 
 ```
 bnn/           STE, layers, models, wrapper, wrap/, export, determinism
+bnn/seq/       Binary Transformer Encoder/Decoder, Seq2Seq, AutoEncoder
+bnn/codec/     portable .bnnpack encode/decode
 bnn/wrap/      ultra hybrid wrap (policy, calib, metrics, QAT)
 bnn/vision/    CIFAR Bi-Real CNN, tiny binary ViT
 bnn/audio/     STFT features, synthetic tones, FP/binary CNN
 bnn/kernels/   packed XNOR GEMM (+ optional MSVC OpenMP DLL)
-scripts/       train / bench / wrap / ultra_wrap_demo / repro_all
+scripts/       train / bench / wrap / seq2seq / bridges / repro_all
 results/       committed golden JSON + SUMMARY.md
 tests/         pytest + golden_floors.json
 docs/          research, tutorials, completion reports

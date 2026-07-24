@@ -1,0 +1,42 @@
+{
+  "demos": [
+    {
+      "task": "reverse_seq2seq",
+      "ffn": "binary",
+      "vocab": 16,
+      "seq_len": 8,
+      "dim": 64,
+      "depth": 2,
+      "steps": 80,
+      "train_token_acc": 1.0,
+      "train_loss": 0.007758231367915869,
+      "eval_token_acc": 1.0,
+      "eval_loss": 0.007495327852666378,
+      "train_seconds": 1.9226939999934984,
+      "thesis": "attn/softmax/LN FP; FFN binary/ternary STE \u2014 not a GPU 32x claim"
+    },
+    {
+      "task": "binary_autoencoder",
+      "ffn": "binary",
+      "n_in": 64,
+      "latent": 16,
+      "steps": 80,
+      "train_mse": 0.898420512676239,
+      "eval_mse": 0.9216713905334473,
+      "train_seconds": 0.1118480000004638
+    }
+  ],
+  "task": "reverse_seq2seq",
+  "ffn": "binary",
+  "vocab": 16,
+  "seq_len": 8,
+  "dim": 64,
+  "depth": 2,
+  "steps": 80,
+  "train_token_acc": 1.0,
+  "train_loss": 0.007758231367915869,
+  "eval_token_acc": 1.0,
+  "eval_loss": 0.007495327852666378,
+  "train_seconds": 1.9226939999934984,
+  "thesis": "attn/softmax/LN FP; FFN binary/ternary STE \u2014 not a GPU 32x claim"
+}

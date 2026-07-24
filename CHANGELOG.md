@@ -2,6 +2,18 @@
 
 ## Unreleased
 
+### Encoder / Decoder + codec (next lane)
+
+- **Seq models:** `bnn.seq` — Binary Transformer Encoder/Decoder, Seq2Seq reverse
+  task, BinaryAutoEncoder; CLI `bnn train-seq2seq`.
+- **Weight codec:** `bnn.codec` + `.bnnpack`; CLI `bnn encode` / `bnn decode`
+  (32× pack, GEMM round-trip err=0).
+- **Wrap lane:** `bnn wrap-transformer` → `results/tiny_transformer_wrap.json`.
+- **Profile:** `bnn profile` pack/act/gemm/overhead vs FP32.
+- **Bridges:** `scripts/bridges/torchao_int4_recipe.py`,
+  `scripts/bridges/llamacpp_bitnet_recipe.py`.
+- **Docs:** `docs/36_ENCODER_DECODER_AND_NEXT.md`, tutorial 06.
+
 ### Quality upgrade (0.2.0)
 
 - **Repro:** `bnn repro` / `scripts/repro_all.py`, `REPRODUCIBILITY.md`, `AGENTS.md`,
