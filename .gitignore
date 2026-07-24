@@ -48,4 +48,5 @@ results/_repro_run.log
 results/_pareto*.json
 results/_ci_*.json
 sbom.json
+sbom-*.json
 *.log
