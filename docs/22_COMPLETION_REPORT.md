@@ -24,7 +24,8 @@
 ## Tasks completed
 
 - Required tracker items in `docs/21` §10 marked `[x]` for P0–P6.
-- Left open (non-blocking): OpenMP/AVX (P1.T5–T6), longer CIFAR (P2.T4), ApproxSign flag (P2.T5), BinaryConv wrap (P3.T7), all **P7**.
+- Left open (non-blocking): OpenMP/AVX (P1.T5–T6), remaining P7 stretch (FINN/mobile/RAPL/ARM).
+- Closed in image/audio pass (`docs/23_IMAGE_AUDIO_COMPLETION.md`): longer CIFAR via `train-image`, ApproxSign (`P2.T5`), BinaryConv wrap (`P3.T7`), ImageNet stub (`P7.T2`).
 
 ## What remains (optional only)
 

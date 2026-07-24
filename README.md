@@ -21,6 +21,18 @@ bnn train --epochs 3 --seed 42
 bnn eval-suite
 ```
 
+### Image + audio (first-class modalities)
+
+```bat
+bnn train-image --epochs 8 --subset 30000
+bnn train-audio --epochs 5
+pytest tests\test_vision_smoke.py tests\test_audio_smoke.py -q
+```
+
+- Image tutorial: [`docs/tutorials/04_image_cifar.md`](docs/tutorials/04_image_cifar.md)
+- Audio tutorial: [`docs/tutorials/05_audio.md`](docs/tutorials/05_audio.md) (synthetic tones; **not** production ASR — use INT8 Whisper/ORT for real speech)
+- Completion: [`docs/23_IMAGE_AUDIO_COMPLETION.md`](docs/23_IMAGE_AUDIO_COMPLETION.md) · [`docs/24_FINAL_COMPLETION.md`](docs/24_FINAL_COMPLETION.md)
+
 ## Measured on this machine (CPU)
 
 | Check | Result |
@@ -60,9 +72,11 @@ Deep dive: `docs/12_WRAPPER_AND_EXISTING_MODELS.md`
 |------|---------|
 | `docs/21_E2E_ROADMAP_COMPLETE_REPO.md` | **Master E2E plan to finish the repo** |
 | `docs/22_COMPLETION_REPORT.md` | **D1–D12 completion evidence** |
+| `docs/23_IMAGE_AUDIO_COMPLETION.md` | **Image + audio modality gates I1–A2** |
+| `docs/24_FINAL_COMPLETION.md` | **Final done criteria + verify** |
 | `docs/22_HF_TO_GGUF_GUIDE.md` | HF → GGUF checklist |
-| `docs/23`–`25` | bitnet.cpp / GPU INT4-FP8 / one-pager |
-| `docs/tutorials/` | MNIST, wrap, CIFAR walkthroughs |
+| `docs/23`–`25` (bitnet / GPU / one-pager) | Bridges (note: numeric prefix collision with modality `23`) |
+| `docs/tutorials/` | MNIST, wrap, CIFAR, **image**, **audio** |
 | `docs/api/README.md` | API stub |
 | `docs/00_DIMENSION_MAP.md` | **Completeness checklist (40/40 Covered)** |
 | `docs/19_GAP_CLOSURE_REPORT.md` | **Gap closure — 0 material OPEN** |
@@ -93,12 +107,13 @@ python scripts\ternary_pack_demo.py
 ## Code layout
 
 ```
-bnn/           STE, layers, models, **wrapper.py**, MNIST + CIFAR loaders
+bnn/           STE, layers, models, wrapper, MNIST + CIFAR loaders
+bnn/vision/    CIFAR Bi-Real CNN, tiny binary ViT, ImageNet folder stub
+bnn/audio/     STFT features, synthetic tones, FP/binary audio CNN
 bnn/kernels/   packed.py, ternary_pack.py, binary_gemm.c (MSVC DLL)
-scripts/       train, benchmark, wrap, CIFAR proxy, FGSM, energy_bound, hybrid FFN, ternary pack
-results/       JSON/MD measurements (incl. cifar10_proxy, energy_bound, robustness_fgsm)
-checkpoints/   trained weights
-docs/          00–20 research map; **19** = gap closure report
+scripts/       train, train_image, train_audio, benchmark, wrap, eval suite
+results/       JSON/MD (image_cifar, audio_synth, kernels, MNIST, …)
+docs/          00–24 research + completion; tutorials 01–05
 ```
 
 ## What this is / is not

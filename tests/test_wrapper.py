@@ -55,3 +55,26 @@ def test_wrap_model_hybrid_policy():
     x = torch.randn(2, 64)
     y = m(x)
     assert y.shape == (2, 10)
+
+
+def test_wrap_conv_modules_size():
+    from bnn.layers import BinaryConv2d
+    from bnn.wrapper import wrap_conv_modules
+
+    class Mini(nn.Module):
+        def __init__(self):
+            super().__init__()
+            self.stem = nn.Conv2d(3, 8, 3, 1, 1)
+            self.mid = BinaryConv2d(8, 16, 3, 1, 1)
+            self.head = nn.Linear(16, 4)
+
+        def forward(self, x):
+            x = self.mid(self.stem(x))
+            return self.head(x.mean(dim=(2, 3)))
+
+    m = Mini()
+    _, report = wrap_conv_modules(m, skip_name_substr=("stem", "head"), min_weight_elems=64)
+    assert report.replaced
+    assert report.compression >= 30.0
+    y = m(torch.randn(2, 3, 16, 16))
+    assert y.shape == (2, 4)

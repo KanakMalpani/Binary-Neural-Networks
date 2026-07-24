@@ -553,8 +553,8 @@ Mark `[x]` when done. **Status 2026-07-23 completion pass: required P0–P6 DONE
 - [x] **P2.T1** Unified train CLI (`bnn train` / `train-cifar`)
 - [x] **P2.T2** Checkpoint export/load (`bnn/export.py`)
 - [x] **P2.T3** Full CIFAR recipe docs (`docs/13` + tutorial 03)
-- [ ] **P2.T4** Longer CIFAR optional run (optional; proxy already exists)
-- [ ] **P2.T5** ApproxSign/ReAct STE flag (optional polish)
+- [x] **P2.T4** Longer CIFAR optional run (optional; proxy already exists)
+- [x] **P2.T5** ApproxSign/ReAct STE flag (optional polish)
 - [x] **P2.T6** Distill sketch script
 - [x] **P2.T7** Schedules + clip logging (train history JSON)
 - [x] **P2.T8** BN momentum test gate
@@ -570,7 +570,7 @@ Mark `[x]` when done. **Status 2026-07-23 completion pass: required P0–P6 DONE
 - [x] **P3.T4** `bnn wrap` CLI
 - [x] **P3.T5** Quality report fields (cosine in wrap_demo)
 - [x] **P3.T6** Skip-list config (`configs/wrap_default.json`)
-- [ ] **P3.T7** BinaryConv wrap (optional)
+- [x] **P3.T7** BinaryConv wrap (optional)
 - [x] **P3.T8** docs/12 refresh (existing + tutorials)
 
 ### P4 Bridges
@@ -614,7 +614,8 @@ Mark `[x]` when done. **Status 2026-07-23 completion pass: required P0–P6 DONE
 
 ### P7 Stretch
 
-- [ ] **P7.T1**–**P7.T8** optional (not required for COMPLETE)
+- [x] **P7.T2** ImageNet folder stub / protocol note (`bnn/vision`, no full train)
+- [ ] **P7.T1**, **P7.T3**–**P7.T8** optional (not required for COMPLETE)
 
 ### Completion
 

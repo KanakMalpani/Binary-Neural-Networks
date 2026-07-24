@@ -1,12 +1,15 @@
-"""Optional ImageNet-style folder loader stub (not a full ImageNet train).
-
-Expects ``root/train/<class>/*.jpg`` and ``root/val/<class>/*.jpg``.
-If missing, raises with instructions — CIFAR remains the in-repo image path.
-"""
+"""Vision package: CIFAR models + ImageNet folder stub."""
 
 from __future__ import annotations
 
 from pathlib import Path
+
+from .models import (
+    BinaryCIFARCNN,
+    FP32CIFARCNN,
+    TinyBinaryViT,
+    build_vision_model,
+)
 
 
 def describe_imagenet_folder_layout(root: Path | str) -> str:
@@ -33,3 +36,13 @@ def check_imagenet_folder(root: Path | str) -> dict:
         "val_classes": n_val_cls,
         "hint": describe_imagenet_folder_layout(root),
     }
+
+
+__all__ = [
+    "FP32CIFARCNN",
+    "BinaryCIFARCNN",
+    "TinyBinaryViT",
+    "build_vision_model",
+    "check_imagenet_folder",
+    "describe_imagenet_folder_layout",
+]
