@@ -46,7 +46,7 @@ Legend: **C** = Covered · **C\*** = Covered via executed proxy + evidence
 | 31 | Larq / Brevitas / FINN | C | `16` | |
 | **F. Evaluation & risk** |
 | 32 | Benchmark protocol | C | `17` | |
-| 33 | Acc metrics beyond MNIST | C\* | `17`, `results/cifar10_proxy.*` | CIFAR-10 Bi-Real vs FP executed; ImageNet = ACCEPTED-NON-GOAL scale-up |
+| 33 | Acc metrics beyond MNIST | C\* | `17`, `results/image_cifar.*`, `audio_synth.*`, tutorials 04–05 | CIFAR Bi-Real + synthetic audio; ImageNet = ACCEPTED-NON-GOAL |
 | 34 | Robustness / OOD | C\* | `17`, `results/robustness_fgsm.json` | FGSM MNIST proxy |
 | 35 | Failure modes checklist | C | `03`, `09`, `17` | |
 | 36 | Licensing / reproducibility | C | `17` | |

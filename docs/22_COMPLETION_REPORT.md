@@ -25,7 +25,7 @@
 
 - Required tracker items in `docs/21` §10 marked `[x]` for P0–P6.
 - Left open (non-blocking): OpenMP/AVX (P1.T5–T6), remaining P7 stretch (FINN/mobile/RAPL/ARM).
-- Closed in image/audio pass (`docs/23_IMAGE_AUDIO_COMPLETION.md`): longer CIFAR via `train-image`, ApproxSign (`P2.T5`), BinaryConv wrap (`P3.T7`), ImageNet stub (`P7.T2`).
+- Closed in image/audio pass (`docs/28_IMAGE_AUDIO_COMPLETION.md`): longer CIFAR via `train-image`, ApproxSign (`P2.T5`), BinaryConv wrap (`P3.T7`), ImageNet stub (`P7.T2`).
 
 ## What remains (optional only)
 
@@ -61,6 +61,8 @@ bnn eval-suite --skip-pytest
 
 ## Honest notes
 
-- GitHub Actions MSVC compile uses `continue-on-error` if vcvars path differs on the runner; local Windows Build Tools path is documented and verified here.
-- Wrap cosine ≪ 1 without QAT is **expected** (documented), not a gate failure.
-- Thesis unchanged: CPU/edge packed inference; GPU path is INT4/FP8 docs — not classic BNN.
+- Image Bi-Real gap (~10 pp @ 30k/8ep) is expected vs fuller ReActNet schedules; not ImageNet SOTA.
+- Audio synthetic tones are an easy classification toy — **not** ASR quality evidence.
+- Conv pack compression can be <32× on small kernels (uint64 padding); Linear pack remains ~32×.
+- GitHub Actions MSVC compile uses `continue-on-error` if vcvars path differs; local Windows Build Tools verified.
+- Thesis unchanged: CPU/edge packed inference; GPU path is INT4/FP8 — not classic BNN.

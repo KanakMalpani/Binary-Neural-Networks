@@ -31,7 +31,7 @@ pytest tests\test_vision_smoke.py tests\test_audio_smoke.py -q
 
 - Image tutorial: [`docs/tutorials/04_image_cifar.md`](docs/tutorials/04_image_cifar.md)
 - Audio tutorial: [`docs/tutorials/05_audio.md`](docs/tutorials/05_audio.md) (synthetic tones; **not** production ASR — use INT8 Whisper/ORT for real speech)
-- Completion: [`docs/23_IMAGE_AUDIO_COMPLETION.md`](docs/23_IMAGE_AUDIO_COMPLETION.md) · [`docs/24_FINAL_COMPLETION.md`](docs/24_FINAL_COMPLETION.md)
+- Completion: [`docs/28_IMAGE_AUDIO_COMPLETION.md`](docs/28_IMAGE_AUDIO_COMPLETION.md) · [`docs/29_FINAL_COMPLETION.md`](docs/29_FINAL_COMPLETION.md)
 
 ## Measured on this machine (CPU)
 
@@ -72,10 +72,10 @@ Deep dive: `docs/12_WRAPPER_AND_EXISTING_MODELS.md`
 |------|---------|
 | `docs/21_E2E_ROADMAP_COMPLETE_REPO.md` | **Master E2E plan to finish the repo** |
 | `docs/22_COMPLETION_REPORT.md` | **D1–D12 completion evidence** |
-| `docs/23_IMAGE_AUDIO_COMPLETION.md` | **Image + audio modality gates I1–A2** |
-| `docs/24_FINAL_COMPLETION.md` | **Final done criteria + verify** |
+| `docs/28_IMAGE_AUDIO_COMPLETION.md` | **Image + audio modality gates I1–A2** |
+| `docs/29_FINAL_COMPLETION.md` | **Final done criteria + verify** |
 | `docs/22_HF_TO_GGUF_GUIDE.md` | HF → GGUF checklist |
-| `docs/23`–`25` (bitnet / GPU / one-pager) | Bridges (note: numeric prefix collision with modality `23`) |
+| `docs/23`–`25` | bitnet.cpp / GPU INT4-FP8 / one-pager |
 | `docs/tutorials/` | MNIST, wrap, CIFAR, **image**, **audio** |
 | `docs/api/README.md` | API stub |
 | `docs/00_DIMENSION_MAP.md` | **Completeness checklist (40/40 Covered)** |

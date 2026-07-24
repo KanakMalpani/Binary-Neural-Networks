@@ -185,8 +185,8 @@ def render_summary(results_dir: Path | None = None) -> str:
         "Do not advertise \\(R_{arith}\\) as wall-clock.",
         "",
         "Gap closure: `docs/19_GAP_CLOSURE_REPORT.md`. "
-        "Image+audio: `docs/23_IMAGE_AUDIO_COMPLETION.md`. "
-        "Final: `docs/24_FINAL_COMPLETION.md`.",
+        "Image+audio: `docs/28_IMAGE_AUDIO_COMPLETION.md`. "
+        "Final: `docs/29_FINAL_COMPLETION.md`.",
         "",
     ]
     return "\n".join(lines)

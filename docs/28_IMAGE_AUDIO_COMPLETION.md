@@ -16,8 +16,9 @@
 
 - Models: `bnn/vision/models.py` — FP CNN, Bi-Real CNN, tiny binary-ViT sketch
 - Train: `scripts/train_image.py` / CLI `bnn train-image`
+- Measured (30k subset, 8 ep, ApproxSign): FP **71.14%** vs binary **61.14%** (`results/image_cifar.*`)
 - ApproxSign: `--approx-sign` → `bnn.ste.set_approx_sign`
-- Packed Conv: `wrap_conv_modules` / `PackedBinaryConv2d` — **size ~32×**, forward = dequant+FP (honest)
+- Packed Conv: `wrap_conv_modules` / `PackedBinaryConv2d` — **size win** (pad-limited <32× on tiny K); forward = dequant+FP (honest)
 - ImageNet full train: ADR non-goal; stub `bnn.vision.check_imagenet_folder`
 
 ## Audio lane
@@ -25,6 +26,7 @@
 - Features: numpy STFT + mel-like pool (`bnn/audio/features.py`)
 - Data: synthetic tones always (CI-safe); optional NPZ cache
 - Models: FP / binary CNN (+ MLP) in `bnn/audio/models.py`
+- Measured (800/200, 5 ep): FP **94.5%** vs binary **96.0%** on easy tones (`results/audio_synth.*`)
 - **Not production ASR** — recommend INT8 Whisper/ORT; demo proves packing/QAT pattern on audio features
 
 ## Roadmap leftovers closed this pass
@@ -36,4 +38,4 @@
 
 OpenMP/AVX remain **ACCEPTED-NON-GOAL**.
 
-See also: `docs/24_FINAL_COMPLETION.md`.
+See also: `docs/29_FINAL_COMPLETION.md`.

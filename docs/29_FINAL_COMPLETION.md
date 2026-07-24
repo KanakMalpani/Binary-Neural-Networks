@@ -2,7 +2,7 @@
 
 **Date:** 2026-07-24  
 **Prior:** D1–D12 in `docs/22_COMPLETION_REPORT.md`  
-**Modality:** `docs/23_IMAGE_AUDIO_COMPLETION.md`
+**Modality:** `docs/28_IMAGE_AUDIO_COMPLETION.md`
 
 ## Verdict
 

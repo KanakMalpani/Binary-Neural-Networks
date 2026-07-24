@@ -1,0 +1,98 @@
+{
+  "modality": "audio",
+  "meta": {
+    "source": "synthetic_tones",
+    "n_classes": 8,
+    "n_train": 800,
+    "n_test": 200,
+    "feature_shape": [
+      40,
+      32
+    ],
+    "note": "Synthetic musical-tone spectrograms (offline). Production ASR \u2192 INT8 Whisper/ORT; classic BNN ASR is research-grade."
+  },
+  "epochs": 5,
+  "approx_sign": false,
+  "results": [
+    {
+      "model": "fp32_cnn",
+      "test_acc": 94.5,
+      "train_seconds": 1.5299300999977277,
+      "params": {
+        "total_params": 19432,
+        "binary_or_ternary_weight_params": 0,
+        "fp_params": 19432,
+        "theoretical_weight_bytes_if_packed": 77728,
+        "fp32_weight_bytes": 77728
+      },
+      "history": [
+        {
+          "epoch": 1,
+          "loss": 1.9855075693130493,
+          "test_acc": 27.0
+        },
+        {
+          "epoch": 2,
+          "loss": 1.7690152788162232,
+          "test_acc": 95.5
+        },
+        {
+          "epoch": 3,
+          "loss": 1.5894036197662353,
+          "test_acc": 95.5
+        },
+        {
+          "epoch": 4,
+          "loss": 1.4185700130462646,
+          "test_acc": 96.0
+        },
+        {
+          "epoch": 5,
+          "loss": 1.2565903997421264,
+          "test_acc": 94.5
+        }
+      ]
+    },
+    {
+      "model": "binary_cnn",
+      "test_acc": 96.0,
+      "train_seconds": 5.172310699999798,
+      "params": {
+        "total_params": 67912,
+        "binary_or_ternary_weight_params": 64512,
+        "fp_params": 3400,
+        "theoretical_weight_bytes_if_packed": 21664,
+        "fp32_weight_bytes": 271648
+      },
+      "history": [
+        {
+          "epoch": 1,
+          "loss": 1.9353414392471313,
+          "test_acc": 47.0
+        },
+        {
+          "epoch": 2,
+          "loss": 1.51212637424469,
+          "test_acc": 71.0
+        },
+        {
+          "epoch": 3,
+          "loss": 1.0674446654319762,
+          "test_acc": 76.5
+        },
+        {
+          "epoch": 4,
+          "loss": 0.7522534394264221,
+          "test_acc": 94.5
+        },
+        {
+          "epoch": 5,
+          "loss": 0.5211069750785827,
+          "test_acc": 96.0
+        }
+      ]
+    }
+  ],
+  "acc_gap_pp": -1.5,
+  "verdict": "Binary audio-CNN within -1.50 pp of FP on synthetic tone spectrograms. Classic BNN is NOT production ASR \u2014 use INT8 Whisper/ORT for real speech; this demo proves STE + packing pattern on audio features."
+}

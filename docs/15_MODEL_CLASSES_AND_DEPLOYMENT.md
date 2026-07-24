@@ -34,6 +34,13 @@ mainstream ASR (Whisper-class) uses FP16/INT8. TTS/codecs increasingly use **dis
 diffusion**, not BNNs. **Recommendation:** INT8 ORT/OpenVINO for ASR edge; BNN only with
 custom QAT budget.
 
+**In-repo audio demo (not ASR):** `bnn train-audio` classifies synthetic tone spectrograms with
+FP vs Bi-Real-style binary CNN (`bnn/audio/`). Proves STE + packing pattern on audio features.
+Production ASR → INT8 Whisper/ORT. Tutorial: `docs/tutorials/05_audio.md`.
+
+**In-repo image demo:** `bnn train-image` CIFAR-10 Bi-Real (+ optional tiny ViT). Full ImageNet
+train remains ADR non-goal (`docs/imagenet_protocol.md`).
+
 ## 24. Multimodal / embeddings
 
 - **BitEmbed** (2026): ternary BitNet-style embedders — competitive retrieval with storage wins
@@ -68,7 +75,7 @@ Vision edge + can retrain → Bi-Real/ReActNet + LCE/FINN
 LLM GPU serve → FP8/INT4 + vLLM
 LLM CPU local → GGUF or bitnet.cpp
 Diffusion → INT8/FP8 PTQ, not BNN
-Speech edge → INT8 first; Binary Conformer research
+Speech edge → INT8 first; Binary Conformer research; in-repo: `bnn train-audio`
 Embeddings → BitEmbed / INT8
 Browser → INT8 ORT-Web
 ```
