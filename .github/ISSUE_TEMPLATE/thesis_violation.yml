@@ -1,0 +1,40 @@
+name: Thesis violation
+description: Flag a claim that breaks the thesis lock (fake GPU 32×, conflated metrics, etc.)
+title: "[thesis] "
+labels: ["thesis-lock"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        **Thesis lock:** packed CPU/edge XNOR-popcount + honest STE; never claim GPU
+        32× from `sign()`. Compression 32× is exact pack — not e2e latency.
+        See [`ROADMAP.md`](../blob/main/ROADMAP.md) §0.2.
+  - type: textarea
+    id: where
+    attributes:
+      label: Where is the claim?
+      description: File, README section, PR, external post, etc.
+    validations:
+      required: true
+  - type: textarea
+    id: quote
+    attributes:
+      label: Exact claim (quote)
+    validations:
+      required: true
+  - type: dropdown
+    id: kind
+    attributes:
+      label: Violation kind
+      options:
+        - GPU 32× / e2e from sign() or STE
+        - Theory compression sold as wall-clock
+        - Invented golden / alternate bench shape
+        - Other honesty / dual-metric issue
+    validations:
+      required: true
+  - type: textarea
+    id: fix
+    attributes:
+      label: Suggested fix
+      placeholder: "Reword to dual metrics; point to docs/24 GPU bridge; …"

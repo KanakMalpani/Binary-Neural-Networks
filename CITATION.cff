@@ -1,0 +1,22 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite it as below."
+type: software
+title: "Binary Neural Networks — Extreme Low-Bit Inference Lab / Optimiser"
+authors:
+  - family-names: Malpani
+    given-names: Kanak
+repository-code: "https://github.com/KanakMalpani/Binary-Neural-Networks"
+url: "https://github.com/KanakMalpani/Binary-Neural-Networks"
+license: MIT
+version: "0.2.0"
+date-released: "2026-07-25"
+abstract: >-
+  Installable lab for packed binary/ternary CPU/edge inference with honest STE
+  training simulation, hybrid wrap/optimise APIs, .bnnpack codec, and dual-metric
+  (theory vs wall-clock) reporting. Does not claim GPU 32x from sign().
+keywords:
+  - binary neural networks
+  - XNOR-popcount
+  - ternary weights
+  - edge inference
+  - model optimisation

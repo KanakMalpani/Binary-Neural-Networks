@@ -1,0 +1,10 @@
+# Default owner for this lab / optimiser repo.
+*       @KanakMalpani
+
+# Kernel + packaging changes need extra care.
+/bnn/kernels/       @KanakMalpani
+/pyproject.toml     @KanakMalpani
+/constraints.txt    @KanakMalpani
+/tests/golden_floors.json @KanakMalpani
+/ROADMAP.md         @KanakMalpani
+/docs/37_WORLD_CLASS_BNN_OPTIMISER_ROADMAP.md @KanakMalpani

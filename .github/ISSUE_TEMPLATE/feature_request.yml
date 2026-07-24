@@ -1,0 +1,38 @@
+name: Feature request
+description: Propose a product / DX / optimiser improvement (prefer ROADMAP IDs)
+title: "[feat] "
+labels: ["enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Prefer picking an unchecked item from [`ROADMAP.md`](../blob/main/ROADMAP.md)
+        (§10 living tracker). New bench shapes are discouraged.
+  - type: input
+    id: roadmap
+    attributes:
+      label: Roadmap task ID (if any)
+      placeholder: "e.g. W1.T05, W5.T04"
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem
+      description: Who is blocked and why?
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposal
+      description: API / CLI / docs sketch
+    validations:
+      required: true
+  - type: checkboxes
+    id: honesty
+    attributes:
+      label: Honesty
+      options:
+        - label: I am not proposing GPU 32× from `sign()` / STE alone
+        - label: I am not inventing a new golden benchmark shape
+      validations:
+        required: true

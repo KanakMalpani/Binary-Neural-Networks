@@ -1,0 +1,49 @@
+name: Bug report
+description: Something broken in install, kernels, wrap, codec, or repro
+title: "[bug] "
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for helping keep the lab honest. Please run `bnn repro` if relevant
+        and paste the last ~30 lines of stdout.
+  - type: textarea
+    id: what
+    attributes:
+      label: What happened?
+      description: Expected vs actual
+    validations:
+      required: true
+  - type: textarea
+    id: repro
+    attributes:
+      label: Repro steps
+      description: Minimal commands
+      value: |
+        1. `pip install -e ".[dev]" -c constraints.txt`
+        2. `python -m bnn.kernels.compile_native`  # Windows
+        3. `bnn repro`
+        4. …
+    validations:
+      required: true
+  - type: input
+    id: os
+    attributes:
+      label: OS / Python / torch
+      placeholder: "Windows 11 · Python 3.12 · torch 2.x"
+    validations:
+      required: true
+  - type: checkboxes
+    id: gates
+    attributes:
+      label: Gates tried
+      options:
+        - label: `bnn repro` (paste PASS/FAIL)
+        - label: `pytest -q`
+        - label: `bnn validate-native` (Windows)
+  - type: textarea
+    id: logs
+    attributes:
+      label: Logs / traceback
+      render: text

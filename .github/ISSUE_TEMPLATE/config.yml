@@ -1,0 +1,8 @@
+blank_issues_enabled: true
+contact_links:
+  - name: Canonical roadmap
+    url: https://github.com/KanakMalpani/Binary-Neural-Networks/blob/main/ROADMAP.md
+    about: When lost — §0 → §7 → current phase → lowest unchecked TODO.
+  - name: Reproducibility
+    url: https://github.com/KanakMalpani/Binary-Neural-Networks/blob/main/REPRODUCIBILITY.md
+    about: How to get REPRO: PASS on a clean install.
