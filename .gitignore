@@ -25,9 +25,9 @@ env/
 *.pdb
 bnn/kernels/_binary_gemm_native*
 
-# Datasets (never commit)
-data/
-!data/.gitkeep
+# Datasets (never commit) — keep empty placeholder
+/data/**
+!/data/.gitkeep
 
 # Checkpoints / local runs
 checkpoints/
