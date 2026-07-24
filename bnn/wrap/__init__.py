@@ -43,6 +43,13 @@ from .schema import (
     is_valid_optimise_report,
     validate_optimise_report,
 )
+from .guardrails import GuardrailVerdict, check_linear_wrap_guardrails
+from .sensitivity import (
+    LayerSensitivity,
+    SensitivityReport,
+    apply_sensitivity_skips,
+    score_layer_sensitivity,
+)
 
 __all__ = [
     "WrapMode",
@@ -80,4 +87,10 @@ __all__ = [
     "envelope",
     "validate_optimise_report",
     "is_valid_optimise_report",
+    "LayerSensitivity",
+    "SensitivityReport",
+    "score_layer_sensitivity",
+    "apply_sensitivity_skips",
+    "GuardrailVerdict",
+    "check_linear_wrap_guardrails",
 ]

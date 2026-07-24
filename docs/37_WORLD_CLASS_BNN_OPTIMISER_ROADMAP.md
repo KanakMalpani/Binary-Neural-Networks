@@ -3,7 +3,7 @@
 | Field | Value |
 |-------|-------|
 | **Status** | Canonical living plan (agents: follow when lost) |
-| **Version** | 0.2.0 → target 1.0 world-class |
+| **Version** | 0.3.0 → target 1.0 world-class |
 | **Created** | 2026-07-25 |
 | **Canonical paths** | `/ROADMAP.md` (this file) · identical twin `docs/37_WORLD_CLASS_BNN_OPTIMISER_ROADMAP.md` |
 | **Supersedes (execution)** | `docs/21` remains historical COMPLETE lab plan; **this file** is the forward “world-class optimiser” plan |
@@ -160,12 +160,12 @@ Audit date: **2026-07-25**. Status legend: `[x] DONE` · `[~] PARTIAL` · `[ ] T
 
 | Area | Status | Evidence (paths) | Gap to world-class |
 |------|--------|------------------|--------------------|
-| Packaging / version | `[x]` | `pyproject.toml` 0.2.0, `bnn/_version.py`, console script | Semver policy doc; PyPI publish |
+| Packaging / version | `[x]` | `pyproject.toml` 0.3.0, `bnn/_version.py`, console script | PyPI Trusted Publishing (prep done) |
 | CLI surface | `[x]` | `bnn optimise` + wrap/encode/… | HF load verb optional |
 | STE layers / models | `[x]` | `bnn/ste.py`, `layers.py`, `models.py` | Broader zoo (ResNet-BiReal full, BitLinear LLM toy) |
-| Native binary GEMM | `[~]` | MSVC DLL + Linux GCC `.so` path; NumPy fallback | macOS/ARM; AVX-512; harden CI |
+| Native binary GEMM | `[~]` | MSVC DLL + Linux GCC `.so` **CI hard**; NumPy fallback | macOS/ARM NEON spike deferred |
 | Ternary kernels | `[~]` | `ternary_pack.py`, `ternary_gemm.py` / C bitplanes | Cross-platform polish; bitnet.cpp handoff clarity |
-| Wrap / ultra wrap | `[~]` | `bnn/wrap/*`, `wrapper.py`, `ultra_wrap_demo.py` | Stable public optimiser API; sensitivity search |
+| Wrap / ultra wrap | `[~]` | `bnn/wrap/*` + sensitivity W3.T05 | Full search W3.T06 |
 | Calibrate / QAT | `[~]` | `wrap/calibrate.py`, `wrap/qat.py`, distill sketch | Full recipes; distill integration |
 | Auto policy | `[~]` | `wrap/policy.py` (`auto`, hybrid_ffn, …) | Layer-wise search; richer HW detect |
 | Codec `.bnnpack` | `[~]` | `bnn/codec/packfile.py` v1, encode/decode CLI | v2 schema, safetensors, ONNX |
@@ -173,28 +173,28 @@ Audit date: **2026-07-25**. Status legend: `[x] DONE` · `[~] PARTIAL` · `[ ] T
 | Vision | `[~]` | `bnn/vision/`, CIFAR Bi-Real, TinyBinaryViT | ImageNet protocol only stub |
 | Audio | `[~]` | `bnn/audio/` synthetic tones | Real dataset optional; keep ASR non-goal |
 | Math identities | `[x]` | `bnn/math/*`, `docs/35`, tests | Keep as regression forever |
-| Profile / bench | `[~]` | `bnn/profile.py`, `scripts/benchmark.py` | Flamegraphs; energy Joules; Pareto plots |
+| Profile / bench | `[~]` | profile + Pareto JSON + flamegraph howto | RAPL Joules moonshot |
 | Repro / goldens | `[x]` | `scripts/repro_all.py`, `golden_floors.json`, `REPRODUCIBILITY.md`, `AGENTS.md` | Broader OS matrix |
-| CI | `[~]` | `.github/workflows/ci.yml` Win+Linux | macOS; py3.11/3.13 matrix; native Linux compile |
+| CI | `[x]` | Win + Linux native hard + py3.11–3.13 matrix | macOS optional |
 | Docs research 00–36 | `[x]` | `docs/` | MkDocs site; fewer conflicting “master” claims |
 | API reference | `[~]` | docs/api + MkDocs stub | Autodoc (W9.T06) |
 | Tutorials | `[x]` | `docs/tutorials/01`–`08` | Keep green |
 | Bridges GPU/BitNet | `[~]` | `docs/23`–`24`, `scripts/bridges/*` | First-class CLI `bnn bridge …` |
 | HF integration | `[x]` | tutorial 08 + optional hf tests | deeper calib recipes |
-| Community OSS | `[x]` | LICENSE, templates, COC, SECURITY, CODEOWNERS, CONTRIBUTING | Discussions / launch checklist |
-| Security | `[~]` | SECURITY.md + paths/weights_only | dependency audit, SBOM |
-| Releases | `[ ]` | version in pyproject only | GitHub Releases, attestations, SBOM |
-| Papers / research series | `[~]` | `docs/32`, local `C:\00 Research Papers\…` | Publication plan + citation CITATION.cff |
-| Compatibility matrix | `[~]` | requires-python ≥3.11; torch pin | Explicit tested matrix doc + CI |
+| Community OSS | `[x]` | LICENSE, templates, COC, SECURITY, CODEOWNERS, CONTRIBUTING, launch checklist | Discussions manual |
+| Security | `[~]` | SECURITY.md + SBOM script + soft pip-audit | Harden audit gate |
+| Releases | `[x]` | `v0.3.0` + SBOM script | Attestations / PyPI upload |
+| Papers / research series | `[~]` | `docs/32`, publication plan, CITATION.cff | Venue submit |
+| Compatibility matrix | `[x]` | docs + CI matrix 3.11–3.13 | macOS CI optional |
 | Memory arena / thread pool API | `[~]` | OpenMP thread setter in C/Python | Arena allocator; documented pool |
 | WASM | `[ ]` | — | Optional moonshot |
-| ONNX / safetensors | `[ ]` | — | Export paths |
-| Leaderboard protocol | `[ ]` | machine-local results | Fair multi-machine protocol |
+| ONNX / safetensors | `[ ]` | Explicit defer (`MOONSHOT_DEFERRALS`) | Export paths |
+| Leaderboard protocol | `[~]` | fair protocol + template | Community submissions |
 | Model cards / ethics | `[x]` | MODEL_CARD.md | Expand ethics essay optional |
 
 ### 2.1 Inventory snapshot (what exists)
 
-**CLI (`bnn`):** `compile-native`, `validate-native`, `bench`, `export-check`, `train`, `train-cifar`, `train-image`, `train-audio`, `train-seq2seq`, `repro`, `wrap` (+ `--ultra`), `wrap-transformer`, `encode`, `decode`, `profile`, `energy-bound`, `eval-suite`, `recommend`, `version`.
+**CLI (`bnn`):** `compile-native`, `validate-native`, `bench`, `export-check`, `train`, `train-cifar`, `train-image`, `train-audio`, `train-seq2seq`, `repro`, `wrap` (+ `--ultra`), `optimise`, `pareto`, `wrap-transformer`, `encode`, `decode`, `profile`, `energy-bound`, `eval-suite`, `recommend`, `version`.
 
 **Packages:** `bnn` core, `kernels`, `wrap`, `codec`, `seq`, `vision`, `audio`, `math`, `profile`.
 
@@ -291,9 +291,9 @@ Acceptance: every task that touches metrics must keep `bnn repro` green unless e
 |----|------|-----|------|--------|
 | W2.T01 | Document current OpenMP MSVC path + thread API | S | — | `[x]` C + docs/34 |
 | W2.T02 | Linux GCC/Clang `.so` compile path | L | W2.T01 | `[x]` `compile_native` |
-| W2.T03 | CI job: build + `validate-native` on Linux | M | W2.T02 | `[~]` CI soft |
-| W2.T04 | ARM NEON spike (Apple Silicon or aarch64 Linux) | L | W2.T02 | `[ ]` |
-| W2.T05 | AVX2 / AVX-512 optional dispatch | XL | W2.T02 | `[ ]` |
+| W2.T03 | CI job: build + `validate-native` on Linux | M | W2.T02 | `[x]` hard gate |
+| W2.T04 | ARM NEON spike (Apple Silicon or aarch64 Linux) | L | W2.T02 | `[~]` spike note deferred |
+| W2.T05 | AVX2 / AVX-512 optional dispatch | XL | W2.T02 | `[~]` moonshot note |
 | W2.T06 | WASM SIMD prototype (optional) | XL | W2.T02 | `[ ]` |
 | W2.T07 | Memory arena for packed buffers | L | W2.T02 | `[ ]` |
 | W2.T08 | Document GPU bridge non-goal for classic BNN | S | — | `[x]` docs/24 |
@@ -316,12 +316,12 @@ Acceptance: every task that touches metrics must keep `bnn repro` green unless e
 | W3.T02 | Effectiveness report always emitted | M | W3.T01 | `[~]` |
 | W3.T03 | Auto policy reasons in report | S | — | `[~]` |
 | W3.T04 | Drop-in threshold tests | S | — | `[~]` |
-| W3.T05 | Layer-wise sensitivity (ablate / score) | L | W3.T01 | `[ ]` |
+| W3.T05 | Layer-wise sensitivity (ablate / score) | L | W3.T01 | `[x]` |
 | W3.T06 | Search: binary vs ternary vs skip per layer | L | W3.T05 | `[ ]` |
 | W3.T07 | QAT recipe docs + longer runnable path | M | W3.T01 | `[~]` sketch |
 | W3.T08 | Distill integration beyond `distill_sketch.py` | L | W3.T07 | `[ ]` |
 | W3.T09 | BN fuse in optimiser path | M | — | `[~]` fuse helpers exist |
-| W3.T10 | Guardrails: refuse known-bad shapes with message | M | W3.T03 | `[ ]` |
+| W3.T10 | Guardrails: refuse known-bad shapes with message | M | W3.T03 | `[x]` |
 
 **Acceptance tests:** documented demo improves cosine with QAT; auto policy deterministic under seed; repro green.  
 **Follow when lost:** W3.T01 → W3.T05 → W3.T06.
@@ -360,9 +360,9 @@ Acceptance: every task that touches metrics must keep `bnn repro` green unless e
 | W5.T02 | Security: `weights_only` load | S | — | `[x]` |
 | W5.T03 | HF tiny wrap demo | M | hf extra | `[x]` |
 | W5.T04 | HF optimiser tutorial + CI-optional test | L | W5.T03, W1 | `[x]` |
-| W5.T05 | `.bnnpack` v2 design (ternary, meta, hashes) | L | W5.T01 | `[ ]` |
+| W5.T05 | `.bnnpack` v2 design (ternary, meta, hashes) | L | W5.T01 | `[~]` design sketch |
 | W5.T06 | safetensors export of packed tensors | L | W5.T05 | `[ ]` |
-| W5.T07 | ONNX export spike (or explicit defer) | XL | W5.T05 | `[ ]` |
+| W5.T07 | ONNX export spike (or explicit defer) | XL | W5.T05 | `[x]` explicit defer |
 | W5.T08 | Round-trip tests in default pytest | M | W5.T01 | `[x]` `test_codec.py` |
 | W5.T09 | Wrap Conv2d packed path polish | M | — | `[~]` |
 
@@ -383,7 +383,7 @@ Acceptance: every task that touches metrics must keep `bnn repro` green unless e
 | W6.T03 | Audio synthetic lane | M | — | `[x]` |
 | W6.T04 | Dataset cards (MNIST/CIFAR/synth audio) | M | — | `[x]` |
 | W6.T05 | Seq reverse-task card | S | — | `[~]` in docs/36 |
-| W6.T06 | Training recipes index | M | W4, W9 | `[ ]` |
+| W6.T06 | Training recipes index | M | W4, W9 | `[x]` |
 | W6.T07 | ImageNet folder protocol only | S | — | `[x]` stub |
 | W6.T08 | Never commit datasets | S | — | `[x]` policy |
 
@@ -400,11 +400,11 @@ Acceptance: every task that touches metrics must keep `bnn repro` green unless e
 |----|------|-----|------|--------|
 | W7.T01 | Keep golden floors / committed results | — | — | `[x]` |
 | W7.T02 | Document allowed bench shapes (forbid inventing) | S | — | `[x]` docs/BENCH_SHAPES.md |
-| W7.T03 | Pareto JSON: accuracy, compression, latency, energy-proxy | M | W1.T06 | `[ ]` |
-| W7.T04 | Plot script (optional mpl extra) | M | W7.T03 | `[ ]` |
-| W7.T05 | Fair protocol doc (warmup, threads, CPU model) | M | W7.T02 | `[ ]` |
+| W7.T03 | Pareto JSON: accuracy, compression, latency, energy-proxy | M | W1.T06 | `[x]` |
+| W7.T04 | Plot script (optional mpl extra) | M | W7.T03 | `[x]` optional mpl |
+| W7.T05 | Fair protocol doc (warmup, threads, CPU model) | M | W7.T02 | `[x]` |
 | W7.T06 | Robustness FGSM keep as optional | S | — | `[x]` script |
-| W7.T07 | Leaderboard template (manual submissions) | L | W7.T05 | `[ ]` |
+| W7.T07 | Leaderboard template (manual submissions) | L | W7.T05 | `[x]` |
 | W7.T08 | `eval-suite` includes codec + seq smokes | M | — | `[~]` |
 
 **Follow when lost:** W7.T02 → W7.T03 → W7.T05.
@@ -420,14 +420,14 @@ Acceptance: every task that touches metrics must keep `bnn repro` green unless e
 |----|------|-----|------|--------|
 | W8.T01 | `bnn repro` verify/full | — | — | `[x]` |
 | W8.T02 | CI Windows + Linux pytest + repro | — | — | `[x]` |
-| W8.T03 | Python 3.11 / 3.12 / 3.13 matrix | M | — | `[ ]` |
+| W8.T03 | Python 3.11 / 3.12 / 3.13 matrix | M | — | `[x]` |
 | W8.T04 | macOS CI (NumPy or native) | M | W2 | `[ ]` |
-| W8.T05 | Tagged GitHub Releases | M | W1 | `[ ]` |
-| W8.T06 | SBOM (e.g. cyclonedx) on release | M | W8.T05 | `[ ]` |
+| W8.T05 | Tagged GitHub Releases | M | W1 | `[x]` v0.3.0 |
+| W8.T06 | SBOM (e.g. cyclonedx) on release | M | W8.T05 | `[x]` script + docs |
 | W8.T07 | Artifact attestations | L | W8.T05 | `[ ]` |
-| W8.T08 | PyPI publish workflow (Trusted Publishing) | L | W8.T05 | `[ ]` |
+| W8.T08 | PyPI publish workflow (Trusted Publishing) | L | W8.T05 | `[~]` prep docs; no upload |
 | W8.T09 | constraints.txt discipline | S | — | `[x]` |
-| W8.T10 | Native compile in CI not `continue-on-error` when possible | M | W2.T03 | `[~]` |
+| W8.T10 | Native compile in CI not `continue-on-error` when possible | M | W2.T03 | `[x]` Linux hard; Win soft |
 
 **Follow when lost:** W8.T03 → W8.T05 → W8.T06.
 
@@ -466,7 +466,7 @@ Acceptance: every task that touches metrics must keep `bnn repro` green unless e
 | W10.T02 | SECURITY.md + vuln reporting | S | — | `[x]` |
 | W10.T03 | Path traversal + pickle policy tests | M | — | `[~]` |
 | W10.T04 | Ethics: dual-use / deployment notes | S | — | `[x]` MODEL_CARD |
-| W10.T05 | Dependency audit in CI (pip-audit) | M | W8 | `[ ]` |
+| W10.T05 | Dependency audit in CI (pip-audit) | M | W8 | `[~]` soft advisory job |
 | W10.T06 | Codec untrusted-file warnings | S | W5 | `[~]` |
 
 **Follow when lost:** W10.T02 → W10.T01 → W10.T05.
@@ -485,9 +485,9 @@ Acceptance: every task that touches metrics must keep `bnn repro` green unless e
 | W11.T03 | PR template (repro checklist) | S | — | `[x]` |
 | W11.T04 | CODEOWNERS | S | — | `[x]` |
 | W11.T05 | CODE_OF_CONDUCT.md | S | — | `[x]` |
-| W11.T06 | Enable Discussions (manual) | S | — | `[ ]` |
-| W11.T07 | Public launch checklist execution | M | W8, W9, W10 | `[ ]` |
-| W11.T08 | Good first issues labeled | M | W11.T02 | `[ ]` |
+| W11.T06 | Enable Discussions (manual) | S | — | `[~]` documented for human |
+| W11.T07 | Public launch checklist execution | M | W8, W9, W10 | `[x]` docs/LAUNCH_CHECKLIST |
+| W11.T08 | Good first issues labeled | M | W11.T02 | `[~]` human labels |
 | W11.T09 | CONTRIBUTING keep synced to ROADMAP | S | — | `[x]` |
 | W11.T10 | CITATION.cff | S | W12 | `[x]` |
 
@@ -503,8 +503,8 @@ Acceptance: every task that touches metrics must keep `bnn repro` green unless e
 | ID | Task | Est | Deps | Status |
 |----|------|-----|------|--------|
 | W12.T01 | Link local series `C:\00 Research Papers\…` in docs | S | — | `[~]` docs/32 |
-| W12.T02 | Publication plan (venue, claims whitelist) | M | WC gates | `[ ]` |
-| W12.T03 | Figure pipeline from `results/*.json` | L | W7 | `[ ]` |
+| W12.T02 | Publication plan (venue, claims whitelist) | M | WC gates | `[x]` draft |
+| W12.T03 | Figure pipeline from `results/*.json` | L | W7 | `[~]` Pareto plot path |
 | W12.T04 | Related work table maintenance | M | docs/02 | `[~]` |
 | W12.T05 | Novel candidates triage (`docs/32`) → ship or defer | M | — | `[~]` |
 | W12.T06 | Never weaken thesis for paper hype | — | — | `[x]` policy |
@@ -521,7 +521,7 @@ Acceptance: every task that touches metrics must keep `bnn repro` green unless e
 | ID | Task | Est | Deps | Status |
 |----|------|-----|------|--------|
 | W13.T01 | `bnn profile` pack/gemm/overhead | M | — | `[x]` |
-| W13.T02 | Flamegraph / vizdoc howto | M | W13.T01 | `[ ]` |
+| W13.T02 | Flamegraph / vizdoc howto | M | W13.T01 | `[x]` |
 | W13.T03 | CI latency soft budgets | M | W7 | `[~]` bench regression |
 | W13.T04 | Thread scaling curves committed | M | — | `[~]` docs/34 |
 | W13.T05 | Memory footprint report | M | W2.T07 | `[ ]` |
@@ -539,10 +539,10 @@ Acceptance: every task that touches metrics must keep `bnn repro` green unless e
 | ID | Task | Est | Deps | Status |
 |----|------|-----|------|--------|
 | W14.T01 | Document OS × arch × Python × torch matrix | M | — | `[x]` |
-| W14.T02 | CI Python 3.11–3.13 | M | W8.T03 | `[ ]` |
+| W14.T02 | CI Python 3.11–3.13 | M | W8.T03 | `[x]` |
 | W14.T03 | Torch upper-bound policy | S | pyproject | `[~]` pin exists |
 | W14.T04 | Windows MSVC Build Tools runbook | S | — | `[x]` REPRODUCIBILITY |
-| W14.T05 | macOS notes (Accelerate / fallback) | M | W2 | `[ ]` |
+| W14.T05 | macOS notes (Accelerate / fallback) | M | W2 | `[x]` |
 | W14.T06 | Optional torchao / transformers version matrix | L | W5 | `[ ]` |
 
 **Follow when lost:** W14.T01 → W14.T02 → W14.T05.
@@ -642,7 +642,7 @@ flowchart TD
 
 ### 7.4 Default active phase
 
-As of 2026-07-25 (updated): **Phase A+B largely complete**; next focus **Phase C** (multi-arch polish, Pareto, py matrix) + remaining Phase D launch tags.
+As of 2026-07-25 (updated): **Phases A–D substantially complete at v0.3.0**; remaining = WC-§1 leftovers + moonshots (see `docs/MOONSHOT_DEFERRALS.md` / `docs/40_ROADMAP_E2E_SESSION.md`).
 
 ---
 
@@ -655,15 +655,15 @@ As of 2026-07-25 (updated): **Phase A+B largely complete**; next focus **Phase C
 - [x] Issue/PR templates
 - [x] HF tutorial draft
 - [x] `bnn repro` PASS
-- [ ] CHANGELOG + tag `v0.3.0`
+- [x] CHANGELOG + tag `v0.3.0`
 
 ### v0.4 — Cross-platform runtime
 
-- [ ] Linux native or explicit tracked deferral with date
-- [ ] Compat matrix doc + broader CI
-- [ ] Pareto report v0
-- [ ] SECURITY.md + MODEL_CARD draft
-- [ ] Tag `v0.4.0` + SBOM artifact
+- [x] Linux native CI hard gate (2026-07-25)
+- [x] Compat matrix doc + py3.11–3.13 CI
+- [x] Pareto report v0 (`bnn_pareto_report_v1`)
+- [x] SECURITY.md + MODEL_CARD
+- [~] Tag `v0.4.0` deferred — folded into v0.3.0 preview; next tag when ARM/macOS land
 
 ### v1.0 — World-class bar
 
@@ -734,55 +734,61 @@ Pre-checked from 2026-07-25 audit. **Agents: flip `[ ]` → `[x]` or `[~]` in PR
 - [x] W9.T01 Optimiser quickstart
 - [x] W4.T08 Zoo registry
 - [x] W6.T04 Dataset cards
-- [ ] W3.T05 Layer-wise sensitivity (can slip to C)
+- [x] W3.T05 Layer-wise sensitivity
 
 ### 10.4 Phase C — Kernels
 
 - [x] W2.T02 Linux `.so`
-- [~] W2.T03 Linux native CI (soft continue-on-error)
-- [ ] W2.T04 ARM NEON spike
+- [x] W2.T03 Linux native CI (hard gate)
+- [~] W2.T04 ARM NEON spike (documented deferral)
 - [x] W14.T01 Compat matrix doc
-- [ ] W8.T03 Python version matrix
-- [ ] W7.T03 Pareto JSON
-- [ ] W13.T02 Flamegraph howto
+- [x] W8.T03 Python version matrix
+- [x] W7.T03 Pareto JSON
+- [x] W7.T05 Fair protocol
+- [x] W13.T02 Flamegraph howto
 
 ### 10.5 Phase D — Launch
 
 - [x] W11.T01 LICENSE
 - [x] W11.T02–T05 Templates / COC / CODEOWNERS / SECURITY
 - [x] W10.T01 Model card
-- [ ] W8.T05–T06 Release + SBOM
-- [ ] W11.T07 Launch checklist executed
+- [x] W8.T05–T06 Release + SBOM (v0.3.0)
+- [x] W11.T07 Launch checklist executed (in-repo; Discussions manual)
 
 ### 10.6 Phase E — Research
 
-- [ ] W12.T02 Publication plan
-- [ ] W12.T03 Figure pipeline
+- [x] W12.T02 Publication plan (draft)
+- [~] W12.T03 Figure pipeline (Pareto plot path)
 - [x] W11.T10 CITATION.cff
 
 ### 10.7 Phase F — Ecosystem
 
-- [ ] W5.T05 `.bnnpack` v2
+- [~] W5.T05 `.bnnpack` v2 (design sketch only)
 - [ ] W5.T06 safetensors
-- [ ] W5.T07 ONNX decision executed
-- [ ] W2.T05 AVX-512 optional
+- [x] W5.T07 ONNX decision executed (explicit defer)
+- [~] W2.T05 AVX-512 optional (moonshot note)
 - [ ] W2.T06 WASM optional
-- [ ] W7.T07 Leaderboard template
+- [x] W7.T07 Leaderboard template
 
 ### 10.8 World-class gates (§1)
 
-- [ ] WC-A1–A3
-- [ ] WC-K1–K4 (K1–K2 already true on Windows lab)
+- [x] WC-A1–A3 (optimiser API + CLI + version/CHANGELOG)
 - [x] WC-K1 compression (aligned)
 - [x] WC-K2 err=0 when native present
-- [ ] WC-K3 multi-OS native
-- [~] WC-K4 dual-metric (exists; harden budgets)
-- [~] WC-O1–O4
+- [~] WC-K3 multi-OS native (Win+Linux; macOS/ARM NumPy)
+- [x] WC-K4 dual-metric (Pareto + fair protocol)
+- [~] WC-O1–O4 (calib/auto/QAT sketch; sensitivity yes; full search no)
 - [x] WC-R1 repro
-- [~] WC-R2–R4
-- [~] WC-D1–D5
+- [~] WC-R2–R4 (matrix+SBOM+LICENSE; PyPI upload / hard pip-audit open)
+- [~] WC-D1–D5 (tutorials+cards+community; Discussions/v1.0 tag open)
 - [x] WC-D1 tutorials + GUIDE_E2E master path
 - [~] WC-P1–P2
+
+### 10.9 Remaining for true v1.0
+
+See `docs/40_ROADMAP_E2E_SESSION.md` and `docs/MOONSHOT_DEFERRALS.md`.
+Non-moonshot leftovers: harden WC-O full QAT demo, autodoc site, PyPI upload,
+macOS CI or NEON, Discussions enable, attestations.
 
 ---
 
@@ -808,11 +814,11 @@ Pre-checked from 2026-07-25 audit. **Agents: flip `[ ]` → `[x]` or `[~]` in PR
 
 ### 11.2 Top 5 next actions (execution resume)
 
-1. ~~**W11.T01** — Add root `LICENSE` (MIT).~~ **DONE**
-2. ~~**W1.T01** — ADR for public optimiser API.~~ **DONE**
-3. ~~**W1.T05** — Implement `bnn optimise` CLI.~~ **DONE**
-4. ~~**W5.T04 / W9.T01** — HF (or local) end-to-end optimiser tutorial.~~ **DONE**
-5. ~~**W11.T02–T03** — Issue + PR templates with repro checklist.~~ **DONE**
+1. ~~Phase A–D v0.3.0 preview~~ **DONE** (this session)
+2. Human: enable GitHub Discussions (W11.T06)
+3. PyPI Trusted Publishing when ready (W8.T08)
+4. ARM NEON on aarch64 CI when runner available (W2.T04)
+5. Autodoc MkDocs expand + WC-O QAT recipe polish toward v1.0
 
 ---
 

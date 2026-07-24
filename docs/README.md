@@ -37,6 +37,10 @@ Ordered path (also nested inside [`GUIDE_E2E.md`](GUIDE_E2E.md)):
 |-----|-----|
 | [`GUIDE_E2E.md`](GUIDE_E2E.md) | Master end-to-end user guide |
 | [`39_GUIDE_E2E_COMPLETION.md`](39_GUIDE_E2E_COMPLETION.md) | E2E guide smoke confirmation |
+| [`40_ROADMAP_E2E_SESSION.md`](40_ROADMAP_E2E_SESSION.md) | v0.3.0 Phase C+D completion report |
+| [`LAUNCH_CHECKLIST.md`](LAUNCH_CHECKLIST.md) | Public launch checklist |
+| [`FAIR_EVAL_PROTOCOL.md`](FAIR_EVAL_PROTOCOL.md) | Dual-metric fair eval |
+| [`MOONSHOT_DEFERRALS.md`](MOONSHOT_DEFERRALS.md) | Explicit v1.0 leftovers |
 | [`37_WORLD_CLASS_BNN_OPTIMISER_ROADMAP.md`](37_WORLD_CLASS_BNN_OPTIMISER_ROADMAP.md) | Canonical world-class plan (twin of root `ROADMAP.md`) |
 | [`38_ROADMAP_EXECUTION_LOG.md`](38_ROADMAP_EXECUTION_LOG.md) | Session execution log |
 | [`SEMVER_AND_DEPRECATION.md`](SEMVER_AND_DEPRECATION.md) | Public API semver policy |

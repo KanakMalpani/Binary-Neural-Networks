@@ -45,4 +45,7 @@ Thumbs.db
 results/_*.txt
 results/_repro_smoke_*.json
 results/_repro_run.log
+results/_pareto*.json
+results/_ci_*.json
+sbom.json
 *.log

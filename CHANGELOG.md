@@ -1,6 +1,34 @@
 # Changelog
 
-## Unreleased
+## 0.3.0 — 2026-07-25
+
+### Phase C — multi-arch & eval
+
+- **Linux native CI hard gate:** GCC `.so` compile + `validate-native` must pass
+  (no soft `continue-on-error` on Linux).
+- **Python 3.11–3.13** CI matrix job (`linux-py-matrix`).
+- **Pareto JSON** schema `bnn_pareto_report_v1` + `bnn pareto` /
+  `scripts/pareto_report.py` (+ optional matplotlib plot).
+- **Fair eval protocol** `docs/FAIR_EVAL_PROTOCOL.md`; leaderboard template.
+- **W3.T05** layer-wise sensitivity (`bnn.wrap.sensitivity`) + optional
+  `OptimiseConfig.sensitivity`.
+- **ARM NEON / AVX-512** documented spike/moonshot notes under `docs/spikes/`.
+- Flamegraph howto `docs/FLAMEGRAPH_HOWTO.md`; macOS notes; recipes index.
+
+### Phase D — launch hygiene
+
+- Version **0.3.0**; annotated tag + GitHub Release.
+- SBOM script `scripts/generate_sbom.py` + `docs/SBOM.md`.
+- PyPI prep checklist `docs/PYPI_PUBLISH.md` (dry-run; no auto-upload).
+- Launch checklist `docs/LAUNCH_CHECKLIST.md` (Discussions = manual).
+- Moonshot deferrals `docs/MOONSHOT_DEFERRALS.md` (ONNX / ImageNet / RAPL / …).
+
+### Docs
+
+- Session report `docs/40_ROADMAP_E2E_SESSION.md`; execution log append.
+- Publication plan + `.bnnpack` v2 design sketch (not implemented).
+
+## 0.2.0
 
 ### Docs — master E2E User Guide
 

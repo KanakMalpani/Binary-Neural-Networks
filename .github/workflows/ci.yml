@@ -26,6 +26,7 @@ jobs:
         run: |
           call "C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Auxiliary\Build\vcvars64.bat" 2>nul || call "C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Auxiliary\Build\vcvars64.bat" 2>nul || call "C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\VC\Auxiliary\Build\vcvars64.bat"
           python -m bnn.kernels.compile_native
+        # Soft: vcvars path varies across GHA images; NumPy path still gated by pytest.
         continue-on-error: true
       - name: Pytest (fast)
         run: pytest -q -m "not slow and not hf"
@@ -34,7 +35,70 @@ jobs:
       - name: Repro verify (gates must pass)
         run: python scripts/repro_all.py --mode verify --skip-compile --skip-pytest
 
-  linux-numpy:
+  linux-native:
+    # Hard gate: Linux GCC .so must build + validate (W2.T03 / W8.T10).
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: |
+            pyproject.toml
+            constraints.txt
+      - name: Install build deps
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq gcc libomp-dev
+      - name: Install
+        run: |
+          python -m pip install -U pip
+          pip install -e ".[dev]" -c constraints.txt
+      - name: Compile native (GCC OpenMP)
+        run: python -m bnn.kernels.compile_native --force
+      - name: Validate native (err=0)
+        run: python scripts/validate_native.py
+      - name: Pytest (fast; native present)
+        run: pytest -q -m "not slow and not hf"
+      - name: Export check
+        run: python scripts/export_check.py
+      - name: Repro verify (goldens must pass)
+        run: python scripts/repro_all.py --mode verify --skip-compile --skip-pytest
+      - name: Pareto smoke
+        run: python scripts/pareto_report.py --demo --out results/_ci_pareto.json
+
+  linux-py-matrix:
+    # W8.T03 / W14.T02 — Python 3.11–3.13 smoke (NumPy path; native optional).
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.11", "3.12", "3.13"]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+          cache: pip
+          cache-dependency-path: |
+            pyproject.toml
+            constraints.txt
+      - name: Install
+        run: |
+          python -m pip install -U pip
+          pip install -e ".[dev]" -c constraints.txt
+      - name: Compile native (best-effort)
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq gcc libomp-dev || true
+          python -m bnn.kernels.compile_native --force || true
+      - name: Pytest (fast)
+        run: pytest -q -m "not slow and not hf"
+      - name: Export check
+        run: python scripts/export_check.py
+
+  supply-chain:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -49,18 +113,11 @@ jobs:
         run: |
           python -m pip install -U pip
           pip install -e ".[dev]" -c constraints.txt
-      - name: Compile native (GCC OpenMP)
+          pip install pip-audit
+      - name: pip-audit (advisory)
         run: |
-          sudo apt-get update -qq
-          sudo apt-get install -y -qq gcc libomp-dev || true
-          python -m bnn.kernels.compile_native --force
+          pip-audit || true
+        # Soft until findings triaged; docs/SBOM.md for hard gate later.
         continue-on-error: true
-      - name: Validate native (when .so present)
-        run: python scripts/validate_native.py
-        continue-on-error: true
-      - name: Pytest (fast; native if built)
-        run: pytest -q -m "not slow and not hf"
-      - name: Export check
-        run: python scripts/export_check.py
-      - name: Repro verify (goldens must pass)
-        run: python scripts/repro_all.py --mode verify --skip-compile --skip-pytest
+      - name: SBOM smoke
+        run: python scripts/generate_sbom.py --out sbom.json

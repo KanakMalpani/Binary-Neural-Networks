@@ -84,3 +84,39 @@ Expect `REPRO: PASS`.
 - `LICENSE`, `SECURITY.md`, `CODE_OF_CONDUCT.md`, `MODEL_CARD.md`, `CITATION.cff`
 - `.github/ISSUE_TEMPLATE/*`, `.github/PULL_REQUEST_TEMPLATE.md`, `.github/CODEOWNERS`
 - `docs/38_ROADMAP_EXECUTION_LOG.md` (this file)
+
+---
+
+# Session 2 — Phase C+D → v0.3.0 (2026-07-25)
+
+## Tasks completed
+
+| ID | Result |
+|----|--------|
+| W2.T03 / W8.T10 | Linux native CI **hard** gate |
+| W8.T03 / W14.T02 | Python 3.11–3.13 CI matrix |
+| W7.T03–T05 / T07 | Pareto JSON + fair protocol + leaderboard template + plot |
+| W3.T05 | Layer-wise sensitivity API + optional optimise flag |
+| W2.T04 / T05 | ARM NEON / AVX-512 spike & moonshot notes |
+| W13.T02 | Flamegraph howto |
+| W14.T05 | macOS notes |
+| W6.T06 | Recipes index |
+| W8.T05–T06 | v0.3.0 release path + SBOM script |
+| W8.T08 | PyPI prep docs (no upload) |
+| W10.T05 | Soft pip-audit CI job |
+| W11.T07 | Launch checklist |
+| W11.T06 | Documented manual Discussions step |
+| W5.T07 | ONNX explicit defer |
+| W5.T05 | `.bnnpack` v2 design sketch |
+| W12.T02 | Publication plan draft |
+
+## Gates
+
+See `docs/40_ROADMAP_E2E_SESSION.md`. Still **not** claiming WC v1.0.
+
+## Verify
+
+```bat
+pytest -q -m "not slow and not hf"
+bnn repro
+```

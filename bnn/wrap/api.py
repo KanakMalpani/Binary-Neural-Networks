@@ -97,13 +97,20 @@ def wrap_model(
     calib: CalibConfig | None = None,
     inplace: bool = True,
     accuracy_first: bool = False,
+    exclude_exact: Iterable[str] | None = None,
+    force_narrow: bool = False,
 ) -> tuple[nn.Module, WrapReport]:
     """Product wrap API with hybrid / aggressive / ternary_wo / auto policies.
 
     ``mode=None`` means unspecified (default binary_xnor, or recommender when
     ``policy='auto'`` / ``mode='auto'``).
+
+    ``exclude_exact``: full dotted module names to never wrap (sensitivity).
+    ``force_narrow``: allow binary_xnor on shapes guardrails would refuse.
     """
     import copy as _copy
+
+    from .guardrails import check_linear_wrap_guardrails
 
     hw = detect_hardware()
     resolved_mode: WrapMode
@@ -142,6 +149,7 @@ def wrap_model(
         min_in_features=min_in_features,
         min_out_features=min_out_features,
         skip_attn=skip_attn,
+        exclude_exact=exclude_exact,
     )
 
     report = WrapReport(
@@ -154,6 +162,12 @@ def wrap_model(
     )
 
     for name, lin in to_replace:
+        verdict = check_linear_wrap_guardrails(
+            lin, mode=str(resolved_mode), force=force_narrow
+        )
+        if not verdict.ok:
+            report.skipped.append(f"{name} ({verdict.code}: {verdict.message})")
+            continue
         fp_bytes = int(lin.weight.numel() * 4)
         new, packed_b = _build_wrapped(lin, resolved_mode, calib=calib)
         report.replaced.append(name)

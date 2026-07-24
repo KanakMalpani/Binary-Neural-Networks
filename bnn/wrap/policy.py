@@ -207,14 +207,22 @@ def select_linears(
     min_in_features: int = 64,
     min_out_features: int = 0,
     skip_attn: bool = True,
+    exclude_exact: Iterable[str] | None = None,
 ) -> tuple[list[tuple[str, nn.Linear]], list[str]]:
-    """Return (to_replace, skipped_reasons)."""
+    """Return (to_replace, skipped_reasons).
+
+    ``exclude_exact`` drops modules by full dotted name (not substring).
+    """
     skipped: list[str] = []
     to_replace: list[tuple[str, nn.Linear]] = []
+    exclude = set(exclude_exact or ())
 
     if policy in ("hybrid_ffn", "ternary_wo", "auto") and skip_name_substr is None:
         for name, mod in model.named_modules():
             if not isinstance(mod, nn.Linear):
+                continue
+            if name in exclude:
+                skipped.append(f"{name} (sensitivity/exact exclude)")
                 continue
             lname = name.lower()
             if not any(a in lname for a in HYBRID_FFN_ALLOW):
@@ -232,6 +240,9 @@ def select_linears(
     skip = resolve_skip_list(policy, skip_name_substr, skip_attn=skip_attn)
     for name, mod in model.named_modules():
         if not isinstance(mod, nn.Linear):
+            continue
+        if name in exclude:
+            skipped.append(f"{name} (sensitivity/exact exclude)")
             continue
         if _should_skip(name, skip):
             skipped.append(f"{name} (skip list)")

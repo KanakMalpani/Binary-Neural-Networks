@@ -55,6 +55,9 @@ class OptimiseConfig:
     inplace: bool = False
     encode_path: Path | str | None = None
     encode_min_width: int = 64
+    # W3.T05 — optional layer-wise sensitivity before wrap
+    sensitivity: bool = False
+    sensitivity_fragile_drop: float = 0.05
 
 
 @dataclass
@@ -132,6 +135,35 @@ def optimise_model(
             layer_names=layer_names,
         )
 
+    sensitivity_payload: dict[str, Any] | None = None
+    exclude_exact: list[str] | None = None
+    if cfg.sensitivity:
+        if calib_inputs is None:
+            warnings.warn(
+                "OptimiseConfig.sensitivity=True requires calib_inputs; "
+                "sensitivity scoring skipped.",
+                stacklevel=2,
+            )
+        else:
+            from .wrap.sensitivity import score_layer_sensitivity
+
+            sens_mode = "ternary_weight_only" if cfg.accuracy_first else "binary_xnor"
+            if mode in ("ternary_weight_only", "binary_xnor"):
+                sens_mode = mode  # type: ignore[assignment]
+            sens = score_layer_sensitivity(
+                work,
+                calib_inputs,
+                mode=sens_mode,  # type: ignore[arg-type]
+                policy="all_large_linear",
+                min_in_features=cfg.min_in_features,
+                min_out_features=cfg.min_out_features,
+                drop_in_threshold=cfg.drop_in_threshold,
+                fragile_drop=cfg.sensitivity_fragile_drop,
+                calib=cfg.calib,
+            )
+            sensitivity_payload = sens.to_dict()
+            exclude_exact = list(sens.skip_suggested)
+
     before = model_param_bytes(work)
     wrapped, report = wrap_model(
         work,
@@ -144,6 +176,8 @@ def optimise_model(
         calib=cfg.calib,
         inplace=True,
         accuracy_first=cfg.accuracy_first,
+        exclude_exact=exclude_exact,
+        force_narrow=cfg.force,
     )
     after = model_param_bytes(wrapped)
 
@@ -202,6 +236,7 @@ def optimise_model(
         calib_method=report.calib_method,
         effectiveness=report.effectiveness,
         qat=report.qat,
+        sensitivity=sensitivity_payload,
         param_bytes_before=before,
         param_bytes_after=after,
         pack_path=str(pack_path) if pack_path else None,

@@ -368,6 +368,24 @@ def cmd_version(_: argparse.Namespace) -> int:
     return 0
 
 
+def cmd_pareto(args: argparse.Namespace) -> int:
+    """Emit dual-metric Pareto JSON (W7.T03)."""
+    extra = ["--out", str(args.out)]
+    if args.demo:
+        extra.append("--demo")
+    for path in args.from_optimise or []:
+        extra += ["--from-optimise", str(path)]
+    if args.plot:
+        extra += ["--plot", str(args.plot)]
+    if args.warmup is not None:
+        extra += ["--warmup", str(args.warmup)]
+    if args.threads is not None:
+        extra += ["--threads", str(args.threads)]
+    if not args.demo and not (args.from_optimise or []):
+        extra.append("--demo")
+    return _run_script("pareto_report.py", extra)
+
+
 def build_parser() -> argparse.ArgumentParser:
     p = argparse.ArgumentParser(
         prog="bnn",
@@ -553,6 +571,28 @@ def build_parser() -> argparse.ArgumentParser:
     e.add_argument("--full", action="store_true", help="Include short image/audio smokes")
     e.add_argument("--skip-pytest", action="store_true")
     e.set_defaults(func=cmd_eval_suite)
+
+    pa = sub.add_parser(
+        "pareto",
+        help="Dual-metric Pareto JSON (accuracy / compression / latency / energy-proxy)",
+    )
+    pa.add_argument("--demo", action="store_true", help="Synthetic schema smoke points")
+    pa.add_argument(
+        "--from-optimise",
+        type=Path,
+        action="append",
+        default=[],
+        help="Load point(s) from bnn_optimise_report_v1 JSON",
+    )
+    pa.add_argument(
+        "--out",
+        type=Path,
+        default=ROOT / "results" / "pareto_report.json",
+    )
+    pa.add_argument("--plot", type=Path, default=None, help="Optional PNG (matplotlib)")
+    pa.add_argument("--warmup", type=int, default=3)
+    pa.add_argument("--threads", type=int, default=None)
+    pa.set_defaults(func=cmd_pareto)
 
     r = sub.add_parser("recommend", help="Recommend stack for a deployment goal")
     r.add_argument(
