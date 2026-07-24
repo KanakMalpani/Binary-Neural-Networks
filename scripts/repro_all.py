@@ -108,6 +108,21 @@ def compare_goldens() -> tuple[str, int]:
     if abs(wrap["weight_compression_replaced_layers"] - floors["wrap_demo"]["weight_compression_exact"]) > 1e-9:
         failures.append("wrap compression != 32")
 
+    ultra_path = ROOT / "results" / "ultra_wrap.json"
+    ug = floors.get("ultra_wrap")
+    if ug and ultra_path.exists():
+        ultra = json.loads(ultra_path.read_text(encoding="utf-8"))
+        ba = ultra.get("before_after") or {}
+        if abs(ba.get("binary_compression", 0) - ug["binary_compression_exact"]) > 1e-9:
+            failures.append("ultra_wrap binary compression != 32")
+        if ba.get("ternary_hybrid_calib_cosine", 0) < ug["ternary_cosine_min"]:
+            failures.append("ultra_wrap ternary cosine below floor")
+        if ba.get("binary_hybrid_calib_cosine", 0) < ug["binary_hybrid_cosine_min"]:
+            failures.append("ultra_wrap binary hybrid cosine below floor")
+        wide = ba.get("binary_gemm_only_speedup_wide")
+        if wide is not None and wide < ug["gemm_only_speedup_wide_min"]:
+            failures.append(f"ultra_wrap wide gemm speedup {wide} < {ug['gemm_only_speedup_wide_min']}")
+
     if failures:
         print("GOLDEN COMPARE FAIL:", *failures, sep="\n  ", flush=True)
         return "FAIL golden-compare", 1

@@ -1,0 +1,7 @@
+LIBRARY _binary_gemm_native
+EXPORTS
+    binary_gemm_u64
+    binary_gemm_set_num_threads
+    binary_gemm_get_num_threads
+    binary_gemm_openmp_enabled
+    ternary_gemm_u64

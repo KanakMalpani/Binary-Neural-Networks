@@ -15,7 +15,7 @@ Zero `OPEN` / `PARTIAL` / `Mitigated` / `Accepted residual` for decision-making.
 | G8 | GPU Tensor Core reality | High | arXiv:1911.04477; industry INT8/FP8 | Explicit non-goal for CUDA BNN | **CLOSED** (pivoted) |
 | G9 | Op-count ≠ wall-clock | High | Theory 64× vs measured ~5× | Dual reporting in docs/bench | **CLOSED** |
 | G10 | LLM ≠ MNIST demo | Med | Scope confusion risk | Perfected concept + BitNet pointers | **CLOSED** |
-| G11 | Single-thread C kernel | Low | Speedup already proves thesis (2–9×) | OpenMP/AVX polish deferred | **ACCEPTED-NON-GOAL** (MVP) |
+| G11 | Single-thread C kernel | Low | OpenMP + thread API; `docs/34` scaling ~3×@8 | Measured OpenMP polish | **CLOSED** |
 | G12 | torchvision / Py version mismatch | Med | tv on 3.12, torch on 3.14 | Custom MNIST + CIFAR loaders | **CLOSED** |
 | G13 | No board Joules / RAPL | Low | `results/energy_bound.json` + lit | E=P×t with measured latency | **CLOSED-BY-PROXY** |
 | G14 | Training slower than FP | Med | STE + dual weights | Document: inference-only win | **CLOSED** |
@@ -35,8 +35,8 @@ Zero `OPEN` / `PARTIAL` / `Mitigated` / `Accepted residual` for decision-making.
 
 ## Accepted non-goals (cannot affect perfected thesis)
 
-1. **G11** OpenMP/AVX2 multi-thread kernel polish — single-thread already proves CPU XNOR thesis.
-2. **G23** Full ImageNet Bi-Real reproduction — optional scale-up; CIFAR-10 proxy + published Bi-Real/ReActNet numbers suffice for decision/build.
+1. **G23** Full ImageNet Bi-Real reproduction — optional scale-up; CIFAR-10 proxy + published Bi-Real/ReActNet numbers suffice for decision/build.
+2. ~~G11 OpenMP/AVX~~ — **CLOSED** in `docs/34` (OpenMP + thread API; AVX2 popcnt not required — `__popcnt64` + unroll).
 
 ## Evidence index
 

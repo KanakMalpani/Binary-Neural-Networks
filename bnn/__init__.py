@@ -18,10 +18,18 @@ from .export import (
     save_checkpoint,
     save_packed_linears,
 )
-from .layers import BinaryConv2d, BinaryLinear, BiRealBlock, TernaryLinear
+from .layers import (
+    BinaryConv2d,
+    BinaryLinear,
+    BiRealBlock,
+    TernaryLinear,
+    fuse_bireal_bn_,
+    fuse_binary_conv_bn_,
+)
 from .models import build_model, count_parameters
 from .ste import binary_sign, clip_weights_, ternary_weight
 from .wrapper import model_param_bytes, wrap_linear_modules, wrap_model
+from .wrap.policy import recommend_wrap_policy
 
 __all__ = [
     "__version__",
@@ -30,6 +38,8 @@ __all__ = [
     "BinaryConv2d",
     "BiRealBlock",
     "TernaryLinear",
+    "fuse_binary_conv_bn_",
+    "fuse_bireal_bn_",
     "binary_sign",
     "ternary_weight",
     "clip_weights_",
@@ -40,6 +50,7 @@ __all__ = [
     "wrap_linear_modules",
     "wrap_model",
     "model_param_bytes",
+    "recommend_wrap_policy",
     "save_checkpoint",
     "load_checkpoint",
     "save_packed_linears",

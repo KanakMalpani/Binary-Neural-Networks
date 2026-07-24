@@ -60,6 +60,16 @@
     "cosine_max_without_qat": 0.5,
     "note": "Low cosine without QAT is expected; gate checks compression + non-crash quality bound"
   },
+  "ultra_wrap": {
+    "source": "results/ultra_wrap.json",
+    "binary_compression_exact": 32.0,
+    "ternary_compression_exact": 16.0,
+    "ternary_cosine_min": 0.85,
+    "binary_hybrid_cosine_min": 0.55,
+    "gemm_only_speedup_wide_min": 1.5,
+    "prior_gemm_speedup_reference": 2.12,
+    "note": "Ultra wrap suite: hybrid+calib binary ≫ 0.28; ternary ≥0.85; wide OpenMP gemm ≥1.5× prior"
+  },
   "notes": [
     "Committed results/*.json are the published goldens.",
     "Fast verify compares those files to floors (no retrain).",

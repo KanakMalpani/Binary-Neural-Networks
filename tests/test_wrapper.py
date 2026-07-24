@@ -1,4 +1,4 @@
-"""Wrapper smoke tests."""
+"""Wrapper smoke tests (legacy + hybrid)."""
 
 from __future__ import annotations
 
@@ -21,7 +21,6 @@ def _mlp():
 
 def test_wrap_compression():
     m = _mlp()
-    # Named modules via Sequential indices — skip first/last by min features + manual
     _, report = wrap_linear_modules(
         m,
         mode="binary_xnor",
@@ -75,7 +74,6 @@ def test_wrap_conv_modules_size():
     m = Mini()
     _, report = wrap_conv_modules(m, skip_name_substr=("stem", "head"), min_weight_elems=64)
     assert report.replaced
-    # uint64 packing pads small K²·C_in → compression often 16–28×, not full 32×
     assert report.compression >= 15.0
     y = m(torch.randn(2, 3, 16, 16))
     assert y.shape == (2, 4)

@@ -101,11 +101,12 @@ binary/ternary (size easy; accuracy + speed need QAT and real kernels).
 
 ```bat
 bnn wrap --mode binary_xnor --hidden 4096 --batch 32
+bnn wrap --ultra --policy auto --qat-steps 40 --force
 ```
 
-Local wrap demo: **32×** weight compression on replaced layers, modest e2e
-speedup, cosine much less than 1 without QAT — expected, not a transparent
-quality wrap.
+- Legacy wrap demo: **32×** compression; binary PTQ cosine ~0.28 without QAT.
+- Ultra wrap: hybrid FFN + calib → binary cosine ~0.71; ternary/auto → ~0.99;
+  OpenMP gemm_only on wide FFN ~**4×** vs torch (see `docs/33_ULTRA_WRAP_LAYER.md`).
 
 Deep dive: [`docs/12_WRAPPER_AND_EXISTING_MODELS.md`](docs/12_WRAPPER_AND_EXISTING_MODELS.md)
 
@@ -114,11 +115,12 @@ Deep dive: [`docs/12_WRAPPER_AND_EXISTING_MODELS.md`](docs/12_WRAPPER_AND_EXISTI
 ## Package layout
 
 ```
-bnn/           STE, layers, models, wrapper, export, determinism
+bnn/           STE, layers, models, wrapper, wrap/, export, determinism
+bnn/wrap/      ultra hybrid wrap (policy, calib, metrics, QAT)
 bnn/vision/    CIFAR Bi-Real CNN, tiny binary ViT
 bnn/audio/     STFT features, synthetic tones, FP/binary CNN
-bnn/kernels/   packed XNOR GEMM (+ optional MSVC DLL)
-scripts/       train / bench / wrap / repro_all
+bnn/kernels/   packed XNOR GEMM (+ optional MSVC OpenMP DLL)
+scripts/       train / bench / wrap / ultra_wrap_demo / repro_all
 results/       committed golden JSON + SUMMARY.md
 tests/         pytest + golden_floors.json
 docs/          research, tutorials, completion reports

@@ -114,8 +114,53 @@ class BiRealBlock(nn.Module):
         super().__init__()
         self.conv = BinaryConv2d(channels, channels, 3, 1, 1, bias=False)
         self.bn = nn.BatchNorm2d(channels, momentum=0.9)
+        self._bn_fused = False
 
     def forward(self, x: Tensor) -> Tensor:
         # x is full-precision residual stream
-        out = self.bn(self.conv(x))
+        out = self.conv(x)
+        if not self._bn_fused:
+            out = self.bn(out)
         return x + out
+
+
+@torch.no_grad()
+def fuse_binary_conv_bn_(block: BiRealBlock) -> BiRealBlock:
+    """Fold BatchNorm into BinaryConv2d.alpha (+ bias) for eval throughput.
+
+    Safe for inference only — does not change STE training when left unfused.
+    Call after ``model.eval()`` once BN running stats are populated.
+    """
+    if not isinstance(block, BiRealBlock):
+        raise TypeError(f"expected BiRealBlock, got {type(block)}")
+    if block._bn_fused:
+        return block
+    bn = block.bn
+    conv = block.conv
+    if bn.running_mean is None or bn.running_var is None:
+        raise RuntimeError("BN has no running stats; run a few eval batches first")
+    eps = bn.eps
+    std = torch.sqrt(bn.running_var + eps)
+    scale = bn.weight / std
+    # y = BN(alpha * bin) = scale * alpha * bin + (bias - scale * mean)
+    conv.alpha.mul_(scale.view_as(conv.alpha))
+    bias = bn.bias - scale * bn.running_mean
+    if conv.bias is None:
+        conv.register_parameter("bias", nn.Parameter(bias.clone()))
+    else:
+        conv.bias.add_(bias)
+    block._bn_fused = True
+    # Identity BN so accidental double-apply is harmless if flag cleared wrongly
+    bn.weight.fill_(1)
+    bn.bias.zero_()
+    bn.running_mean.zero_()
+    bn.running_var.fill_(1)
+    return block
+
+
+def fuse_bireal_bn_(module: nn.Module) -> nn.Module:
+    """Recursively fuse BiRealBlock BN into binary conv scales (eval)."""
+    for child in module.modules():
+        if isinstance(child, BiRealBlock) and not child._bn_fused:
+            fuse_binary_conv_bn_(child)
+    return module

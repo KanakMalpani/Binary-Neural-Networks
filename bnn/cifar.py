@@ -125,7 +125,10 @@ def get_cifar10_loaders(
 
     train_ds = TensorDataset(torch.from_numpy(x_train), torch.from_numpy(y_train))
     test_ds = TensorDataset(torch.from_numpy(x_test), torch.from_numpy(y_test))
+    from bnn.data import default_num_workers
+
+    nw = default_num_workers()
     return (
-        DataLoader(train_ds, batch_size=batch_size, shuffle=True),
-        DataLoader(test_ds, batch_size=256, shuffle=False),
+        DataLoader(train_ds, batch_size=batch_size, shuffle=True, num_workers=nw),
+        DataLoader(test_ds, batch_size=256, shuffle=False, num_workers=nw),
     )

@@ -5,7 +5,8 @@ Dot: <a,b> = N - 2 * popcount(a XOR b)
 
 Includes:
   - NumPy reference (correct, may lose to BLAS without SIMD popcnt)
-  - Optional native C kernel (compiled on first use if a compiler exists)
+  - Optional native C kernel (OpenMP + hardware popcnt when compiled)
+  - Thread control via BNN_NUM_THREADS / set_num_threads()
 """
 
 from __future__ import annotations
@@ -21,42 +22,103 @@ import numpy as np
 
 _NATIVE = None
 _NATIVE_PATH = Path(__file__).with_name("_binary_gemm_native")
+_THREADS_APPLIED: int | None = None
+
+# Keep embedded source in sync with binary_gemm.c for non-Windows auto-build.
+_C_SOURCE = (Path(__file__).with_name("binary_gemm.c")).read_text(encoding="utf-8") if (
+    Path(__file__).with_name("binary_gemm.c").exists()
+) else ""
 
 
-_C_SOURCE = r"""
-#include <stdint.h>
-#include <stddef.h>
+def _env_num_threads() -> int | None:
+    raw = os.environ.get("BNN_NUM_THREADS") or os.environ.get("OMP_NUM_THREADS")
+    if raw is None or raw.strip() == "":
+        return None
+    try:
+        n = int(raw)
+    except ValueError:
+        return None
+    return n if n > 0 else None
 
-#ifdef _MSC_VER
-#include <intrin.h>
-static inline int pop64(uint64_t x) { return (int)__popcnt64(x); }
-#else
-static inline int pop64(uint64_t x) { return __builtin_popcountll(x); }
-#endif
 
-#ifdef _WIN32
-__declspec(dllexport)
-#endif
-void binary_gemm_u64(
-    const uint64_t* X, /* B x words */
-    const uint64_t* W, /* M x words */
-    float* Y,          /* B x M */
-    int B, int M, int words, int n
-) {
-    for (int b = 0; b < B; ++b) {
-        const uint64_t* xb = X + (size_t)b * words;
-        float* yb = Y + (size_t)b * M;
-        for (int m = 0; m < M; ++m) {
-            const uint64_t* wm = W + (size_t)m * words;
-            int dist = 0;
-            for (int w = 0; w < words; ++w) {
-                dist += pop64(xb[w] ^ wm[w]);
-            }
-            yb[m] = (float)(n - 2 * dist);
-        }
-    }
-}
-"""
+def set_num_threads(n: int | None) -> None:
+    """Set native OpenMP thread count (None / 0 = library default).
+
+    Also honors process env when first applied via ensure_native_threads().
+    """
+    global _THREADS_APPLIED
+    lib = _try_load_native()
+    if not lib:
+        _THREADS_APPLIED = n if n and n > 0 else None
+        return
+    val = int(n) if n and n > 0 else 0
+    if hasattr(lib, "binary_gemm_set_num_threads"):
+        lib.binary_gemm_set_num_threads(val)
+    _THREADS_APPLIED = val if val > 0 else None
+
+
+def get_num_threads() -> int:
+    """Effective native thread count (1 if no OpenMP / no DLL)."""
+    lib = _try_load_native()
+    if lib and hasattr(lib, "binary_gemm_get_num_threads"):
+        return int(lib.binary_gemm_get_num_threads())
+    return 1
+
+
+def openmp_enabled() -> bool:
+    lib = _try_load_native()
+    if lib and hasattr(lib, "binary_gemm_openmp_enabled"):
+        return bool(lib.binary_gemm_openmp_enabled())
+    return False
+
+
+def ensure_native_threads() -> None:
+    """Apply BNN_NUM_THREADS / OMP_NUM_THREADS once after DLL load."""
+    global _THREADS_APPLIED
+    if _THREADS_APPLIED is not None:
+        return
+    env_n = _env_num_threads()
+    if env_n is not None:
+        set_num_threads(env_n)
+    else:
+        _THREADS_APPLIED = 0  # mark applied; leave OpenMP default
+
+
+def _bind_native(lib: ctypes.CDLL) -> ctypes.CDLL:
+    lib.binary_gemm_u64.argtypes = [
+        ctypes.POINTER(ctypes.c_uint64),
+        ctypes.POINTER(ctypes.c_uint64),
+        ctypes.POINTER(ctypes.c_float),
+        ctypes.c_int,
+        ctypes.c_int,
+        ctypes.c_int,
+        ctypes.c_int,
+    ]
+    lib.binary_gemm_u64.restype = None
+    if hasattr(lib, "binary_gemm_set_num_threads"):
+        lib.binary_gemm_set_num_threads.argtypes = [ctypes.c_int]
+        lib.binary_gemm_set_num_threads.restype = None
+    if hasattr(lib, "binary_gemm_get_num_threads"):
+        lib.binary_gemm_get_num_threads.argtypes = []
+        lib.binary_gemm_get_num_threads.restype = ctypes.c_int
+    if hasattr(lib, "binary_gemm_openmp_enabled"):
+        lib.binary_gemm_openmp_enabled.argtypes = []
+        lib.binary_gemm_openmp_enabled.restype = ctypes.c_int
+    if hasattr(lib, "ternary_gemm_u64"):
+        lib.ternary_gemm_u64.argtypes = [
+            ctypes.POINTER(ctypes.c_uint64),
+            ctypes.POINTER(ctypes.c_uint64),
+            ctypes.POINTER(ctypes.c_uint64),
+            ctypes.POINTER(ctypes.c_int),
+            ctypes.POINTER(ctypes.c_int),
+            ctypes.POINTER(ctypes.c_float),
+            ctypes.c_float,
+            ctypes.c_int,
+            ctypes.c_int,
+            ctypes.c_int,
+        ]
+        lib.ternary_gemm_u64.restype = None
+    return lib
 
 
 def _try_load_native():
@@ -68,18 +130,10 @@ def _try_load_native():
     dll_path = Path(str(_NATIVE_PATH) + ext)
     if dll_path.exists():
         try:
-            lib = ctypes.CDLL(str(dll_path))
-            lib.binary_gemm_u64.argtypes = [
-                ctypes.POINTER(ctypes.c_uint64),
-                ctypes.POINTER(ctypes.c_uint64),
-                ctypes.POINTER(ctypes.c_float),
-                ctypes.c_int,
-                ctypes.c_int,
-                ctypes.c_int,
-                ctypes.c_int,
-            ]
+            lib = _bind_native(ctypes.CDLL(str(dll_path)))
             _ = lib.binary_gemm_u64
             _NATIVE = lib
+            ensure_native_threads()
             return lib
         except OSError as e:
             # WinError 193 = 32-bit DLL on 64-bit Python (typical MinGW mistake)
@@ -92,22 +146,46 @@ def _try_load_native():
             _NATIVE = False
             return False
 
-    # Non-Windows: attempt compile from embedded source
+    # Non-Windows: attempt compile from binary_gemm.c / embedded source
     if os.name == "nt":
         _NATIVE = False
         return False
 
-    src = Path(tempfile.gettempdir()) / "bnn_binary_gemm.c"
-    src.write_text(_C_SOURCE, encoding="utf-8")
+    src_text = _C_SOURCE
+    src_file = Path(__file__).with_name("binary_gemm.c")
+    if src_file.exists():
+        src = src_file
+    else:
+        if not src_text:
+            _NATIVE = False
+            return False
+        src = Path(tempfile.gettempdir()) / "bnn_binary_gemm.c"
+        src.write_text(src_text, encoding="utf-8")
+
     for cmd in (
+        ["gcc", "-O3", "-fopenmp", "-shared", "-fPIC", "-o", str(dll_path), str(src)],
         ["gcc", "-O3", "-shared", "-fPIC", "-o", str(dll_path), str(src)],
+        ["clang", "-O3", "-fopenmp", "-shared", "-fPIC", "-o", str(dll_path), str(src)],
         ["clang", "-O3", "-shared", "-fPIC", "-o", str(dll_path), str(src)],
     ):
         try:
-            subprocess.run(cmd, check=True, capture_output=True, timeout=60)
-            if dll_path.exists():
-                _NATIVE = None
-                return _try_load_native()
+            subprocess.run(cmd, check=True, capture_output=True, timeout=120)
+            if not dll_path.exists():
+                continue
+            try:
+                lib = _bind_native(ctypes.CDLL(str(dll_path)))
+                _ = lib.binary_gemm_u64
+                _NATIVE = lib
+                ensure_native_threads()
+                return lib
+            except OSError:
+                # OpenMP .so may compile but fail to load (missing libgomp) —
+                # delete and try next (usually no-OpenMP) command.
+                try:
+                    dll_path.unlink()
+                except OSError:
+                    pass
+                continue
         except (FileNotFoundError, subprocess.CalledProcessError, subprocess.TimeoutExpired):
             continue
 
@@ -116,7 +194,10 @@ def _try_load_native():
 
 
 def pack_binary_pm1(x: np.ndarray, axis: int = -1) -> tuple[np.ndarray, int]:
-    """Pack ±1 values along `axis` into uint64 words. bit1 => -1/non-positive."""
+    """Pack ±1 values along `axis` into uint64 words. bit1 => -1/non-positive.
+
+    Uses NumPy ``packbits`` (little bit-order) — much faster than per-bit multiply-sum.
+    """
     x = np.ascontiguousarray(np.asarray(x))
     if x.size == 0:
         raise ValueError("pack_binary_pm1: empty array")
@@ -124,14 +205,18 @@ def pack_binary_pm1(x: np.ndarray, axis: int = -1) -> tuple[np.ndarray, int]:
         raise TypeError(f"pack_binary_pm1: expected numeric dtype, got {x.dtype}")
     x = np.moveaxis(x, axis, -1)
     shape = x.shape
-    n = shape[-1]
-    bits = (x <= 0).astype(np.uint8)
+    n = int(shape[-1])
+    bits = np.less_equal(x, 0)
     pad = (-n) % 64
     if pad:
-        bits = np.pad(bits, [(0, 0)] * (bits.ndim - 1) + [(0, pad)], constant_values=0)
-    bits = bits.reshape(*shape[:-1], -1, 64)
-    weights = np.uint64(1) << np.arange(64, dtype=np.uint64)
-    packed = (bits.astype(np.uint64) * weights).sum(axis=-1)
+        bits = np.pad(bits, [(0, 0)] * (bits.ndim - 1) + [(0, pad)], constant_values=False)
+    # (..., words, 64) → packbits → (..., words, 8) uint8 → view uint64
+    packed_shape = bits.shape[:-1] + (bits.shape[-1] // 64, 64)
+    bits64 = bits.reshape(packed_shape)
+    u8 = np.packbits(bits64.astype(np.uint8, copy=False), axis=-1, bitorder="little")
+    # Force little-endian uint64 so bit j of the word matches bits[..., j]
+    u8 = np.ascontiguousarray(u8)
+    packed = u8.view("<u8").reshape(*shape[:-1], -1).astype(np.uint64, copy=False)
     return np.ascontiguousarray(packed, dtype=np.uint64), n
 
 
@@ -173,6 +258,7 @@ def binary_gemm_native_prepacked(
     lib = _try_load_native()
     if not lib:
         return None
+    ensure_native_threads()
     B, M, words = _validate_prepacked(xp, wp, n)
     out = np.empty((B, M), dtype=np.float32)
     lib.binary_gemm_u64(
@@ -239,3 +325,8 @@ def theoretical_ops(m: int, n: int, k: int) -> dict:
 
 def native_kernel_available() -> bool:
     return bool(_try_load_native())
+
+
+def ternary_native_available() -> bool:
+    lib = _try_load_native()
+    return bool(lib and hasattr(lib, "ternary_gemm_u64"))

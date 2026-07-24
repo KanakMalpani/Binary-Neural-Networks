@@ -61,8 +61,21 @@ def _read_labels(path: Path) -> np.ndarray:
         return np.frombuffer(f.read(), dtype=np.uint8).astype(np.int64)
 
 
+def default_num_workers() -> int:
+    """Windows spawn + TensorDataset usually wants 0; override with BNN_NUM_WORKERS."""
+    import os
+
+    raw = os.environ.get("BNN_NUM_WORKERS")
+    if raw is not None and raw.strip() != "":
+        try:
+            return max(0, int(raw))
+        except ValueError:
+            pass
+    return 0 if os.name == "nt" else 2
+
+
 def get_mnist_loaders(
-    data_dir: Path, batch_size: int
+    data_dir: Path, batch_size: int, num_workers: int | None = None
 ) -> tuple[DataLoader, DataLoader]:
     data_dir = _safe_data_dir(data_dir)
     _download(data_dir)
@@ -72,8 +85,13 @@ def get_mnist_loaders(
     x_test = (_read_images(resolve_under(data_dir, FILES["test_images"])) - mean) / std
     y_test = _read_labels(resolve_under(data_dir, FILES["test_labels"]))
 
+    nw = default_num_workers() if num_workers is None else num_workers
     train_ds = TensorDataset(torch.from_numpy(x_train), torch.from_numpy(y_train))
     test_ds = TensorDataset(torch.from_numpy(x_test), torch.from_numpy(y_test))
-    train_loader = DataLoader(train_ds, batch_size=batch_size, shuffle=True)
-    test_loader = DataLoader(test_ds, batch_size=512, shuffle=False)
+    train_loader = DataLoader(
+        train_ds, batch_size=batch_size, shuffle=True, num_workers=nw
+    )
+    test_loader = DataLoader(
+        test_ds, batch_size=512, shuffle=False, num_workers=nw
+    )
     return train_loader, test_loader

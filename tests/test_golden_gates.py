@@ -108,6 +108,27 @@ def test_wrap_demo_compression_gate():
         assert cos <= g["cosine_max_without_qat"]
 
 
+def test_ultra_wrap_floors():
+    g = FLOORS.get("ultra_wrap")
+    if g is None:
+        return
+    path = ROOT / "results" / "ultra_wrap.json"
+    if not path.exists():
+        return
+    data = json.loads(path.read_text(encoding="utf-8"))
+    ba = data["before_after"]
+    assert abs(ba["binary_compression"] - g["binary_compression_exact"]) < 1e-9
+    assert abs(ba["ternary_compression"] - g["ternary_compression_exact"]) < 1e-9
+    assert ba["ternary_hybrid_calib_cosine"] >= g["ternary_cosine_min"]
+    assert ba["binary_hybrid_calib_cosine"] >= g["binary_hybrid_cosine_min"]
+    wide = ba.get("binary_gemm_only_speedup_wide")
+    if wide is not None:
+        # Advisory efficiency floor — soft on CI noise (still assert minimum sanity)
+        assert wide >= g["gemm_only_speedup_wide_min"], (
+            f"wide gemm speedup {wide} < {g['gemm_only_speedup_wide_min']}"
+        )
+
+
 def test_export_check_compression_floor_matches_floors():
     """Live micro-check: packing still ~32× (independent of committed JSON)."""
     import numpy as np

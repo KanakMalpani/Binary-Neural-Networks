@@ -1,15 +1,15 @@
 # Results summary (this workspace)
 
-_Regenerated: 2026-07-24T12:59:10.383378+00:00_
+_Regenerated: 2026-07-24T13:27:10.113341+00:00_
 _Machine: Windows-11-10.0.26200-SP0 | torch 2.12.0+cpu | CUDA=False_
 
 ## Kernel (CPU packed XNOR)
 
 | Shape | S vs NumPy FP32 | S vs Torch FP32 | Err |
 |-------|----------------:|----------------:|----:|
-| 128×2048×2048 | 3.04 | 1.14 | 0 |
-| 64×4096×4096 | 3.75 | 2.29 | 0 |
-| 32×8192×8192 | 4.19 | 1.76 | 0 |
+| 128×2048×2048 | 5.28 | 2.31 | 0 |
+| 64×4096×4096 | 8.05 | 3.73 | 0 |
+| 32×8192×8192 | 13.96 | 7.55 | 0 |
 
 Compression: **32.0×**. Source: `benchmark.json`.
 

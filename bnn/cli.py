@@ -41,6 +41,10 @@ def cmd_bench(args: argparse.Namespace) -> int:
     extra: list[str] = []
     if args.reps:
         extra += ["--reps", str(args.reps)]
+    if getattr(args, "threads", None):
+        extra += ["--threads", str(args.threads)]
+    if getattr(args, "warmup", None):
+        extra += ["--warmup", str(args.warmup)]
     return _run_script("benchmark.py", extra)
 
 
@@ -127,9 +131,44 @@ def cmd_repro(args: argparse.Namespace) -> int:
 
 
 def cmd_wrap(args: argparse.Namespace) -> int:
+    """Legacy wide-MLP wrap, or ``--ultra`` for hybrid/calib/ternary demo."""
+    if getattr(args, "ultra", False):
+        extra: list[str] = [
+            "--policy",
+            args.policy,
+            "--batch",
+            str(args.batch),
+            "--d-model",
+            str(getattr(args, "d_model", 512)),
+            "--ff",
+            str(getattr(args, "ff", 2048)),
+            "--calib-batches",
+            str(args.calib_batches),
+            "--min-width",
+            str(args.min_width),
+            "--qat-steps",
+            str(args.qat_steps),
+            "--drop-in-threshold",
+            str(args.drop_in_threshold),
+        ]
+        # Only forward --mode when explicit; let policy=auto pick mode.
+        if args.mode and args.mode != "auto" and args.policy != "auto":
+            extra += ["--mode", args.mode]
+        elif args.mode == "auto" or args.policy == "auto":
+            extra += ["--mode", "auto"]
+        elif args.mode:
+            extra += ["--mode", args.mode]
+        if args.force:
+            extra.append("--force")
+        if args.report:
+            extra += ["--report", str(args.report)]
+        if args.compare_baseline:
+            extra.append("--compare-baseline")
+        return _run_script("ultra_wrap_demo.py", extra)
+
     extra = [
         "--mode",
-        args.mode,
+        args.mode if args.mode != "auto" else "binary_xnor",
         "--hidden",
         str(args.hidden),
         "--batch",
@@ -189,6 +228,13 @@ def build_parser() -> argparse.ArgumentParser:
 
     b = sub.add_parser("bench", help="Kernel microbench (theory vs wall-clock)")
     b.add_argument("--reps", type=int, default=None)
+    b.add_argument("--warmup", type=int, default=None)
+    b.add_argument(
+        "--threads",
+        type=str,
+        default=None,
+        help="Comma list for OpenMP scaling, e.g. 1,2,4,8",
+    )
     b.set_defaults(func=cmd_bench)
 
     sub.add_parser("export-check", help="Assert ~32× weight pack compression").set_defaults(
@@ -253,14 +299,37 @@ def build_parser() -> argparse.ArgumentParser:
     rp.add_argument("--skip-pytest", action="store_true")
     rp.set_defaults(func=cmd_repro)
 
-    w = sub.add_parser("wrap", help="Wrap demo MLP with packed Linears")
+    w = sub.add_parser(
+        "wrap",
+        help="Wrap demo MLP (legacy) or --ultra hybrid/calib/ternary path",
+    )
     w.add_argument(
         "--mode",
         default="binary_xnor",
-        choices=["binary_xnor", "ternary_weight_only", "binary_weight_only_dequant"],
+        choices=[
+            "binary_xnor",
+            "ternary_weight_only",
+            "binary_weight_only_dequant",
+            "auto",
+        ],
+    )
+    w.add_argument(
+        "--policy",
+        default="hybrid_ffn",
+        choices=["hybrid_ffn", "aggressive", "ternary_wo", "auto", "default"],
     )
     w.add_argument("--hidden", type=int, default=4096)
     w.add_argument("--batch", type=int, default=32)
+    w.add_argument("--ultra", action="store_true", help="Run ultra wrap demo")
+    w.add_argument("--d-model", type=int, default=512)
+    w.add_argument("--ff", type=int, default=2048)
+    w.add_argument("--calib-batches", type=int, default=4)
+    w.add_argument("--min-width", type=int, default=64)
+    w.add_argument("--qat-steps", type=int, default=0)
+    w.add_argument("--drop-in-threshold", type=float, default=0.85)
+    w.add_argument("--force", action="store_true", help="Allow drop-in claim below threshold")
+    w.add_argument("--report", type=Path, default=None, help="JSON report path (ultra)")
+    w.add_argument("--compare-baseline", action="store_true")
     w.set_defaults(func=cmd_wrap)
 
     sub.add_parser("energy-bound", help="Bind energy estimate to wrap latencies").set_defaults(

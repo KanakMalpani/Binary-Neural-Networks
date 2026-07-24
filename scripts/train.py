@@ -141,6 +141,21 @@ def main() -> None:
 
     if args.threads is not None:
         torch.set_num_threads(args.threads)
+        try:
+            from bnn.kernels.packed import set_num_threads as set_bnn_threads
+
+            set_bnn_threads(args.threads)
+        except Exception:
+            pass
+    elif __import__("os").environ.get("BNN_NUM_THREADS"):
+        try:
+            n = int(__import__("os").environ["BNN_NUM_THREADS"])
+            torch.set_num_threads(n)
+            from bnn.kernels.packed import set_num_threads as set_bnn_threads
+
+            set_bnn_threads(n)
+        except Exception:
+            pass
     args.ckpt_dir.mkdir(parents=True, exist_ok=True)
     args.out.parent.mkdir(parents=True, exist_ok=True)
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")

@@ -150,6 +150,19 @@ This maximizes \(f\) under quantization while protecting quality-critical ops.
 | Layer gemm_only vs torch Linear | **2.58×** |
 | Output cosine vs FP (no QAT) | **0.28** (not drop-in accurate) |
 
+### Ultra wrap upgrade (2026-07-24) — see `docs/33_ULTRA_WRAP_LAYER.md`
+
+| Metric | Value |
+|--------|------:|
+| Binary **hybrid FFN + calib** cosine | **~0.71** (≫ 0.28 aggressive PTQ) |
+| Ternary hybrid + calib cosine | **~0.99** (meets ≥0.85 drop-in gate) |
+| Wide FFN gemm_only (OpenMP, 2048→8192) | **~4.25×** vs torch Linear |
+| Policies | `hybrid_ffn` \| `aggressive` \| `ternary_wo` \| `auto` |
+
+```bat
+bnn wrap --ultra --policy auto --qat-steps 40 --force
+```
+
 ### Measured (`ternary_weight_only`, same shape, batch=64)
 
 | Metric | Value |
