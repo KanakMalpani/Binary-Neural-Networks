@@ -5,15 +5,16 @@
 ## Quick run
 
 ```bat
-cd "C:\Users\mrkan\CRAZZY\Binary Neural Network"
-bnn train-image --epochs 8 --subset 30000
+bnn train-image --epochs 8 --subset 30000 --seed 0 --approx-sign
 ```
 
 Or:
 
 ```bat
-python scripts\train_image.py --epochs 8 --train-subset 30000 --approx-sign
+python scripts/train_image.py --epochs 8 --train-subset 30000 --seed 0 --approx-sign
 ```
+
+Committed golden: `results/image_cifar.json` (verify without retrain: `bnn repro`).
 
 Outputs: `results/image_cifar.json` (+ `.md`) and refreshes `results/cifar10_proxy.json` for the eval suite.
 

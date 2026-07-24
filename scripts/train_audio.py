@@ -17,6 +17,7 @@ sys.path.insert(0, str(ROOT))
 
 from bnn.audio.data import get_audio_loaders  # noqa: E402
 from bnn.audio.models import build_audio_model  # noqa: E402
+from bnn.determinism import set_repro_seed  # noqa: E402
 from bnn.models import count_parameters  # noqa: E402
 from bnn.ste import clip_weights_, set_approx_sign  # noqa: E402
 
@@ -79,7 +80,7 @@ def main():
     p.add_argument("--out", type=Path, default=ROOT / "results" / "audio_synth.json")
     args = p.parse_args()
 
-    torch.manual_seed(args.seed)
+    set_repro_seed(args.seed, deterministic=True, force_cpu=True)
     set_approx_sign(args.approx_sign)
     device = torch.device("cpu")
     train_loader, test_loader, meta = get_audio_loaders(

@@ -1,4 +1,9 @@
-"""Checkpoint save/load for latent STE weights and packed inference blobs."""
+"""Checkpoint save/load for latent STE weights and packed inference blobs.
+
+Security note: prefer ``weights_only=True`` for torch.load. Legacy checkpoints
+that embed arbitrary ``meta`` dicts fall back with an explicit warning — never
+load untrusted paths.
+"""
 
 from __future__ import annotations
 
@@ -10,6 +15,7 @@ import torch
 import torch.nn as nn
 
 from .kernels.packed import pack_binary_pm1
+from .logutil import warn
 from .ste import binary_sign
 
 
@@ -25,15 +31,33 @@ def save_checkpoint(
     return path
 
 
+def _torch_load(path: Path, *, map_location: str | torch.device = "cpu") -> Any:
+    """Load a checkpoint; prefer weights_only, fall back for legacy meta blobs."""
+    path = Path(path)
+    if not path.is_file():
+        raise FileNotFoundError(path)
+    try:
+        return torch.load(path, map_location=map_location, weights_only=True)
+    except Exception:
+        warn(
+            "torch.load falling back to weights_only=False — only use trusted checkpoints",
+            path=str(path),
+        )
+        return torch.load(path, map_location=map_location, weights_only=False)
+
+
 def load_checkpoint(
     model: nn.Module,
     path: Path | str,
     *,
     map_location: str | torch.device = "cpu",
 ) -> dict[str, Any]:
-    payload = torch.load(Path(path), map_location=map_location, weights_only=False)
+    payload = _torch_load(Path(path), map_location=map_location)
+    if not isinstance(payload, dict) or "state_dict" not in payload:
+        raise ValueError(f"Checkpoint {path} missing state_dict")
     model.load_state_dict(payload["state_dict"])
-    return payload.get("meta", {})
+    meta = payload.get("meta", {})
+    return meta if isinstance(meta, dict) else {}
 
 
 def pack_linear_weight(weight: torch.Tensor) -> dict[str, Any]:
@@ -73,4 +97,8 @@ def save_packed_linears(model: nn.Module, path: Path | str) -> Path:
 
 
 def load_packed_linears(path: Path | str) -> dict[str, Any]:
-    return torch.load(Path(path), map_location="cpu", weights_only=False)
+    payload = _torch_load(Path(path), map_location="cpu")
+    if not isinstance(payload, dict):
+        raise ValueError(f"Packed linears file {path} is not a dict")
+    return payload
+

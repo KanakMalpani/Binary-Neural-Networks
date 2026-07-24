@@ -1,11 +1,69 @@
 {
+  "schema_version": 2,
+  "python_min": "3.11",
+  "repro_seed_default": 0,
+  "device_policy": "cpu",
   "native_err_max": 0.0,
   "compression_min": 30.0,
   "compression_target": 32.0,
+  "compression_exact_when_uint64_pack": 32.0,
   "speedup_vs_numpy_min_n4096": 2.0,
   "speedup_vs_numpy_floor_4096_recorded": 3.0,
-  "mnist_binary_mlp_min_acc": 95.0,
-  "mnist_fp_for_gate": 97.0,
-  "mnist_gap_max_pp": 3.0,
-  "notes": "Floors from docs/21 Done Definition + results/ golden run"
+  "mnist": {
+    "source": "results/train_results.json",
+    "seed_committed": 42,
+    "epochs_committed": 3,
+    "fp32_mlp_min_acc": 96.0,
+    "binary_mlp_min_acc": 95.0,
+    "ternary_mlp_min_acc": 95.0,
+    "fp_for_gap_gate": 97.0,
+    "gap_max_pp_fp_vs_binary": 3.0,
+    "recorded": {
+      "fp32_mlp": 97.67,
+      "binary_mlp": 96.36,
+      "ternary_mlp": 97.16
+    },
+    "acc_tolerance_pp": 2.0
+  },
+  "image_cifar": {
+    "source": "results/image_cifar.json",
+    "seed_committed": 0,
+    "epochs_committed": 8,
+    "train_subset_committed": 30000,
+    "fp32_cnn_min_acc": 60.0,
+    "binary_bireal_min_acc": 55.0,
+    "gap_max_pp_fp_vs_binary": 15.0,
+    "recorded": {
+      "fp32_cifar_cnn": 71.14,
+      "binary_cifar_bireal": 61.14,
+      "acc_gap_pp_fp_vs_binary_cnn": 10.0
+    },
+    "acc_tolerance_pp": 5.0
+  },
+  "audio_synth": {
+    "source": "results/audio_synth.json",
+    "seed_committed": 0,
+    "epochs_committed": 5,
+    "fp32_cnn_min_acc": 85.0,
+    "binary_cnn_min_acc": 85.0,
+    "gap_max_pp_abs": 10.0,
+    "recorded": {
+      "fp32_cnn": 94.5,
+      "binary_cnn": 96.0,
+      "acc_gap_pp": -1.5
+    },
+    "acc_tolerance_pp": 5.0
+  },
+  "wrap_demo": {
+    "source": "results/wrap_demo.json",
+    "weight_compression_exact": 32.0,
+    "cosine_max_without_qat": 0.5,
+    "note": "Low cosine without QAT is expected; gate checks compression + non-crash quality bound"
+  },
+  "notes": [
+    "Committed results/*.json are the published goldens.",
+    "Fast verify compares those files to floors (no retrain).",
+    "Full regen retrains with fixed seeds on CPU; floats need not be bit-identical.",
+    "Native err=0 and MSVC DLL apply on Windows x64; Linux uses NumPy fallback (pytest still passes)."
+  ]
 }

@@ -1,10 +1,42 @@
-# Contributing / agent protocol
+# Contributing
 
-1. Read `docs/21_E2E_ROADMAP_COMPLETE_REPO.md` — pick first unchecked task with deps met.
-2. Do not reopen science gaps in `docs/09` as blockers.
-3. Honor ADR non-goals (`docs/08`): no CUDA-BNN 32× claims; OpenMP/ImageNet optional.
-4. After a task: mark `[x]` in §10 of `docs/21`; add a `CHANGELOG.md` Unreleased line.
-5. Run relevant tests: `pytest -q`, `bnn export-check`, `bnn validate-native`.
-6. Keep PRs to one phase subsection when humans commit (agents: no commits unless asked).
+Thank you for helping keep this lab honest and reproducible.
 
-Windows: compile kernels with **MSVC x64** (`python -m bnn.kernels.compile_native`). MinGW 32-bit → WinError 193.
+## Before you change code
+
+1. Read [`AGENTS.md`](AGENTS.md) (agents) or [`REPRODUCIBILITY.md`](REPRODUCIBILITY.md) (humans).
+2. Honor the **thesis lock**: packed CPU/edge kernels; GPU → INT4/FP8; no fake 32× e2e.
+3. Do not reopen closed science gaps in [`docs/09_GAP_REGISTER.md`](docs/09_GAP_REGISTER.md) as blockers.
+4. Prefer improving gates/docs/DX over inventing new benchmark shapes.
+
+## Dev setup
+
+```bat
+pip install -e ".[dev]" -c constraints.txt
+python -m bnn.kernels.compile_native
+pytest -q
+bnn repro
+```
+
+Windows: compile with **MSVC x64** only. MinGW 32-bit → WinError 193.
+
+## Checks before a PR / push
+
+| Check | Command |
+|-------|---------|
+| Unit + golden gates | `pytest -q` |
+| Compression microcheck | `bnn export-check` |
+| Native (Windows) | `bnn validate-native` |
+| Full fast repro | `bnn repro` |
+
+Default CI is the **fast** path (`-m "not slow"` when slow tests exist).
+Do not commit `data/`, `*.dll`, or checkpoints.
+
+## Changelog
+
+Add a bullet under `## Unreleased` in [`CHANGELOG.md`](CHANGELOG.md).
+
+## Roadmap tasks
+
+Optional: pick an unchecked item from [`docs/21_E2E_ROADMAP_COMPLETE_REPO.md`](docs/21_E2E_ROADMAP_COMPLETE_REPO.md)
+with dependencies met; mark `[x]` when done.

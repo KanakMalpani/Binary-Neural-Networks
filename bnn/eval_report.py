@@ -159,14 +159,35 @@ def render_summary(results_dir: Path | None = None) -> str:
 
     lines += ["", "## Wrap / energy / robustness", ""]
     if wrap:
+        e2e_fp = wrap.get("e2e_latency_ms_fp")
+        e2e_w = wrap.get("e2e_latency_ms_wrapped")
+        e2e_s = wrap.get("e2e_speedup")
+        comp = wrap.get("weight_compression_replaced_layers") or wrap.get("compression")
+        cos = wrap.get("output_cosine_vs_fp")
+        gemm = (wrap.get("layer_microbench") or {}).get("speedup_gemm_only_vs_torch_linear")
         lines.append(
-            f"- Wrap e2e: FP {wrap.get('e2e_latency_ms_fp')} ms → "
-            f"binary {wrap.get('e2e_latency_ms_wrapped')} ms "
-            f"(compression {wrap.get('compression')})"
+            f"- Wrap e2e latency: FP **{e2e_fp:.2f}** ms → wrapped **{e2e_w:.2f}** ms "
+            f"(e2e **{e2e_s:.2f}×**)"
+            if isinstance(e2e_fp, (int, float)) and isinstance(e2e_w, (int, float))
+            else f"- Wrap e2e: {e2e_fp} → {e2e_w} ms"
         )
+        if comp is not None:
+            lines.append(f"- Weight compression (replaced layers): **{comp}×** (exact bit-pack)")
+        if gemm is not None:
+            lines.append(f"- Layer gemm_only vs torch Linear: **{gemm:.2f}×** (kernel ROI)")
+        if cos is not None:
+            lines.append(
+                f"- Output cosine vs FP: **{cos:.3f}** "
+                "(low without QAT is expected — not a transparent wrap)"
+            )
     if energy:
         er = energy.get("energy_reduction_latency_only_same_power")
-        lines.append(f"- Energy latency-only reduction: **{er}×** (`energy_bound.json`)")
+        if isinstance(er, (int, float)):
+            lines.append(
+                f"- Energy (latency-only, same power proxy): **{er:.2f}×** (`energy_bound.json`)"
+            )
+        else:
+            lines.append(f"- Energy latency-only reduction: **{er}×** (`energy_bound.json`)")
     if fgsm:
         for r in fgsm.get("results", []):
             lines.append(
@@ -176,17 +197,23 @@ def render_summary(results_dir: Path | None = None) -> str:
 
     lines += [
         "",
-        "## Formula reminder",
+        "## Honesty / dual reporting",
         "",
-        r"\[",
-        r"S_{e2e}=\frac{1}{(1-f)+f/S_{kernel}},\quad R_{arith}\approx 64,\quad compress=32\times",
-        r"\]",
+        "| Quantity | Meaning | Do not claim as |",
+        "|----------|---------|-----------------|",
+        "| Weight compression **32×** | Bit-pack bytes | e2e latency |",
+        "| Theoretical word reduction ~64× | XNOR-popcount ops | wall-clock |",
+        "| Kernel speedup (bench) | Prepacked GEMM vs NumPy/Torch FP | full-model FPS |",
+        "| E2E wrap speedup | Whole forward | quality-preserving wrap |",
         "",
-        "Do not advertise \\(R_{arith}\\) as wall-clock.",
+        r"Amdahl: \(S_{e2e}=\frac{1}{(1-f)+f/S_{kernel}}\). "
+        "Fake `sign()`+torch Linear is often **slower** than FP32 on GPU.",
         "",
-        "Gap closure: `docs/19_GAP_CLOSURE_REPORT.md`. "
-        "Image+audio: `docs/28_IMAGE_AUDIO_COMPLETION.md`. "
-        "Final: `docs/29_FINAL_COMPLETION.md`.",
+        "Repro gates: `tests/golden_floors.json` · `bnn repro` · "
+        "[`REPRODUCIBILITY.md`](../REPRODUCIBILITY.md).",
+        "",
+        "More: `docs/19_GAP_CLOSURE_REPORT.md`, `docs/28_IMAGE_AUDIO_COMPLETION.md`, "
+        "`docs/29_FINAL_COMPLETION.md`, `docs/31_QUALITY_UPGRADE.md`.",
         "",
     ]
     return "\n".join(lines)

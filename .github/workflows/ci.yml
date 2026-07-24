@@ -13,20 +13,26 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
+          cache: pip
+          cache-dependency-path: |
+            pyproject.toml
+            constraints.txt
       - name: Install
         run: |
           python -m pip install -U pip
-          pip install -e ".[dev]"
+          pip install -e ".[dev]" -c constraints.txt
       - name: Compile native (MSVC)
         shell: cmd
         run: |
           call "C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Auxiliary\Build\vcvars64.bat" 2>nul || call "C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Auxiliary\Build\vcvars64.bat" 2>nul || call "C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\VC\Auxiliary\Build\vcvars64.bat"
           python -m bnn.kernels.compile_native
         continue-on-error: true
-      - name: Pytest
-        run: pytest -q
+      - name: Pytest (fast)
+        run: pytest -q -m "not slow"
       - name: Export check
         run: python scripts/export_check.py
+      - name: Repro verify (gates must pass)
+        run: python scripts/repro_all.py --mode verify --skip-compile --skip-pytest
 
   linux-numpy:
     runs-on: ubuntu-latest
@@ -35,11 +41,17 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
+          cache: pip
+          cache-dependency-path: |
+            pyproject.toml
+            constraints.txt
       - name: Install
         run: |
           python -m pip install -U pip
-          pip install -e ".[dev]"
-      - name: Pytest (NumPy fallback OK)
-        run: pytest -q
+          pip install -e ".[dev]" -c constraints.txt
+      - name: Pytest (NumPy fallback, fast)
+        run: pytest -q -m "not slow"
       - name: Export check
         run: python scripts/export_check.py
+      - name: Repro verify (native skipped; goldens must pass)
+        run: python scripts/repro_all.py --mode verify --skip-compile --skip-pytest

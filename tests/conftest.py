@@ -3,10 +3,11 @@
 from __future__ import annotations
 
 import pytest
-import torch
+
+from bnn.determinism import set_repro_seed
 
 
 @pytest.fixture
 def seed():
-    torch.manual_seed(0)
+    set_repro_seed(0, deterministic=True, force_cpu=True)
     return 0

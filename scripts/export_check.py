@@ -12,13 +12,14 @@ import torch
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
+from bnn.determinism import set_repro_seed  # noqa: E402
 from bnn.kernels.packed import binary_gemm_packed, pack_binary_pm1  # noqa: E402
 from bnn.layers import BinaryLinear  # noqa: E402
 from bnn.ste import binary_sign  # noqa: E402
 
 
 def main() -> None:
-    torch.manual_seed(0)
+    set_repro_seed(0, deterministic=True, force_cpu=True)
     layer = BinaryLinear(1024, 512)
     with torch.no_grad():
         w = binary_sign(layer.weight).cpu().numpy()

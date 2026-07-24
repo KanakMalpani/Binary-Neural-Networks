@@ -1,8 +1,10 @@
-# Runtime deps (see also pyproject.toml). Prefer: pip install -e ".[dev]"
-torch>=2.1
-numpy>=1.24
+# Runtime deps (see also pyproject.toml + constraints.txt).
+# Prefer:
+#   pip install -e ".[dev]" -c constraints.txt
+torch>=2.1,<2.13
+numpy>=1.24,<2.5
 # Optional: pytest via pip install -e ".[dev]"
 # Optional: transformers/datasets via pip install -e ".[hf]"
 # torchvision optional — MNIST/CIFAR use bnn.data / bnn.cifar loaders
 # Native kernel: Windows MSVC x64 via `python -m bnn.kernels.compile_native`
-# Python: 3.11–3.14 supported; 3.12 recommended for widest wheels
+# Python: 3.11+ required; 3.12 recommended for widest wheels

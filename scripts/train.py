@@ -17,13 +17,12 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
 from bnn.data import get_mnist_loaders  # noqa: E402
+from bnn.determinism import set_repro_seed  # noqa: E402
 from bnn.models import build_model, count_parameters  # noqa: E402
 
 
 def set_seed(seed: int) -> None:
-    torch.manual_seed(seed)
-    if torch.cuda.is_available():
-        torch.cuda.manual_seed_all(seed)
+    set_repro_seed(seed, deterministic=True, force_cpu=True)
 
 
 def get_loaders(data_dir: Path, batch_size: int) -> tuple[DataLoader, DataLoader]:

@@ -132,7 +132,9 @@ def main():
     p.add_argument("--out", type=Path, default=ROOT / "results" / "cifar10_proxy.json")
     args = p.parse_args()
 
-    torch.manual_seed(0)
+    from bnn.determinism import set_repro_seed
+
+    set_repro_seed(0, deterministic=True, force_cpu=True)
     device = torch.device("cpu")
     subset = None if args.train_subset <= 0 else args.train_subset
     train_loader, test_loader = get_cifar10_loaders(

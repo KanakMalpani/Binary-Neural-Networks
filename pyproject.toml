@@ -4,28 +4,55 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "bnn"
-version = "0.1.0"
-description = "Extreme low-bit inference lab: packed binary/ternary CPU kernels + STE training"
+version = "0.2.0"
+description = "Extreme low-bit inference lab: packed binary/ternary CPU kernels + STE training (honest CPU/edge speedups)"
 readme = "README.md"
 requires-python = ">=3.11"
 license = { text = "MIT" }
 authors = [{ name = "Binary Neural Network Lab" }]
+keywords = [
+  "binary-neural-network",
+  "ternary",
+  "xnor",
+  "popcount",
+  "quantization",
+  "edge-ai",
+  "cpu-inference",
+  "ste",
+  "bitnet",
+]
+classifiers = [
+  "Development Status :: 4 - Beta",
+  "Intended Audience :: Science/Research",
+  "License :: OSI Approved :: MIT License",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Programming Language :: Python :: 3.13",
+  "Topic :: Scientific/Engineering :: Artificial Intelligence",
+]
 dependencies = [
-  "torch>=2.1",
-  "numpy>=1.24",
+  "torch>=2.1,<2.13",
+  "numpy>=1.24,<2.5",
 ]
 
 [project.optional-dependencies]
-dev = ["pytest>=7.4", "pytest-timeout>=2.2"]
-hf = ["transformers>=4.40", "datasets>=2.18", "huggingface_hub>=0.22"]
+dev = ["pytest>=7.4,<9", "pytest-timeout>=2.2,<3"]
+vision = []  # CIFAR/MNIST loaders are stdlib+torch; reserved for future torchvision
+audio = []   # Synthetic audio is NumPy-only; reserved for real ASR deps
+hf = ["transformers>=4.40,<5", "datasets>=2.18,<4", "huggingface_hub>=0.22,<1"]
 all = ["bnn[dev,hf]"]
 
 [project.scripts]
 bnn = "bnn.cli:main"
 
 [project.urls]
-Homepage = "https://github.com/local/binary-neural-network"
-Documentation = "docs/21_E2E_ROADMAP_COMPLETE_REPO.md"
+Homepage = "https://github.com/KanakMalpani/Binary-Neural-Networks"
+Documentation = "https://github.com/KanakMalpani/Binary-Neural-Networks/blob/main/REPRODUCIBILITY.md"
+Repository = "https://github.com/KanakMalpani/Binary-Neural-Networks"
+Changelog = "https://github.com/KanakMalpani/Binary-Neural-Networks/blob/main/CHANGELOG.md"
+"Reproduce results" = "https://github.com/KanakMalpani/Binary-Neural-Networks/blob/main/REPRODUCIBILITY.md"
+"Agent entrypoint" = "https://github.com/KanakMalpani/Binary-Neural-Networks/blob/main/AGENTS.md"
 
 [tool.setuptools.packages.find]
 where = ["."]
@@ -39,3 +66,7 @@ testpaths = ["tests"]
 pythonpath = ["."]
 addopts = "-q"
 filterwarnings = ["ignore::DeprecationWarning"]
+markers = [
+  "slow: longer trains / downloads (deselect with -m 'not slow')",
+  "native: requires MSVC native DLL",
+]

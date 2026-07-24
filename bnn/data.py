@@ -11,6 +11,8 @@ import numpy as np
 import torch
 from torch.utils.data import DataLoader, TensorDataset
 
+from .paths import PathSecurityError, resolve_under
+
 BASE = "https://storage.googleapis.com/cvdf-datasets/mnist/"
 FILES = {
     "train_images": "train-images-idx3-ubyte.gz",
@@ -20,15 +22,28 @@ FILES = {
 }
 
 
-def _download(data_dir: Path) -> None:
+def _safe_data_dir(data_dir: Path) -> Path:
+    """Resolve data_dir; reject traversal via weird symlinks when nested under cwd."""
+    data_dir = Path(data_dir).expanduser().resolve()
     data_dir.mkdir(parents=True, exist_ok=True)
+    # Ensure filenames below stay under this resolved root
     for name in FILES.values():
-        dest = data_dir / name
+        try:
+            resolve_under(data_dir, name)
+        except PathSecurityError as exc:
+            raise PathSecurityError(f"MNIST path rejected: {exc}") from exc
+    return data_dir
+
+
+def _download(data_dir: Path) -> None:
+    data_dir = _safe_data_dir(data_dir)
+    for name in FILES.values():
+        dest = resolve_under(data_dir, name)
         if dest.exists():
             continue
         url = BASE + name
-        print(f"Downloading {url}")
-        urllib.request.urlretrieve(url, dest)
+        print(f"Downloading {url}", flush=True)
+        urllib.request.urlretrieve(url, dest)  # noqa: S310 — fixed CDN URL
 
 
 def _read_images(path: Path) -> np.ndarray:
@@ -49,12 +64,13 @@ def _read_labels(path: Path) -> np.ndarray:
 def get_mnist_loaders(
     data_dir: Path, batch_size: int
 ) -> tuple[DataLoader, DataLoader]:
+    data_dir = _safe_data_dir(data_dir)
     _download(data_dir)
     mean, std = 0.1307, 0.3081
-    x_train = (_read_images(data_dir / FILES["train_images"]) - mean) / std
-    y_train = _read_labels(data_dir / FILES["train_labels"])
-    x_test = (_read_images(data_dir / FILES["test_images"]) - mean) / std
-    y_test = _read_labels(data_dir / FILES["test_labels"])
+    x_train = (_read_images(resolve_under(data_dir, FILES["train_images"])) - mean) / std
+    y_train = _read_labels(resolve_under(data_dir, FILES["train_labels"]))
+    x_test = (_read_images(resolve_under(data_dir, FILES["test_images"])) - mean) / std
+    y_test = _read_labels(resolve_under(data_dir, FILES["test_labels"]))
 
     train_ds = TensorDataset(torch.from_numpy(x_train), torch.from_numpy(y_train))
     test_ds = TensorDataset(torch.from_numpy(x_test), torch.from_numpy(y_test))

@@ -117,7 +117,11 @@ def _try_load_native():
 
 def pack_binary_pm1(x: np.ndarray, axis: int = -1) -> tuple[np.ndarray, int]:
     """Pack ±1 values along `axis` into uint64 words. bit1 => -1/non-positive."""
-    x = np.ascontiguousarray(x)
+    x = np.ascontiguousarray(np.asarray(x))
+    if x.size == 0:
+        raise ValueError("pack_binary_pm1: empty array")
+    if not np.issubdtype(x.dtype, np.floating) and not np.issubdtype(x.dtype, np.integer):
+        raise TypeError(f"pack_binary_pm1: expected numeric dtype, got {x.dtype}")
     x = np.moveaxis(x, axis, -1)
     shape = x.shape
     n = shape[-1]
@@ -131,12 +135,29 @@ def pack_binary_pm1(x: np.ndarray, axis: int = -1) -> tuple[np.ndarray, int]:
     return np.ascontiguousarray(packed, dtype=np.uint64), n
 
 
+def _validate_prepacked(xp: np.ndarray, wp: np.ndarray, n: int) -> tuple[int, int, int]:
+    if xp.dtype != np.uint64 or wp.dtype != np.uint64:
+        raise TypeError(
+            f"prepacked matrices must be uint64, got xp={xp.dtype} wp={wp.dtype}"
+        )
+    if xp.ndim != 2 or wp.ndim != 2:
+        raise ValueError(f"expected 2D packed mats, got xp.ndim={xp.ndim} wp.ndim={wp.ndim}")
+    if xp.shape[1] != wp.shape[1]:
+        raise ValueError(
+            f"packed word mismatch: xp words={xp.shape[1]} wp words={wp.shape[1]}"
+        )
+    words = xp.shape[1]
+    expected = (n + 63) // 64
+    if words != expected:
+        raise ValueError(f"n={n} implies {expected} words, got {words}")
+    return int(xp.shape[0]), int(wp.shape[0]), words
+
+
 def binary_gemm_numpy_prepacked(
     xp: np.ndarray, wp: np.ndarray, n: int
 ) -> np.ndarray:
     """Y = binary GEMM from pre-packed uint64 matrices (NumPy path)."""
-    B, words = xp.shape
-    M = wp.shape[0]
+    B, M, _words = _validate_prepacked(xp, wp, n)
     out = np.empty((B, M), dtype=np.float32)
     # Row-at-a-time to keep temporaries small and cache-friendly
     for b in range(B):
@@ -152,8 +173,7 @@ def binary_gemm_native_prepacked(
     lib = _try_load_native()
     if not lib:
         return None
-    B, words = xp.shape
-    M = wp.shape[0]
+    B, M, words = _validate_prepacked(xp, wp, n)
     out = np.empty((B, M), dtype=np.float32)
     lib.binary_gemm_u64(
         xp.ctypes.data_as(ctypes.POINTER(ctypes.c_uint64)),
@@ -175,15 +195,24 @@ def binary_gemm_packed(
 ) -> np.ndarray:
     """Compute Y = X @ W.T for ±1 matrices using packed XNOR-popcount."""
     x_pm1 = np.asarray(x_pm1)
-    assert x_pm1.ndim == 2
+    if x_pm1.ndim != 2:
+        raise ValueError(f"x_pm1 must be 2D, got shape {x_pm1.shape}")
     xp, n = pack_binary_pm1(x_pm1, axis=1)
     if prepacked_w is None:
         w_pm1 = np.asarray(w_pm1)
+        if w_pm1.ndim != 2:
+            raise ValueError(f"w_pm1 must be 2D, got shape {w_pm1.shape}")
+        if w_pm1.shape[1] != x_pm1.shape[1]:
+            raise ValueError(
+                f"in_features mismatch: x {x_pm1.shape[1]} vs w {w_pm1.shape[1]}"
+            )
         wp, n2 = pack_binary_pm1(w_pm1, axis=1)
-        assert n == n2
+        if n != n2:
+            raise ValueError(f"packed n mismatch: {n} vs {n2}")
     else:
         wp, n2 = prepacked_w
-        assert n == n2
+        if n != n2:
+            raise ValueError(f"packed n mismatch: {n} vs {n2}")
 
     native = binary_gemm_native_prepacked(xp, wp, n)
     if native is not None:

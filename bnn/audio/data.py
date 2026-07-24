@@ -67,13 +67,17 @@ def get_audio_loaders(
     cache_dir: Path | None = None,
 ) -> tuple[DataLoader, DataLoader, dict]:
     """Always works offline via synthetic tones. Optional NPZ cache."""
-    cache_dir = Path(cache_dir) if cache_dir else None
+    cache_dir = Path(cache_dir).expanduser().resolve() if cache_dir else None
     cache = None
     if cache_dir is not None:
         cache_dir.mkdir(parents=True, exist_ok=True)
-        cache = cache_dir / f"synth_audio_{n_train}_{n_test}_{n_classes}_{seed}.npz"
+        # Filename is constructed from ints only — no user path segments
+        fname = f"synth_audio_{int(n_train)}_{int(n_test)}_{int(n_classes)}_{int(seed)}.npz"
+        cache = (cache_dir / fname).resolve()
+        if not str(cache).startswith(str(cache_dir)):
+            raise ValueError(f"audio cache path escapes cache_dir: {cache}")
     if cache is not None and cache.exists():
-        z = np.load(cache)
+        z = np.load(cache, allow_pickle=False)
         x_tr, y_tr, x_te, y_te = z["x_tr"], z["y_tr"], z["x_te"], z["y_te"]
     else:
         x_tr, y_tr, x_te, y_te = build_synthetic_audio_arrays(

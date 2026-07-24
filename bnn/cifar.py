@@ -1,8 +1,12 @@
 """CIFAR-10 loader without torchvision.
 
 Sources (first hit wins):
-1. ``data/cifar10_hf/{train,test}.npz`` (HF ``datasets`` dump)
-2. Official pickle batches under ``cifar-10-batches-py``
+1. ``data/cifar10_hf/{train,test}.npz`` (HF ``datasets`` dump) — preferred
+2. Official pickle batches under ``cifar-10-batches-py`` (trusted CDN only)
+
+Security: pickle is only used for the official CIFAR-10 batch format after
+download from the Toronto CDN (or a pre-placed tarball under ``data_dir``).
+Prefer NPZ caches; never point ``data_dir`` at untrusted pickle trees.
 """
 
 from __future__ import annotations
@@ -64,10 +68,25 @@ def _download_pickle(data_dir: Path) -> Path:
 
 
 def _load_batch(path: Path) -> tuple[np.ndarray, np.ndarray]:
+    """Load one official CIFAR-10 pickle batch (structure-validated).
+
+    Prefer NPZ via ``cifar10_hf/`` — pickle is only for the Toronto CDN layout.
+    """
+    path = Path(path).resolve()
+    # Only accept known batch filenames under a cifar-10-batches-py tree
+    if path.name not in {*(f"data_batch_{i}" for i in range(1, 6)), "test_batch"}:
+        raise ValueError(f"Unexpected CIFAR batch name: {path.name}")
     with open(path, "rb") as f:
-        d = pickle.load(f, encoding="bytes")
-    raw = d[b"data"].reshape(-1, 3, 32, 32).astype(np.float32) / 255.0
+        d = pickle.load(f, encoding="bytes")  # noqa: S301 — official CIFAR-10 only
+    if not isinstance(d, dict) or b"data" not in d or b"labels" not in d:
+        raise ValueError(f"Not a CIFAR-10 batch dict: {path}")
+    data = np.asarray(d[b"data"])
+    if data.ndim != 2 or data.shape[1] != 3072:
+        raise ValueError(f"Bad CIFAR data shape {data.shape} in {path}")
+    raw = data.reshape(-1, 3, 32, 32).astype(np.float32) / 255.0
     labels = np.array(d[b"labels"], dtype=np.int64)
+    if labels.shape[0] != raw.shape[0]:
+        raise ValueError("CIFAR labels/data length mismatch")
     return raw, labels
 
 
@@ -78,6 +97,8 @@ def get_cifar10_loaders(
     train_subset: int | None = None,
     seed: int = 0,
 ) -> tuple[DataLoader, DataLoader]:
+    data_dir = Path(data_dir).expanduser().resolve()
+    data_dir.mkdir(parents=True, exist_ok=True)
     loaded = _from_hf_npz(data_dir)
     if loaded is not None:
         x_train, y_train, x_test, y_test = loaded

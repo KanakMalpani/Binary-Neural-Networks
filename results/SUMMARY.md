@@ -1,6 +1,6 @@
 # Results summary (this workspace)
 
-_Regenerated: 2026-07-24T10:01:19.945536+00:00_
+_Regenerated: 2026-07-24T12:59:10.383378+00:00_
 _Machine: Windows-11-10.0.26200-SP0 | torch 2.12.0+cpu | CUDA=False_
 
 ## Kernel (CPU packed XNOR)
@@ -41,17 +41,25 @@ Source: `audio_synth.json`. **Not production ASR** — INT8 Whisper/ORT for real
 
 ## Wrap / energy / robustness
 
-- Wrap e2e: FP 21.553476666789116 ms → binary 18.65172999993471 ms (compression None)
-- Energy latency-only reduction: **1.1555752022393935×** (`energy_bound.json`)
+- Wrap e2e latency: FP **21.55** ms → wrapped **18.65** ms (e2e **1.16×**)
+- Weight compression (replaced layers): **32.0×** (exact bit-pack)
+- Layer gemm_only vs torch Linear: **2.12×** (kernel ROI)
+- Output cosine vs FP: **0.283** (low without QAT is expected — not a transparent wrap)
+- Energy (latency-only, same power proxy): **1.16×** (`energy_bound.json`)
 - FGSM fp32_mlp: clean 97.08% → 62.99% (drop 34.09 pp)
 - FGSM binary_mlp: clean 95.96% → 60.38% (drop 35.58 pp)
 
-## Formula reminder
+## Honesty / dual reporting
 
-\[
-S_{e2e}=\frac{1}{(1-f)+f/S_{kernel}},\quad R_{arith}\approx 64,\quad compress=32\times
-\]
+| Quantity | Meaning | Do not claim as |
+|----------|---------|-----------------|
+| Weight compression **32×** | Bit-pack bytes | e2e latency |
+| Theoretical word reduction ~64× | XNOR-popcount ops | wall-clock |
+| Kernel speedup (bench) | Prepacked GEMM vs NumPy/Torch FP | full-model FPS |
+| E2E wrap speedup | Whole forward | quality-preserving wrap |
 
-Do not advertise \(R_{arith}\) as wall-clock.
+Amdahl: \(S_{e2e}=\frac{1}{(1-f)+f/S_{kernel}}\). Fake `sign()`+torch Linear is often **slower** than FP32 on GPU.
 
-Gap closure: `docs/19_GAP_CLOSURE_REPORT.md`. Image+audio: `docs/28_IMAGE_AUDIO_COMPLETION.md`. Final: `docs/29_FINAL_COMPLETION.md`.
+Repro gates: `tests/golden_floors.json` · `bnn repro` · [`REPRODUCIBILITY.md`](../REPRODUCIBILITY.md).
+
+More: `docs/19_GAP_CLOSURE_REPORT.md`, `docs/28_IMAGE_AUDIO_COMPLETION.md`, `docs/29_FINAL_COMPLETION.md`, `docs/31_QUALITY_UPGRADE.md`.

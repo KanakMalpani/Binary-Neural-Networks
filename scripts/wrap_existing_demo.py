@@ -85,7 +85,9 @@ def main() -> None:
     p.add_argument("--out", type=Path, default=ROOT / "results" / "wrap_demo.json")
     args = p.parse_args()
 
-    torch.manual_seed(0)
+    from bnn.determinism import set_repro_seed
+
+    set_repro_seed(0, deterministic=True, force_cpu=True)
     fp_model = make_wide_mlp(args.hidden)
     wrapped = copy.deepcopy(fp_model)
     report = replace_middles(wrapped, args.mode)

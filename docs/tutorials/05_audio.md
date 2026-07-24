@@ -9,15 +9,16 @@ Classic BNNs are **not** production ASR/TTS. For real speech use **INT8 Whisper 
 ## Quick run (always works offline)
 
 ```bat
-cd "C:\Users\mrkan\CRAZZY\Binary Neural Network"
-bnn train-audio --epochs 5 --n-train 800 --n-test 200
+bnn train-audio --epochs 5 --n-train 800 --n-test 200 --seed 0
 ```
 
 Or:
 
 ```bat
-python scripts\train_audio.py --epochs 5
+python scripts/train_audio.py --epochs 5 --seed 0
 ```
+
+Committed golden: `results/audio_synth.json` (verify: `bnn repro`).
 
 Outputs: `results/audio_synth.json` (+ `.md`).
 

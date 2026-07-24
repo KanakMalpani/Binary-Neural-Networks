@@ -47,4 +47,4 @@ def test_clip_weights_on_binary_linear():
     with torch.no_grad():
         layer.weight.fill_(5.0)
     clip_weights_(layer)
-    assert float(layer.weight.max()) <= 1.0 + 1e-5
+    assert float(layer.weight.detach().max()) <= 1.0 + 1e-5

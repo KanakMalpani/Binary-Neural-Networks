@@ -1,0 +1,14 @@
+# Soft pins for portable installs. Prefer:
+#   pip install -e ".[dev]" -c constraints.txt
+#
+# Exact wheels vary by OS/Python; these bounds keep third-party / other-AI
+# clones in a known-good band without requiring a full lockfile.
+
+torch>=2.1,<2.13
+numpy>=1.24,<2.5
+pytest>=7.4,<9
+pytest-timeout>=2.2,<3
+# Optional HF lane:
+# transformers>=4.40,<5
+# datasets>=2.18,<4
+# huggingface_hub>=0.22,<1

@@ -41,8 +41,12 @@ def test_mnist_acc_gates():
         pytest.skip("no train_results.json")
     rows = json.loads(path.read_text(encoding="utf-8"))
     by = {r["model"]: r["test_acc"] for r in rows}
+    g = FLOORS.get("mnist") or {}
+    min_bn = g.get("binary_mlp_min_acc", FLOORS.get("mnist_binary_mlp_min_acc", 95.0))
+    fp_gate = g.get("fp_for_gap_gate", FLOORS.get("mnist_fp_for_gate", 97.0))
+    gap_max = g.get("gap_max_pp_fp_vs_binary", FLOORS.get("mnist_gap_max_pp", 3.0))
     if "fp32_mlp" in by and "binary_mlp" in by:
         fp, bn = by["fp32_mlp"], by["binary_mlp"]
-        if fp >= FLOORS["mnist_fp_for_gate"]:
-            assert bn >= FLOORS["mnist_binary_mlp_min_acc"]
-            assert (fp - bn) <= FLOORS["mnist_gap_max_pp"]
+        if fp >= fp_gate:
+            assert bn >= min_bn
+            assert (fp - bn) <= gap_max

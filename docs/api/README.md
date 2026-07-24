@@ -1,31 +1,76 @@
-# API stub
+# Public API reference (`bnn`)
 
-Public package: **`bnn`** (`pip install -e .`).
+Install: `pip install -e ".[dev]" -c constraints.txt`  
+Version: `import bnn; print(bnn.__version__)` · CLI: `bnn --version`
 
-## Core
+## Core (`import bnn`)
 
-| Symbol | Module | Role |
-|--------|--------|------|
-| `BinaryLinear`, `BinaryConv2d`, `BiRealBlock`, `TernaryLinear` | `bnn.layers` | STE training layers |
-| `binary_sign`, `ternary_weight`, `clip_weights_` | `bnn.ste` | Estimators |
-| `build_model`, `count_parameters` | `bnn.models` | Zoo |
-| `wrap_model`, `wrap_linear_modules` | `bnn.wrapper` | Inference wrap |
-| `save_checkpoint`, `load_checkpoint`, `save_packed_linears` | `bnn.export` | Checkpoints |
-| `write_summary` | `bnn.eval_report` | SUMMARY.md |
+| Symbol | Role |
+|--------|------|
+| `BinaryLinear`, `BinaryConv2d`, `BiRealBlock`, `TernaryLinear` | STE training layers |
+| `binary_sign`, `ternary_weight`, `clip_weights_` | Estimators / clip |
+| `build_model`, `count_parameters` | MNIST zoo |
+| `wrap_model`, `wrap_linear_modules`, `model_param_bytes` | Inference wrap |
+| `save_checkpoint`, `load_checkpoint` | Latent STE weights (trusted paths only) |
+| `save_packed_linears`, `load_packed_linears`, `pack_linear_weight` | Packed blobs |
+| `set_repro_seed` | Seeds + deterministic/CPU policy for goldens |
 
-## Kernels
+```python
+import bnn
+from bnn import BinaryLinear, wrap_model, set_repro_seed
 
-| Symbol | Module |
-|--------|--------|
-| `pack_binary_pm1`, `binary_gemm_packed`, `native_kernel_available` | `bnn.kernels.packed` |
-| `pack_ternary_2bit`, `unpack_ternary_2bit` | `bnn.kernels.ternary_pack` |
-| `compile_native` | `python -m bnn.kernels.compile_native` |
+set_repro_seed(0, deterministic=True, force_cpu=True)
+```
+
+## Kernels (`bnn.kernels`)
+
+| Symbol | Role |
+|--------|------|
+| `pack_binary_pm1` | ±1 → uint64 words |
+| `binary_gemm_packed` | XNOR-popcount GEMM (native if available) |
+| `binary_gemm_numpy_prepacked` / `binary_gemm_native_prepacked` | Explicit paths |
+| `native_kernel_available` | DLL/SO probe |
+| `theoretical_ops` | Theory (≠ wall-clock) |
+| `pack_ternary_2bit` / `unpack_ternary_2bit` | Ternary pedagogy |
+
+Compile (Windows MSVC x64): `python -m bnn.kernels.compile_native`
+
+## Vision (`bnn.vision`)
+
+`FP32CIFARCNN`, `BinaryCIFARCNN`, `TinyBinaryViT`, `build_vision_model`,
+`check_imagenet_folder` (layout stub; full ImageNet train is a non-goal).
+
+## Audio (`bnn.audio`)
+
+`get_audio_loaders`, `synthesize_tone`, `waveform_to_features`, `build_audio_model`.
+Synthetic tones only — not production ASR.
+
+## Paths / logging
+
+| Module | Role |
+|--------|------|
+| `bnn.paths.resolve_under` | Reject path traversal outside a root |
+| `bnn.logutil.info/warn/error` | Flushing stdout/stderr conventions |
 
 ## CLI
 
 ```bat
-bnn compile-native | validate-native | bench | export-check
-bnn train | train-cifar | wrap | energy-bound | eval-suite | recommend
+bnn --help
+bnn --version
+bnn repro                 # fast golden verify
+bnn compile-native
+bnn validate-native       # exit 2 if DLL missing
+bnn export-check
+bnn bench | train | train-image | train-audio | wrap
+bnn eval-suite | recommend --goal edge-vision
 ```
 
-Thesis: inference on CPU/edge with real packed kernels — not `sign()` for GPU 32×.
+Also: `python -m bnn <command>`.
+
+## Security notes
+
+- Prefer NPZ CIFAR (`data/cifar10_hf/`); pickle batches only from the official
+  Toronto layout under your `data_dir`.
+- `torch.load` prefers `weights_only=True`; legacy meta falls back with a warning —
+  never load untrusted checkpoints.
+- Dataset trees under `data/` are gitignored; do not commit them.

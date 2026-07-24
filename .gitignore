@@ -1,5 +1,6 @@
 __pycache__/
 *.py[cod]
+*$py.class
 *.egg-info/
 .eggs/
 dist/
@@ -7,22 +8,40 @@ build/
 .pytest_cache/
 .mypy_cache/
 .ruff_cache/
+.coverage
+htmlcov/
 .venv/
 venv/
+env/
+
+# Native build artifacts (compile locally)
 *.dll
+*.so
+*.dylib
 *.obj
+*.o
 *.exp
 *.lib
 *.pdb
-data/**/*.tar.gz
-data/cifar-10-python.tar.gz
-data/cifar-10-python-full.tar.gz
-data/cifar-10-batches-py/
-data/cifar10_hf/
-data/*-ubyte.gz
-checkpoints/*.pt
-checkpoints/**/*.pt
+bnn/kernels/_binary_gemm_native*
+
+# Datasets (never commit)
+data/
+!data/.gitkeep
+
+# Checkpoints / local runs
+checkpoints/
+*.pt
+*.pth
+
+# OS / editor
 .DS_Store
 Thumbs.db
+.idea/
+.vscode/
+
+# Local repro / logs
 results/_*.txt
+results/_repro_smoke_*.json
+results/_repro_run.log
 *.log
