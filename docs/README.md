@@ -11,6 +11,7 @@ Start here if you are new to the repo.
 | [`25_ONEPAGER.md`](25_ONEPAGER.md) | Executive decision tree (honest) |
 | [`api/README.md`](api/README.md) | Public Python API |
 | [`31_QUALITY_UPGRADE.md`](31_QUALITY_UPGRADE.md) | Latest quality leap changelog |
+| [`34_COMPUTE_SPEEDUP.md`](34_COMPUTE_SPEEDUP.md) | OpenMP / pack / ternary speedups + thread curve |
 
 ## Tutorials
 
