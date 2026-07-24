@@ -28,7 +28,7 @@ jobs:
           python -m bnn.kernels.compile_native
         continue-on-error: true
       - name: Pytest (fast)
-        run: pytest -q -m "not slow"
+        run: pytest -q -m "not slow and not hf"
       - name: Export check
         run: python scripts/export_check.py
       - name: Repro verify (gates must pass)
@@ -49,9 +49,18 @@ jobs:
         run: |
           python -m pip install -U pip
           pip install -e ".[dev]" -c constraints.txt
-      - name: Pytest (NumPy fallback, fast)
-        run: pytest -q -m "not slow"
+      - name: Compile native (GCC OpenMP)
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq gcc libomp-dev || true
+          python -m bnn.kernels.compile_native --force
+        continue-on-error: true
+      - name: Validate native (when .so present)
+        run: python scripts/validate_native.py
+        continue-on-error: true
+      - name: Pytest (fast; native if built)
+        run: pytest -q -m "not slow and not hf"
       - name: Export check
         run: python scripts/export_check.py
-      - name: Repro verify (native skipped; goldens must pass)
+      - name: Repro verify (goldens must pass)
         run: python scripts/repro_all.py --mode verify --skip-compile --skip-pytest

@@ -59,7 +59,7 @@ where = ["."]
 include = ["bnn*"]
 
 [tool.setuptools.package-data]
-bnn = ["kernels/*.c", "kernels/*.py"]
+bnn = ["kernels/*.c", "kernels/*.py", "zoo_registry.json"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
@@ -69,4 +69,5 @@ filterwarnings = ["ignore::DeprecationWarning"]
 markers = [
   "slow: longer trains / downloads (deselect with -m 'not slow')",
   "native: requires MSVC native DLL",
+  "hf: optional Hugging Face / transformers (deselect with -m 'not hf')",
 ]

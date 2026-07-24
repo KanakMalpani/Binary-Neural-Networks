@@ -25,7 +25,16 @@ def test_cli_help_lists_repro():
     p = build_parser()
     help_txt = p.format_help()
     assert "repro" in help_txt
+    assert "optimise" in help_txt
     assert "packed" in help_txt.lower() or "CPU" in help_txt or "edge" in help_txt
+
+
+def test_cli_optimise_help():
+    code = main(["optimise", "--help"])
+    assert code == 0
+    p = build_parser()
+    help_txt = p.format_help()
+    assert "optimise" in help_txt
 
 
 def test_cli_unknown_command_exits_nonzero():

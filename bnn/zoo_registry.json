@@ -1,0 +1,61 @@
+{
+  "schema": "bnn_zoo_registry_v1",
+  "thesis_note": "Entries are pedagogy / recipes — not SOTA claims. Compression ≠ wall-clock.",
+  "models": [
+    {
+      "id": "binary_mlp_mnist",
+      "name": "Binary MLP (MNIST)",
+      "build": "bnn.models.build_model('binary_mlp')",
+      "train_cli": "bnn train",
+      "wrap": "hybrid_ffn / binary_xnor",
+      "docs": ["docs/tutorials/01_GETTING_STARTED.md"],
+      "results": ["results/mnist_ste.json"]
+    },
+    {
+      "id": "bireal_cifar",
+      "name": "Bi-Real CNN proxy (CIFAR-10)",
+      "build": "bnn.vision / train-image",
+      "train_cli": "bnn train-image",
+      "wrap": "wrap_conv_modules",
+      "docs": ["docs/tutorials/"],
+      "results": ["results/cifar_bireal.json"]
+    },
+    {
+      "id": "tiny_binary_vit",
+      "name": "Tiny Binary ViT",
+      "build": "bnn.vision",
+      "train_cli": "bnn train-image --vit",
+      "wrap": "hybrid_ffn on MLP blocks",
+      "docs": ["docs/36_ENCODER_DECODER_AND_NEXT.md"],
+      "results": []
+    },
+    {
+      "id": "binary_transformer_seq2seq",
+      "name": "Binary Transformer enc/dec (reverse task)",
+      "build": "bnn.seq",
+      "train_cli": "bnn train-seq2seq",
+      "wrap": "bnn wrap-transformer",
+      "docs": ["docs/tutorials/06_ENCODER_DECODER.md", "docs/36_ENCODER_DECODER_AND_NEXT.md"],
+      "results": ["results/seq2seq_reverse.json"]
+    },
+    {
+      "id": "audio_synthetic",
+      "name": "Synthetic tone classifier",
+      "build": "bnn.audio",
+      "train_cli": "bnn train-audio",
+      "wrap": "optional",
+      "docs": ["docs/tutorials/"],
+      "results": ["results/audio_tones.json"],
+      "non_goal": "Not production ASR / Whisper"
+    },
+    {
+      "id": "optimiser_tiny_block",
+      "name": "Optimiser demo TinyBlock (FFN hybrid)",
+      "build": "scripts/ultra_wrap_demo.py::TinyBlock",
+      "train_cli": "bnn optimise",
+      "wrap": "auto / hybrid_ffn / ternary_wo",
+      "docs": ["docs/tutorials/07_OPTIMISER_QUICKSTART.md"],
+      "results": ["results/ultra_wrap.json", "results/optimise_report.json"]
+    }
+  ]
+}

@@ -28,6 +28,7 @@ from .layers import (
 )
 from .models import build_model, count_parameters
 from .ste import binary_sign, clip_weights_, ternary_weight
+from .optimise import OptimiseConfig, OptimiseResult, optimise_model
 from .wrapper import model_param_bytes, wrap_linear_modules, wrap_model
 from .wrap.policy import recommend_wrap_policy
 
@@ -46,6 +47,10 @@ __all__ = [
     # Models
     "build_model",
     "count_parameters",
+    # Optimiser (preferred product API)
+    "optimise_model",
+    "OptimiseConfig",
+    "OptimiseResult",
     # Wrap / export
     "wrap_linear_modules",
     "wrap_model",

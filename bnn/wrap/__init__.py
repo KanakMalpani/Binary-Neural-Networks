@@ -36,6 +36,13 @@ from .policy import (
     select_linears,
 )
 from .qat import light_qat_recover
+from .schema import (
+    SCHEMA_ID,
+    SCHEMA_VERSION,
+    envelope,
+    is_valid_optimise_report,
+    validate_optimise_report,
+)
 
 __all__ = [
     "WrapMode",
@@ -68,4 +75,9 @@ __all__ = [
     "select_linears",
     "light_qat_recover",
     "attach_effectiveness",
+    "SCHEMA_ID",
+    "SCHEMA_VERSION",
+    "envelope",
+    "validate_optimise_report",
+    "is_valid_optimise_report",
 ]

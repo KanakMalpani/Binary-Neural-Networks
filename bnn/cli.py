@@ -130,42 +130,89 @@ def cmd_repro(args: argparse.Namespace) -> int:
     return _run_script("repro_all.py", extra)
 
 
+def _ultra_wrap_extra(args: argparse.Namespace) -> list[str]:
+    extra: list[str] = [
+        "--policy",
+        args.policy,
+        "--batch",
+        str(args.batch),
+        "--d-model",
+        str(getattr(args, "d_model", 512)),
+        "--ff",
+        str(getattr(args, "ff", 2048)),
+        "--calib-batches",
+        str(getattr(args, "calib_batches", 4)),
+        "--min-width",
+        str(args.min_width),
+        "--qat-steps",
+        str(args.qat_steps),
+        "--drop-in-threshold",
+        str(args.drop_in_threshold),
+    ]
+    if args.mode and args.mode != "auto" and args.policy != "auto":
+        extra += ["--mode", args.mode]
+    elif args.mode == "auto" or args.policy == "auto":
+        extra += ["--mode", "auto"]
+    elif args.mode:
+        extra += ["--mode", args.mode]
+    if args.force:
+        extra.append("--force")
+    if getattr(args, "report", None):
+        extra += ["--report", str(args.report)]
+    if getattr(args, "compare_baseline", False):
+        extra.append("--compare-baseline")
+    return extra
+
+
+def cmd_optimise(args: argparse.Namespace) -> int:
+    """Product verb: ultra wrap (+ optional encode). Preferred over ``bnn wrap --ultra``."""
+    from pathlib import Path as _Path
+
+    report = args.report or (ROOT / "results" / "optimise_report.json")
+    args.report = _Path(report)
+    code = _run_script("ultra_wrap_demo.py", _ultra_wrap_extra(args))
+    if code != 0:
+        return code
+    if getattr(args, "pack", None):
+        enc_extra = [
+            "--source",
+            "mlp",
+            "--out",
+            str(args.pack),
+            "--hidden",
+            str(getattr(args, "pack_hidden", 256)),
+            "--min-width",
+            str(args.min_width),
+        ]
+        enc_code = _run_script("encode_demo.py", enc_extra) if (ROOT / "scripts" / "encode_demo.py").exists() else None
+        if enc_code is None:
+            # Use CLI encode path in-process
+            enc_ns = argparse.Namespace(
+                source="mlp",
+                out=_Path(args.pack),
+                hidden=getattr(args, "pack_hidden", 256),
+                min_width=args.min_width,
+                in_features=512,
+                out_features=512,
+            )
+            return cmd_encode(enc_ns)
+        return int(enc_code)
+    return 0
+
+
 def cmd_wrap(args: argparse.Namespace) -> int:
     """Legacy wide-MLP wrap, or ``--ultra`` for hybrid/calib/ternary demo."""
     if getattr(args, "ultra", False):
-        extra: list[str] = [
-            "--policy",
-            args.policy,
-            "--batch",
-            str(args.batch),
-            "--d-model",
-            str(getattr(args, "d_model", 512)),
-            "--ff",
-            str(getattr(args, "ff", 2048)),
-            "--calib-batches",
-            str(args.calib_batches),
-            "--min-width",
-            str(args.min_width),
-            "--qat-steps",
-            str(args.qat_steps),
-            "--drop-in-threshold",
-            str(args.drop_in_threshold),
-        ]
-        # Only forward --mode when explicit; let policy=auto pick mode.
-        if args.mode and args.mode != "auto" and args.policy != "auto":
-            extra += ["--mode", args.mode]
-        elif args.mode == "auto" or args.policy == "auto":
-            extra += ["--mode", "auto"]
-        elif args.mode:
-            extra += ["--mode", args.mode]
-        if args.force:
-            extra.append("--force")
-        if args.report:
-            extra += ["--report", str(args.report)]
-        if args.compare_baseline:
-            extra.append("--compare-baseline")
-        return _run_script("ultra_wrap_demo.py", extra)
+        return _run_script("ultra_wrap_demo.py", _ultra_wrap_extra(args))
 
+    import warnings
+
+    warnings.warn(
+        "bnn wrap without --ultra is the legacy demo; prefer `bnn optimise` "
+        "(see docs/adr/0001_public_optimiser_api.md).",
+        DeprecationWarning,
+        stacklevel=2,
+    )
     extra = [
         "--mode",
         args.mode if args.mode != "auto" else "binary_xnor",
@@ -453,6 +500,49 @@ def build_parser() -> argparse.ArgumentParser:
     w.add_argument("--report", type=Path, default=None, help="JSON report path (ultra)")
     w.add_argument("--compare-baseline", action="store_true")
     w.set_defaults(func=cmd_wrap)
+
+    opt = sub.add_parser(
+        "optimise",
+        help="Optimise demo model: calibrate → policy → wrap → report (+ optional .bnnpack)",
+    )
+    opt.add_argument(
+        "--mode",
+        default="auto",
+        choices=[
+            "binary_xnor",
+            "ternary_weight_only",
+            "binary_weight_only_dequant",
+            "auto",
+        ],
+    )
+    opt.add_argument(
+        "--policy",
+        default="auto",
+        choices=["hybrid_ffn", "aggressive", "ternary_wo", "auto", "default"],
+    )
+    opt.add_argument("--batch", type=int, default=32)
+    opt.add_argument("--d-model", type=int, default=512)
+    opt.add_argument("--ff", type=int, default=2048)
+    opt.add_argument("--calib-batches", type=int, default=4)
+    opt.add_argument("--min-width", type=int, default=64)
+    opt.add_argument("--qat-steps", type=int, default=0)
+    opt.add_argument("--drop-in-threshold", type=float, default=0.85)
+    opt.add_argument("--force", action="store_true")
+    opt.add_argument(
+        "--report",
+        type=Path,
+        default=ROOT / "results" / "optimise_report.json",
+        help="JSON report path (schema bnn_optimise_report_v1)",
+    )
+    opt.add_argument("--compare-baseline", action="store_true")
+    opt.add_argument(
+        "--pack",
+        type=Path,
+        default=None,
+        help="Also write a toy MLP .bnnpack via encode (portable artifact smoke)",
+    )
+    opt.add_argument("--pack-hidden", type=int, default=256)
+    opt.set_defaults(func=cmd_optimise)
 
     sub.add_parser("energy-bound", help="Bind energy estimate to wrap latencies").set_defaults(
         func=cmd_energy_bound

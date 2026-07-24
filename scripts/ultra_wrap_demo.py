@@ -170,10 +170,15 @@ def run_one(
         status = "OK" if drop_ok else "FORCED"
 
     return {
-        "schema": "ultra_wrap_report_v1",
+        "schema": "bnn_optimise_report_v1",
+        "schema_version": 1,
         "policy": report.policy,
         "mode": report.mode,
         "policy_reason": report.policy_reason,
+        "thesis_note": (
+            "Compression is theoretical pack ratio; latency fields are wall-clock. "
+            "Never claim GPU 32× from sign()/STE."
+        ),
         "auto_recommendation": {
             "policy": decision.policy,
             "mode": decision.mode,
@@ -203,6 +208,8 @@ def run_one(
         "d_model": d,
         "ff": ff,
         "batch": batch,
+        # Legacy alias for older golden readers
+        "schema_legacy": "ultra_wrap_report_v1",
     }
 
 
