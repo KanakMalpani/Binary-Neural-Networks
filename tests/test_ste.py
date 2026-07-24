@@ -8,9 +8,13 @@ from bnn.layers import BinaryLinear
 from bnn.ste import (
     binary_sign,
     binary_sign_approx,
+    binary_sign_tanh_soft,
     clip_weights_,
     get_binary_sign_fn,
+    get_sign_mode,
+    irnet_ede_schedule,
     set_approx_sign,
+    set_sign_mode,
     ternary_weight,
 )
 
@@ -31,9 +35,32 @@ def test_approx_sign_forward_and_switch():
     set_approx_sign(True)
     try:
         assert get_binary_sign_fn() is binary_sign_approx
+        assert get_sign_mode() == "approx"
     finally:
         set_approx_sign(False)
     assert get_binary_sign_fn() is binary_sign
+
+
+def test_tanh_soft_and_ede_schedule():
+    x = torch.tensor([-0.5, 0.25], requires_grad=True)
+    y = binary_sign_tanh_soft(x, t=1.0, k=1.0)
+    assert torch.equal(y.detach(), torch.tensor([-1.0, 1.0]))
+    y.sum().backward()
+    assert x.grad is not None
+    # Grad should be k t (1-tanh^2(t x)) > 0 near 0
+    assert float(x.grad[1]) > 0
+    t0, k0 = irnet_ede_schedule(0, 100)
+    t1, k1 = irnet_ede_schedule(100, 100)
+    assert t1 > t0
+    set_sign_mode("tanh_soft", t=2.0, k=1.0)
+    try:
+        assert get_sign_mode() == "tanh_soft"
+        fn = get_binary_sign_fn()
+        z = torch.tensor([0.1], requires_grad=True)
+        fn(z).sum().backward()
+        assert z.grad is not None
+    finally:
+        set_sign_mode("ste")
 
 
 def test_ternary_weight_values():

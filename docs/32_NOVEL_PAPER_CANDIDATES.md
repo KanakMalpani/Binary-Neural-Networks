@@ -22,6 +22,8 @@ Each folder contains: `README.md`, `01_idea.md`, `00_source/` (`SOURCES.md` + ex
 |----------|---------------|
 | `docs/06`, `results/benchmark.json`, fake-binary trap | B1 |
 | `results/energy_bound.json`, \(E=P\cdot t\) proxy | B1 |
+| `docs/35`, `bnn/math/` XNOR↔dot proofs + Amdahl calculators | B1 (math spine) |
+| `results/math_ste_compare.json` (STE / ApproxSign / EDE) | B1 (learning math) |
 | `AGENTS.md`, `docs/30`, `tests/golden_floors.json`, `bnn repro` | B2 |
 | Multimodal canaries (MNIST / CIFAR / audio synth) | B2 (canaries, not SOTA) |
 | `docs/18` decision tree, `docs/12` wrapper taxonomy | B3 |

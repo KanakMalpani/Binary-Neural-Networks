@@ -24,16 +24,15 @@ Forward: \(q = \mathrm{sign}(x)\). True \(\partial q/\partial x = 0\) a.e.
 
 | Estimator | Backward approx | Source / note |
 |-----------|-----------------|---------------|
-| **STE (clip)** | \(1_{\|x\|\le1}\) | BinaryNet |
-| **ApproxSign** (Bi-Real) | piecewise polynomial near 0 | tighterder STE |
-| **IR-Net** | error-decay + libra parameter | Improves early training |
-| **SWISH-Sign / Soft-Sign** | smooth surrogate | Research variants |
-| **RSign / RPReLU** | learnable thresholds / slopes | ReActNet |
+| **STE (clip)** | \(1_{\|x\|\le1}\) | BinaryNet; `binary_sign` default |
+| **ApproxSign** (Bi-Real) | tent \(2-2\|x\|\) on \([-1,1]\) | arXiv:1808.00278; `--approx-sign` |
+| **TanhSoft / IR-Net EDE** | \(kt(1-\tanh^2(tx))\) | arXiv:1909.10788; `set_sign_mode("tanh_soft")` |
+| **RSign / RPReLU** | learnable thresholds / slopes | ReActNet (documented; not default) |
 | **SURGE / DPGC** | learnable dual-path surrogate | ICML 2026 |
 
-**Practice:** start with clipped STE + weight clip \(w\leftarrow\mathrm{clip}(w,-1,1)\); escalate to
-ReActNet/SURGE if accuracy plateaus. Larq reports little difference among many STE variants
-once architecture is Bi-Real-class.
+**Practice:** start with clipped STE + weight clip; use `--approx-sign` on deeper image nets;
+try tanh-soft / `irnet_ede_schedule` when mismatch shows in `results/math_ste_compare.json`.
+Full derivations: `docs/35_BINARY_MATH_EFFECTIVENESS.md`.
 
 ## 3. Loss landscape, BN, optimizers
 

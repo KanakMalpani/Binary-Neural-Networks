@@ -19,13 +19,17 @@ inference).
 
 ### 1. Arithmetic: MAC → XNOR + popcount
 
-If weights and activations are in \(\{+1,-1\}\):
+If weights and activations are in \(\{+1,-1\}\) with lab encoding bit0↦\(+1\), bit1↦\(-1\):
 
 \[
-\langle w, x \rangle = N - 2 \cdot \mathrm{Hamming}(w_{\mathrm{bit}}, x_{\mathrm{bit}})
+\langle w, x \rangle = N - 2 \cdot \mathrm{popcount}(w_{\mathrm{bit}} \oplus x_{\mathrm{bit}})
 \]
 
-equivalently: pack 32 (or 64) bits into a word, `~xor` (XNOR), then `popcount`.
+**Derivation (one line):** agreements contribute \(+1\), disagreements \(-1\), so
+\((N-d)-d = N-2d\).  Pad bits must encode \(+1\) so they do not inflate \(d\).
+Machine-checked in `bnn.math.xnor_dot_identity` / `docs/35_BINARY_MATH_EFFECTIVENESS.md`.
+
+Equivalently: pack 64 bits into a word, XOR (or XNOR), then `popcount`.
 
 | Regime | Op per element | Notes |
 |--------|----------------|-------|

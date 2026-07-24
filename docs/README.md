@@ -12,6 +12,7 @@ Start here if you are new to the repo.
 | [`api/README.md`](api/README.md) | Public Python API |
 | [`31_QUALITY_UPGRADE.md`](31_QUALITY_UPGRADE.md) | Latest quality leap changelog |
 | [`34_COMPUTE_SPEEDUP.md`](34_COMPUTE_SPEEDUP.md) | OpenMP / pack / ternary speedups + thread curve |
+| [`35_BINARY_MATH_EFFECTIVENESS.md`](35_BINARY_MATH_EFFECTIVENESS.md) | XNOR↔dot proofs, STE math, when binary loses |
 
 ## Tutorials
 

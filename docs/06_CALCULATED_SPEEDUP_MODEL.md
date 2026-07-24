@@ -35,6 +35,9 @@ For equal-length ±1 vectors of length \(N\):
 Pack \(N\) bits into \(W=\lceil N/64\rceil\) uint64 words.
 Per output element cost ≈ \(W\) XOR + \(W\) popcount + 1 scale (vs \(N\) FP MACs).
 
+**Programmatic calculators** (same formulas): `bnn.math.effective_ops_per_mac`,
+`bnn.math.bytes_per_mac`, `bnn.math.amdahl_speedup` — see `docs/35_BINARY_MATH_EFFECTIVENESS.md`.
+
 **Theoretical word-op reduction:**
 
 \[
