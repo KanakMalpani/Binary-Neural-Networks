@@ -56,7 +56,7 @@ class TinyBinMLP(nn.Module):
 
 def _train_curve(mode: str, steps: int = 80, seed: int = 0) -> dict:
     torch.manual_seed(seed)
-    np.random.seed(seed)
+    np.random.seed(seed)  # noqa: NPY002 — legacy global RNG seeded intentionally
     set_sign_mode("ste" if mode == "ste" else mode if mode != "approx_sign" else "approx")
     if mode == "approx_sign":
         set_sign_mode("approx")

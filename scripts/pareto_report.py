@@ -71,7 +71,7 @@ def _try_plot(report: dict, out_png: Path) -> bool:
     fig, ax = plt.subplots(figsize=(6, 4))
     sizes = [max(20.0, float(pt.get("compression") or 1) * 3) for pt in report["points"] if pt.get("latency_ms") is not None and pt.get("accuracy") is not None]
     ax.scatter(xs, ys, s=sizes, alpha=0.75)
-    for x, y, lab in zip(xs, ys, labels):
+    for x, y, lab in zip(xs, ys, labels, strict=True):
         ax.annotate(lab, (x, y), fontsize=8, xytext=(4, 4), textcoords="offset points")
     ax.set_xlabel("latency_ms (wall-clock)")
     ax.set_ylabel("accuracy (cosine/top1)")

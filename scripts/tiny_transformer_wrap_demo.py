@@ -18,6 +18,7 @@ sys.path.insert(0, str(ROOT))
 
 from bnn.codec import encode_file, roundtrip_gemm_err  # noqa: E402
 from bnn.layers import BinaryLinear  # noqa: E402
+from bnn.paths import repo_relative  # noqa: E402
 from bnn.ste import clip_weights_  # noqa: E402
 from bnn.wrap.api import wrap_model  # noqa: E402
 from bnn.wrap.calibrate import CalibConfig  # noqa: E402
@@ -32,7 +33,7 @@ class TinyTransformer(nn.Module):
         super().__init__()
         self.embed = nn.Linear(64, d)
         self.blocks = nn.ModuleList()
-        for i in range(depth):
+        for _i in range(depth):
             self.blocks.append(
                 nn.ModuleDict(
                     {
@@ -189,7 +190,7 @@ def main(argv: list[str] | None = None) -> int:
         "bytes_before": before,
         "bytes_after": after,
         "wrapped_forward_ms": wrap_ms,
-        "bnnpack": str(pack_path),
+        "bnnpack": repo_relative(pack_path),
         "codec_roundtrip": rt,
         "thesis": "hybrid_ffn wrap; attn FP; packed CPU binary — not fake GPU 32x",
     }

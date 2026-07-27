@@ -1,7 +1,11 @@
 LIBRARY _binary_gemm_native
 EXPORTS
     binary_gemm_u64
+    binary_gemm_u64_scaled
     binary_gemm_set_num_threads
     binary_gemm_get_num_threads
     binary_gemm_openmp_enabled
+    binary_gemm_kernel_id
+    binary_gemm_set_kernel
+    binary_gemm_cpu_features
     ternary_gemm_u64

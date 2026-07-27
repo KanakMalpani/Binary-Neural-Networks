@@ -20,8 +20,8 @@ from bnn.determinism import set_repro_seed  # noqa: E402
 from bnn.models import count_parameters  # noqa: E402
 from bnn.ste import clip_weights_, set_approx_sign  # noqa: E402
 from bnn.vision.models import (  # noqa: E402
-    BinaryCIFARCNN,
     FP32CIFARCNN,
+    BinaryCIFARCNN,
     TinyBinaryViT,
 )
 

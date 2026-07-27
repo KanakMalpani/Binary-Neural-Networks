@@ -118,6 +118,9 @@ class _ViTBlock(nn.Module):
         self.attn_qkv = nn.Linear(dim, dim * 3)
         self.attn_proj = nn.Linear(dim, dim)
         self.n2 = nn.LayerNorm(dim)
+        # Either binary or FP depending on binary_ffn; declare the union.
+        self.ff1: BinaryLinear | nn.Linear
+        self.ff2: BinaryLinear | nn.Linear
         if binary_ffn:
             self.ff1 = BinaryLinear(dim, dim * 2)
             self.ff2 = BinaryLinear(dim * 2, dim)

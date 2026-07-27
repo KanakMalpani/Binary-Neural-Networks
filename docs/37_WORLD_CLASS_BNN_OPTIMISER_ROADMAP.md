@@ -22,7 +22,7 @@ We already shipped an **honest, installable, reproducible lab** (packaging, MSVC
 
 1. **Freeze a public optimiser API** (`bnn.optimise` / stable `wrap_model` surface + semver + deprecation) so HF/PyTorch users get one obvious entrypoint.
 2. **Hugging Face + safetensors UX** — load → calibrate → policy → encode `.bnnpack` → report Pareto (accuracy / size / latency) without tribal knowledge.
-3. **Multi-arch kernels** — Linux `.so`, macOS, ARM NEON; keep NumPy correctness fallback; optional AVX-512 / WASM later.
+3. **Multi-arch kernels** — **Delivered:** portable runtime SIMD (AVX-512 → AVX2 → NEON → scalar) on Win/Linux/macOS/ARM via `docs/41`; keep NumPy correctness fallback; optional WASM later.
 4. **Fair eval protocol + regression budgets** — published shapes only; latency–energy–accuracy Pareto; no new “golden” inventiveness.
 5. **OSS launch hygiene** — LICENSE file, issue/PR templates, CODEOWNERS, release tags, SBOM, model cards, Sphinx/MkDocs API.
 
@@ -156,14 +156,14 @@ A future agent may claim **“world-class BNN optimiser (v1.0)”** only when **
 
 ## 2. Current state scorecard
 
-Audit date: **2026-07-25**. Status legend: `[x] DONE` · `[~] PARTIAL` · `[ ] TODO`.
+Audit date: **2026-07-28** (SIMD/portability refresh). Status legend: `[x] DONE` · `[~] PARTIAL` · `[ ] TODO`.
 
 | Area | Status | Evidence (paths) | Gap to world-class |
 |------|--------|------------------|--------------------|
 | Packaging / version | `[x]` | `pyproject.toml` 0.3.0, `bnn/_version.py`, console script | PyPI Trusted Publishing (prep done) |
 | CLI surface | `[x]` | `bnn optimise` + wrap/encode/… | HF load verb optional |
 | STE layers / models | `[x]` | `bnn/ste.py`, `layers.py`, `models.py` | Broader zoo (ResNet-BiReal full, BitLinear LLM toy) |
-| Native binary GEMM | `[~]` | MSVC DLL + Linux GCC `.so` **CI hard**; NumPy fallback | macOS/ARM NEON spike deferred |
+| Native binary GEMM | `[x]` | Win/Linux/macOS/ARM native + runtime SIMD (`docs/41`); NumPy fallback | Arena / WASM optional |
 | Ternary kernels | `[~]` | `ternary_pack.py`, `ternary_gemm.py` / C bitplanes | Cross-platform polish; bitnet.cpp handoff clarity |
 | Wrap / ultra wrap | `[~]` | `bnn/wrap/*` + sensitivity W3.T05 | Full search W3.T06 |
 | Calibrate / QAT | `[~]` | `wrap/calibrate.py`, `wrap/qat.py`, distill sketch | Full recipes; distill integration |
@@ -175,17 +175,17 @@ Audit date: **2026-07-25**. Status legend: `[x] DONE` · `[~] PARTIAL` · `[ ] T
 | Math identities | `[x]` | `bnn/math/*`, `docs/35`, tests | Keep as regression forever |
 | Profile / bench | `[~]` | profile + Pareto JSON + flamegraph howto | RAPL Joules moonshot |
 | Repro / goldens | `[x]` | `scripts/repro_all.py`, `golden_floors.json`, `REPRODUCIBILITY.md`, `AGENTS.md` | Broader OS matrix |
-| CI | `[x]` | Win + Linux native hard + py3.11–3.13 matrix | macOS optional |
+| CI | `[x]` | Win + Linux native hard + py3.11–3.13 + **portability** (ARM/macOS) | Attestations / hard pip-audit |
 | Docs research 00–36 | `[x]` | `docs/` | MkDocs site; fewer conflicting “master” claims |
 | API reference | `[~]` | docs/api + MkDocs stub | Autodoc (W9.T06) |
 | Tutorials | `[x]` | `docs/tutorials/01`–`08` | Keep green |
 | Bridges GPU/BitNet | `[~]` | `docs/23`–`24`, `scripts/bridges/*` | First-class CLI `bnn bridge …` |
 | HF integration | `[x]` | tutorial 08 + optional hf tests | deeper calib recipes |
-| Community OSS | `[x]` | LICENSE, templates, COC, SECURITY, CODEOWNERS, CONTRIBUTING, launch checklist | Discussions manual |
+| Community OSS | `[x]` | LICENSE, templates, COC, SECURITY, CODEOWNERS, CONTRIBUTING, launch checklist, Discussions, branch protection | PyPI Trusted Publishing |
 | Security | `[~]` | SECURITY.md + SBOM script + soft pip-audit | Harden audit gate |
 | Releases | `[x]` | `v0.3.0` + SBOM script | Attestations / PyPI upload |
 | Papers / research series | `[~]` | `docs/32`, publication plan, CITATION.cff | Venue submit |
-| Compatibility matrix | `[x]` | docs + CI matrix 3.11–3.13 | macOS CI optional |
+| Compatibility matrix | `[x]` | docs + CI matrix 3.11–3.13 + portability | Keep matrix honest |
 | Memory arena / thread pool API | `[~]` | OpenMP thread setter in C/Python | Arena allocator; documented pool |
 | WASM | `[ ]` | — | Optional moonshot |
 | ONNX / safetensors | `[ ]` | Explicit defer (`MOONSHOT_DEFERRALS`) | Export paths |
@@ -222,7 +222,7 @@ Audit date: **2026-07-25**. Status legend: `[x] DONE` · `[~] PARTIAL` · `[ ] T
 | # | Item | Why | Primary IDs |
 |---|------|-----|-------------|
 | 7 | Linux native `.so` build in CI | Not Windows-only credibility | W2.T01–T03, W14.T01 |
-| 8 | ARM NEON path or documented roadmap spike | Edge story | W2.T04 |
+| 8 | ~~ARM NEON path or documented roadmap spike~~ **DONE** (`docs/41`) | Edge story | W2.T04 |
 | 9 | Pareto report JSON schema + plots | Optimiser output users need | W7.T01–T04 |
 | 10 | Regression latency budgets tightened | Perf engineering culture | W13.T01–T03 |
 | 11 | `.bnnpack` v2 design (ternary + meta) | Codec longevity | W5.T05–T07 |
@@ -242,7 +242,7 @@ Audit date: **2026-07-25**. Status legend: `[x] DONE` · `[~] PARTIAL` · `[ ] T
 | # | Item | Notes |
 |---|------|-------|
 | M1 | WASM SIMD popcount demo | Browser edge pedagogy |
-| M2 | AVX-512 VPOPCNTDQ kernel | If hardware available; dual-metric |
+| M2 | ~~AVX-512 VPOPCNTDQ kernel~~ **DONE** (runtime dispatch; never required) | See `docs/41` + spike note |
 | M3 | ONNX Runtime custom op | Heavy; may stay bridge-only |
 | M4 | Community leaderboard | Fair protocol first (W7) |
 | M5 | RAPL / board Joules | Replace energy proxy where possible |
@@ -292,8 +292,8 @@ Acceptance: every task that touches metrics must keep `bnn repro` green unless e
 | W2.T01 | Document current OpenMP MSVC path + thread API | S | — | `[x]` C + docs/34 |
 | W2.T02 | Linux GCC/Clang `.so` compile path | L | W2.T01 | `[x]` `compile_native` |
 | W2.T03 | CI job: build + `validate-native` on Linux | M | W2.T02 | `[x]` hard gate |
-| W2.T04 | ARM NEON spike (Apple Silicon or aarch64 Linux) | L | W2.T02 | `[~]` spike note deferred |
-| W2.T05 | AVX2 / AVX-512 optional dispatch | XL | W2.T02 | `[~]` moonshot note |
+| W2.T04 | ARM NEON path (Apple Silicon / aarch64 Linux) | L | W2.T02 | `[x]` `docs/41` + portability CI |
+| W2.T05 | AVX2 / AVX-512 optional runtime dispatch | XL | W2.T02 | `[x]` `docs/41` (AVX-512 never required) |
 | W2.T06 | WASM SIMD prototype (optional) | XL | W2.T02 | `[ ]` |
 | W2.T07 | Memory arena for packed buffers | L | W2.T02 | `[ ]` |
 | W2.T08 | Document GPU bridge non-goal for classic BNN | S | — | `[x]` docs/24 |
@@ -301,7 +301,7 @@ Acceptance: every task that touches metrics must keep `bnn repro` green unless e
 | W2.T10 | Fail-loud native probe UX (already partial) | S | — | `[x]` validate-native |
 
 **Acceptance tests:** err=0; bench floors; thread scaling smoke; no claim without dual metrics.  
-**Follow when lost:** W2.T02 → W2.T03 → W2.T04.
+**Follow when lost:** W2.T07 (arena) → W2.T06 (WASM optional) → W2.T09 (ternary polish).
 
 ---
 
@@ -421,7 +421,7 @@ Acceptance: every task that touches metrics must keep `bnn repro` green unless e
 | W8.T01 | `bnn repro` verify/full | — | — | `[x]` |
 | W8.T02 | CI Windows + Linux pytest + repro | — | — | `[x]` |
 | W8.T03 | Python 3.11 / 3.12 / 3.13 matrix | M | — | `[x]` |
-| W8.T04 | macOS CI (NumPy or native) | M | W2 | `[ ]` |
+| W8.T04 | macOS CI (NumPy or native) | M | W2 | `[x]` `portability` job (arm64 + x86_64) |
 | W8.T05 | Tagged GitHub Releases | M | W1 | `[x]` v0.3.0 |
 | W8.T06 | SBOM (e.g. cyclonedx) on release | M | W8.T05 | `[x]` script + docs |
 | W8.T07 | Artifact attestations | L | W8.T05 | `[ ]` |
@@ -485,9 +485,9 @@ Acceptance: every task that touches metrics must keep `bnn repro` green unless e
 | W11.T03 | PR template (repro checklist) | S | — | `[x]` |
 | W11.T04 | CODEOWNERS | S | — | `[x]` |
 | W11.T05 | CODE_OF_CONDUCT.md | S | — | `[x]` |
-| W11.T06 | Enable Discussions (manual) | S | — | `[~]` documented for human |
+| W11.T06 | Enable Discussions (manual) | S | — | `[x]` enabled 2026-07-27 |
 | W11.T07 | Public launch checklist execution | M | W8, W9, W10 | `[x]` docs/LAUNCH_CHECKLIST |
-| W11.T08 | Good first issues labeled | M | W11.T02 | `[~]` human labels |
+| W11.T08 | Good first issues labeled | M | W11.T02 | `[x]` 2 starter issues + label |
 | W11.T09 | CONTRIBUTING keep synced to ROADMAP | S | — | `[x]` |
 | W11.T10 | CITATION.cff | S | W12 | `[x]` |
 
@@ -567,7 +567,7 @@ Evidence: `docs/22_COMPLETION_REPORT.md`, `docs/28`, `docs/31`, `docs/36`, `CHAN
 
 ### Phase C — Multi-arch kernels
 
-**Exit:** Linux native CI green (or formally deferred with tracked issue); matrix doc; ARM spike report.
+**Exit:** Linux native CI green; matrix doc; ARM NEON + AVX2/AVX-512 runtime dispatch **delivered** (`docs/41` + portability CI).
 
 ### Phase D — Public launch
 
@@ -579,7 +579,7 @@ Evidence: `docs/22_COMPLETION_REPORT.md`, `docs/28`, `docs/31`, `docs/36`, `CHAN
 
 ### Phase F — Ecosystem
 
-**Exit:** safetensors/ONNX decisions executed; bridges CLI; optional WASM/AVX-512; community leaderboard template.
+**Exit:** safetensors/ONNX decisions executed; bridges CLI; optional WASM; AVX-512/NEON **delivered** (`docs/41`); community leaderboard template.
 
 ---
 
@@ -663,7 +663,7 @@ As of 2026-07-25 (updated): **Phases A–D substantially complete at v0.3.0**; r
 - [x] Compat matrix doc + py3.11–3.13 CI
 - [x] Pareto report v0 (`bnn_pareto_report_v1`)
 - [x] SECURITY.md + MODEL_CARD
-- [~] Tag `v0.4.0` deferred — folded into v0.3.0 preview; next tag when ARM/macOS land
+- [~] Tag `v0.4.0` deferred — folded into v0.3.0 preview; ARM/macOS native **landed** (`docs/41` + portability CI); next tag on v1.0 gate progress
 
 ### v1.0 — World-class bar
 
@@ -740,7 +740,9 @@ Pre-checked from 2026-07-25 audit. **Agents: flip `[ ]` → `[x]` or `[~]` in PR
 
 - [x] W2.T02 Linux `.so`
 - [x] W2.T03 Linux native CI (hard gate)
-- [~] W2.T04 ARM NEON spike (documented deferral)
+- [x] W2.T04 ARM NEON path (`docs/41` + aarch64/macOS portability CI)
+- [x] W2.T05 AVX2 / AVX-512 runtime dispatch (`docs/41`; never required)
+- [x] W8.T04 macOS CI (`portability` job)
 - [x] W14.T01 Compat matrix doc
 - [x] W8.T03 Python version matrix
 - [x] W7.T03 Pareto JSON
@@ -753,7 +755,9 @@ Pre-checked from 2026-07-25 audit. **Agents: flip `[ ]` → `[x]` or `[~]` in PR
 - [x] W11.T02–T05 Templates / COC / CODEOWNERS / SECURITY
 - [x] W10.T01 Model card
 - [x] W8.T05–T06 Release + SBOM (v0.3.0)
-- [x] W11.T07 Launch checklist executed (in-repo; Discussions manual)
+- [x] W11.T07 Launch checklist executed (Discussions + branch protection + topics done)
+- [x] W11.T06 Discussions enabled
+- [x] W11.T08 good first issues #1 #2
 
 ### 10.6 Phase E — Research
 
@@ -766,7 +770,7 @@ Pre-checked from 2026-07-25 audit. **Agents: flip `[ ]` → `[x]` or `[~]` in PR
 - [~] W5.T05 `.bnnpack` v2 (design sketch only)
 - [ ] W5.T06 safetensors
 - [x] W5.T07 ONNX decision executed (explicit defer)
-- [~] W2.T05 AVX-512 optional (moonshot note)
+- [x] W2.T05 AVX-512 / AVX2 optional dispatch (**delivered**; dual-metric on listed shapes still honest)
 - [ ] W2.T06 WASM optional
 - [x] W7.T07 Leaderboard template
 
@@ -775,7 +779,7 @@ Pre-checked from 2026-07-25 audit. **Agents: flip `[ ]` → `[x]` or `[~]` in PR
 - [x] WC-A1–A3 (optimiser API + CLI + version/CHANGELOG)
 - [x] WC-K1 compression (aligned)
 - [x] WC-K2 err=0 when native present
-- [~] WC-K3 multi-OS native (Win+Linux; macOS/ARM NumPy)
+- [x] WC-K3 multi-OS native (Win+Linux+macOS/ARM via portable SIMD; NumPy fallback remains)
 - [x] WC-K4 dual-metric (Pareto + fair protocol)
 - [~] WC-O1–O4 (calib/auto/QAT sketch; sensitivity yes; full search no)
 - [x] WC-R1 repro
@@ -788,7 +792,7 @@ Pre-checked from 2026-07-25 audit. **Agents: flip `[ ]` → `[x]` or `[~]` in PR
 
 See `docs/40_ROADMAP_E2E_SESSION.md` and `docs/MOONSHOT_DEFERRALS.md`.
 Non-moonshot leftovers: harden WC-O full QAT demo, autodoc site, PyPI upload,
-macOS CI or NEON, Discussions enable, attestations.
+attestations. (W2.T04/T05 + macOS/ARM portability CI **done** — `docs/41`.)
 
 ---
 
@@ -814,10 +818,10 @@ macOS CI or NEON, Discussions enable, attestations.
 
 ### 11.2 Top 5 next actions (execution resume)
 
-1. ~~Phase A–D v0.3.0 preview~~ **DONE** (this session)
-2. Human: enable GitHub Discussions (W11.T06)
-3. PyPI Trusted Publishing when ready (W8.T08)
-4. ARM NEON on aarch64 CI when runner available (W2.T04)
+1. ~~Phase A–D v0.3.0 preview~~ **DONE**
+2. ~~Human: enable GitHub Discussions (W11.T06)~~ **done**
+3. ~~W2.T04 / W2.T05 portable SIMD + portability CI~~ **DONE** (`docs/41`)
+4. PyPI Trusted Publishing when ready (W8.T08)
 5. Autodoc MkDocs expand + WC-O QAT recipe polish toward v1.0
 
 ---

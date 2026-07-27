@@ -1,0 +1,29 @@
+version: 2
+updates:
+  # Actions are the highest-value target to keep current: a stale third-party
+  # action is the most common supply-chain exposure in a repo like this.
+  - package-ecosystem: github-actions
+    directory: "/"
+    schedule:
+      interval: weekly
+    commit-message:
+      prefix: "ci"
+    labels: ["dependencies", "ci"]
+
+  - package-ecosystem: pip
+    directory: "/"
+    schedule:
+      interval: weekly
+    commit-message:
+      prefix: "chore"
+    labels: ["dependencies"]
+    open-pull-requests-limit: 5
+    groups:
+      # One PR for routine dev-tool bumps instead of five.
+      dev-tooling:
+        patterns: ["pytest*", "ruff", "mypy", "pip-audit"]
+    ignore:
+      # torch and numpy are pinned by constraints.txt and gate the numeric
+      # goldens; bump them deliberately, with a repro run, not automatically.
+      - dependency-name: torch
+      - dependency-name: numpy

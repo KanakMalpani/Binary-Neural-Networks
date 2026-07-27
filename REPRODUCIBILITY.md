@@ -31,17 +31,17 @@ run the listed commands in order; do **not** invent new benches; compare to
 | Item | Requirement |
 |------|-------------|
 | Python | **3.11+** (3.12 recommended) |
-| OS | Windows x64 (native DLL) or Linux/macOS (NumPy fallback) |
-| Native kernel | Windows **MSVC x64** via `python -m bnn.kernels.compile_native` |
-| MinGW | **Do not use** for the DLL — WinError 193 / wrong arch |
+| OS | Windows / Linux / macOS (x64 or arm64); native preferred, NumPy fallback |
+| Native kernel | `python -m bnn.kernels.compile_native` (MSVC on Win; GCC/Clang elsewhere). Runtime SIMD: AVX-512→AVX2→NEON→scalar (`docs/41`) |
+| MinGW | **Do not use** for the Windows DLL — WinError 193 / wrong arch |
 | Deps | `pyproject.toml` + `constraints.txt` |
 | Device for goldens | **CPU** (`bnn.determinism.set_repro_seed(..., force_cpu=True)`) |
 
 ### Hardware assumptions
 
-- CPU x64 with enough RAM for 8192×8192 GEMM microbench (~few hundred MB peak).
-- Native popcount DLL: Windows + Visual Studio Build Tools / VS 2022.
-- Elsewhere: NumPy packed GEMM (correctness preserved; speedups lower).
+- CPU with enough RAM for 8192×8192 GEMM microbench (~few hundred MB peak).
+- Native popcount: Windows (MSVC) or Linux/macOS/ARM (GCC/Clang); see portability CI.
+- Fallback: NumPy packed GEMM (correctness preserved; speedups lower).
 
 ## What is committed vs must-rerun
 
@@ -111,7 +111,7 @@ wall-clock latency, first-run dataset download time.
 | Symptom | Fix |
 |---------|-----|
 | WinError 193 loading DLL | Rebuild with **MSVC x64**, not MinGW 32-bit |
-| `native_kernel_available() == False` | Expected on Linux/macOS; pytest NumPy path still PASS |
+| `native_kernel_available() == False` | Compile failed or unsupported host; pytest NumPy path still PASS. Prefer `compile_native` on Linux/macOS/ARM |
 | Missing MSVC | Install VS 2022 Build Tools + “Desktop development with C++”; open **x64 Native Tools** shell |
 | CIFAR/MNIST download fails | Network; retry. Data lands under `data/` (ignored) |
 | Speedup below soft floor | Machine variance OK if compression=32 and err=0; check `golden_floors` min 2.0× |
@@ -122,7 +122,9 @@ wall-clock latency, first-run dataset download time.
 GitHub Actions (`.github/workflows/ci.yml`):
 
 - **Windows:** install → compile-native (best-effort) → pytest → export-check → `bnn repro --skip-compile` (or equivalent)
-- **Linux:** pytest + export-check + golden compare (NumPy fallback; native skipped)
+- **Linux x64:** `linux-native` hard gate (compile + validate + pytest)
+- **Portability:** linux-arm64 + macos-arm64 + macos-x86_64 (compile + validate + scalar recheck)
+- **Linux py matrix:** 3.11–3.13 smoke (native optional)
 
 ## Related docs
 

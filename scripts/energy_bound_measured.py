@@ -5,9 +5,13 @@ from __future__ import annotations
 
 import argparse
 import json
+import sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(ROOT))
+
+from bnn.paths import repo_relative  # noqa: E402
 
 
 def main() -> None:
@@ -37,7 +41,7 @@ def main() -> None:
 
     # Windows: no portable RAPL in stdlib; document proxy
     payload = {
-        "source_latency": str(args.wrap_json),
+        "source_latency": repo_relative(args.wrap_json),
         "measured_latency_s": {"fp": t_fp, "binary_wrap": t_bin},
         "assumed_power_w": {"fp": args.power_w_fp, "binary": args.power_w_binary},
         "energy_j": {"fp": e_fp, "binary": e_bin},

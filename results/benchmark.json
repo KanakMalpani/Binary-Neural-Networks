@@ -12,48 +12,48 @@
       },
       "native_kernel": true,
       "openmp": true,
-      "bench_threads": 4,
+      "bench_threads": 8,
       "max_abs_error_vs_fp32": 0.0,
       "seconds": {
-        "numpy_fp32_gemm": 0.009430019999854267,
-        "binary_compute_only_prepacked": 0.001785109999764245,
-        "binary_e2e_with_act_pack": 0.0016607700003078208,
-        "pack_weights_once": 0.005310580000514165,
-        "pack_activations": 0.00021937999990768732,
-        "torch_fp32_linear": 0.004126690000703093,
-        "torch_fake_binary_sign_linear": 0.0051075499999569726,
-        "ternary_bitplane_compute": 0.00331498999876203,
-        "ternary_dequant_fp_gemm": 0.021535929999663493
+        "numpy_fp32_gemm": 0.007338780001737178,
+        "binary_compute_only_prepacked": 0.0006118500023148954,
+        "binary_e2e_with_act_pack": 0.0008948799979407341,
+        "pack_weights_once": 0.005854420003015548,
+        "pack_activations": 0.00031289999606087804,
+        "torch_fp32_linear": 0.003636440000263974,
+        "torch_fake_binary_sign_linear": 0.005233909998787567,
+        "ternary_bitplane_compute": 0.0013309600006323307,
+        "ternary_dequant_fp_gemm": 0.013019280001753942
       },
       "ternary_max_abs_error_vs_dequant": 0.0,
-      "speedup_compute_vs_numpy_fp32": 5.282598832060582,
-      "speedup_e2e_vs_numpy_fp32": 5.678101120628641,
-      "speedup_compute_vs_torch_fp32": 2.311728689687523,
-      "fake_binary_vs_torch_fp32": 1.2376868626155015,
-      "speedup_ternary_bitplane_vs_dequant": 6.49652940361992,
+      "speedup_compute_vs_numpy_fp32": 11.99441035216372,
+      "speedup_e2e_vs_numpy_fp32": 8.200853766566373,
+      "speedup_compute_vs_torch_fp32": 5.943352106734879,
+      "fake_binary_vs_torch_fp32": 1.4392950243665865,
+      "speedup_ternary_bitplane_vs_dequant": 9.781871728352892,
       "thread_scaling": [
         {
           "threads": 1,
-          "seconds_compute": 0.005216170000494458,
+          "seconds_compute": 0.0019311500014737248,
           "speedup_vs_1thread": 1.0,
           "reported_get_num_threads": 1
         },
         {
           "threads": 2,
-          "seconds_compute": 0.00290101999999024,
-          "speedup_vs_1thread": 1.7980468940276202,
+          "seconds_compute": 0.0011933500005397945,
+          "speedup_vs_1thread": 1.6182595220180143,
           "reported_get_num_threads": 2
         },
         {
           "threads": 4,
-          "seconds_compute": 0.001982560000033118,
-          "speedup_vs_1thread": 2.6310275605314963,
+          "seconds_compute": 0.000847909995354712,
+          "speedup_vs_1thread": 2.2775412626971727,
           "reported_get_num_threads": 4
         },
         {
           "threads": 8,
-          "seconds_compute": 0.0017954199996893295,
-          "speedup_vs_1thread": 2.905264507133171,
+          "seconds_compute": 0.0013054499984718859,
+          "speedup_vs_1thread": 1.4792983291081707,
           "reported_get_num_threads": 8
         }
       ],
@@ -74,48 +74,48 @@
       },
       "native_kernel": true,
       "openmp": true,
-      "bench_threads": 4,
+      "bench_threads": 8,
       "max_abs_error_vs_fp32": 0.0,
       "seconds": {
-        "numpy_fp32_gemm": 0.02349265000084415,
-        "binary_compute_only_prepacked": 0.0029191300011007114,
-        "binary_e2e_with_act_pack": 0.0035344200005056337,
-        "pack_weights_once": 0.020127319998573513,
-        "pack_activations": 0.00033007999882102014,
-        "torch_fp32_linear": 0.010892479999165516,
-        "torch_fake_binary_sign_linear": 0.016191599999729078,
-        "ternary_bitplane_compute": 0.004558809999434743,
-        "ternary_dequant_fp_gemm": 0.05464130000036675
+        "numpy_fp32_gemm": 0.014373900002101436,
+        "binary_compute_only_prepacked": 0.0006023599999025464,
+        "binary_e2e_with_act_pack": 0.0010133899981155992,
+        "pack_weights_once": 0.02166549999965355,
+        "pack_activations": 0.00026101999683305623,
+        "torch_fp32_linear": 0.010905680002178997,
+        "torch_fake_binary_sign_linear": 0.015927310002734885,
+        "ternary_bitplane_compute": 0.0012588299985509365,
+        "ternary_dequant_fp_gemm": 0.05510178999975324
       },
       "ternary_max_abs_error_vs_dequant": 0.0,
-      "speedup_compute_vs_numpy_fp32": 8.047825890585832,
-      "speedup_e2e_vs_numpy_fp32": 6.646818996464284,
-      "speedup_compute_vs_torch_fp32": 3.7314131248208566,
-      "fake_binary_vs_torch_fp32": 1.4864934340911833,
-      "speedup_ternary_bitplane_vs_dequant": 11.98586912092012,
+      "speedup_compute_vs_numpy_fp32": 23.86264028890852,
+      "speedup_e2e_vs_numpy_fp32": 14.183976582391509,
+      "speedup_compute_vs_torch_fp32": 18.10492065200775,
+      "fake_binary_vs_torch_fp32": 1.4604600538024723,
+      "speedup_ternary_bitplane_vs_dequant": 43.77222505277279,
       "thread_scaling": [
         {
           "threads": 1,
-          "seconds_compute": 0.007356740000250284,
+          "seconds_compute": 0.0022221999999601392,
           "speedup_vs_1thread": 1.0,
           "reported_get_num_threads": 1
         },
         {
           "threads": 2,
-          "seconds_compute": 0.005037599999923259,
-          "speedup_vs_1thread": 1.4603660473960525,
+          "seconds_compute": 0.0016604700009338557,
+          "speedup_vs_1thread": 1.3382957829472162,
           "reported_get_num_threads": 2
         },
         {
           "threads": 4,
-          "seconds_compute": 0.0033307899997453206,
-          "speedup_vs_1thread": 2.2087072438709123,
+          "seconds_compute": 0.0010662399989087134,
+          "speedup_vs_1thread": 2.0841461605591047,
           "reported_get_num_threads": 4
         },
         {
           "threads": 8,
-          "seconds_compute": 0.0025076999998418616,
-          "speedup_vs_1thread": 2.9336603264801244,
+          "seconds_compute": 0.0007430600002408027,
+          "speedup_vs_1thread": 2.990606410303331,
           "reported_get_num_threads": 8
         }
       ],
@@ -136,48 +136,48 @@
       },
       "native_kernel": true,
       "openmp": true,
-      "bench_threads": 4,
+      "bench_threads": 8,
       "max_abs_error_vs_fp32": 0.0,
       "seconds": {
-        "numpy_fp32_gemm": 0.0843365199994878,
-        "binary_compute_only_prepacked": 0.006042639999941457,
-        "binary_e2e_with_act_pack": 0.005591399999684654,
-        "pack_weights_once": 0.09066746000025887,
-        "pack_activations": 0.00038834000006318095,
-        "torch_fp32_linear": 0.045610039999883153,
-        "torch_fake_binary_sign_linear": 0.05287809000001289,
-        "ternary_bitplane_compute": 0.011201779999828432,
-        "ternary_dequant_fp_gemm": 0.188703089999035
+        "numpy_fp32_gemm": 0.027354940003715456,
+        "binary_compute_only_prepacked": 0.0009350599953904748,
+        "binary_e2e_with_act_pack": 0.0013199899985920638,
+        "pack_weights_once": 0.08331680000992492,
+        "pack_activations": 0.00023805999662727118,
+        "torch_fp32_linear": 0.04743717999663204,
+        "torch_fake_binary_sign_linear": 0.06138052000314929,
+        "ternary_bitplane_compute": 0.006838019995484501,
+        "ternary_dequant_fp_gemm": 0.2315789499960374
       },
       "ternary_max_abs_error_vs_dequant": 0.0,
-      "speedup_compute_vs_numpy_fp32": 13.956899633323328,
-      "speedup_e2e_vs_numpy_fp32": 15.083256430275824,
-      "speedup_compute_vs_torch_fp32": 7.548031986073147,
-      "fake_binary_vs_torch_fp32": 1.1593519760155517,
-      "speedup_ternary_bitplane_vs_dequant": 16.84581289776493,
+      "speedup_compute_vs_numpy_fp32": 29.254743159333017,
+      "speedup_e2e_vs_numpy_fp32": 20.723596415800845,
+      "speedup_compute_vs_torch_fp32": 50.7316966082188,
+      "fake_binary_vs_torch_fp32": 1.2939327339337456,
+      "speedup_ternary_bitplane_vs_dequant": 33.86637508357112,
       "thread_scaling": [
         {
           "threads": 1,
-          "seconds_compute": 0.016533099999651312,
+          "seconds_compute": 0.0036912099982146173,
           "speedup_vs_1thread": 1.0,
           "reported_get_num_threads": 1
         },
         {
           "threads": 2,
-          "seconds_compute": 0.01027094000019133,
-          "speedup_vs_1thread": 1.609696872861036,
+          "seconds_compute": 0.0025204400008078665,
+          "speedup_vs_1thread": 1.4645101637140692,
           "reported_get_num_threads": 2
         },
         {
           "threads": 4,
-          "seconds_compute": 0.006530269999348093,
-          "speedup_vs_1thread": 2.5317636179364387,
+          "seconds_compute": 0.0016519500000867992,
+          "speedup_vs_1thread": 2.2344562474776284,
           "reported_get_num_threads": 4
         },
         {
           "threads": 8,
-          "seconds_compute": 0.005688820000796113,
-          "speedup_vs_1thread": 2.9062441767075797,
+          "seconds_compute": 0.0010029700002633034,
+          "speedup_vs_1thread": 3.6802795669318,
           "reported_get_num_threads": 8
         }
       ],

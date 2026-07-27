@@ -21,7 +21,7 @@ non-moonshot in-repo TODOs flipped. Still **lab / beta optimiser** for full WC-�
 |------|--------|
 | WC-A1–A3 | **Met** |
 | WC-K1–K2 | **Met** |
-| WC-K3 | Partial (Win+Linux native; macOS/ARM NumPy) |
+| WC-K3 | **Met** (Win+Linux+macOS/ARM native via portable SIMD; NumPy fallback remains) |
 | WC-K4 | **Met** (Pareto + fair protocol) |
 | WC-O1–O4 | Partial (sensitivity yes; full search/QAT recipe polish open) |
 | WC-R1 | **Met** |
@@ -42,12 +42,16 @@ non-moonshot in-repo TODOs flipped. Still **lab / beta optimiser** for full WC-�
 
 ## Remaining for true v1.0
 
-1. macOS CI and/or ARM NEON native (hardware)
+> **Supersession (2026-07-28):** portable SIMD + portability CI closed W2.T04/T05
+> and macOS/ARM native — see [`41_PORTABLE_SIMD_KERNEL.md`](41_PORTABLE_SIMD_KERNEL.md).
+> Item 1 below is historical; do not treat as open.
+
+1. ~~macOS CI and/or ARM NEON native~~ **DONE** (`docs/41` + `portability` CI)
 2. PyPI Trusted Publishing + real upload
 3. Harden pip-audit / attestations
 4. Autodoc MkDocs site (W9.T06)
 5. Full layer search W3.T06 + stronger QAT demo (WC-O)
-6. Enable Discussions (human)
+6. ~~Enable Discussions (human)~~ **done**
 7. Optional: safetensors, WASM, RAPL, ImageNet protocol runner — moonshots
 
 ## Verify

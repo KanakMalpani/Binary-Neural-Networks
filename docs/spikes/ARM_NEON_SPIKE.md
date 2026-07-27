@@ -2,33 +2,33 @@
 
 | Field | Value |
 |-------|-------|
-| **Status** | **Deferred** (documented spike) |
-| **Date** | 2026-07-25 |
-| **Blocker** | No aarch64 CI runner / Apple Silicon self-hosted agent in this lab |
-| **Acceptance leftover** | Portable NEON (or SVE) popcount GEMM + CI job on aarch64 with err=0 |
+| **Status** | **DELIVERED** — see [`../41_PORTABLE_SIMD_KERNEL.md`](../41_PORTABLE_SIMD_KERNEL.md) |
+| **Date** | 2026-07-25 (note) · delivered with portable SIMD |
+| **Blocker** | ~~No aarch64 CI runner~~ — resolved via GitHub `ubuntu-24.04-arm` + `macos-latest` |
+| **Acceptance** | Met: `vcntq_u8`/`vpadalq_u8` NEON path + aarch64/macOS CI asserting err=0 |
 
-## Intent
+## Intent (historical)
 
-Edge phones / Apple Silicon are the honest BNN deployment story. Today:
+Edge phones / Apple Silicon are the honest BNN deployment story. At spike-write time the matrix was:
 
 - **Windows x64** — MSVC OpenMP DLL (primary lab path)
 - **Linux x64** — GCC `.so` (CI hard gate as of v0.3)
-- **macOS / ARM** — **NumPy correctness fallback** only
+- **macOS / ARM** — NumPy correctness fallback only ← **superseded**
 
-## Spike plan (when hardware available)
+## Delivered (current)
 
-1. Add `#ifdef __ARM_NEON` path in `bnn/kernels/binary_gemm.c` using
-   `vcntq_u8` / pairwise sums (or ACLE popcount) for 128-bit words.
-2. Keep scalar / `__builtin_popcountll` fallback for correctness.
-3. `compile_native` on Darwin: `clang -O3 -shared -fPIC` (+ `-fopenmp` if present).
-4. CI: self-hosted aarch64 **or** GitHub `ubuntu-24.04-arm` when available to org.
+1. `#ifdef` / runtime NEON path in `bnn/kernels/binary_gemm.c` using
+   `vcntq_u8` / `vpadalq_u8` (128-bit words).
+2. Scalar / `__builtin_popcountll` fallback kept for correctness.
+3. `compile_native` on Darwin + aarch64 Linux (Clang/GCC `-O3 -shared -fPIC`, OpenMP when present).
+4. CI: `portability` job on `ubuntu-24.04-arm` and `macos-latest` (plus forced `BNN_KERNEL=scalar`).
 5. Dual-metric bench only — no theory-as-latency claims.
 
-## Interim acceptance
+## Interim acceptance (met → closed)
 
-- Documented in `docs/COMPATIBILITY_MATRIX.md`
-- Tests pass via NumPy path on any arch
-- This spike note linked from ROADMAP W2.T04 as `[~]` deferred-with-plan
+- Documented in `docs/COMPATIBILITY_MATRIX.md` (native NEON on arm64)
+- Tests pass via native **and** NumPy path
+- ROADMAP W2.T04 flipped to `[x]`
 
 ## Non-goals
 

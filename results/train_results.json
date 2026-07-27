@@ -31,7 +31,7 @@
         "test_acc": 97.67
       }
     ],
-    "checkpoint": "C:\\Users\\mrkan\\CRAZZY\\Binary Neural Network\\checkpoints\\fp32_mlp.pt"
+    "checkpoint": "checkpoints/fp32_mlp.pt"
   },
   {
     "model": "binary_mlp",
@@ -65,7 +65,7 @@
         "test_acc": 96.36
       }
     ],
-    "checkpoint": "C:\\Users\\mrkan\\CRAZZY\\Binary Neural Network\\checkpoints\\binary_mlp.pt"
+    "checkpoint": "checkpoints/binary_mlp.pt"
   },
   {
     "model": "ternary_mlp",
@@ -99,7 +99,7 @@
         "test_acc": 97.16
       }
     ],
-    "checkpoint": "C:\\Users\\mrkan\\CRAZZY\\Binary Neural Network\\checkpoints\\ternary_mlp.pt"
+    "checkpoint": "checkpoints/ternary_mlp.pt"
   },
   {
     "model": "fp32_cnn",
@@ -133,7 +133,7 @@
         "test_acc": 96.61
       }
     ],
-    "checkpoint": "C:\\Users\\mrkan\\CRAZZY\\Binary Neural Network\\checkpoints\\fp32_cnn.pt"
+    "checkpoint": "checkpoints/fp32_cnn.pt"
   },
   {
     "model": "binary_cnn",
@@ -167,6 +167,6 @@
         "test_acc": 94.79
       }
     ],
-    "checkpoint": "C:\\Users\\mrkan\\CRAZZY\\Binary Neural Network\\checkpoints\\binary_cnn.pt"
+    "checkpoint": "checkpoints/binary_cnn.pt"
   }
 ]

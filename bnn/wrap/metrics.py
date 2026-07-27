@@ -4,7 +4,6 @@ from __future__ import annotations
 
 from dataclasses import asdict, dataclass
 
-import torch
 import torch.nn.functional as F
 from torch import Tensor
 

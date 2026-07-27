@@ -11,7 +11,7 @@ from __future__ import annotations
 import platform
 import sys
 from dataclasses import asdict, dataclass, field
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from typing import Any
 
 PARETO_SCHEMA_ID = "bnn_pareto_report_v1"
@@ -57,7 +57,7 @@ def _machine_meta() -> dict[str, Any]:
         "platform": platform.platform(),
         "machine": platform.machine(),
         "processor": platform.processor() or "unknown",
-        "timestamp_utc": datetime.now(timezone.utc).isoformat(),
+        "timestamp_utc": datetime.now(UTC).isoformat(),
     }
 
 

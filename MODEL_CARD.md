@@ -46,5 +46,5 @@ on the target domain.
 
 ## Citation
 
-See [`CITATION.cff`](../CITATION.cff) when present; otherwise cite the GitHub repo
+See [`CITATION.cff`](CITATION.cff) when present; otherwise cite the GitHub repo
 https://github.com/KanakMalpani/Binary-Neural-Networks

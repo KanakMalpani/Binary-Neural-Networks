@@ -6,7 +6,6 @@ from __future__ import annotations
 import argparse
 import json
 
-
 RECS = {
     "gpu-server": {
         "use": "BF16/FP8 train → FP8 or AWQ-INT4 serve (vLLM / SGLang / TensorRT / torchao)",

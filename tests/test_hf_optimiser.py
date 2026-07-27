@@ -21,7 +21,6 @@ ROOT = Path(__file__).resolve().parents[1]
 @pytest.mark.hf
 @pytest.mark.slow
 def test_hf_tiny_wrap_script(tmp_path: Path):
-    from bnn.cli import _run_script  # type: ignore
 
     out = tmp_path / "hf_wrap.json"
     # Prefer in-process import of the demo main for clearer failures
@@ -35,7 +34,9 @@ def test_hf_tiny_wrap_script(tmp_path: Path):
         sys.argv = argv
         runpy.run_path(str(script), run_name="__main__")
     except SystemExit as exc:
-        assert int(exc.code or 0) == 0
+        # runpy raises SystemExit on the *success* path too, so pytest.raises
+        # would be wrong here — we assert the exit code, not that it raised.
+        assert int(exc.code or 0) == 0  # noqa: PT017
     finally:
         sys.argv = old
 

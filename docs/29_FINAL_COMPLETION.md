@@ -37,7 +37,7 @@
 ## 5-command verify
 
 ```bat
-cd "C:\Users\mrkan\CRAZZY\Binary Neural Network"
+cd path\to\Binary-Neural-Networks
 pytest tests\test_vision_smoke.py tests\test_audio_smoke.py -q
 python scripts\train_audio.py --epochs 2 --n-train 128 --n-test 64
 python scripts\train_image.py --epochs 1 --train-subset 512 --channels 32

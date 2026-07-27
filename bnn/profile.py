@@ -5,7 +5,6 @@ from __future__ import annotations
 import time
 from dataclasses import asdict, dataclass
 
-import numpy as np
 import torch
 import torch.nn as nn
 
@@ -13,7 +12,6 @@ from .kernels.packed import (
     binary_gemm_native_prepacked,
     binary_gemm_numpy_prepacked,
     native_kernel_available,
-    pack_binary_pm1,
 )
 from .wrap.packed_linear import PackedBinaryXNORLinear, _pack_activations_fast
 
@@ -89,7 +87,8 @@ def profile_packed_linear(
     assert y is not None
     for _ in range(warmup):
         yy = y * packed_mod._alpha_np
-        yy = yy + packed_mod._bias_np
+        if packed_mod._bias_np is not None:
+            yy = yy + packed_mod._bias_np
     t0 = time.perf_counter()
     for _ in range(reps):
         yy = y * packed_mod._alpha_np

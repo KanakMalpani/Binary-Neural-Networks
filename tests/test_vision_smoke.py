@@ -8,7 +8,7 @@ import torch
 import torch.nn as nn
 
 from bnn.ste import set_approx_sign
-from bnn.vision.models import BinaryCIFARCNN, FP32CIFARCNN, TinyBinaryViT, build_vision_model
+from bnn.vision.models import FP32CIFARCNN, BinaryCIFARCNN, TinyBinaryViT, build_vision_model
 from bnn.wrapper import wrap_conv_modules
 
 ROOT = Path(__file__).resolve().parents[1]

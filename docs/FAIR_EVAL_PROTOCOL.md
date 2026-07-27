@@ -10,7 +10,7 @@ no invented goldens.
 | CPU model | `platform.processor()` / `lscpu` |
 | OS | Windows 11 / Ubuntu 22.04 / … |
 | Python / torch | from `constraints.txt` pin |
-| Native kernel | MSVC DLL / Linux `.so` / NumPy fallback |
+| Native kernel | Win/Linux/macOS/ARM native (runtime ISA) / NumPy fallback |
 | Threads | OpenMP / `BNN_NUM_THREADS` / `torch.set_num_threads` |
 | Warmup | ≥3 iters discarded before timed reps |
 | Power | RAPL / board Joules optional (moonshot); else energy-proxy |

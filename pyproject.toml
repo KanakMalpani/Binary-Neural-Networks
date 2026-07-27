@@ -37,7 +37,13 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
-dev = ["pytest>=7.4,<9", "pytest-timeout>=2.2,<3"]
+dev = [
+  "pytest>=7.4,<9",
+  "pytest-timeout>=2.2,<3",
+  "pytest-cov>=4.1,<8",
+  "ruff>=0.6,<1",
+  "mypy>=1.10,<2",
+]
 vision = []  # CIFAR/MNIST loaders are stdlib+torch; reserved for future torchvision
 audio = []   # Synthetic audio is NumPy-only; reserved for real ASR deps
 hf = ["transformers>=4.40,<5", "datasets>=2.18,<4", "huggingface_hub>=0.22,<1"]
@@ -59,7 +65,7 @@ where = ["."]
 include = ["bnn*"]
 
 [tool.setuptools.package-data]
-bnn = ["kernels/*.c", "kernels/*.py", "zoo_registry.json"]
+bnn = ["py.typed", "kernels/*.c", "kernels/*.def", "kernels/*.py", "zoo_registry.json"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
@@ -71,3 +77,90 @@ markers = [
   "native: requires MSVC native DLL",
   "hf: optional Hugging Face / transformers (deselect with -m 'not hf')",
 ]
+
+[tool.cibuildwheel]
+# Wheels exist so that `pip install bnn` yields the fast kernel with no
+# compiler on the user's machine. The smoke test runs against the *shipped*
+# binary and needs only NumPy — pulling torch into every wheel's test env would
+# cost ~200 MB per target and is not available on all of them.
+build-frontend = "build"
+# Single source of truth for target versions — matches the classifiers and the
+# CI matrix. Do not also set CIBW_BUILD in the workflow or the two can drift.
+build = ["cp311-*", "cp312-*", "cp313-*"]
+# PyPy: no torch. i686/win32: 32-bit, and a 32-bit DLL under 64-bit Python is
+# the WinError 193 trap. Free-threaded (t) builds lack reliable NumPy wheels.
+skip = ["pp*", "*_i686", "*-win32", "*t-*"]
+test-requires = ["numpy"]
+test-command = "python {project}/scripts/check_wheel_kernel.py"
+
+[tool.cibuildwheel.macos]
+# Apple clang has no OpenMP runtime; libomp is bundled by delocate when found.
+# If it is missing the build falls back to single-threaded (still SIMD).
+before-all = "brew install libomp || true"
+environment = { LIBOMP_PREFIX = "/opt/homebrew/opt/libomp", MACOSX_DEPLOYMENT_TARGET = "11.0" }
+
+[tool.cibuildwheel.linux]
+before-all = "yum install -y libgomp || apk add --no-cache libgomp || true"
+
+[tool.coverage.run]
+source = ["bnn"]
+branch = true
+
+[tool.coverage.report]
+exclude_also = [
+  "if TYPE_CHECKING:",
+  "raise NotImplementedError",
+  "if __name__ == .__main__.:",
+  "@(abc\\.)?abstractmethod",
+]
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+extend-exclude = ["bnn.egg-info", "dist", "data", "checkpoints"]
+
+[tool.ruff.lint]
+select = [
+  "E",     # pycodestyle errors
+  "F",     # pyflakes
+  "W",     # pycodestyle warnings
+  "I",     # import sorting
+  "UP",    # pyupgrade
+  "B",     # bugbear (mutable defaults, loop-variable capture, ...)
+  "C4",    # comprehensions
+  "SIM",   # simplify
+  "RET",   # return hygiene
+  "NPY",   # NumPy-specific correctness
+  "PIE",
+  "PT",    # pytest style
+]
+ignore = [
+  "E501",    # long lines: enforced at 100 above; legacy prose lines exempted below
+  "SIM108",  # ternaries are not always clearer than if/else here
+  "RET504",  # named result before return often documents intent
+  "PT011",   # broad pytest.raises(ValueError) is fine for this codebase
+  "PT006",   # "B,N,M" parametrize strings are valid pytest and used throughout
+  "PT018",   # compound asserts read better than split ones in the numeric gates
+]
+
+[tool.ruff.lint.per-file-ignores]
+# Scripts and tests intentionally sys.path-hack before importing bnn.
+"scripts/*" = ["E402"]
+"tests/*" = ["E402"]
+
+[tool.ruff.lint.isort]
+known-first-party = ["bnn"]
+
+[tool.mypy]
+python_version = "3.11"
+files = ["bnn"]
+ignore_missing_imports = true
+warn_unused_ignores = true
+warn_redundant_casts = true
+no_implicit_optional = true
+check_untyped_defs = true
+# warn_unreachable is deliberately off: torch types nn.Module.__getattr__ as
+# returning `Tensor | Module`, so any `if module.bias is None` narrows to a
+# branch mypy then calls unreachable. It reported 10 such false positives here
+# and no true ones. Revisit if torch's stubs improve.
+warn_unreachable = false

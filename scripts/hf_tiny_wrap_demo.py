@@ -26,8 +26,7 @@ def main() -> int:
         )
         return 0
 
-    import torch
-    from bnn.wrapper import wrap_model, model_param_bytes
+    from bnn.wrapper import model_param_bytes, wrap_model
 
     p = argparse.ArgumentParser()
     p.add_argument("--model", default="hf-internal-testing/tiny-random-BertModel")

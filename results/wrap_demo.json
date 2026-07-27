@@ -1,7 +1,7 @@
 {
   "mode": "binary_xnor",
   "hidden": 4096,
-  "batch": 32,
+  "batch": 64,
   "replaced_layers": [
     "3",
     "5"
@@ -10,18 +10,18 @@
   "fp32_weight_bytes_replaced": 134217728,
   "packed_weight_bytes_reported": 4194304,
   "model_total_bytes_fp": 147275816,
-  "model_total_bytes_wrapped": 13090856,
-  "e2e_latency_ms_fp": 21.553476666789116,
-  "e2e_latency_ms_wrapped": 18.65172999993471,
-  "e2e_speedup": 1.1555752022393935,
+  "model_total_bytes_wrapped": 17285160,
+  "e2e_latency_ms_fp": 34.13500333360086,
+  "e2e_latency_ms_wrapped": 7.088746665976942,
+  "e2e_speedup": 4.815379211876027,
   "layer_microbench": {
-    "linear_fp_ms": 12.760653333437707,
-    "linear_wrapped_forward_ms": 7.638166666583857,
-    "linear_gemm_only_prepacked_acts_ms": 6.006213333118164,
-    "speedup_gemm_only_vs_torch_linear": 2.124575439749312,
-    "speedup_wrapped_linear_vs_torch": 1.6706434790516118
+    "linear_fp_ms": 14.12006999986867,
+    "linear_wrapped_forward_ms": 1.5635533335929117,
+    "linear_gemm_only_prepacked_acts_ms": 2.04715666671594,
+    "speedup_gemm_only_vs_torch_linear": 6.897405669747869,
+    "speedup_wrapped_linear_vs_torch": 9.030756864188291
   },
-  "output_cosine_vs_fp": 0.28316834568977356,
+  "output_cosine_vs_fp": 0.31023794412612915,
   "native_kernel": true,
   "interpretation": "E2E may lose to torch when stem/head/ReLU dominate or Python pack overhead is large; layer gemm_only shows true kernel ROI. Cosine<<1 for binary_xnor without QAT is expected (not a transparent accuracy-preserving wrap)."
 }

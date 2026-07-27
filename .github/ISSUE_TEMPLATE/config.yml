@@ -5,4 +5,4 @@ contact_links:
     about: When lost — §0 → §7 → current phase → lowest unchecked TODO.
   - name: Reproducibility
     url: https://github.com/KanakMalpani/Binary-Neural-Networks/blob/main/REPRODUCIBILITY.md
-    about: How to get REPRO: PASS on a clean install.
+    about: "How to get REPRO: PASS on a clean install."

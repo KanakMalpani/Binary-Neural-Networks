@@ -22,7 +22,7 @@ sys.path.insert(0, str(ROOT))
 
 from bnn.layers import BinaryLinear  # noqa: E402
 from bnn.ste import clip_weights_  # noqa: E402
-from bnn.wrapper import wrap_linear_modules, model_param_bytes  # noqa: E402
+from bnn.wrapper import model_param_bytes, wrap_linear_modules  # noqa: E402
 
 
 class TinyTransformerish(nn.Module):

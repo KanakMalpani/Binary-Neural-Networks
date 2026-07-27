@@ -51,7 +51,7 @@
 ## Verify in 5 commands
 
 ```bat
-cd "C:\Users\mrkan\CRAZZY\Binary Neural Network"
+cd path\to\Binary-Neural-Networks
 pip install -e ".[dev]"
 python -m bnn.kernels.compile_native
 pytest -q

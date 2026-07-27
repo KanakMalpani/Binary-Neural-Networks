@@ -1,7 +1,7 @@
 {
   "pattern": "hybrid_ffn_only_wrap_after_short_STE_QAT",
   "qat_steps": 50,
-  "qat_seconds": 1.879257400003553,
+  "qat_seconds": 0.4817394999554381,
   "replaced": [
     "ffn_fc1",
     "ffn_fc2"
@@ -19,8 +19,8 @@
   },
   "param_bytes_after_wrap": {
     "param_bytes": 1077288,
-    "buffer_bytes": 10240,
-    "total_bytes": 1087528
+    "buffer_bytes": 75776,
+    "total_bytes": 1153064
   },
   "logits_finite": true,
   "native_kernel": true,

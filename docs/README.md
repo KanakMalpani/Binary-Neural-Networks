@@ -37,10 +37,11 @@ Ordered path (also nested inside [`GUIDE_E2E.md`](GUIDE_E2E.md)):
 |-----|-----|
 | [`GUIDE_E2E.md`](GUIDE_E2E.md) | Master end-to-end user guide |
 | [`39_GUIDE_E2E_COMPLETION.md`](39_GUIDE_E2E_COMPLETION.md) | E2E guide smoke confirmation |
-| [`40_ROADMAP_E2E_SESSION.md`](40_ROADMAP_E2E_SESSION.md) | v0.3.0 Phase C+D completion report |
+| [`40_ROADMAP_E2E_SESSION.md`](40_ROADMAP_E2E_SESSION.md) | v0.3.0 Phase C+D completion report (WC-K3 met after portable SIMD) |
+| [`41_PORTABLE_SIMD_KERNEL.md`](41_PORTABLE_SIMD_KERNEL.md) | **Current** runtime AVX-512/AVX2/NEON dispatch (closes W2.T04/T05) |
 | [`LAUNCH_CHECKLIST.md`](LAUNCH_CHECKLIST.md) | Public launch checklist |
 | [`FAIR_EVAL_PROTOCOL.md`](FAIR_EVAL_PROTOCOL.md) | Dual-metric fair eval |
-| [`MOONSHOT_DEFERRALS.md`](MOONSHOT_DEFERRALS.md) | Explicit v1.0 leftovers |
+| [`MOONSHOT_DEFERRALS.md`](MOONSHOT_DEFERRALS.md) | Explicit v1.0 leftovers (W2.T04/T05 removed — delivered) |
 | [`37_WORLD_CLASS_BNN_OPTIMISER_ROADMAP.md`](37_WORLD_CLASS_BNN_OPTIMISER_ROADMAP.md) | Canonical world-class plan (twin of root `ROADMAP.md`) |
 | [`38_ROADMAP_EXECUTION_LOG.md`](38_ROADMAP_EXECUTION_LOG.md) | Session execution log |
 | [`SEMVER_AND_DEPRECATION.md`](SEMVER_AND_DEPRECATION.md) | Public API semver policy |
@@ -80,6 +81,38 @@ Ordered path (also nested inside [`GUIDE_E2E.md`](GUIDE_E2E.md)):
 | [`24_GPU_INT4_FP8_LANE.md`](24_GPU_INT4_FP8_LANE.md) | GPU INT4/FP8 |
 | [`20_NPU_VENDOR_CLOSURE.md`](20_NPU_VENDOR_CLOSURE.md) | Phone NPUs |
 | [`../scripts/bridges/`](../scripts/bridges/) | Concrete torchao / llama.cpp / bitnet recipes (JSON) |
+
+## Research background
+
+Written up during the design phase and still the reasoning behind the current
+thesis — previously unlinked from this index.
+
+| Doc | Topic |
+|-----|-------|
+| [`02_SOTA_SURVEY.md`](02_SOTA_SURVEY.md) | Prior art: XNOR-Net, Bi-Real, BitNet, LCE/FINN |
+| [`03_FAILURE_ANALYSIS.md`](03_FAILURE_ANALYSIS.md) | Why naive binarisation loses accuracy and speed |
+| [`11_DEEP_RESEARCH_REPORT.md`](11_DEEP_RESEARCH_REPORT.md) | Long-form research write-up |
+| [`14_HARDWARE_AND_ENERGY.md`](14_HARDWARE_AND_ENERGY.md) | Hardware limits and the energy argument |
+| [`16_ECOSYSTEM_AND_TOOLING.md`](16_ECOSYSTEM_AND_TOOLING.md) | Where this sits among existing toolchains |
+| [`17_EVALUATION_ROBUSTNESS_ECONOMICS.md`](17_EVALUATION_ROBUSTNESS_ECONOMICS.md) | Evaluation, robustness, cost |
+| [`32_NOVEL_PAPER_CANDIDATES.md`](32_NOVEL_PAPER_CANDIDATES.md) | Publishable directions |
+
+## Planning / design sketches
+
+| Doc | Topic |
+|-----|-------|
+| [`RECIPES_INDEX.md`](RECIPES_INDEX.md) | One-line index of every runnable recipe |
+| [`BNNPACK_V2_DESIGN.md`](BNNPACK_V2_DESIGN.md) | `.bnnpack` v2 sketch (**not implemented**) |
+| [`PUBLICATION_PLAN.md`](PUBLICATION_PLAN.md) | Write-up / publication plan |
+
+## Kernel internals
+
+| Doc | Topic |
+|-----|-------|
+| [`41_PORTABLE_SIMD_KERNEL.md`](41_PORTABLE_SIMD_KERNEL.md) | Runtime AVX-512/AVX2/NEON dispatch, blocking, fused epilogue |
+| [`34_COMPUTE_SPEEDUP.md`](34_COMPUTE_SPEEDUP.md) | Where the compute win comes from |
+| [`spikes/ARM_NEON_SPIKE.md`](spikes/ARM_NEON_SPIKE.md) | ARM NEON note (delivered) |
+| [`spikes/AVX512_MOONSHOT.md`](spikes/AVX512_MOONSHOT.md) | AVX-512 note (delivered) |
 
 ## Thesis lock (never reopen as a “win”)
 

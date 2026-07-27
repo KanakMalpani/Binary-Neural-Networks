@@ -23,7 +23,6 @@ from bnn.wrapper import (  # noqa: E402
     TernaryWeightOnlyLinear,
     WrapReport,
     model_param_bytes,
-    wrap_linear_modules,
 )
 
 

@@ -11,9 +11,10 @@ from __future__ import annotations
 
 import copy
 import warnings
+from collections.abc import Iterable
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Any, Iterable
+from typing import Any
 
 import torch
 import torch.nn as nn
@@ -149,7 +150,7 @@ def optimise_model(
 
             sens_mode = "ternary_weight_only" if cfg.accuracy_first else "binary_xnor"
             if mode in ("ternary_weight_only", "binary_xnor"):
-                sens_mode = mode  # type: ignore[assignment]
+                sens_mode = mode
             sens = score_layer_sensitivity(
                 work,
                 calib_inputs,

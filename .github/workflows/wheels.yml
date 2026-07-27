@@ -1,0 +1,108 @@
+name: wheels
+
+# Manual dispatch is the normal path ("Run workflow" in the Actions tab).
+# Tags build automatically so a release always has artifacts attached.
+on:
+  workflow_dispatch:
+    inputs:
+      publish:
+        description: "Publish to PyPI after building (requires trusted publishing to be configured)"
+        type: boolean
+        default: false
+  push:
+    tags: ["v*"]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+env:
+  # Pinned so a cibuildwheel release cannot silently change what we ship.
+  # Target selection lives in [tool.cibuildwheel] in pyproject.toml -- do not
+  # set CIBW_BUILD here as well, or the two definitions can drift.
+  CIBW_VERSION: "4.1.1"
+
+jobs:
+  wheels:
+    name: ${{ matrix.label }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: ubuntu-latest
+            label: linux-x86_64
+          - os: ubuntu-24.04-arm
+            label: linux-aarch64
+          - os: windows-latest
+            label: windows-amd64
+          - os: macos-latest
+            label: macos-arm64
+          - os: macos-15-intel
+            label: macos-x86_64
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5.6.0
+        with:
+          python-version: "3.12"
+
+      - name: Install cibuildwheel
+        run: python -m pip install --upgrade pip "cibuildwheel==${{ env.CIBW_VERSION }}"
+
+      - name: Build wheels
+        # Native runners for every arch, so no QEMU emulation is involved.
+        run: python -m cibuildwheel --output-dir wheelhouse
+
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: wheels-${{ matrix.label }}
+          path: wheelhouse/*.whl
+          if-no-files-found: error
+
+  sdist:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5.6.0
+        with:
+          python-version: "3.12"
+      - name: Build sdist
+        run: |
+          python -m pip install -U pip build
+          python -m build --sdist
+      - name: Verify sdist compiles the kernel from source
+        # --no-binary is scoped to bnn: `:all:` would force source builds of
+        # numpy and torch too. --no-deps keeps torch out of this job entirely;
+        # check_wheel_kernel.py needs only NumPy.
+        run: |
+          python -m pip install numpy
+          python -m pip install --no-binary bnn --no-deps dist/*.tar.gz
+          python scripts/check_wheel_kernel.py
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: sdist
+          path: dist/*.tar.gz
+          if-no-files-found: error
+
+  publish:
+    # Never fires on its own: requires a human to dispatch with publish=true.
+    # Set up PyPI trusted publishing for this repo and create the `pypi`
+    # environment (with required reviewers) before using it.
+    needs: [wheels, sdist]
+    if: github.event_name == 'workflow_dispatch' && inputs.publish
+    runs-on: ubuntu-latest
+    environment: pypi
+    permissions:
+      id-token: write  # OIDC for trusted publishing; no API token stored
+    steps:
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
+        with:
+          path: dist
+          merge-multiple: true
+      - name: List artifacts
+        run: ls -la dist
+      - uses: pypa/gh-action-pypi-publish@ba38be9e461d3875417946c167d0b5f3d385a247 # v1.14.1

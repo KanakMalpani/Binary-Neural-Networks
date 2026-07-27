@@ -16,6 +16,7 @@ env/
 
 # Native build artifacts (compile locally)
 *.dll
+*.pyd
 *.so
 *.dylib
 *.obj

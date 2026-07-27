@@ -131,7 +131,6 @@ def test_ultra_wrap_floors():
 
 def test_export_check_compression_floor_matches_floors():
     """Live micro-check: packing still ~32× (independent of committed JSON)."""
-    import numpy as np
     import torch
 
     from bnn.kernels.packed import pack_binary_pm1

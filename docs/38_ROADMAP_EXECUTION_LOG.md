@@ -1,5 +1,10 @@
 # Roadmap execution log — 2026-07-25
 
+> **Supersession (2026-07-28):** W2.T04 / W2.T05 and macOS/ARM native are **delivered**
+> (`docs/41_PORTABLE_SIMD_KERNEL.md`, CI `portability`). Open-item bullets below that
+> still name those IDs are **historical session notes**, not current status.
+> Living plan: root `ROADMAP.md`.
+
 Session goal: complete **Phase A (API freeze / OSS hygiene)** and push into
 **Phase B (HF optimiser UX)** per root `ROADMAP.md`.
 

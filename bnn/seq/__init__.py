@@ -147,7 +147,7 @@ class BinaryTransformerEncoder(nn.Module):
     def forward(self, tokens: Tensor) -> Tensor:
         # tokens: (B, T) long
         B, T = tokens.shape
-        if T > self.max_len:
+        if self.max_len < T:
             raise ValueError(f"seq len {T} > max_len {self.max_len}")
         pos = torch.arange(T, device=tokens.device).unsqueeze(0).expand(B, T)
         x = self.embed(tokens) + self.pos(pos)
@@ -190,7 +190,7 @@ class BinaryTransformerDecoder(nn.Module):
 
     def forward(self, tokens: Tensor, memory: Tensor | None = None) -> Tensor:
         B, T = tokens.shape
-        if T > self.max_len:
+        if self.max_len < T:
             raise ValueError(f"seq len {T} > max_len {self.max_len}")
         pos = torch.arange(T, device=tokens.device).unsqueeze(0).expand(B, T)
         x = self.embed(tokens) + self.pos(pos)
@@ -245,6 +245,9 @@ class BinaryAutoEncoder(nn.Module):
     def __init__(self, n_in: int = 64, latent: int = 16, hidden: int = 64, *, ffn_kind: str = "binary"):
         super().__init__()
         self.stem = nn.Linear(n_in, hidden)
+        # enc/dec vary with ffn_kind; declare the union.
+        self.enc: BinaryLinear | TernaryLinear | nn.Linear
+        self.dec: BinaryLinear | TernaryLinear | nn.Linear
         if ffn_kind == "binary":
             self.enc = BinaryLinear(hidden, latent)
             self.dec = BinaryLinear(latent, hidden)

@@ -6,7 +6,7 @@ models need real data + longer distillation (see docs/12, docs/33).
 
 from __future__ import annotations
 
-from typing import Callable
+from collections.abc import Callable
 
 import torch
 import torch.nn as nn

@@ -3,9 +3,13 @@
 from __future__ import annotations
 
 import argparse
-import subprocess
+import importlib.util
+import inspect
 import sys
+from collections.abc import Callable, Iterator
+from contextlib import contextmanager
 from pathlib import Path
+from types import ModuleType
 
 from bnn._version import __version__
 
@@ -20,10 +24,84 @@ Docs:       REPRODUCIBILITY.md
 """.strip()
 
 
+def _script_path(script: str) -> Path:
+    """Resolve a bare ``*.py`` name under ``scripts/`` (no path separators)."""
+    if Path(script).name != script or not script.endswith(".py"):
+        raise FileNotFoundError(f"refusing non-basename script: {script!r}")
+    scripts_root = (ROOT / "scripts").resolve()
+    path = (scripts_root / script).resolve()
+    if not path.is_relative_to(scripts_root) or not path.is_file():
+        raise FileNotFoundError(path)
+    return path
+
+
+def _load_script_module(path: Path) -> ModuleType:
+    """Import ``path`` once as ``bnn._scripts.<stem>``; undo cache on failure."""
+    mod_name = f"bnn._scripts.{path.stem}"
+    cached = sys.modules.get(mod_name)
+    if cached is not None:
+        return cached
+    spec = importlib.util.spec_from_file_location(mod_name, path)
+    if spec is None or spec.loader is None:
+        raise ImportError(f"cannot load script {path}")
+    module = importlib.util.module_from_spec(spec)
+    sys.modules[mod_name] = module
+    try:
+        spec.loader.exec_module(module)
+    except BaseException:
+        sys.modules.pop(mod_name, None)
+        raise
+    return module
+
+
+def _exit_code(result: object) -> int:
+    """Map ``main()`` returns / ``SystemExit.code`` to a process exit status."""
+    if result is None or result is True:
+        return 0
+    if result is False:
+        return 1
+    if isinstance(result, int):
+        return result
+    return 1 if result else 0
+
+
+@contextmanager
+def _temporary_argv(argv: list[str]) -> Iterator[None]:
+    previous = sys.argv
+    sys.argv = argv
+    try:
+        yield
+    finally:
+        sys.argv = previous
+
+
+def _call_script_main(main: Callable[..., object], path: Path, argv: list[str]) -> int:
+    """Invoke ``main``, supporting either ``main(argv)`` or ``parse_args()``-style mains."""
+    if "argv" in inspect.signature(main).parameters:
+        return _exit_code(main(argv))
+    with _temporary_argv([str(path), *argv]):
+        return _exit_code(main())
+
+
 def _run_script(script: str, extra: list[str] | None = None) -> int:
-    cmd = [sys.executable, str(ROOT / "scripts" / script), *(extra or [])]
-    print(">", " ".join(cmd), flush=True)
-    return int(subprocess.call(cmd, cwd=str(ROOT)))
+    """Run ``scripts/<script>`` in-process (testable; same exit-code contract as subprocess).
+
+    ``main(argv)`` gets ``extra`` directly. Otherwise ``sys.argv`` is rewritten for
+    scripts that call ``argparse.parse_args()`` with no arguments.
+    """
+    argv = list(extra or [])
+    path = _script_path(script)
+    print(f"> scripts/{path.name}", *argv, flush=True)
+    try:
+        main = getattr(_load_script_module(path), "main", None)
+        if not callable(main):
+            raise RuntimeError(f"{path.name} has no callable main()")
+        return _call_script_main(main, path, argv)
+    except SystemExit as exc:
+        return _exit_code(exc.code)
+    except Exception as exc:
+        print(f"ERROR {path.name}: {exc}", file=sys.stderr, flush=True)
+        return 1
 
 
 def cmd_compile_native(args: argparse.Namespace) -> int:
@@ -149,12 +227,9 @@ def _ultra_wrap_extra(args: argparse.Namespace) -> list[str]:
         "--drop-in-threshold",
         str(args.drop_in_threshold),
     ]
-    if args.mode and args.mode != "auto" and args.policy != "auto":
-        extra += ["--mode", args.mode]
-    elif args.mode == "auto" or args.policy == "auto":
-        extra += ["--mode", "auto"]
-    elif args.mode:
-        extra += ["--mode", args.mode]
+    # Forward mode as chosen on the CLI. Never let policy=auto clobber an
+    # explicit non-auto mode (matches scripts/ultra_wrap_demo.py).
+    extra += ["--mode", args.mode]
     if args.force:
         extra.append("--force")
     if getattr(args, "report", None):
@@ -166,37 +241,21 @@ def _ultra_wrap_extra(args: argparse.Namespace) -> list[str]:
 
 def cmd_optimise(args: argparse.Namespace) -> int:
     """Product verb: ultra wrap (+ optional encode). Preferred over ``bnn wrap --ultra``."""
-    from pathlib import Path as _Path
-
     report = args.report or (ROOT / "results" / "optimise_report.json")
-    args.report = _Path(report)
+    args.report = Path(report)
     code = _run_script("ultra_wrap_demo.py", _ultra_wrap_extra(args))
     if code != 0:
         return code
     if getattr(args, "pack", None):
-        enc_extra = [
-            "--source",
-            "mlp",
-            "--out",
-            str(args.pack),
-            "--hidden",
-            str(getattr(args, "pack_hidden", 256)),
-            "--min-width",
-            str(args.min_width),
-        ]
-        enc_code = _run_script("encode_demo.py", enc_extra) if (ROOT / "scripts" / "encode_demo.py").exists() else None
-        if enc_code is None:
-            # Use CLI encode path in-process
-            enc_ns = argparse.Namespace(
-                source="mlp",
-                out=_Path(args.pack),
-                hidden=getattr(args, "pack_hidden", 256),
-                min_width=args.min_width,
-                in_features=512,
-                out_features=512,
-            )
-            return cmd_encode(enc_ns)
-        return int(enc_code)
+        enc_ns = argparse.Namespace(
+            source="mlp",
+            out=Path(args.pack),
+            hidden=getattr(args, "pack_hidden", 256),
+            min_width=args.min_width,
+            in_features=512,
+            out_features=512,
+        )
+        return cmd_encode(enc_ns)
     return 0
 
 
@@ -662,8 +721,7 @@ def main(argv: list[str] | None = None) -> int:
         args = parser.parse_args(argv)
     except SystemExit as exc:
         # argparse already printed help/errors; normalize to int exit
-        code = exc.code
-        return int(code) if isinstance(code, int) else (1 if code else 0)
+        return _exit_code(exc.code)
     try:
         return int(args.func(args))
     except FileNotFoundError as exc:

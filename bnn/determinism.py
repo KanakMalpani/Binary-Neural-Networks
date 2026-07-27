@@ -27,7 +27,7 @@ def set_repro_seed(
     import torch
 
     random.seed(seed)
-    np.random.seed(seed)
+    np.random.seed(seed)  # noqa: NPY002 — seeding the legacy global RNG is the point
     torch.manual_seed(seed)
     if torch.cuda.is_available():
         torch.cuda.manual_seed_all(seed)

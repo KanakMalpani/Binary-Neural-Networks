@@ -2,10 +2,12 @@
 
 Honest leftovers toward **v1.0 world-class**. None of these are pretend-done.
 
+> **Closed (not deferrals):** W2.T04 ARM NEON and W2.T05 AVX-512/AVX2 runtime
+> dispatch are **delivered** — see [`41_PORTABLE_SIMD_KERNEL.md`](41_PORTABLE_SIMD_KERNEL.md)
+> and spike notes under [`spikes/`](spikes/). Removed from this table 2026-07-28.
+
 | ID | Item | Blocker | Acceptance leftover |
 |----|------|---------|---------------------|
-| W2.T04 | ARM NEON | No aarch64 CI agent | See [`spikes/ARM_NEON_SPIKE.md`](spikes/ARM_NEON_SPIKE.md) |
-| W2.T05 | AVX-512 VPOPCNTDQ | Hardware + dispatch | [`spikes/AVX512_MOONSHOT.md`](spikes/AVX512_MOONSHOT.md) |
 | W2.T06 | WASM SIMD | Browser pedagogy only | Optional demo after C/D |
 | W5.T05 | `.bnnpack` v2 | Design after v0.3 usage | Schema ADR + hashes + ternary meta |
 | W5.T06 | safetensors export | Depends W5.T05 | Packed tensor export path |
@@ -17,7 +19,6 @@ Honest leftovers toward **v1.0 world-class**. None of these are pretend-done.
 | W8.T07 | Artifact attestations | Org policy | Optional on later tags |
 | W8.T08 | PyPI Trusted Publishing | Manual PyPI↔GH link | [`PYPI_PUBLISH.md`](PYPI_PUBLISH.md) |
 | W9.T06 | Autodoc API site | MkDocs deploy | Stub exists; expand later |
-| W11.T06 | GitHub Discussions | Manual settings toggle | Listed on launch checklist |
 | W12.T02 | Publication plan | Venue + claims whitelist | After WC gates closer |
 | W3.T06 | Search binary/ternary/skip | Builds on W3.T05 | Sensitivity scores exist; full search later |
 | W3.T08 | Distill integration | Recipe time | `distill_sketch.py` remains sketch |

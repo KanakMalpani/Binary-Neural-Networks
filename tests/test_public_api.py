@@ -9,7 +9,6 @@ import bnn
 import bnn.optimise as optimise
 import bnn.wrap as wrap
 
-
 REQUIRED_BNN = {
     "optimise_model",
     "OptimiseConfig",

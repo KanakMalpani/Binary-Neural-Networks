@@ -5,6 +5,7 @@ from __future__ import annotations
 import numpy as np
 import pytest
 
+from bnn.kernels.packed import pack_binary_pm1, ternary_native_available
 from bnn.kernels.ternary_gemm import (
     ternary_bitplane_gemm_native,
     ternary_bitplane_gemm_numpy,
@@ -13,7 +14,6 @@ from bnn.kernels.ternary_gemm import (
     ternary_gemm_pm1_x,
 )
 from bnn.kernels.ternary_pack import pack_ternary_bitplanes, precompute_bitplane_pops
-from bnn.kernels.packed import pack_binary_pm1, ternary_native_available
 
 
 @pytest.mark.parametrize("B,N,M", [(4, 64, 32), (8, 128, 64), (2, 65, 17)])

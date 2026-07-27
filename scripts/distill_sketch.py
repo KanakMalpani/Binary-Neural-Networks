@@ -47,7 +47,7 @@ def main() -> None:
 
     teacher.eval()
     opt = torch.optim.Adam(student.parameters(), lr=1e-3)
-    for ep in range(args.epochs):
+    for _ep in range(args.epochs):
         student.train()
         for i, (x, y) in enumerate(train_loader):
             if i > 40:

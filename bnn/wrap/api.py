@@ -2,8 +2,8 @@
 
 from __future__ import annotations
 
+from collections.abc import Iterable
 from dataclasses import asdict, dataclass, field
-from typing import Iterable
 
 import torch.nn as nn
 
@@ -14,6 +14,7 @@ from .packed_linear import (
     BinaryWeightOnlyDequantLinear,
     PackedBinaryConv2d,
     PackedBinaryXNORLinear,
+    PackedLinearLike,
     TernaryWeightOnlyLinear,
 )
 from .policy import (
@@ -70,9 +71,10 @@ def _build_wrapped(
 ) -> tuple[nn.Module, int]:
     w = lin.weight.data
     b = lin.bias.data if lin.bias is not None else None
+    new: PackedLinearLike
     if mode == "binary_xnor":
-        new: nn.Module = PackedBinaryXNORLinear(w, b, calib=calib)
-        packed_b = new.packed_weight_bytes()  # type: ignore[attr-defined]
+        new = PackedBinaryXNORLinear(w, b, calib=calib)
+        packed_b = new.packed_weight_bytes()
     elif mode == "ternary_weight_only":
         per_ch = True if calib is None else calib.per_channel
         new = TernaryWeightOnlyLinear(w, b, per_channel=per_ch, calib=calib)
@@ -231,11 +233,9 @@ def wrap_conv_modules(
     from ..layers import BinaryConv2d
 
     report = WrapReport(mode="binary_xnor", policy="conv", native_kernel=False)
-    to_replace: list[tuple[str, nn.Module]] = []
+    to_replace: list[tuple[str, BinaryConv2d | nn.Conv2d]] = []
     for name, mod in model.named_modules():
-        if isinstance(mod, BinaryConv2d):
-            pass
-        elif isinstance(mod, nn.Conv2d) and mod.groups == 1:
+        if isinstance(mod, BinaryConv2d) or isinstance(mod, nn.Conv2d) and mod.groups == 1:
             pass
         else:
             continue
@@ -251,7 +251,8 @@ def wrap_conv_modules(
 
     for name, mod in to_replace:
         w = mod.weight.data
-        b = mod.bias.data if getattr(mod, "bias", None) is not None else None
+        mod_bias = getattr(mod, "bias", None)
+        b = mod_bias.data if mod_bias is not None else None
         stride = getattr(mod, "stride", 1)
         padding = getattr(mod, "padding", 0)
         if isinstance(stride, tuple):

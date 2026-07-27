@@ -51,7 +51,7 @@ Infer (packed): bitpack(x), bitpack(W) → XNOR → popcount → scale → BN/ad
 - Larq is TF/Keras and archived; Brevitas is heavy for a from-scratch teaching repo.
 - We need **transparent** packing kernels to prove speedup with evidence in `results/`.
 - Dependencies: `torch`, `numpy` (see `pyproject.toml`); torchvision optional.
-- Kernels: MSVC x64 DLL on Windows; NumPy fallback elsewhere.
+- Kernels: portable native GEMM (MSVC / GCC / Clang) with runtime AVX-512→AVX2→NEON→scalar dispatch (`docs/41`); NumPy fallback when native absent.
 - Package entry: `pip install -e .` → `import bnn` / `bnn` CLI.
 
 ## Repo map

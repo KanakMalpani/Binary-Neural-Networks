@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import json
 import platform
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
 
@@ -12,8 +12,8 @@ ROOT = Path(__file__).resolve().parents[1]
 RESULTS = ROOT / "results"
 
 
-def _load(name: str) -> dict[str, Any] | None:
-    p = RESULTS / name
+def _load(name: str, results_dir: Path | None = None) -> dict[str, Any] | None:
+    p = (results_dir or RESULTS) / name
     if not p.exists():
         return None
     return json.loads(p.read_text(encoding="utf-8"))
@@ -28,21 +28,23 @@ def machine_card() -> dict[str, Any]:
         "python": platform.python_version(),
         "torch": torch.__version__,
         "cuda": torch.cuda.is_available(),
-        "generated_utc": datetime.now(timezone.utc).isoformat(),
+        "generated_utc": datetime.now(UTC).isoformat(),
     }
 
 
 def render_summary(results_dir: Path | None = None) -> str:
-    global RESULTS
-    if results_dir is not None:
-        RESULTS = Path(results_dir)
+    # Resolve locally rather than rebinding the module-level RESULTS: mutating
+    # the global leaked the caller's directory into every later call in the
+    # process, so a no-arg render_summary() after a scoped one silently read
+    # the wrong (often deleted) directory.
+    base = Path(results_dir) if results_dir is not None else RESULTS
 
-    bench_raw = _load("benchmark.json")
-    train_raw = _load("train_results.json")
-    cifar = _load("cifar10_proxy.json") or {}
-    wrap = _load("wrap_demo.json") or {}
-    energy = _load("energy_bound.json") or {}
-    fgsm = _load("robustness_fgsm.json") or {}
+    bench_raw = _load("benchmark.json", base)
+    train_raw = _load("train_results.json", base)
+    cifar = _load("cifar10_proxy.json", base) or {}
+    wrap = _load("wrap_demo.json", base) or {}
+    energy = _load("energy_bound.json", base) or {}
+    fgsm = _load("robustness_fgsm.json", base) or {}
     card = machine_card()
 
     lines = [
@@ -112,8 +114,8 @@ def render_summary(results_dir: Path | None = None) -> str:
     else:
         lines.append("_No train_results.json — run `bnn train`._")
 
-    image = _load("image_cifar.json") or cifar
-    audio = _load("audio_synth.json") or {}
+    image = _load("image_cifar.json", base) or cifar
+    audio = _load("audio_synth.json", base) or {}
 
     lines += ["", "## Image (CIFAR-10 Bi-Real)", ""]
     if image:
@@ -135,7 +137,7 @@ def render_summary(results_dir: Path | None = None) -> str:
             if gap is None:
                 gap = fp["test_acc"] - bn["test_acc"]
             lines.append(f"- Gap: **{gap:.2f} pp**")
-        src = "image_cifar.json" if (_load("image_cifar.json")) else "cifar10_proxy.json"
+        src = "image_cifar.json" if (_load("image_cifar.json", base)) else "cifar10_proxy.json"
         lines.append(f"Source: `{src}`. Tutorial: `docs/tutorials/04_image_cifar.md`.")
     else:
         lines.append("_No image results — run `bnn train-image`._")

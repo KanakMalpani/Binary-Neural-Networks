@@ -20,8 +20,8 @@ sys.path.insert(0, str(ROOT))
 
 from bnn.kernels.ternary_pack import (  # noqa: E402
     pack_ternary_2bit,
-    unpack_ternary_2bit,
     ternary_bytes,
+    unpack_ternary_2bit,
 )
 
 

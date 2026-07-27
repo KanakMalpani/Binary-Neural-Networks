@@ -132,7 +132,7 @@ Dimension docs: `13`–`20` (incl. gap closure + NPU vendor closure).
 ## 8. How to reproduce
 
 ```bat
-cd "C:\Users\mrkan\CRAZZY\Binary Neural Network"
+cd path\to\Binary-Neural-Networks
 python bnn\kernels\compile_native.py
 python scripts\export_check.py
 python scripts\validate_native.py

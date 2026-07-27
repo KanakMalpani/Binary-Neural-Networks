@@ -39,9 +39,9 @@ body:
     attributes:
       label: Gates tried
       options:
-        - label: `bnn repro` (paste PASS/FAIL)
-        - label: `pytest -q`
-        - label: `bnn validate-native` (Windows)
+        - label: "`bnn repro` (paste PASS/FAIL)"
+        - label: "`pytest -q`"
+        - label: "`bnn validate-native` (any platform)"
   - type: textarea
     id: logs
     attributes:

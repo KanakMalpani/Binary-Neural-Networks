@@ -5,7 +5,7 @@ from __future__ import annotations
 import numpy as np
 import torch
 
-from bnn.export import pack_linear_weight, save_checkpoint, load_checkpoint
+from bnn.export import load_checkpoint, pack_linear_weight, save_checkpoint
 from bnn.kernels.packed import binary_gemm_packed, pack_binary_pm1
 from bnn.layers import BinaryLinear
 from bnn.models import build_model

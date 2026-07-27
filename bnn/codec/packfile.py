@@ -25,7 +25,6 @@ import torch.nn as nn
 
 from ..kernels.packed import pack_binary_pm1
 from ..layers import BinaryLinear
-from ..ste import binary_sign
 from ..wrap.packed_linear import PackedBinaryXNORLinear, sign_pm1
 from ..wrap.policy import HYBRID_FFN_SKIP
 

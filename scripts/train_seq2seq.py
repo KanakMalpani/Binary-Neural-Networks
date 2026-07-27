@@ -89,7 +89,7 @@ def train_ae(args: argparse.Namespace) -> dict:
     opt = torch.optim.Adam(model.parameters(), lr=args.lr)
     t0 = time.perf_counter()
     last = 0.0
-    for step in range(args.steps):
+    for _step in range(args.steps):
         x = torch.randn(args.batch, args.ae_in)
         opt.zero_grad(set_to_none=True)
         recon = model(x)

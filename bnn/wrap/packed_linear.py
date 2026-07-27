@@ -10,6 +10,7 @@ from torch import Tensor
 
 from ..kernels.packed import (
     binary_gemm_native_prepacked,
+    binary_gemm_native_scaled,
     binary_gemm_numpy_prepacked,
     native_kernel_available,
     pack_binary_pm1,
@@ -36,15 +37,15 @@ def sign_pm1(w: Tensor) -> Tensor:
 
 
 def _pack_activations_fast(x2: np.ndarray, n: int) -> np.ndarray:
-    """Vectorized pack of (B, n) float activations → uint64 words."""
-    bits = (x2 <= 0).astype(np.uint8, copy=False)
-    pad = (-n) % 64
-    if pad:
-        bits = np.pad(bits, ((0, 0), (0, pad)), constant_values=0)
-    B = bits.shape[0]
-    bits = bits.reshape(B, -1, 64)
-    weights = np.uint64(1) << np.arange(64, dtype=np.uint64)
-    return np.ascontiguousarray((bits.astype(np.uint64) * weights).sum(axis=-1))
+    """Pack (B, n) float activations → uint64 words.
+
+    Delegates to :func:`pack_binary_pm1`, which uses ``np.packbits``. The
+    previous shift-multiply-sum expanded the batch to a (B, words, 64) uint64
+    temporary — ~6.5x slower for identical output, and once the native GEMM got
+    faster this packing dominated the whole forward pass.
+    """
+    xp, _ = pack_binary_pm1(x2, axis=1)
+    return xp
 
 
 class PackedBinaryXNORLinear(nn.Module):
@@ -52,6 +53,15 @@ class PackedBinaryXNORLinear(nn.Module):
 
     Weights are packed **once** at construction and cached on the module.
     """
+
+    # nn.Module.__getattr__ is typed as returning Tensor | Module, so buffers
+    # must be declared for a type checker to see them as tensors.
+    weight_packed_i64: Tensor
+    alpha: Tensor
+    bias: Tensor | None
+    _wp_np: np.ndarray
+    _alpha_np: np.ndarray
+    _bias_np: np.ndarray | None
 
     def __init__(
         self,
@@ -86,7 +96,7 @@ class PackedBinaryXNORLinear(nn.Module):
         if bias is not None:
             self.register_buffer("bias", bias.detach().float().cpu().contiguous().clone())
         else:
-            self.bias = None  # type: ignore[assignment]
+            self.bias = None
         self.uses_native = native_kernel_available()
         self._sync_numpy_views()
 
@@ -103,7 +113,7 @@ class PackedBinaryXNORLinear(nn.Module):
             else np.ascontiguousarray(self.bias.detach().cpu().numpy(), dtype=np.float32)
         )
 
-    def _load_from_state_dict(self, *args, **kwargs):  # type: ignore[override]
+    def _load_from_state_dict(self, *args, **kwargs) -> None:
         super()._load_from_state_dict(*args, **kwargs)
         self._sync_numpy_views()
         self.uses_native = native_kernel_available()
@@ -120,15 +130,23 @@ class PackedBinaryXNORLinear(nn.Module):
         x_cpu = x.detach().to(dtype=torch.float32, device="cpu").contiguous()
         x2 = x_cpu.reshape(-1, self.in_features).numpy()
         xp = _pack_activations_fast(x2, self._n)
+        y = None
         if self.uses_native:
-            y = binary_gemm_native_prepacked(xp, self._wp_np, self._n)
-            assert y is not None
-        else:
-            y = binary_gemm_numpy_prepacked(xp, self._wp_np, self._n)
-        # Fused scale (+ bias) in-place on numpy
-        y *= self._alpha_np
-        if self._bias_np is not None:
-            y += self._bias_np
+            # Preferred: alpha/bias folded into the kernel, so the (B, M)
+            # output is written once instead of re-read twice by NumPy.
+            y = binary_gemm_native_scaled(
+                xp, self._wp_np, self._n, self._alpha_np, self._bias_np
+            )
+        if y is None:
+            if self.uses_native:
+                y = binary_gemm_native_prepacked(xp, self._wp_np, self._n)
+                assert y is not None
+            else:
+                y = binary_gemm_numpy_prepacked(xp, self._wp_np, self._n)
+            # Unfused fallback: scale (+ bias) in-place on numpy
+            y *= self._alpha_np
+            if self._bias_np is not None:
+                y += self._bias_np
         out = torch.from_numpy(np.ascontiguousarray(y))
         if x.device.type != "cpu":
             out = out.to(x.device)
@@ -150,6 +168,12 @@ class PackedBinaryXNORLinear(nn.Module):
 
 class TernaryWeightOnlyLinear(nn.Module):
     """Accurate-first weight-only ternary (FP activations, FP GEMM after dequant)."""
+
+    # Buffers declared for the type checker: nn.Module.__getattr__ is
+    # typed as Tensor | Module.
+    weight_q: Tensor
+    scale: Tensor
+    bias: Tensor | None
 
     def __init__(
         self,
@@ -178,7 +202,7 @@ class TernaryWeightOnlyLinear(nn.Module):
         if bias is not None:
             self.register_buffer("bias", bias.detach().float().cpu().clone())
         else:
-            self.bias = None  # type: ignore[assignment]
+            self.bias = None
 
     def extra_repr(self) -> str:
         return (
@@ -207,6 +231,13 @@ class TernaryWeightOnlyLinear(nn.Module):
 
 
 class BinaryWeightOnlyDequantLinear(nn.Module):
+    # Buffers declared for the type checker: nn.Module.__getattr__ is
+    # typed as Tensor | Module.
+    weight_pm1: Tensor
+    alpha: Tensor
+    bias: Tensor | None
+    _wp_np: np.ndarray
+
     def __init__(self, weight: Tensor, bias: Tensor | None = None):
         super().__init__()
         out_f, in_f = weight.shape
@@ -221,7 +252,7 @@ class BinaryWeightOnlyDequantLinear(nn.Module):
         if bias is not None:
             self.register_buffer("bias", bias.detach().float().cpu().clone())
         else:
-            self.bias = None  # type: ignore[assignment]
+            self.bias = None
 
     def forward(self, x: Tensor) -> Tensor:
         w = self.weight_pm1.to(x.device) * self.alpha.to(x.device)
@@ -237,6 +268,13 @@ class BinaryWeightOnlyDequantLinear(nn.Module):
 
 class PackedBinaryConv2d(nn.Module):
     """Packed ±1 Conv2d weights (size win). Forward = dequant + F.conv2d."""
+
+    # Buffers declared for the type checker: nn.Module.__getattr__ is
+    # typed as Tensor | Module.
+    weight_pm1: Tensor
+    alpha: Tensor
+    bias: Tensor | None
+    _wp_np: np.ndarray
 
     def __init__(
         self,
@@ -270,7 +308,7 @@ class PackedBinaryConv2d(nn.Module):
         if bias is not None:
             self.register_buffer("bias", bias.detach().float().cpu().clone())
         else:
-            self.bias = None  # type: ignore[assignment]
+            self.bias = None
 
     def extra_repr(self) -> str:
         return (
@@ -291,3 +329,11 @@ class PackedBinaryConv2d(nn.Module):
 
     def packed_weight_bytes(self) -> int:
         return int(self._wp_np.nbytes)
+
+
+# The packed replacement modules all expose packed_weight_bytes(); naming the
+# union keeps that visible to type checkers, which a bare `nn.Module`
+# annotation would erase.
+PackedLinearLike = (
+    PackedBinaryXNORLinear | TernaryWeightOnlyLinear | BinaryWeightOnlyDequantLinear
+)

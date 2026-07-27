@@ -20,4 +20,4 @@
 - [x] Train/bench/export scripts
 - [x] Linear wrap + hybrid FFN sketch + CIFAR proxy + energy/FGSM proxies
 
-**Next:** Phase A in root [`ROADMAP.md`](../ROADMAP.md) (API freeze / `bnn optimise`); parallel **W11.T01** LICENSE.
+**Next:** follow root [`ROADMAP.md`](../ROADMAP.md) §10 / §11.2 (lowest unchecked). W2.T04/T05 portable SIMD **done** (`docs/41`).

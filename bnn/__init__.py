@@ -23,14 +23,14 @@ from .layers import (
     BinaryLinear,
     BiRealBlock,
     TernaryLinear,
-    fuse_bireal_bn_,
     fuse_binary_conv_bn_,
+    fuse_bireal_bn_,
 )
 from .models import build_model, count_parameters
-from .ste import binary_sign, clip_weights_, ternary_weight
 from .optimise import OptimiseConfig, OptimiseResult, optimise_model
-from .wrapper import model_param_bytes, wrap_linear_modules, wrap_model
+from .ste import binary_sign, clip_weights_, ternary_weight
 from .wrap.policy import recommend_wrap_policy
+from .wrapper import model_param_bytes, wrap_linear_modules, wrap_model
 
 __all__ = [
     "__version__",

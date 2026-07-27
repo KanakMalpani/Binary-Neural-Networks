@@ -19,6 +19,7 @@ sys.path.insert(0, str(ROOT))
 from bnn.data import get_mnist_loaders  # noqa: E402
 from bnn.determinism import set_repro_seed  # noqa: E402
 from bnn.models import build_model, count_parameters  # noqa: E402
+from bnn.paths import repo_relative  # noqa: E402
 
 
 def set_seed(seed: int) -> None:
@@ -116,7 +117,7 @@ def train_one(
         "sim_images_per_sec": ips,
         "params": count_parameters(model),
         "history": history,
-        "checkpoint": str(ckpt_path),
+        "checkpoint": repo_relative(ckpt_path),
     }
     return result
 

@@ -1,151 +1,12 @@
 {
   "schema": "ultra_wrap_suite_v1",
   "primary": {
-    "schema": "ultra_wrap_report_v1",
+    "schema": "bnn_optimise_report_v1",
+    "schema_version": 1,
     "policy": "hybrid_ffn",
     "mode": "binary_xnor",
     "policy_reason": "CPU + native XNOR DLL + wide FFN \u2192 binary_xnor hybrid",
-    "auto_recommendation": {
-      "policy": "hybrid_ffn",
-      "mode": "binary_xnor",
-      "reason": "CPU + native XNOR DLL + wide FFN \u2192 binary_xnor hybrid",
-      "fallback_note": ""
-    },
-    "replaced": [
-      "ffn_fc1",
-      "ffn_fc2"
-    ],
-    "skipped": [
-      "embed (not FFN allowlist)",
-      "attn_qkv (not FFN allowlist)",
-      "lm_head (not FFN allowlist)"
-    ],
-    "compression_replaced_weights": 32.0,
-    "fp32_weight_bytes_replaced": 8388608,
-    "packed_weight_bytes": 262144,
-    "param_bytes_before": {
-      "param_bytes": 11077672,
-      "buffer_bytes": 0,
-      "total_bytes": 11077672
-    },
-    "param_bytes_after": {
-      "param_bytes": 2678824,
-      "buffer_bytes": 282624,
-      "total_bytes": 2961448
-    },
-    "calib_method": "absmean",
-    "qat": {
-      "steps": 40,
-      "skipped": false,
-      "last_loss": 0.019663995131850243,
-      "restored_linears": [
-        "ffn_fc1",
-        "ffn_fc2"
-      ],
-      "note": "Light STE only; production needs BitDistill-scale QAT on real data"
-    },
-    "effectiveness": {
-      "cosine": 0.7090919017791748,
-      "kl_div": 0.022228294983506203,
-      "top1_agreement": 0.4375,
-      "n_samples": 32,
-      "drop_in_threshold": 0.85,
-      "drop_in_ok": false,
-      "notes": "Below drop-in threshold (0.709 < 0.85); refuse to claim drop-in unless --force"
-    },
-    "drop_in_ok": true,
-    "forced": true,
-    "status": "OK",
-    "native_kernel": true,
-    "e2e_latency_ms_fp": 2.452496000332758,
-    "e2e_latency_ms_wrapped": 2.274603999685496,
-    "e2e_speedup": 1.0782078993406583,
-    "samples_per_s_fp": 13047.931574876451,
-    "samples_per_s_wrapped": 14068.382894088187,
-    "layer_microbench": {
-      "linear_fp_ms": 0.6441839999752119,
-      "linear_wrapped_forward_ms": 0.5517199996393174,
-      "speedup_wrapped_vs_torch": 1.1675922576603026,
-      "linear_gemm_only_ms": 0.45844800013583153,
-      "speedup_gemm_only_vs_torch": 1.4051408224800839
-    },
-    "d_model": 512,
-    "ff": 2048,
-    "batch": 32
-  },
-  "ternary_accurate_path": {
-    "schema": "ultra_wrap_report_v1",
-    "policy": "ternary_wo",
-    "mode": "ternary_weight_only",
-    "policy_reason": "policy=ternary_wo (accurate-first weight-only)",
-    "auto_recommendation": {
-      "policy": "hybrid_ffn",
-      "mode": "binary_xnor",
-      "reason": "CPU + native XNOR DLL + wide FFN \u2192 binary_xnor hybrid",
-      "fallback_note": ""
-    },
-    "replaced": [
-      "ffn_fc1",
-      "ffn_fc2"
-    ],
-    "skipped": [
-      "embed (not FFN allowlist)",
-      "attn_qkv (not FFN allowlist)",
-      "lm_head (not FFN allowlist)"
-    ],
-    "compression_replaced_weights": 16.0,
-    "fp32_weight_bytes_replaced": 8388608,
-    "packed_weight_bytes": 524288,
-    "param_bytes_before": {
-      "param_bytes": 11077672,
-      "buffer_bytes": 0,
-      "total_bytes": 11077672
-    },
-    "param_bytes_after": {
-      "param_bytes": 2678824,
-      "buffer_bytes": 2117632,
-      "total_bytes": 4796456
-    },
-    "calib_method": "absmean",
-    "qat": {
-      "steps": 40,
-      "skipped": false,
-      "last_loss": 0.0,
-      "kind": "fp_mse_distill_pre_ternary",
-      "note": "FP distill then ternary snap \u2014 not BinaryLinear STE"
-    },
-    "effectiveness": {
-      "cosine": 0.9904898405075073,
-      "kl_div": 0.0005868007428944111,
-      "top1_agreement": 0.75,
-      "n_samples": 32,
-      "drop_in_threshold": 0.85,
-      "drop_in_ok": true,
-      "notes": "Meets drop-in cosine threshold"
-    },
-    "drop_in_ok": true,
-    "forced": true,
-    "status": "OK",
-    "native_kernel": true,
-    "e2e_latency_ms_fp": 1.470056000398472,
-    "e2e_latency_ms_wrapped": 2.3930679995100945,
-    "e2e_speedup": 0.6142976299459187,
-    "samples_per_s_fp": 21767.878224588796,
-    "samples_per_s_wrapped": 13371.956002316272,
-    "layer_microbench": {
-      "linear_fp_ms": 0.3685799997765571,
-      "linear_wrapped_forward_ms": 0.7499280001502484,
-      "speedup_wrapped_vs_torch": 0.4914871823731237
-    },
-    "d_model": 512,
-    "ff": 2048,
-    "batch": 32
-  },
-  "binary_hybrid_baseline": {
-    "schema": "ultra_wrap_report_v1",
-    "policy": "hybrid_ffn",
-    "mode": "binary_xnor",
-    "policy_reason": "policy=hybrid_ffn mode=binary_xnor",
+    "thesis_note": "Compression is theoretical pack ratio; latency fields are wall-clock. Never claim GPU 32\u00d7 from sign()/STE.",
     "auto_recommendation": {
       "policy": "hybrid_ffn",
       "mode": "binary_xnor",
@@ -177,39 +38,180 @@
     "calib_method": "absmean",
     "qat": null,
     "effectiveness": {
-      "cosine": 0.7072896957397461,
-      "kl_div": 0.032086193561553955,
-      "top1_agreement": 0.3125,
-      "n_samples": 32,
+      "cosine": 0.6987784504890442,
+      "kl_div": 0.030751163139939308,
+      "top1_agreement": 0.34375,
+      "n_samples": 64,
       "drop_in_threshold": 0.85,
       "drop_in_ok": false,
-      "notes": "Below drop-in threshold (0.707 < 0.85); refuse to claim drop-in unless --force"
+      "notes": "Below drop-in threshold (0.699 < 0.85); refuse to claim drop-in unless --force"
+    },
+    "drop_in_ok": false,
+    "forced": false,
+    "status": "REFUSE_DROP_IN_CLAIM",
+    "native_kernel": true,
+    "e2e_latency_ms_fp": 3.012964001391083,
+    "e2e_latency_ms_wrapped": 1.8767160014249384,
+    "e2e_speedup": 1.6054448297469746,
+    "samples_per_s_fp": 21241.541541967064,
+    "samples_per_s_wrapped": 34102.1230444066,
+    "layer_microbench": {
+      "linear_fp_ms": 0.702076000161469,
+      "linear_wrapped_forward_ms": 0.4462679987773299,
+      "speedup_wrapped_vs_torch": 1.5732160990368864,
+      "linear_gemm_only_ms": 0.3785480000078678,
+      "speedup_gemm_only_vs_torch": 1.8546551564052032
+    },
+    "d_model": 512,
+    "ff": 2048,
+    "batch": 64,
+    "schema_legacy": "ultra_wrap_report_v1"
+  },
+  "ternary_accurate_path": {
+    "schema": "bnn_optimise_report_v1",
+    "schema_version": 1,
+    "policy": "ternary_wo",
+    "mode": "ternary_weight_only",
+    "policy_reason": "policy=ternary_wo (accurate-first weight-only)",
+    "thesis_note": "Compression is theoretical pack ratio; latency fields are wall-clock. Never claim GPU 32\u00d7 from sign()/STE.",
+    "auto_recommendation": {
+      "policy": "hybrid_ffn",
+      "mode": "binary_xnor",
+      "reason": "CPU + native XNOR DLL + wide FFN \u2192 binary_xnor hybrid",
+      "fallback_note": ""
+    },
+    "replaced": [
+      "ffn_fc1",
+      "ffn_fc2"
+    ],
+    "skipped": [
+      "embed (not FFN allowlist)",
+      "attn_qkv (not FFN allowlist)",
+      "lm_head (not FFN allowlist)"
+    ],
+    "compression_replaced_weights": 16.0,
+    "fp32_weight_bytes_replaced": 8388608,
+    "packed_weight_bytes": 524288,
+    "param_bytes_before": {
+      "param_bytes": 11077672,
+      "buffer_bytes": 0,
+      "total_bytes": 11077672
+    },
+    "param_bytes_after": {
+      "param_bytes": 2678824,
+      "buffer_bytes": 2117632,
+      "total_bytes": 4796456
+    },
+    "calib_method": "absmean",
+    "qat": {
+      "steps": 20,
+      "skipped": false,
+      "last_loss": 0.0,
+      "kind": "fp_mse_distill_pre_ternary",
+      "note": "FP distill then ternary snap \u2014 not BinaryLinear STE"
+    },
+    "effectiveness": {
+      "cosine": 0.9909882545471191,
+      "kl_div": 0.000540819251909852,
+      "top1_agreement": 0.828125,
+      "n_samples": 64,
+      "drop_in_threshold": 0.85,
+      "drop_in_ok": true,
+      "notes": "Meets drop-in cosine threshold"
     },
     "drop_in_ok": true,
     "forced": true,
     "status": "OK",
     "native_kernel": true,
-    "e2e_latency_ms_fp": 2.3968279996188357,
-    "e2e_latency_ms_wrapped": 3.0086159997154027,
-    "e2e_speedup": 0.7966546743903382,
-    "samples_per_s_fp": 13350.978879205732,
-    "samples_per_s_wrapped": 10636.119731805924,
+    "e2e_latency_ms_fp": 3.291279999539256,
+    "e2e_latency_ms_wrapped": 4.484039999078959,
+    "e2e_speedup": 0.7339988046973933,
+    "samples_per_s_fp": 19445.322187404083,
+    "samples_per_s_wrapped": 14272.843242510298,
     "layer_microbench": {
-      "linear_fp_ms": 0.5416519998107105,
-      "linear_wrapped_forward_ms": 2.0605320000322536,
-      "speedup_wrapped_vs_torch": 0.2628699771720274,
-      "linear_gemm_only_ms": 1.4906160003738478,
-      "speedup_gemm_only_vs_torch": 0.36337460464322385
+      "linear_fp_ms": 0.8335560001432896,
+      "linear_wrapped_forward_ms": 1.9041719986125827,
+      "speedup_wrapped_vs_torch": 0.4377524723347654
     },
     "d_model": 512,
     "ff": 2048,
-    "batch": 32
+    "batch": 64,
+    "schema_legacy": "ultra_wrap_report_v1"
   },
-  "wide_efficiency_probe": {
-    "schema": "ultra_wrap_report_v1",
+  "binary_hybrid_baseline": {
+    "schema": "bnn_optimise_report_v1",
+    "schema_version": 1,
     "policy": "hybrid_ffn",
     "mode": "binary_xnor",
     "policy_reason": "policy=hybrid_ffn mode=binary_xnor",
+    "thesis_note": "Compression is theoretical pack ratio; latency fields are wall-clock. Never claim GPU 32\u00d7 from sign()/STE.",
+    "auto_recommendation": {
+      "policy": "hybrid_ffn",
+      "mode": "binary_xnor",
+      "reason": "CPU + native XNOR DLL + wide FFN \u2192 binary_xnor hybrid",
+      "fallback_note": ""
+    },
+    "replaced": [
+      "ffn_fc1",
+      "ffn_fc2"
+    ],
+    "skipped": [
+      "embed (not FFN allowlist)",
+      "attn_qkv (not FFN allowlist)",
+      "lm_head (not FFN allowlist)"
+    ],
+    "compression_replaced_weights": 32.0,
+    "fp32_weight_bytes_replaced": 8388608,
+    "packed_weight_bytes": 262144,
+    "param_bytes_before": {
+      "param_bytes": 11077672,
+      "buffer_bytes": 0,
+      "total_bytes": 11077672
+    },
+    "param_bytes_after": {
+      "param_bytes": 2678824,
+      "buffer_bytes": 282624,
+      "total_bytes": 2961448
+    },
+    "calib_method": "absmean",
+    "qat": null,
+    "effectiveness": {
+      "cosine": 0.6987784504890442,
+      "kl_div": 0.030751163139939308,
+      "top1_agreement": 0.34375,
+      "n_samples": 64,
+      "drop_in_threshold": 0.85,
+      "drop_in_ok": false,
+      "notes": "Below drop-in threshold (0.699 < 0.85); refuse to claim drop-in unless --force"
+    },
+    "drop_in_ok": true,
+    "forced": true,
+    "status": "OK",
+    "native_kernel": true,
+    "e2e_latency_ms_fp": 3.229315998032689,
+    "e2e_latency_ms_wrapped": 2.0245880004949868,
+    "e2e_speedup": 1.5950484726982286,
+    "samples_per_s_fp": 19818.438343905964,
+    "samples_per_s_wrapped": 31611.369811711218,
+    "layer_microbench": {
+      "linear_fp_ms": 0.7459719991311431,
+      "linear_wrapped_forward_ms": 0.36505599971860647,
+      "speedup_wrapped_vs_torch": 2.0434453883956305,
+      "linear_gemm_only_ms": 0.36576399812474847,
+      "speedup_gemm_only_vs_torch": 2.039489952416585
+    },
+    "d_model": 512,
+    "ff": 2048,
+    "batch": 64,
+    "schema_legacy": "ultra_wrap_report_v1"
+  },
+  "wide_efficiency_probe": {
+    "schema": "bnn_optimise_report_v1",
+    "schema_version": 1,
+    "policy": "hybrid_ffn",
+    "mode": "binary_xnor",
+    "policy_reason": "policy=hybrid_ffn mode=binary_xnor",
+    "thesis_note": "Compression is theoretical pack ratio; latency fields are wall-clock. Never claim GPU 32\u00d7 from sign()/STE.",
     "auto_recommendation": {
       "policy": "hybrid_ffn",
       "mode": "binary_xnor",
@@ -253,31 +255,32 @@
     "forced": true,
     "status": "OK",
     "native_kernel": true,
-    "e2e_latency_ms_fp": 27.7338879997842,
-    "e2e_latency_ms_wrapped": 10.709335999563336,
-    "e2e_speedup": 2.5896925823333046,
-    "samples_per_s_fp": 1153.823077393584,
-    "samples_per_s_wrapped": 2988.0470648511514,
+    "e2e_latency_ms_fp": 28.098143998067826,
+    "e2e_latency_ms_wrapped": 6.9727119989693165,
+    "e2e_speedup": 4.029729609113527,
+    "samples_per_s_fp": 1138.8652575131114,
+    "samples_per_s_wrapped": 4589.319048991287,
     "layer_microbench": {
-      "linear_fp_ms": 12.122584000462666,
-      "linear_wrapped_forward_ms": 17.817032000166364,
-      "speedup_wrapped_vs_torch": 0.6803930082378185,
-      "linear_gemm_only_ms": 4.91221200034488,
-      "speedup_gemm_only_vs_torch": 2.4678462573707236
+      "linear_fp_ms": 13.78838799893856,
+      "linear_wrapped_forward_ms": 1.6248040017671883,
+      "speedup_wrapped_vs_torch": 8.486185400787956,
+      "linear_gemm_only_ms": 1.4679080015048385,
+      "speedup_gemm_only_vs_torch": 9.393223543167062
     },
     "d_model": 2048,
     "ff": 8192,
-    "batch": 32
+    "batch": 32,
+    "schema_legacy": "ultra_wrap_report_v1"
   },
   "before_after": {
     "legacy_binary_ptq_cosine_doc": 0.28,
-    "binary_hybrid_calib_cosine": 0.7072896957397461,
-    "binary_hybrid_qat_cosine": 0.7090919017791748,
-    "ternary_hybrid_calib_cosine": 0.9904898405075073,
+    "binary_hybrid_calib_cosine": 0.6987784504890442,
+    "binary_hybrid_qat_cosine": null,
+    "ternary_hybrid_calib_cosine": 0.9909882545471191,
     "ternary_compression": 16.0,
     "binary_compression": 32.0,
-    "binary_gemm_only_speedup_demo_shape": 0.36337460464322385,
-    "binary_gemm_only_speedup_wide": 2.4678462573707236,
+    "binary_gemm_only_speedup_demo_shape": 2.039489952416585,
+    "binary_gemm_only_speedup_wide": 9.393223543167062,
     "prior_wrap_demo_gemm_speedup": 2.12
   },
   "thesis_lock": "CPU/edge packed kernels; no fake GPU 32\u00d7; ternary path is size/accuracy-first without ternary GEMM; GPU production stays INT4/FP8"

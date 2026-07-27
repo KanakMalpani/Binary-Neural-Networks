@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from pathlib import Path
 
+import pytest
 import torch
 import torch.nn as nn
 
@@ -43,7 +44,8 @@ def test_bnnpack_file_roundtrip(tmp_path: Path):
     # Defaults: BinaryLinear only (not FP Linear stem)
     assert len(modules) == 1
     name, mod = next(iter(modules.items()))
-    assert "2" in name or True
+    # nn.Sequential names children by index; BinaryLinear is child 2.
+    assert name.endswith("2")
     x = torch.randn(4, mod.in_features)
     y = mod(x)
     assert y.shape == (4, mod.out_features)
@@ -74,11 +76,10 @@ def test_cli_encode_decode(tmp_path: Path):
 def test_decode_rejects_bad_magic(tmp_path: Path):
     path = tmp_path / "bad.bnnpack"
     torch.save({"magic": "NOPE", "version": 1, "layers": {}}, path)
-    try:
+    with pytest.raises(ValueError) as excinfo:
         load_bnnpack(path)
-        assert False, "expected ValueError"
-    except ValueError as e:
-        assert "magic" in str(e).lower() or "BNNPACK" in str(e)
+    msg = str(excinfo.value)
+    assert "magic" in msg.lower() or "BNNPACK" in msg
 
 
 def test_encode_skips_attn_when_fp_linear_off():

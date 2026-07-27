@@ -82,9 +82,11 @@ def compare_goldens() -> tuple[str, int]:
     g = floors["mnist"]
     if by.get("binary_mlp", 0) < g["binary_mlp_min_acc"]:
         failures.append(f"mnist binary_mlp {by.get('binary_mlp')} < {g['binary_mlp_min_acc']}")
-    if by.get("fp32_mlp", 0) >= g["fp_for_gap_gate"]:
-        if (by["fp32_mlp"] - by["binary_mlp"]) > g["gap_max_pp_fp_vs_binary"]:
-            failures.append("mnist gap too large")
+    if (
+        by.get("fp32_mlp", 0) >= g["fp_for_gap_gate"]
+        and (by["fp32_mlp"] - by["binary_mlp"]) > g["gap_max_pp_fp_vs_binary"]
+    ):
+        failures.append("mnist gap too large")
 
     # Image
     img = json.loads((ROOT / "results" / "image_cifar.json").read_text(encoding="utf-8"))

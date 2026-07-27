@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import contextlib
 import os
 import shutil
 import subprocess
@@ -85,15 +86,16 @@ def _compile_msvc(openmp: bool) -> int:
         return int(r.returncode)
 
     if cl is not None:
-        # Already in a developer prompt
-        cmd = ["cl", "/nologo", "/O2"]
+        # Already in a developer prompt. Distinct name from the shell string
+        # built above -- this branch passes an argv list, not a command line.
+        argv = ["cl", "/nologo", "/O2"]
         if openmp:
-            cmd.append("/openmp")
-        cmd += ["/LD", f"/Fe:{DLL.name}", SRC.name]
+            argv.append("/openmp")
+        argv += ["/LD", f"/Fe:{DLL.name}", SRC.name]
         if DEF.exists():
-            cmd.append(f"/DEF:{DEF.name}")
-        print("Running:", " ".join(cmd))
-        r = subprocess.run(cmd, cwd=str(HERE))
+            argv.append(f"/DEF:{DEF.name}")
+        print("Running:", " ".join(argv))
+        r = subprocess.run(argv, cwd=str(HERE))
         return int(r.returncode)
 
     print(
@@ -108,25 +110,78 @@ def _compile_msvc(openmp: bool) -> int:
     return 1
 
 
-def _compile_gcc(openmp: bool) -> int:
-    cc = shutil.which("gcc") or shutil.which("clang")
-    if cc is None:
-        print("ERROR: gcc/clang not found on PATH", file=sys.stderr)
-        return 1
-    cmd = [cc, "-O3", "-shared", "-fPIC", "-o", str(DLL), str(SRC)]
+def _brew_libomp() -> Path | None:
+    """Homebrew libomp prefix, if present (Apple clang ships no OpenMP)."""
+    brew = shutil.which("brew")
+    if brew is None:
+        return None
+    try:
+        r = subprocess.run(
+            [brew, "--prefix", "libomp"], capture_output=True, text=True, timeout=30, check=False
+        )
+    except (OSError, subprocess.TimeoutExpired):
+        return None
+    prefix = (r.stdout or "").strip()
+    if not prefix:
+        return None
+    p = Path(prefix)
+    return p if (p / "include").is_dir() else None
+
+
+def unix_compile_commands(cc: str, out: Path, src: Path, openmp: bool) -> list[list[str]]:
+    """Candidate compiler invocations, most-preferred first.
+
+    Deliberately no ``-march=native``: the library selects AVX2 / AVX-512 /
+    NEON at *run* time, so the object must stay portable to any CPU of the
+    same architecture. Baking in build-host ISA would produce binaries that
+    SIGILL on older machines — the opposite of what runtime dispatch is for.
+    """
+    base = ["-O3", "-shared", "-fPIC"]
+    cmds: list[list[str]] = []
     if openmp:
-        # Insert -fopenmp before -o
-        cmd = [cc, "-O3", "-fopenmp", "-shared", "-fPIC", "-o", str(DLL), str(SRC)]
-    print("Running:", " ".join(cmd))
-    r = subprocess.run(cmd, cwd=str(HERE))
-    if r.returncode != 0 and openmp:
-        print("OpenMP build failed — retrying without -fopenmp", flush=True)
+        cmds.append([cc, *base, "-fopenmp", "-o", str(out), str(src)])
+        libomp = _brew_libomp() if sys.platform == "darwin" else None
+        if libomp is not None:
+            # Apple clang needs libomp routed through the preprocessor.
+            cmds.append([
+                cc, *base,
+                "-Xpreprocessor", "-fopenmp",
+                f"-I{libomp / 'include'}",
+                f"-L{libomp / 'lib'}",
+                "-lomp",
+                "-o", str(out), str(src),
+            ])
+    # Single-threaded fallback always builds; correctness never depends on OpenMP.
+    cmds.append([cc, *base, "-o", str(out), str(src)])
+    return cmds
+
+
+def _compile_gcc(openmp: bool) -> int:
+    cc = shutil.which("gcc") or shutil.which("clang") or shutil.which("cc")
+    if cc is None:
+        print(
+            "ERROR: no C compiler found on PATH (looked for gcc, clang, cc).\n"
+            "  Debian/Ubuntu: sudo apt-get install gcc libomp-dev\n"
+            "  Fedora/RHEL:   sudo dnf install gcc libomp-devel\n"
+            "  macOS:         xcode-select --install && brew install libomp\n"
+            "  Alpine:        apk add build-base\n"
+            "  Without a compiler the NumPy fallback still gives correct results.",
+            file=sys.stderr,
+        )
+        return 1
+
+    rc = 1
+    for cmd in unix_compile_commands(cc, DLL, SRC, openmp):
+        print("Running:", " ".join(cmd))
+        r = subprocess.run(cmd, cwd=str(HERE))
+        rc = int(r.returncode)
+        if rc == 0 and DLL.exists():
+            return 0
         if DLL.exists():
-            DLL.unlink()
-        cmd2 = [cc, "-O3", "-shared", "-fPIC", "-o", str(DLL), str(SRC)]
-        print("Running:", " ".join(cmd2))
-        r = subprocess.run(cmd2, cwd=str(HERE))
-    return int(r.returncode)
+            with contextlib.suppress(OSError):
+                DLL.unlink()
+        print("  -> failed, trying next configuration", flush=True)
+    return rc
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -161,10 +216,8 @@ def main(argv: list[str] | None = None) -> int:
         if rc != 0 and openmp:
             print("OpenMP build failed — retrying without /openmp", flush=True)
             if DLL.exists():
-                try:
+                with contextlib.suppress(OSError):
                     DLL.unlink()
-                except OSError:
-                    pass
             rc = _compile_msvc(openmp=False)
     else:
         rc = _compile_gcc(openmp)
@@ -178,6 +231,9 @@ def main(argv: list[str] | None = None) -> int:
             import bnn.kernels.packed as packed
 
             packed._NATIVE = None
+            # Must clear the sticky "already tried and failed" flag too, or a
+            # rebuild after a failed load would never be picked up.
+            packed._NATIVE_TRIED = False
             packed._THREADS_APPLIED = None
         except Exception:
             pass

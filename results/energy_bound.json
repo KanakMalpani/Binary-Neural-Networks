@@ -1,19 +1,19 @@
 {
-  "source_latency": "C:\\Users\\mrkan\\CRAZZY\\Binary Neural Network\\results\\wrap_demo.json",
+  "source_latency": "results/wrap_demo.json",
   "measured_latency_s": {
-    "fp": 0.021553476666789115,
-    "binary_wrap": 0.01865172999993471
+    "fp": 0.03413500333360086,
+    "binary_wrap": 0.007088746665976942
   },
   "assumed_power_w": {
     "fp": 35.0,
     "binary": 25.0
   },
   "energy_j": {
-    "fp": 0.7543716833376191,
-    "binary": 0.46629324999836774
+    "fp": 1.19472511667603,
+    "binary": 0.17721866664942354
   },
-  "energy_reduction_factor_if_power_as_assumed": 1.617805283135151,
-  "energy_reduction_latency_only_same_power": 1.1555752022393935,
+  "energy_reduction_factor_if_power_as_assumed": 6.741530896626437,
+  "energy_reduction_latency_only_same_power": 4.815379211876027,
   "board_joules_status": "CLOSED-BY-PROXY: no RAPL API used; E=P*t with measured t from wrap_demo + assumed P brackets + literature anchors. Sufficient for decision thesis.",
   "literature": {
     "bitnet_cpp_cpu_energy_reduction_pct": "55\u201382% (Microsoft bitnet.cpp reports)",

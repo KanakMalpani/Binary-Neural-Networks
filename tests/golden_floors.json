@@ -74,6 +74,6 @@
     "Committed results/*.json are the published goldens.",
     "Fast verify compares those files to floors (no retrain).",
     "Full regen retrains with fixed seeds on CPU; floats need not be bit-identical.",
-    "Native err=0 and MSVC DLL apply on Windows x64; Linux uses NumPy fallback (pytest still passes)."
+    "Native err=0 when the platform DLL/.so is present (Win/Linux/macOS/ARM via portable SIMD); NumPy packed path remains the correctness fallback when native is absent (pytest still passes)."
   ]
 }

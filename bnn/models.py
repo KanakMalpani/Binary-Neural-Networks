@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-import torch
 import torch.nn as nn
 
 from .layers import BinaryConv2d, BinaryLinear, BiRealBlock, TernaryLinear
@@ -141,7 +140,7 @@ class BinaryCNN(nn.Module):
 def count_parameters(model: nn.Module) -> dict:
     total = sum(p.numel() for p in model.parameters())
     binaryish = 0
-    for name, module in model.named_modules():
+    for _name, module in model.named_modules():
         if isinstance(module, (BinaryLinear, BinaryConv2d, TernaryLinear)):
             binaryish += module.weight.numel()
     return {

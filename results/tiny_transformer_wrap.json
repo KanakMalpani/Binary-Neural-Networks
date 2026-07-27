@@ -4,8 +4,8 @@
   "ff": 512,
   "depth": 2,
   "policy": "hybrid_ffn",
-  "qat_steps": 20,
-  "qat_seconds": 1.6373703999997815,
+  "qat_steps": 40,
+  "qat_seconds": 0.513882500003092,
   "replaced": [
     "blocks.0.ffn_fc1",
     "blocks.0.ffn_fc2",
@@ -25,8 +25,8 @@
   "packed_weight_bytes": 32768,
   "native_kernel": true,
   "agreement": {
-    "cosine": 0.9075151681900024,
-    "kl_div": 0.311361163854599,
+    "cosine": 0.9261711239814758,
+    "kl_div": 0.27177613973617554,
     "top1_agreement": 0.96875,
     "n_samples": 32,
     "drop_in_threshold": 0.85,
@@ -43,8 +43,8 @@
     "buffer_bytes": 43008,
     "total_bytes": 613928
   },
-  "wrapped_forward_ms": 8.01837999970303,
-  "bnnpack": "C:\\Users\\mrkan\\CRAZZY\\Binary Neural Network\\results\\_tiny_transformer.bnnpack",
+  "wrapped_forward_ms": 2.445045000058599,
+  "bnnpack": "results/_tiny_transformer.bnnpack",
   "codec_roundtrip": {
     "max_abs_err": 0.0,
     "compression": 32.0,

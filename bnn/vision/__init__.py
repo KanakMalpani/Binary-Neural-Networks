@@ -5,8 +5,8 @@ from __future__ import annotations
 from pathlib import Path
 
 from .models import (
-    BinaryCIFARCNN,
     FP32CIFARCNN,
+    BinaryCIFARCNN,
     TinyBinaryViT,
     build_vision_model,
 )

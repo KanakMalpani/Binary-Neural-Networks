@@ -1,15 +1,15 @@
 # Results summary (this workspace)
 
-_Regenerated: 2026-07-24T20:02:19.372324+00:00_
-_Machine: Windows-11-10.0.26200-SP0 | torch 2.12.0+cpu | CUDA=False_
+_Regenerated: 2026-07-27T18:32:16.638133+00:00_
+_Machine: Windows-11-10.0.26200-SP0 | torch 2.10.0+cu128 | CUDA=True_
 
 ## Kernel (CPU packed XNOR)
 
 | Shape | S vs NumPy FP32 | S vs Torch FP32 | Err |
 |-------|----------------:|----------------:|----:|
-| 128×2048×2048 | 5.28 | 2.31 | 0 |
-| 64×4096×4096 | 8.05 | 3.73 | 0 |
-| 32×8192×8192 | 13.96 | 7.55 | 0 |
+| 128×2048×2048 | 11.99 | 5.94 | 0 |
+| 64×4096×4096 | 23.86 | 18.10 | 0 |
+| 32×8192×8192 | 29.25 | 50.73 | 0 |
 
 Compression: **32.0×**. Source: `benchmark.json`.
 
@@ -41,11 +41,11 @@ Source: `audio_synth.json`. **Not production ASR** — INT8 Whisper/ORT for real
 
 ## Wrap / energy / robustness
 
-- Wrap e2e latency: FP **21.55** ms → wrapped **18.65** ms (e2e **1.16×**)
+- Wrap e2e latency: FP **34.14** ms → wrapped **7.09** ms (e2e **4.82×**)
 - Weight compression (replaced layers): **32.0×** (exact bit-pack)
-- Layer gemm_only vs torch Linear: **2.12×** (kernel ROI)
-- Output cosine vs FP: **0.283** (low without QAT is expected — not a transparent wrap)
-- Energy (latency-only, same power proxy): **1.16×** (`energy_bound.json`)
+- Layer gemm_only vs torch Linear: **6.90×** (kernel ROI)
+- Output cosine vs FP: **0.310** (low without QAT is expected — not a transparent wrap)
+- Energy (latency-only, same power proxy): **4.82×** (`energy_bound.json`)
 - FGSM fp32_mlp: clean 97.08% → 62.99% (drop 34.09 pp)
 - FGSM binary_mlp: clean 95.96% → 60.38% (drop 35.58 pp)
 

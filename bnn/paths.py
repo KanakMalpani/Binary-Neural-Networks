@@ -47,3 +47,22 @@ def results_path(*parts: str) -> Path:
     if not parts:
         return base
     return resolve_under(base, Path(*parts))
+
+
+def repo_relative(path: Path | str) -> str:
+    """Path as a POSIX string relative to the repo root, for committed JSON.
+
+    Committed results are read on other people's machines and diffed across
+    them, so an absolute path is both non-portable and a needless disclosure of
+    the author's home directory. Falls back to the bare filename when the path
+    lies outside the repo.
+    """
+    p = Path(path)
+    try:
+        resolved = p.resolve()
+    except OSError:
+        return p.name
+    try:
+        return resolved.relative_to(REPO_ROOT).as_posix()
+    except ValueError:
+        return p.name

@@ -5,7 +5,7 @@ from __future__ import annotations
 import numpy as np
 
 from bnn.kernels.ternary_gemm import pack_and_dequant_roundtrip_gemm
-from bnn.kernels.ternary_pack import pack_ternary_2bit, unpack_ternary_2bit, ternary_bytes
+from bnn.kernels.ternary_pack import pack_ternary_2bit, ternary_bytes, unpack_ternary_2bit
 
 
 def test_ternary_fuzz_roundtrip():

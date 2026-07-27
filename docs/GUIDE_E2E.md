@@ -64,7 +64,7 @@ the **Binary Neural Network Optimiser lab/product** for packed CPU/edge.
 | Item | Requirement |
 |------|-------------|
 | Python | **3.11+** (3.12 recommended; avoid bleeding-edge unless you know torch wheels exist) |
-| OS | Windows x64 (native OpenMP DLL) **or** Linux/macOS (NumPy packed GEMM fallback — correctness OK) |
+| OS | Windows / Linux / macOS (x64 or arm64). Prefer native kernel via `compile_native`; NumPy packed GEMM is the correctness fallback if native is absent |
 | Git | Clone the repo |
 | Disk / RAM | Few hundred MB peak for large GEMM microbenches; `data/` downloads on first train |
 | Windows native (optional but preferred) | **MSVC x64** — Visual Studio 2022 Build Tools + “Desktop development with C++”. Open an **x64 Native Tools** shell if `cl` is missing from PATH |
@@ -122,7 +122,7 @@ Or: `bnn compile-native`.
 |---------|-----|
 | `cl` not found | Install VS Build Tools C++; use **x64 Native Tools** prompt |
 | WinError 193 on load | Rebuild with **MSVC x64**, never MinGW 32-bit |
-| Linux/macOS | Skip compile; NumPy path is used — still run `bnn repro` |
+| Linux/macOS | Run `python -m bnn.kernels.compile_native` (preferred); if `.so` missing, NumPy path is used — still run `bnn repro` |
 
 ### 3.3 Verify — `bnn repro`
 
@@ -485,7 +485,7 @@ Do **not** invent alternate bench shapes as “the” golden.
 | `AttributeError: numpy has no attribute bitwise_count` | Fixed via `bnn.kernels.popcount` LUT fallback (NumPy 1.24+). Upgrade to NumPy 2+ optional; reinstall with `-c constraints.txt` |
 | `REPRO: FAIL` / non-zero exit | Read failing gate; fix env/DLL; do not change shapes or floors without explicit intent |
 | WinError 193 loading DLL | Rebuild with **MSVC x64**; delete MinGW-built DLL; `python -m bnn.kernels.compile_native --force` |
-| `native_kernel_available() == False` | Expected on Linux/macOS; NumPy path must still pass pytest |
+| `native_kernel_available() == False` | Possible if compile/load failed; NumPy path must still pass pytest. Prefer `compile_native` on Linux/macOS/ARM too |
 | `cl` / MSVC missing | VS 2022 Build Tools + C++ workload; **x64 Native Tools** shell |
 | Cosine collapse / `REFUSE_DROP_IN_CLAIM` | Expected for aggressive binary PTQ — use `--policy auto` / ternary / QAT / `--force` with honesty |
 | CIFAR/MNIST download fails | Network; retry; data under `data/` (gitignored — never commit) |

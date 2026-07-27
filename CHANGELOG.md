@@ -1,5 +1,181 @@
 # Changelog
 
+## Unreleased
+
+### CLI — in-process script dispatch + handler coverage
+
+- ``bnn.cli`` runs ``scripts/*.py`` in-process via small helpers
+  (``_script_path`` / ``_load_script_module`` / ``_call_script_main``): basename
+  jail, failed-import cache cleanup, ``sys.argv`` rewrite for ``parse_args()``
+  mains, exceptions → exit 1. ``_ultra_wrap_extra`` forwards ``--mode`` as
+  chosen (policy=auto no longer clobbers an explicit mode).
+- ``bnn optimise --pack`` uses in-process ``cmd_encode``.
+- ``tests/test_cli_handlers.py``: exact argv tables + ``sys.argv`` bridge tests;
+  ``bnn/cli.py`` coverage ~92%.
+
+### OSS hygiene (GitHub settings)
+
+- Repo About description + topics; Discussions enabled; ``main`` branch protection
+  (required checks: quality / windows / linux-native; no force-push/deletes).
+
+### Kernel — portable runtime SIMD dispatch (closes W2.T04 + W2.T05)
+
+- **Runtime ISA dispatch** in `bnn/kernels/binary_gemm.c`: AVX-512 VPOPCNTDQ →
+  AVX2 (`vpshufb` nibble LUT) → ARM64 NEON (`vcntq_u8`) → scalar. Detection uses
+  `cpuid` **and** `xgetbv` (OS must have enabled YMM/ZMM state). No
+  `-march=native` — one build stays valid on any CPU of the same architecture.
+  AVX-512 is used when present, never required.
+- **Single OpenMP region + 4-row batch blocking.** The old kernel forked a
+  parallel team per batch row and re-streamed all of `W` `B` times. Aggregate
+  **5.1×** faster over 12 shapes (up to 19.9× on small-N/large-batch).
+- **Fused `alpha`/`bias` epilogue** (`binary_gemm_u64_scaled`): the wrapper's
+  `y *= alpha; y += bias` NumPy passes cost as much as the vectorised GEMM.
+- New Python API: `kernel_name()`, `cpu_features()`, `available_kernels()`,
+  `set_kernel()`; `BNN_KERNEL=scalar|avx2|avx512|neon` env override.
+- ARM NEON and AVX-512 spike notes moved from *deferred* to **delivered**.
+- Full write-up: `docs/41_PORTABLE_SIMD_KERNEL.md`.
+
+### Fixed
+
+- **`fp32_gemm` timed its own memcpy.** It called `.astype(np.float32)` on
+  already-float32 inputs; `astype` copies unconditionally, so the FP32 baseline
+  included ~64 MB of copying per call and **every published "vs FP32" speedup was
+  ~2× overstated**. Now uses `asarray`. `results/benchmark.json` was measured
+  against the old baseline and needs regeneration before its ratios are quoted.
+- **`_pack_activations_fast` was the slowest step in the forward pass.** It
+  expanded the batch to a `(B, words, 64)` uint64 temporary; now delegates to
+  `pack_binary_pm1` (`np.packbits`) — bit-identical, ~6.5× faster.
+- `profile_packed_linear` added `bias` unconditionally in its warmup loop while
+  the timed loop guarded for `None` — latent `TypeError` for bias-free layers.
+- `scripts/validate_native.py` benchmark closures captured loop variables
+  (`B023`) instead of binding them.
+- `tests/test_codec.py` had an assertion neutralised by `or True`, and used
+  `assert False` for exception flow (removed under `python -O`).
+
+### Packaging — prebuilt wheels (no compiler required)
+
+- `setup.py` builds the kernel into the wheel, with an OpenMP → single-threaded
+  → no-native fallback ladder. **An install never fails because of the C
+  kernel**; worst case you get the correct NumPy path.
+- `[tool.cibuildwheel]` + `.github/workflows/wheels.yml` (`workflow_dispatch`,
+  and automatic on `v*` tags) build Linux/macOS/Windows × x86-64/arm64 wheels,
+  plus an sdist that is verified to compile from source.
+- `scripts/check_wheel_kernel.py` — post-install smoke test that loads the
+  *shipped* binary and asserts err=0 on every ISA path. NumPy-only, so wheel
+  testing does not drag in torch.
+- PyPI publishing is a separate job that only runs on an explicit manual
+  dispatch with `publish=true`, via trusted publishing (no stored token).
+- The loader now also accepts ABI-tagged filenames
+  (`_binary_gemm_native.cpython-312-x86_64-linux-gnu.so`) as shipped in wheels.
+
+### Quality
+
+- **Ruff** configured and enforced (hard CI gate); repo is clean.
+- **mypy** is now a **hard CI gate** — 51 errors → 0. Real fixes, not silencing:
+  PyTorch buffers declared on the module classes, `_try_load_native()` returns a
+  plain `CDLL | None` instead of a `CDLL | bool | None` sentinel that leaked
+  into every caller, `nn.Linear`/`TernaryLinear` union attributes declared, and
+  a `str`/`list[str]` collision in the MSVC builder untangled.
+  `bnn/py.typed` added so downstream users get the types.
+- **Coverage 66% → 80.2%, now a hard CI gate** (`--cov-fail-under=80`), up from
+  143 to **380 tests**. New suites cover the previously untested surface:
+  `eval_report` (0% → covered), `wrap/qat` (8%), `wrap/calibrate`, `wrap/schema`,
+  `wrap/guardrails`, `export`, `data` (IDX parsing via synthetic files, no
+  network), `kernels/compile_native` (toolchain decisions, monkeypatched),
+  `paths`, `logutil`, `determinism`, `audio/features`, the packed ternary /
+  dequant / conv modules, and the full CLI subcommand surface.
+- Tests assert behaviour rather than lines: kernel input contracts fail fast on
+  dtype/shape mismatch, `set_num_threads` cannot change results, every ISA path
+  stays bit-identical, and the wrap report's dual-metric honesty rule is
+  exercised in both directions.
+- **Dependabot** (actions + pip, with torch/numpy pinned out since they gate the
+  numeric goldens), **CodeQL** (python + c-cpp), **OpenSSF Scorecard**,
+  `.editorconfig`, and README status badges.
+- **Fixed two malformed issue templates.** `bug_report.yml` began a scalar with
+  a backtick and `config.yml` contained an unquoted `REPRO: PASS` — both are
+  YAML errors, so GitHub was silently rejecting those forms.
+- **All 28 action references pinned to commit SHAs** (with the release tag as a
+  trailing comment), resolved via the GitHub API rather than hand-copied. Tags
+  are mutable; this is the single largest OpenSSF Scorecard penalty. Dependabot
+  is configured to bump the pins.
+- **Workflows are now linted with `actionlint`**, which caught a build-breaking
+  error: `macos-13` has been **retired** by GitHub, so both Intel-macOS jobs
+  would have failed with "no runner matching labels". Moved to `macos-15-intel`.
+- `cibuildwheel` was pinned to `v2.21.3` while upstream is **4.1.1** — two
+  majors stale, and 3.x+ validates `[tool.cibuildwheel]` strictly. Bumped and
+  the config verified locally with `--print-build-identifiers` on all three
+  platforms. Target selection moved into `pyproject.toml` as the single source
+  of truth so it cannot drift from a `CIBW_BUILD` env var.
+- **`pip install --no-binary :all:` in the sdist job** would have forced source
+  builds of NumPy *and* torch. Scoped to `--no-binary bnn --no-deps`; verified
+  locally that the sdist compiles the kernel and passes err=0 without torch.
+- CodeQL was missing `actions: read` / `contents: read`.
+
+### Fixed (build flags)
+
+- **`/O2` was passed twice on MSVC.** setuptools already supplies
+  `/O2 /W3 /GL /DNDEBUG /MD`; `setup.py` appended another `/O2`. Now it adds
+  only `/openmp`, and the single-threaded fallback adds nothing on MSVC. The
+  deliberate `-O3` on Unix stays (Python's own `CFLAGS` carry `-O2` and the last
+  optimisation flag wins).
+
+### Fixed (state leak)
+
+- **`eval_report.render_summary()` rebound the module-level `RESULTS` global**
+  and never restored it, so passing a custom directory silently redirected every
+  later call in the process — a subsequent no-arg call read the caller's
+  (often already-deleted) temp directory instead of `results/`. The directory is
+  now threaded through as a parameter; regression test included.
+
+### Fixed (privacy / portability)
+
+- **Six committed files embedded the author's absolute home directory**
+  (`C:\Users\<user>\...`) — three docs as copy-paste `cd` commands that could
+  never work for a reader, and three result JSONs. Added `bnn.paths.repo_relative`
+  and switched the generators (`train.py`, `tiny_transformer_wrap_demo.py`,
+  `energy_bound_measured.py`) to emit repo-relative POSIX paths, then sanitised
+  the committed files. No tracked file references a local home directory now.
+
+### Docs
+
+- **Ten documents were unreachable from the docs index**, including the SOTA
+  survey, failure analysis and deep-research report — the substantive research
+  backing the thesis. Added *Research background*, *Planning / design sketches*
+  and *Kernel internals* sections to `docs/README.md`; every doc is now linked.
+- Fixed two broken relative links: `MODEL_CARD.md` pointed at `../CITATION.cff`
+  (outside the repo — it sits at the root), and the roadmap linked
+  `docs/GUIDE_E2E.md` from inside `docs/`.
+
+### Removed
+
+- `results/wrap_demo_ternary.{json,md}` and `results/wrap_demo_dequant.{json,md}`
+  — no generator exists for them anywhere in the tree, nothing references them,
+  and their timings predate the kernel rewrite.
+
+### Goldens regenerated
+
+`results/benchmark.json`, `results/benchmark.md` and `results/profile.json` were
+measured against the inflated FP32 baseline and have been regenerated. Floors in
+`tests/golden_floors.json` are unchanged and still pass.
+
+| | before | after |
+|---|---|---|
+| `speedup_compute_vs_numpy_fp32` @ 64×4096×4096 | 3.61× (inflated baseline) | **23.86×** |
+| `profile.speedup_vs_fp32` @ 32×1024×1024 | 0.60× | **2.54×** |
+| `profile.e2e_forward_ms` @ 32×1024×1024 | 1.396 | **0.236** |
+| `ultra_wrap.binary_gemm_only_speedup_wide` | 2.12× | **9.39×** |
+
+Also regenerated from the new kernel: `wrap_demo.json`, `ultra_wrap.json`,
+`tiny_transformer_wrap.json`, `hybrid_ffn_wrap.json`, `energy_bound.json`
+(derived from `wrap_demo` latency). Training-derived goldens
+(`train_results`, `image_cifar`, `audio_synth`, `cifar10_proxy`) were **not**
+regenerated: their accuracy figures are the goldens and are unaffected by kernel
+changes, so retraining would burn hours to move only incidental timing fields.
+- CI: `concurrency` cancels superseded runs, least-privilege `permissions`.
+- **New `portability` CI matrix** — `ubuntu-24.04-arm`, `macos-latest` (Apple
+  Silicon), `macos-13` (Intel) — each builds native, validates cross-ISA err=0,
+  and re-runs the kernel suite with `BNN_KERNEL=scalar`.
+
 ## 0.3.0 — 2026-07-25
 
 ### Phase C — multi-arch & eval

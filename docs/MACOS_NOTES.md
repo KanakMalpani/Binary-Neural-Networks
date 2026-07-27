@@ -2,22 +2,25 @@
 
 | Field | Value |
 |-------|-------|
-| **Native kernel** | Not shipped; use **NumPy** correctness path |
-| **NEON** | Spike deferred — [`spikes/ARM_NEON_SPIKE.md`](spikes/ARM_NEON_SPIKE.md) |
-| **CI** | Not in default matrix (cost); Linux/Windows cover gates |
+| **Native kernel** | **Supported** — `python -m bnn.kernels.compile_native` (Clang `.so`); runtime NEON on Apple Silicon, AVX2/scalar on Intel |
+| **NEON / SIMD** | **Delivered** — [`41_PORTABLE_SIMD_KERNEL.md`](41_PORTABLE_SIMD_KERNEL.md); spike [`spikes/ARM_NEON_SPIKE.md`](spikes/ARM_NEON_SPIKE.md) |
+| **CI** | `portability` job: `macos-latest` (arm64) + `macos-15-intel` (x86_64) |
+| **Fallback** | NumPy packed GEMM if native build/load fails — correctness preserved |
 
 ## Install
 
 ```bash
 python -m pip install -U pip
 pip install -e ".[dev]" -c constraints.txt
+python -m bnn.kernels.compile_native
 bnn repro
 ```
 
-Optional: attempt `python -m bnn.kernels.compile_native` with Homebrew `gcc`
-/`libomp` — best-effort; if `.so` fails to load, NumPy path remains correct.
+Optional: Homebrew `libomp` improves OpenMP scaling (`brew install libomp`).
+If `.so` fails to load, NumPy path remains correct.
 
 ## Accelerate
 
-PyTorch may use Accelerate BLAS for FP baselines. Packed BNN path does not
-claim Accelerate popcount wins until a Darwin native kernel lands.
+PyTorch may use Accelerate BLAS for FP baselines. Packed BNN path uses the
+portable native kernel (or NumPy fallback) — do not conflate Accelerate FP GEMM
+with XNOR-popcount wall-clock.

@@ -11,6 +11,7 @@ Includes:
 
 from __future__ import annotations
 
+import contextlib
 import ctypes
 import math
 import os
@@ -22,7 +23,11 @@ import numpy as np
 
 from .popcount import bitwise_count
 
-_NATIVE = None
+# Loaded library, or None. `_NATIVE_TRIED` makes a failed load sticky so we
+# do not re-attempt (and re-warn) on every call. Keeping the failure flag
+# separate lets `_try_load_native()` return a plain `CDLL | None`.
+_NATIVE: ctypes.CDLL | None = None
+_NATIVE_TRIED: bool = False
 _NATIVE_PATH = Path(__file__).with_name("_binary_gemm_native")
 _THREADS_APPLIED: int | None = None
 
@@ -106,6 +111,28 @@ def _bind_native(lib: ctypes.CDLL) -> ctypes.CDLL:
     if hasattr(lib, "binary_gemm_openmp_enabled"):
         lib.binary_gemm_openmp_enabled.argtypes = []
         lib.binary_gemm_openmp_enabled.restype = ctypes.c_int
+    if hasattr(lib, "binary_gemm_u64_scaled"):
+        lib.binary_gemm_u64_scaled.argtypes = [
+            ctypes.POINTER(ctypes.c_uint64),
+            ctypes.POINTER(ctypes.c_uint64),
+            ctypes.POINTER(ctypes.c_float),
+            ctypes.POINTER(ctypes.c_float),
+            ctypes.POINTER(ctypes.c_float),
+            ctypes.c_int,
+            ctypes.c_int,
+            ctypes.c_int,
+            ctypes.c_int,
+        ]
+        lib.binary_gemm_u64_scaled.restype = None
+    if hasattr(lib, "binary_gemm_kernel_id"):
+        lib.binary_gemm_kernel_id.argtypes = []
+        lib.binary_gemm_kernel_id.restype = ctypes.c_int
+    if hasattr(lib, "binary_gemm_set_kernel"):
+        lib.binary_gemm_set_kernel.argtypes = [ctypes.c_int]
+        lib.binary_gemm_set_kernel.restype = ctypes.c_int
+    if hasattr(lib, "binary_gemm_cpu_features"):
+        lib.binary_gemm_cpu_features.argtypes = []
+        lib.binary_gemm_cpu_features.restype = ctypes.c_int
     if hasattr(lib, "ternary_gemm_u64"):
         lib.ternary_gemm_u64.argtypes = [
             ctypes.POINTER(ctypes.c_uint64),
@@ -123,16 +150,41 @@ def _bind_native(lib: ctypes.CDLL) -> ctypes.CDLL:
     return lib
 
 
-def _try_load_native():
-    global _NATIVE
-    if _NATIVE is not False and _NATIVE is not None:
+def _native_library_candidates(exact: Path) -> list[Path]:
+    """Shared libraries to try, most specific first.
+
+    A locally built library has the plain name (``_binary_gemm_native.so``).
+    A library built into a *wheel* by setuptools carries an ABI tag, e.g.
+    ``_binary_gemm_native.cpython-312-x86_64-linux-gnu.so`` or
+    ``_binary_gemm_native.cp312-win_amd64.pyd`` — so prebuilt wheels need the
+    glob as well as the exact name.
+    """
+    found: list[Path] = []
+    if exact.exists():
+        found.append(exact)
+    directory = exact.parent
+    if directory.is_dir():
+        for pattern in ("_binary_gemm_native*.so", "_binary_gemm_native*.pyd",
+                        "_binary_gemm_native*.dll", "_binary_gemm_native*.dylib"):
+            for hit in sorted(directory.glob(pattern)):
+                if hit != exact and hit.is_file():
+                    found.append(hit)
+    return found
+
+
+def _try_load_native() -> ctypes.CDLL | None:
+    global _NATIVE, _NATIVE_TRIED
+    if _NATIVE is not None:
         return _NATIVE
+    if _NATIVE_TRIED:
+        return None
+    _NATIVE_TRIED = True
 
     ext = ".dll" if os.name == "nt" else ".so"
     dll_path = Path(str(_NATIVE_PATH) + ext)
-    if dll_path.exists():
+    for candidate in _native_library_candidates(dll_path):
         try:
-            lib = _bind_native(ctypes.CDLL(str(dll_path)))
+            lib = _bind_native(ctypes.CDLL(str(candidate)))
             _ = lib.binary_gemm_u64
             _NATIVE = lib
             ensure_native_threads()
@@ -140,18 +192,18 @@ def _try_load_native():
         except OSError as e:
             # WinError 193 = 32-bit DLL on 64-bit Python (typical MinGW mistake)
             print(
-                f"WARNING: failed to load {dll_path}: {e}. "
+                f"WARNING: failed to load {candidate}: {e}. "
                 "On Windows use MSVC x64 via `python -m bnn.kernels.compile_native` "
                 "(MinGW 32-bit DLLs raise WinError 193).",
                 flush=True,
             )
-            _NATIVE = False
-            return False
+            return None
+    if dll_path.exists():
+        return None
 
     # Non-Windows: attempt compile from binary_gemm.c / embedded source
     if os.name == "nt":
-        _NATIVE = False
-        return False
+        return None
 
     src_text = _C_SOURCE
     src_file = Path(__file__).with_name("binary_gemm.c")
@@ -159,17 +211,19 @@ def _try_load_native():
         src = src_file
     else:
         if not src_text:
-            _NATIVE = False
-            return False
+            return None
         src = Path(tempfile.gettempdir()) / "bnn_binary_gemm.c"
         src.write_text(src_text, encoding="utf-8")
 
-    for cmd in (
-        ["gcc", "-O3", "-fopenmp", "-shared", "-fPIC", "-o", str(dll_path), str(src)],
-        ["gcc", "-O3", "-shared", "-fPIC", "-o", str(dll_path), str(src)],
-        ["clang", "-O3", "-fopenmp", "-shared", "-fPIC", "-o", str(dll_path), str(src)],
-        ["clang", "-O3", "-shared", "-fPIC", "-o", str(dll_path), str(src)],
-    ):
+    # Same command ladder the explicit builder uses (incl. macOS libomp), so
+    # the auto-build path and `python -m bnn.kernels.compile_native` agree.
+    from .compile_native import unix_compile_commands
+
+    candidates: list[list[str]] = []
+    for cc in ("gcc", "clang", "cc"):
+        candidates.extend(unix_compile_commands(cc, dll_path, src, openmp=True))
+
+    for cmd in candidates:
         try:
             subprocess.run(cmd, check=True, capture_output=True, timeout=120)
             if not dll_path.exists():
@@ -183,16 +237,13 @@ def _try_load_native():
             except OSError:
                 # OpenMP .so may compile but fail to load (missing libgomp) —
                 # delete and try next (usually no-OpenMP) command.
-                try:
+                with contextlib.suppress(OSError):
                     dll_path.unlink()
-                except OSError:
-                    pass
                 continue
         except (FileNotFoundError, subprocess.CalledProcessError, subprocess.TimeoutExpired):
             continue
 
-    _NATIVE = False
-    return False
+    return None
 
 
 def pack_binary_pm1(x: np.ndarray, axis: int = -1) -> tuple[np.ndarray, int]:
@@ -275,6 +326,55 @@ def binary_gemm_native_prepacked(
     return out
 
 
+def binary_gemm_native_scaled(
+    xp: np.ndarray,
+    wp: np.ndarray,
+    n: int,
+    alpha: np.ndarray | None = None,
+    bias: np.ndarray | None = None,
+) -> np.ndarray | None:
+    """Native GEMM with ``alpha`` / ``bias`` folded into the kernel epilogue.
+
+    ``Y = alpha * (n - 2*hamming) + bias`` in one pass. Returns ``None`` when
+    the native library is missing or predates the fused entry point, so callers
+    can fall back to the unfused path.
+    """
+    lib = _try_load_native()
+    if not lib or not hasattr(lib, "binary_gemm_u64_scaled"):
+        return None
+    ensure_native_threads()
+    B, M, words = _validate_prepacked(xp, wp, n)
+
+    fptr = ctypes.POINTER(ctypes.c_float)
+    null = fptr()  # NULL pointer
+
+    def _vec(v: np.ndarray | None, name: str):
+        if v is None:
+            return null, None
+        arr = np.ascontiguousarray(v, dtype=np.float32).reshape(-1)
+        if arr.size != M:
+            raise ValueError(f"{name} must have {M} elements, got {arr.size}")
+        # Keep a reference alive until the call returns.
+        return arr.ctypes.data_as(fptr), arr
+
+    a_ptr, _a_keep = _vec(alpha, "alpha")
+    b_ptr, _b_keep = _vec(bias, "bias")
+
+    out = np.empty((B, M), dtype=np.float32)
+    lib.binary_gemm_u64_scaled(
+        xp.ctypes.data_as(ctypes.POINTER(ctypes.c_uint64)),
+        wp.ctypes.data_as(ctypes.POINTER(ctypes.c_uint64)),
+        out.ctypes.data_as(fptr),
+        a_ptr,
+        b_ptr,
+        B,
+        M,
+        words,
+        n,
+    )
+    return out
+
+
 def binary_gemm_packed(
     x_pm1: np.ndarray,
     w_pm1: np.ndarray,
@@ -309,7 +409,14 @@ def binary_gemm_packed(
 
 
 def fp32_gemm(x: np.ndarray, w: np.ndarray) -> np.ndarray:
-    return x.astype(np.float32) @ w.astype(np.float32).T
+    """FP32 reference GEMM: Y = X @ W.T.
+
+    Uses ``asarray`` rather than ``astype`` so already-float32 inputs are *not*
+    copied. ``ndarray.astype`` copies unconditionally by default, which for a
+    4096x4096 baseline meant timing ~64 MB of memcpy alongside the GEMM and
+    inflating every "vs FP32" speedup by ~2x.
+    """
+    return np.asarray(x, dtype=np.float32) @ np.asarray(w, dtype=np.float32).T
 
 
 def theoretical_ops(m: int, n: int, k: int) -> dict:
@@ -327,6 +434,79 @@ def theoretical_ops(m: int, n: int, k: int) -> dict:
 
 def native_kernel_available() -> bool:
     return bool(_try_load_native())
+
+
+# Kernel ids must match the enum in binary_gemm.c.
+KERNEL_SCALAR = 0
+KERNEL_AVX2 = 1
+KERNEL_AVX512 = 2
+KERNEL_NEON = 3
+_KERNEL_NAMES = {
+    KERNEL_SCALAR: "scalar",
+    KERNEL_AVX2: "avx2",
+    KERNEL_AVX512: "avx512",
+    KERNEL_NEON: "neon",
+}
+
+
+def kernel_name() -> str:
+    """Name of the SIMD path the native kernel selected at runtime.
+
+    ``"numpy"`` when no native library is loaded, ``"unknown"`` for a native
+    library built before runtime dispatch existed.
+    """
+    lib = _try_load_native()
+    if not lib:
+        return "numpy"
+    if not hasattr(lib, "binary_gemm_kernel_id"):
+        return "unknown"
+    return _KERNEL_NAMES.get(int(lib.binary_gemm_kernel_id()), "unknown")
+
+
+def cpu_features() -> dict[str, bool]:
+    """Which accelerated paths this CPU can actually run."""
+    lib = _try_load_native()
+    if not lib or not hasattr(lib, "binary_gemm_cpu_features"):
+        return {"avx2": False, "avx512_vpopcntdq": False, "neon": False}
+    bits = int(lib.binary_gemm_cpu_features())
+    return {
+        "avx2": bool(bits & 1),
+        "avx512_vpopcntdq": bool(bits & 2),
+        "neon": bool(bits & 4),
+    }
+
+
+def available_kernels() -> list[str]:
+    """Kernel paths usable on this machine, slowest first (always ≥ scalar)."""
+    feats = cpu_features()
+    out = ["scalar"]
+    if feats["avx2"]:
+        out.append("avx2")
+    if feats["avx512_vpopcntdq"]:
+        out.append("avx512")
+    if feats["neon"]:
+        out.append("neon")
+    return out
+
+
+def set_kernel(name: str | None) -> str:
+    """Force a kernel path (``None`` re-runs auto-detection).
+
+    Falls back to ``scalar`` if the requested path is unsupported here. Returns
+    the path actually in effect. Intended for validation and reproducibility —
+    every path must produce identical results.
+    """
+    lib = _try_load_native()
+    if not lib or not hasattr(lib, "binary_gemm_set_kernel"):
+        return kernel_name()
+    if name is None:
+        lib.binary_gemm_set_kernel(-1)
+        return kernel_name()
+    ids = {v: k for k, v in _KERNEL_NAMES.items()}
+    if name not in ids:
+        raise ValueError(f"unknown kernel {name!r}; choose from {sorted(ids)} or None")
+    lib.binary_gemm_set_kernel(ids[name])
+    return kernel_name()
 
 
 def ternary_native_available() -> bool:
