@@ -128,6 +128,24 @@ def _brew_libomp() -> Path | None:
     return p if (p / "include").is_dir() else None
 
 
+def default_openmp() -> bool:
+    """Whether builds should try OpenMP unless the user overrides.
+
+    On macOS, Homebrew ``libomp`` plus PyTorch's own OpenMP runtime both
+    initialize in-process and abort with ``OMP: Error #15`` (seen on GHA
+    macos-arm64 / macos-x86_64). SIMD (NEON / AVX2) still works without
+    OpenMP — that is the thesis win. Opt back in with ``--openmp`` or
+    ``BNN_FORCE_OPENMP=1`` if you know only one runtime is linked.
+    """
+    if sys.platform == "darwin":
+        return os.environ.get("BNN_FORCE_OPENMP", "").strip().lower() in {
+            "1",
+            "true",
+            "yes",
+        }
+    return True
+
+
 def unix_compile_commands(cc: str, out: Path, src: Path, openmp: bool) -> list[list[str]]:
     """Candidate compiler invocations, most-preferred first.
 
@@ -189,10 +207,16 @@ def main(argv: list[str] | None = None) -> int:
 
     p = argparse.ArgumentParser(description="Build native packed GEMM library")
     p.add_argument("--force", action="store_true", help="Rebuild even if library exists")
-    p.add_argument(
+    omp = p.add_mutually_exclusive_group()
+    omp.add_argument(
         "--no-openmp",
         action="store_true",
         help="Disable OpenMP (fallback single-thread)",
+    )
+    omp.add_argument(
+        "--openmp",
+        action="store_true",
+        help="Force OpenMP (macOS: may conflict with PyTorch's libomp)",
     )
     args, _unknown = p.parse_known_args(argv)
 
@@ -210,7 +234,12 @@ def main(argv: list[str] | None = None) -> int:
             print(f"ERROR: cannot remove {DLL}: {e}", file=sys.stderr)
             return 1
 
-    openmp = not args.no_openmp
+    if args.no_openmp:
+        openmp = False
+    elif args.openmp:
+        openmp = True
+    else:
+        openmp = default_openmp()
     if os.name == "nt":
         rc = _compile_msvc(openmp)
         if rc != 0 and openmp:

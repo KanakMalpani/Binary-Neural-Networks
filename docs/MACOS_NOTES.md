@@ -16,8 +16,12 @@ python -m bnn.kernels.compile_native
 bnn repro
 ```
 
-Optional: Homebrew `libomp` improves OpenMP scaling (`brew install libomp`).
-If `.so` fails to load, NumPy path remains correct.
+**OpenMP is off by default on macOS.** Linking Homebrew `libomp` into a
+process that already loaded PyTorch's OpenMP runtime aborts with
+`OMP: Error #15` (duplicate libomp). The native build still uses NEON / AVX2;
+threading is the only thing disabled. Force OpenMP only if you know a single
+runtime is present: `BNN_FORCE_OPENMP=1 python -m bnn.kernels.compile_native`
+or `--openmp`. If `.so` fails to load, NumPy path remains correct.
 
 ## Accelerate
 

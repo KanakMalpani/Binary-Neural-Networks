@@ -134,14 +134,18 @@ jobs:
           cache-dependency-path: |
             pyproject.toml
             constraints.txt
-      - name: Install OpenMP (macOS)
-        if: startsWith(matrix.os, 'macos')
-        run: brew install libomp || true
+      # macOS: do not brew-install libomp for CI. PyTorch already ships an
+      # OpenMP runtime; a second libomp aborts validate_native (OMP Error #15).
+      # compile_native.default_openmp() is False on Darwin — SIMD still runs.
       - name: Install
         run: |
           python -m pip install -U pip
           pip install -e ".[dev]" -c constraints.txt
-      - name: Compile native
+      - name: Compile native (macOS: no OpenMP)
+        if: startsWith(matrix.os, 'macos')
+        run: python -m bnn.kernels.compile_native --force --no-openmp
+      - name: Compile native (Linux)
+        if: startsWith(matrix.os, 'ubuntu')
         run: python -m bnn.kernels.compile_native --force
       - name: Validate native (cross-ISA err=0)
         run: python scripts/validate_native.py

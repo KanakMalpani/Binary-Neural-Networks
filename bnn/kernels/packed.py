@@ -215,13 +215,16 @@ def _try_load_native() -> ctypes.CDLL | None:
         src = Path(tempfile.gettempdir()) / "bnn_binary_gemm.c"
         src.write_text(src_text, encoding="utf-8")
 
-    # Same command ladder the explicit builder uses (incl. macOS libomp), so
-    # the auto-build path and `python -m bnn.kernels.compile_native` agree.
-    from .compile_native import unix_compile_commands
+    # Same command ladder the explicit builder uses (macOS defaults to
+    # no-OpenMP — see compile_native.default_openmp), so auto-build and
+    # `python -m bnn.kernels.compile_native` agree.
+    from .compile_native import default_openmp, unix_compile_commands
 
     candidates: list[list[str]] = []
     for cc in ("gcc", "clang", "cc"):
-        candidates.extend(unix_compile_commands(cc, dll_path, src, openmp=True))
+        candidates.extend(
+            unix_compile_commands(cc, dll_path, src, openmp=default_openmp())
+        )
 
     for cmd in candidates:
         try:

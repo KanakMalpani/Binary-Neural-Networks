@@ -173,7 +173,7 @@ def test_main_force_triggers_a_rebuild(monkeypatch, tmp_path: Path):
     monkeypatch.setattr(cn, "_compile_msvc", fake_compile)
     monkeypatch.setattr(cn, "_compile_gcc", fake_compile)
     assert cn.main(["--force"]) == 0
-    assert built == [True]
+    assert built == [cn.default_openmp()]
 
 
 def test_main_no_openmp_flag_is_honoured(monkeypatch, tmp_path: Path):
@@ -190,6 +190,22 @@ def test_main_no_openmp_flag_is_honoured(monkeypatch, tmp_path: Path):
     monkeypatch.setattr(cn, "_compile_gcc", fake_compile)
     assert cn.main(["--no-openmp"]) == 0
     assert seen == [False]
+
+
+def test_main_openmp_flag_forces_on(monkeypatch, tmp_path: Path):
+    lib = tmp_path / "lib.so"
+    monkeypatch.setattr(cn, "DLL", lib)
+    seen: list[bool] = []
+
+    def fake_compile(openmp: bool) -> int:
+        seen.append(openmp)
+        lib.write_bytes(b"\x7fELF")
+        return 0
+
+    monkeypatch.setattr(cn, "_compile_msvc", fake_compile)
+    monkeypatch.setattr(cn, "_compile_gcc", fake_compile)
+    assert cn.main(["--openmp"]) == 0
+    assert seen == [True]
 
 
 def test_main_resets_cached_loader_state(monkeypatch, tmp_path: Path):
