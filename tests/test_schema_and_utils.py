@@ -228,5 +228,10 @@ def test_compile_commands_openmp_disabled_yields_only_plain_build():
 
 @pytest.mark.skipif(sys.platform != "darwin", reason="macOS libomp routing")
 def test_macos_uses_xpreprocessor_for_libomp():
+    """When Homebrew libomp is present, Apple clang needs -Xpreprocessor."""
+    from bnn.kernels.compile_native import _brew_libomp
+
+    if _brew_libomp() is None:
+        pytest.skip("Homebrew libomp not installed (CI omits it to avoid PyTorch OMP #15)")
     cmds = unix_compile_commands("clang", Path("o.so"), Path("i.c"), openmp=True)
     assert any("-Xpreprocessor" in c for c in cmds)
