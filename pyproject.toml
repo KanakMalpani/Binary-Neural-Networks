@@ -33,7 +33,7 @@ classifiers = [
 ]
 dependencies = [
   "torch>=2.1,<2.13",
-  "numpy>=1.24,<2.5",
+  "numpy>=1.24,<2",
 ]
 
 [project.optional-dependencies]
