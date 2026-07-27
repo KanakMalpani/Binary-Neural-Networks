@@ -5,7 +5,7 @@
 [![CI](https://github.com/KanakMalpani/Binary-Neural-Networks/actions/workflows/ci.yml/badge.svg)](https://github.com/KanakMalpani/Binary-Neural-Networks/actions/workflows/ci.yml)
 [![CodeQL](https://github.com/KanakMalpani/Binary-Neural-Networks/actions/workflows/codeql.yml/badge.svg)](https://github.com/KanakMalpani/Binary-Neural-Networks/actions/workflows/codeql.yml)
 [![OpenSSF Scorecard](https://api.securityscorecards.dev/projects/github.com/KanakMalpani/Binary-Neural-Networks/badge)](https://scorecard.dev/viewer/?uri=github.com/KanakMalpani/Binary-Neural-Networks)
-[![Wheels](https://github.com/KanakMalpani/Binary-Neural-Networks/actions/workflows/wheels.yml/badge.svg)](https://github.com/KanakMalpani/Binary-Neural-Networks/actions/workflows/wheels.yml)
+[![Wheels](https://img.shields.io/badge/wheels-manual%20%2F%20v*%20tag-lightgrey)](https://github.com/KanakMalpani/Binary-Neural-Networks/actions/workflows/wheels.yml)
 [![Python 3.11+](https://img.shields.io/badge/python-3.11%2B-blue.svg)](https://www.python.org/downloads/)
 [![License: MIT](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 [![Ruff](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/ruff/main/assets/badge/v2.json)](https://github.com/astral-sh/ruff)
