@@ -46,9 +46,12 @@ from .schema import (
 )
 from .sensitivity import (
     LayerSensitivity,
+    ModeSearchReport,
+    SearchAssignment,
     SensitivityReport,
     apply_sensitivity_skips,
     score_layer_sensitivity,
+    search_layer_modes,
 )
 
 __all__ = [
@@ -91,6 +94,9 @@ __all__ = [
     "SensitivityReport",
     "score_layer_sensitivity",
     "apply_sensitivity_skips",
+    "search_layer_modes",
+    "ModeSearchReport",
+    "SearchAssignment",
     "GuardrailVerdict",
     "check_linear_wrap_guardrails",
 ]
