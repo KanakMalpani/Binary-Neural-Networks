@@ -380,6 +380,47 @@ def cmd_profile(args: argparse.Namespace) -> int:
     return 0
 
 
+def cmd_memory(args: argparse.Namespace) -> int:
+    """Weight footprint of a demo model, FP32 vs wrapped (W13.T05)."""
+    import json
+
+    import torch.nn as nn
+
+    from bnn.memory import forward_transient_bytes, memory_report
+    from bnn.wrap import wrap_model
+
+    dim, ff = args.dim, args.ff
+
+    def build() -> nn.Module:
+        return nn.Sequential(
+            nn.Linear(dim, ff),
+            nn.ReLU(),
+            nn.Linear(ff, dim),
+        )
+
+    fp32 = memory_report(build()).to_dict()
+    wrapped, _report = wrap_model(build(), mode=args.mode, policy="all_large_linear")
+    packed = memory_report(wrapped).to_dict()
+
+    out = {
+        "schema": "bnn_memory_report_v1",
+        "shape": {"dim": dim, "ff": ff, "batch": args.batch},
+        "mode": args.mode,
+        "fp32": fp32,
+        "wrapped": packed,
+        "transient_per_forward": forward_transient_bytes(args.batch, dim, ff),
+        "thesis_note": (
+            "Weight bytes are measured from real buffers; theoretical_* is the "
+            "encoding pack ratio. Neither is a latency claim."
+        ),
+    }
+    print(json.dumps(out, indent=2))
+    if args.out:
+        Path(args.out).parent.mkdir(parents=True, exist_ok=True)
+        Path(args.out).write_text(json.dumps(out, indent=2), encoding="utf-8")
+    return 0
+
+
 def cmd_train_seq2seq(args: argparse.Namespace) -> int:
     extra = [
         "--task",
@@ -682,6 +723,15 @@ def build_parser() -> argparse.ArgumentParser:
     pr.add_argument("--warmup", type=int, default=5)
     pr.add_argument("--out", type=Path, default=None)
     pr.set_defaults(func=cmd_profile)
+
+    mem = sub.add_parser("memory", help="Weight footprint: FP32 vs wrapped (measured + theoretical)")
+    mem.add_argument("--dim", type=int, default=1024)
+    mem.add_argument("--ff", type=int, default=4096)
+    mem.add_argument("--batch", type=int, default=64)
+    mem.add_argument("--mode", default="binary_xnor",
+                     choices=["binary_xnor", "ternary_weight_only", "binary_weight_only_dequant"])
+    mem.add_argument("--out", type=Path, default=None)
+    mem.set_defaults(func=cmd_memory)
 
     s2s = sub.add_parser(
         "train-seq2seq",
