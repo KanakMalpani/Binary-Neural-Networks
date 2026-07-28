@@ -3,8 +3,8 @@ site_description: Honest packed binary/ternary CPU/edge optimiser lab
 repo_url: https://github.com/KanakMalpani/Binary-Neural-Networks
 repo_name: Binary-Neural-Networks
 
-# Stub site config (W9.T05). Autodoc publish = W9.T06.
-# Build (optional): pip install mkdocs-material && mkdocs build
+# Autodoc site (W9.T05 + W9.T06 complete).
+#   pip install -e ".[docs]" && mkdocs build --strict
 # Note: root README / ROADMAP are linked from docs pages, not duplicated here.
 
 theme:
@@ -17,12 +17,32 @@ nav:
   - Docs index: README.md
   - Optimiser quickstart: tutorials/07_OPTIMISER_QUICKSTART.md
   - HF optimiser: tutorials/08_HF_OPTIMISER.md
-  - API overview: api/README.md
+  - API reference:
+      - Overview: api/README.md
+      - Optimiser: api/optimise.md
+      - Wrapping models: api/wrap.md
+      - Kernels: api/kernels.md
+      - Layers & STE: api/layers.md
+      - Encoder / decoder: api/seq.md
+      - Weight codec: api/codec.md
+      - Reporting & repro: api/reporting.md
   - ADRs: adr/README.md
   - Semver policy: SEMVER_AND_DEPRECATION.md
+  - Portable SIMD kernel: 41_PORTABLE_SIMD_KERNEL.md
+  - QAT + layer search: 42_QAT_AND_LAYER_SEARCH.md
+  - Memory footprint: 43_MEMORY_FOOTPRINT.md
   - World-class roadmap: 37_WORLD_CLASS_BNN_OPTIMISER_ROADMAP.md
 
 docs_dir: docs
+
+# README / ROADMAP / REPRODUCIBILITY / AGENTS live at the repo root on purpose
+# (AGENTS.md points agents at them), so docs pages link upward out of docs_dir
+# and MkDocs cannot resolve those targets. Link integrity is instead enforced
+# repo-wide by tests/test_docs_links.py, which does understand the layout —
+# so --strict still catches nav and autodoc errors without false positives here.
+validation:
+  links:
+    not_found: ignore
 
 markdown_extensions:
   - admonition
@@ -32,3 +52,17 @@ markdown_extensions:
 
 plugins:
   - search
+  - mkdocstrings:
+      default_handler: python
+      handlers:
+        python:
+          options:
+            docstring_style: google
+            show_source: true
+            show_signature_annotations: true
+            separate_signature: true
+            members_order: source
+            heading_level: 3
+            show_root_heading: true
+            show_root_full_path: false
+            filters: ["!^_"]

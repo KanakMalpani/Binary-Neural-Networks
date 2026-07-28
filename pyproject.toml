@@ -47,7 +47,12 @@ dev = [
 vision = []  # CIFAR/MNIST loaders are stdlib+torch; reserved for future torchvision
 audio = []   # Synthetic audio is NumPy-only; reserved for real ASR deps
 hf = ["transformers>=4.40,<5", "datasets>=2.18,<4", "huggingface_hub>=0.22,<1"]
-all = ["bnn[dev,hf]"]
+docs = [
+  "mkdocs>=1.6,<2",
+  "mkdocs-material>=9.5,<10",
+  "mkdocstrings[python]>=0.26,<1",
+]
+all = ["bnn[dev,hf,docs]"]
 
 [project.scripts]
 bnn = "bnn.cli:main"

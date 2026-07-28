@@ -51,3 +51,6 @@ results/_ci_*.json
 sbom.json
 sbom-*.json
 *.log
+
+# MkDocs build output
+site/

@@ -110,6 +110,8 @@ thesis — previously unlinked from this index.
 | Doc | Topic |
 |-----|-------|
 | [`41_PORTABLE_SIMD_KERNEL.md`](41_PORTABLE_SIMD_KERNEL.md) | Runtime AVX-512/AVX2/NEON dispatch, blocking, fused epilogue |
+| [`42_QAT_AND_LAYER_SEARCH.md`](42_QAT_AND_LAYER_SEARCH.md) | QAT recipe + per-layer binary/ternary/skip search |
+| [`43_MEMORY_FOOTPRINT.md`](43_MEMORY_FOOTPRINT.md) | Resident vs theoretical bytes; why the arena was declined |
 | [`34_COMPUTE_SPEEDUP.md`](34_COMPUTE_SPEEDUP.md) | Where the compute win comes from |
 | [`spikes/ARM_NEON_SPIKE.md`](spikes/ARM_NEON_SPIKE.md) | ARM NEON note (delivered) |
 | [`spikes/AVX512_MOONSHOT.md`](spikes/AVX512_MOONSHOT.md) | AVX-512 note (delivered) |
