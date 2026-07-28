@@ -33,7 +33,9 @@ def absmean_ternary_per_channel(w: Tensor) -> tuple[Tensor, Tensor]:
 
 
 def sign_pm1(w: Tensor) -> Tensor:
-    return torch.where(w >= 0, torch.ones_like(w), -torch.ones_like(w))
+    # w >= 0 -> +1, else -1 (ties to +1, matching the packed encoding once
+    # zeros are removed). Single allocation; see bnn/ste.py for the rationale.
+    return w.ge(0).to(w.dtype).mul_(2).sub_(1)
 
 
 def _pack_activations_fast(x2: np.ndarray, n: int) -> np.ndarray:
@@ -318,7 +320,7 @@ class PackedBinaryConv2d(nn.Module):
 
     def forward(self, x: Tensor) -> Tensor:
         w = self.weight_pm1.to(x.device) * self.alpha.view(-1, 1, 1, 1).to(x.device)
-        x_b = torch.where(x > 0, torch.ones_like(x), -torch.ones_like(x))
+        x_b = x.gt(0).to(x.dtype).mul_(2).sub_(1)
         return F.conv2d(
             x_b,
             w,

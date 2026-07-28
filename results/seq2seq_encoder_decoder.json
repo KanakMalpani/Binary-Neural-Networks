@@ -9,10 +9,10 @@
       "depth": 2,
       "steps": 80,
       "train_token_acc": 1.0,
-      "train_loss": 0.007758231367915869,
+      "train_loss": 0.007758209016174078,
       "eval_token_acc": 1.0,
-      "eval_loss": 0.007495327852666378,
-      "train_seconds": 1.9226939999934984,
+      "eval_loss": 0.007495289668440819,
+      "train_seconds": 1.918552200018894,
       "thesis": "attn/softmax/LN FP; FFN binary/ternary STE \u2014 not a GPU 32x claim"
     },
     {
@@ -23,7 +23,7 @@
       "steps": 80,
       "train_mse": 0.898420512676239,
       "eval_mse": 0.9216713905334473,
-      "train_seconds": 0.1118480000004638
+      "train_seconds": 0.16654489998472854
     }
   ],
   "task": "reverse_seq2seq",
@@ -34,9 +34,9 @@
   "depth": 2,
   "steps": 80,
   "train_token_acc": 1.0,
-  "train_loss": 0.007758231367915869,
+  "train_loss": 0.007758209016174078,
   "eval_token_acc": 1.0,
-  "eval_loss": 0.007495327852666378,
-  "train_seconds": 1.9226939999934984,
+  "eval_loss": 0.007495289668440819,
+  "train_seconds": 1.918552200018894,
   "thesis": "attn/softmax/LN FP; FFN binary/ternary STE \u2014 not a GPU 32x claim"
 }

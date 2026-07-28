@@ -40,18 +40,13 @@ class MultiHeadAttention(nn.Module):
     def forward(self, x: Tensor) -> Tensor:
         B, T, D = x.shape
         qkv = self.qkv(x).reshape(B, T, 3, self.n_heads, self.head_dim)
-        qkv = qkv.permute(2, 0, 3, 1, 4)  # 3, B, H, T, Hd
-        q, k, v = qkv[0], qkv[1], qkv[2]
-        scale = self.head_dim**-0.5
-        attn = (q @ k.transpose(-2, -1)) * scale
-        if self.causal:
-            mask = torch.triu(
-                torch.ones(T, T, device=x.device, dtype=torch.bool), diagonal=1
-            )
-            attn = attn.masked_fill(mask, float("-inf"))
-        attn = torch.softmax(attn, dim=-1)
-        out = (attn @ v).transpose(1, 2).reshape(B, T, D)
-        return self.proj(out)
+        # (3, B, H, T, Hd); unbind gives contiguous-friendly views for SDPA.
+        q, k, v = qkv.permute(2, 0, 3, 1, 4).unbind(0)
+        # Fused attention: avoids materialising the (B, H, T, T) score matrix and
+        # needs no explicit causal mask, so nothing is allocated per forward.
+        # Default scale is head_dim**-0.5, matching the previous manual scale.
+        out = F.scaled_dot_product_attention(q, k, v, is_causal=self.causal)
+        return self.proj(out.transpose(1, 2).reshape(B, T, D))
 
 
 class CrossAttention(nn.Module):
@@ -71,12 +66,10 @@ class CrossAttention(nn.Module):
         S = memory.size(1)
         q = self.q(x).reshape(B, T, self.n_heads, self.head_dim).transpose(1, 2)
         kv = self.kv(memory).reshape(B, S, 2, self.n_heads, self.head_dim)
-        kv = kv.permute(2, 0, 3, 1, 4)
-        k, v = kv[0], kv[1]
-        scale = self.head_dim**-0.5
-        attn = torch.softmax((q @ k.transpose(-2, -1)) * scale, dim=-1)
-        out = (attn @ v).transpose(1, 2).reshape(B, T, D)
-        return self.proj(out)
+        k, v = kv.permute(2, 0, 3, 1, 4).unbind(0)
+        # Cross-attention is never causal: the decoder may see all of memory.
+        out = F.scaled_dot_product_attention(q, k, v)
+        return self.proj(out.transpose(1, 2).reshape(B, T, D))
 
 
 class EncoderLayer(nn.Module):

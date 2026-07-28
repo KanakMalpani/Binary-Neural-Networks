@@ -32,7 +32,9 @@ class SignSTE(torch.autograd.Function):
     def forward(ctx, x: Tensor) -> Tensor:
         ctx.save_for_backward(x)
         # Map non-positive -> -1, positive -> +1 (no zeros — packing-friendly)
-        return torch.where(x > 0, torch.ones_like(x), -torch.ones_like(x))
+        # x > 0 -> +1, else -1. One full-size allocation instead of the four
+        # that where(ones_like(x), -ones_like(x)) needed. Bit-identical.
+        return x.gt(0).to(x.dtype).mul_(2).sub_(1)
 
     @staticmethod
     def backward(ctx, grad_output: Tensor):
@@ -58,7 +60,9 @@ class ApproxSignSTE(torch.autograd.Function):
     @staticmethod
     def forward(ctx, x: Tensor) -> Tensor:
         ctx.save_for_backward(x)
-        return torch.where(x > 0, torch.ones_like(x), -torch.ones_like(x))
+        # x > 0 -> +1, else -1. One full-size allocation instead of the four
+        # that where(ones_like(x), -ones_like(x)) needed. Bit-identical.
+        return x.gt(0).to(x.dtype).mul_(2).sub_(1)
 
     @staticmethod
     def backward(ctx, grad_output: Tensor):
@@ -89,7 +93,9 @@ class TanhSoftSTE(torch.autograd.Function):
     @staticmethod
     def forward(ctx, x: Tensor, t: Tensor, k: Tensor) -> Tensor:
         ctx.save_for_backward(x, t, k)
-        return torch.where(x > 0, torch.ones_like(x), -torch.ones_like(x))
+        # x > 0 -> +1, else -1. One full-size allocation instead of the four
+        # that where(ones_like(x), -ones_like(x)) needed. Bit-identical.
+        return x.gt(0).to(x.dtype).mul_(2).sub_(1)
 
     @staticmethod
     def backward(ctx, grad_output: Tensor):
