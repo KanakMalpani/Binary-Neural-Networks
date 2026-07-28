@@ -15,6 +15,44 @@
 
 It is a lab / beta **optimiser toolkit** (`bnn 0.3.0`), not a claim that `sign()` is 32× faster on GPU.
 
+<table>
+<tr>
+<td width="25%" align="center">
+
+### 32.00×
+**weight pack**<br/>
+<sub>exact, uint64-aligned</sub>
+
+</td>
+<td width="25%" align="center">
+
+### err = 0
+**every SIMD path**<br/>
+<sub>AVX-512 · AVX2 · NEON · scalar</sub>
+
+</td>
+<td width="25%" align="center">
+
+### 5.1×
+**faster kernel**<br/>
+<sub>aggregate over 12 shapes</sub>
+
+</td>
+<td width="25%" align="center">
+
+### 29.68×
+**measured** RAM<br/>
+<sub>not the 32× brochure number</sub>
+
+</td>
+</tr>
+</table>
+
+> Four numbers, four different kinds of claim — that distinction *is* the product.
+> Pack ratio is exact math. `err = 0` is exact integer arithmetic. The kernel
+> speedup is wall-clock on one machine. The memory figure is measured from real
+> buffers, which is why it is **below** the theoretical 32×.
+
 ```mermaid
 flowchart LR
   subgraph Desire["What you want"]
@@ -42,6 +80,7 @@ flowchart LR
 | **Roadmap** | [`ROADMAP.md`](ROADMAP.md) |
 | **Compatibility** | [`docs/COMPATIBILITY_MATRIX.md`](docs/COMPATIBILITY_MATRIX.md) — Win/Linux/macOS × x86-64/arm64 |
 | **Limits** | [`MODEL_CARD.md`](MODEL_CARD.md) |
+| **Kernel internals** | [`docs/41`](docs/41_PORTABLE_SIMD_KERNEL.md) SIMD · [`docs/42`](docs/42_QAT_AND_LAYER_SEARCH.md) QAT+search · [`docs/43`](docs/43_MEMORY_FOOTPRINT.md) memory |
 | **Docs index** | [`docs/README.md`](docs/README.md) |
 
 ---
@@ -180,10 +219,33 @@ Committed snapshot (CPU; see [`results/SUMMARY.md`](results/SUMMARY.md)):
 |-------|--------|
 | Pack compression | **32.0×** (exact) |
 | Native GEMM vs ±1 FP32 | **err = 0** |
+| Every ISA path agrees bit-for-bit | **err = 0** (binary **and** ternary) |
 | 64×4096×4096 compute vs NumPy FP32 | **~23.9×** (machine-dependent) |
+| Wrapped Linear, measured RAM | **29.68×** (theoretical 32.00×) |
 | MNIST binary / ternary | **96.36%** / **97.16%** (FP **97.67%**) |
 | CIFAR Bi-Real vs FP CNN | **61.14%** vs **71.14%** (~10 pp) |
 | Audio binary vs FP (synthetic tones) | **96.0%** vs **94.5%** — **not** production ASR |
+
+<details>
+<summary><b>Where the kernel speed came from</b> (before → after, same process, min-of-5)</summary>
+
+The old kernel opened a **new OpenMP parallel region per batch row** and
+re-streamed all of `W` `B` times. One team per call plus 4-row register blocking,
+then runtime SIMD dispatch:
+
+| Shape (B×N×M) | before | after | |
+|---|---|---|---|
+| 8 × 4096 × 4096 | 0.212 ms | 0.062 ms | 3.4× |
+| 64 × 4096 × 4096 | 1.999 ms | 0.437 ms | 4.6× |
+| 256 × 1024 × 1024 | 0.739 ms | 0.119 ms | 6.2× |
+| 512 × 512 × 512 | 2.038 ms | 0.103 ms | **19.9×** |
+| **aggregate, 12 shapes** | **10.74 ms** | **2.12 ms** | **5.1×** |
+
+Tiny shapes are call-overhead bound and unchanged — as expected. Wall-clock moves
+with core count, memory bandwidth and thermals; `err = 0` does not.
+Details: [`docs/41_PORTABLE_SIMD_KERNEL.md`](docs/41_PORTABLE_SIMD_KERNEL.md).
+
+</details>
 
 > Floors live in [`tests/golden_floors.json`](tests/golden_floors.json). Wall-clock ratios move with CPU, threads, and OpenMP — gates check conclusions, not bit-identical floats.
 
@@ -257,11 +319,30 @@ Full tree: [`docs/18_DECISION_TREE_AND_COMPLETE_ROADMAP.md`](docs/18_DECISION_TR
 | Path | Command / entry | Docs |
 |------|-----------------|------|
 | Optimiser | `bnn optimise --policy auto` | [GUIDE §4](docs/GUIDE_E2E.md) · [tutorial 07](docs/tutorials/07_OPTIMISER_QUICKSTART.md) · [HF 08](docs/tutorials/08_HF_OPTIMISER.md) |
+| **Per-layer search** | `bnn.wrap.search_layer_modes(...)` | [docs/42](docs/42_QAT_AND_LAYER_SEARCH.md) — binary vs ternary vs skip, per layer |
+| **QAT recovery** | `bnn optimise --qat-steps 200` | [docs/42](docs/42_QAT_AND_LAYER_SEARCH.md) — search *before* QAT |
+| **Memory footprint** | `bnn memory --dim 1024 --ff 4096` | [docs/43](docs/43_MEMORY_FOOTPRINT.md) — resident vs theoretical |
 | Codec | `bnn encode` / `bnn decode` | [GUIDE §5](docs/GUIDE_E2E.md) |
 | MNIST STE | `bnn train --epochs 3 --seed 42` | pedagogy — not a throughput win |
 | Vision | `bnn train-image --epochs 8 --subset 30000` | [tutorial 04](docs/tutorials/04_image_cifar.md) |
 | Audio | `bnn train-audio --epochs 5` | [tutorial 05](docs/tutorials/05_audio.md) — synthetic only |
 | Seq2seq / profile | `bnn train-seq2seq` · `bnn profile` | [tutorial 06](docs/tutorials/06_encoder_decoder.md) |
+
+### The layer search, in one table
+
+`search_layer_modes` starts every layer binary and relaxes whatever costs the
+most quality, re-measuring the **whole** model each step. The trade-off is
+monotonic — and tested as such, because a search that ever reported *more*
+compression at *higher* quality would be lying:
+
+| `quality_floor` | final cosine | theoretical compression | assignment |
+|---|---|---|---|
+| 0.00 | 0.271 | **32.0×** | 3 binary |
+| 0.90 | 0.950 | 1.71× | 1 ternary, 2 skip |
+| 0.999 | 1.000 | 1.00× | 3 skip |
+
+That first row is the honest headline: **32× is available, at cosine 0.27.**
+Which is exactly why the search exists.
 
 ```
 bnn/           STE, layers, models, optimise, export, determinism
@@ -295,6 +376,8 @@ Public API: `import bnn` — [`docs/api/README.md`](docs/api/README.md). CLI: `b
 
 - [`CONTRIBUTING.md`](CONTRIBUTING.md) · [`CHANGELOG.md`](CHANGELOG.md) · [`SECURITY.md`](SECURITY.md) · [`docs/LAUNCH_CHECKLIST.md`](docs/LAUNCH_CHECKLIST.md)
 - Product direction: [`ROADMAP.md`](ROADMAP.md) (Phases A→F; workstreams W1–W14)
+- API reference is **generated** from docstrings (`mkdocs build --strict` in CI) — see [`docs/api/`](docs/api/); a renamed symbol breaks the build rather than silently emptying a page
+- Supply chain: wheels + sdist carry signed [build provenance](https://docs.github.com/actions/security-guides/using-artifact-attestations) (`gh attestation verify`), and `pip-audit` is a **hard gate** on the shipped dependency set with every ignore triaged in [`ci.yml`](.github/workflows/ci.yml)
 - Agents: [`AGENTS.md`](AGENTS.md) — do not invent alternate golden shapes
 - CI: [`ci.yml`](.github/workflows/ci.yml) — quality (ruff/mypy/coverage ≥80%), Windows + Linux native (export-check, repro), **portability** (linux-arm64 NEON, macos-arm64 NEON, macos-x86_64) per [`COMPATIBILITY_MATRIX.md`](docs/COMPATIBILITY_MATRIX.md), Python 3.11–3.13; plus [CodeQL](.github/workflows/codeql.yml), [Scorecard](.github/workflows/scorecard.yml), [wheels](.github/workflows/wheels.yml)
 
@@ -307,4 +390,4 @@ bnn eval-suite
 
 ---
 
-**License:** [MIT](LICENSE) · **Citation:** [`CITATION.cff`](CITATION.cff) when present · **Repo:** [KanakMalpani/Binary-Neural-Networks](https://github.com/KanakMalpani/Binary-Neural-Networks)
+**License:** [MIT](LICENSE) · **Citation:** [`CITATION.cff`](CITATION.cff) · **Repo:** [KanakMalpani/Binary-Neural-Networks](https://github.com/KanakMalpani/Binary-Neural-Networks)

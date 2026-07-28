@@ -2,6 +2,125 @@
 
 ## Unreleased
 
+### Memory footprint report (W13.T05) + arena decision (W2.T07)
+
+- **`bnn memory` / `bnn.memory.memory_report`** — per-layer footprint that keeps
+  **resident** (measured from real buffers) separate from **theoretical** (the
+  encoding's pack ratio). `TernaryWeightOnlyLinear` stores int8 while encoding
+  2 bits; reporting only the theoretical figure would claim a saving no machine
+  observes. Also reports a whole-model ratio that includes the FP embeddings /
+  attention / norms that were deliberately never wrapped.
+  Example (512→2048→512, `binary_xnor`): resident **29.68x**, theoretical 32.00x —
+  the gap is per-channel `alpha` and FP32 `bias`. Whole-model with a real
+  embedding table: **2.07x** vs 3.33x tracked.
+- `forward_transient_bytes` sizes the per-forward buffers. Activation packing is
+  32x smaller than FP32 activations and nearly free; the **FP32 output**
+  dominates transient memory, which is the buffer to plan edge deployments
+  around.
+- **W2.T07 memory arena: measured, then declined.** Output allocation is
+  **1.4–1.8%** of kernel time (9.74 µs vs 694.93 µs at 64x4096x4096). Against
+  that, `torch.from_numpy(np.ascontiguousarray(y))` *aliases* the NumPy buffer,
+  so recycling it would silently corrupt tensors the caller still holds — a
+  data-corruption bug for ~1.5%. Recorded in `docs/43_MEMORY_FOOTPRINT.md` with
+  the threshold for revisiting, so nobody has to re-derive it.
+
+### Ternary cross-ISA parity (W2.T09)
+
+- The ternary kernel has its own per-ISA `popcount_and`, but only the *binary*
+  path was tested across scalar / AVX2 / AVX-512 / NEON — a SIMD-only ternary
+  bug could have shipped silently. Added parity tests over six shapes covering
+  every vector-width remainder: all paths are **bit-identical to each other** and
+  to the NumPy path, and match the dequantised FP reference within the float32
+  scale rounding. No bug found; the gap was in coverage.
+- Also covers negative scale, all-zero ternary rows, and precomputed vs
+  on-the-fly `pop_p`/`pop_n`.
+
+### Performance — encoder / decoder / STE
+
+- **Fused attention (SDPA).** `MultiHeadAttention` and `CrossAttention` now use
+  `F.scaled_dot_product_attention` instead of a manual `q @ k.T` → softmax →
+  `@ v`. The `(B, H, T, T)` score matrix is no longer materialised, and the
+  causal path needs no mask, so nothing is allocated per forward (the old code
+  rebuilt `torch.triu(torch.ones(T, T))` on every call). Verified equal to the
+  previous computation to ~5e-7 (float32 rounding) on both causal and
+  non-causal paths.
+- **Sign is 4x cheaper to allocate.** `torch.where(x > 0, ones_like(x),
+  -ones_like(x))` allocated four full tensors; `x.gt(0).to(x.dtype).mul_(2).sub_(1)`
+  allocates one. **Bit-identical** — including `0.0`, `-0.0`, `±inf`, and
+  float16/32/64 — and 1.4–1.65x faster on its own. Applied to all five call
+  sites (`SignSTE`, `ApproxSignSTE`, `TanhSoftSTE`, `sign_pm1`, packed conv).
+  This is the hottest op in every binary layer: it was ~22% of encoder time.
+
+Combined, measured on this machine (min-of-5, same process):
+
+| case | before | after | speedup |
+|---|---|---|---|
+| encoder T=64 / 128 / 256 | 5.86 / 8.18 / 16.54 ms | 4.71 / 6.67 / 11.72 ms | 1.25 / 1.23 / **1.41x** |
+| decoder (causal) T=64 / 128 / 256 | 6.35 / 9.35 / 19.26 ms | 4.61 / 6.68 / 12.76 ms | 1.38 / 1.40 / **1.51x** |
+| seq2seq (cross-attn) T=64 / 128 | 14.97 / 21.89 ms | 10.80 / 16.55 ms | 1.39 / 1.32x |
+| codec encode / roundtrip | 4.98 / 9.19 ms | 3.98 / 7.34 ms | 1.25 / 1.25x |
+
+`train_seq2seq` still reaches `eval_token_acc = 1.0`, and all repro gates pass.
+
+### Optimiser — per-layer mode search (W3.T06) + QAT recipe (W3.T07)
+
+- **`bnn.wrap.search_layer_modes`** picks binary / ternary / skip **per layer**
+  to maximise theoretical compression subject to a measured cosine floor. It
+  starts maximally aggressive and greedily relaxes the layer costing the most
+  quality, re-measuring the *whole* model each step — per-layer scoring cannot
+  see layer interactions. `O(L)` probes per relaxation, not `3**L`.
+- Measured trade-off is monotonic (enforced by test — a search that reported
+  more compression at higher quality would be lying): floor 0.00 → 32.0x at
+  cosine 0.27; floor 0.90 → 1.71x at 0.950; floor 0.999 → 1.00x at 1.000.
+- **`docs/42_QAT_AND_LAYER_SEARCH.md`** — runnable QAT recipe with the knobs
+  that actually matter (steps, teacher, lr, target layers, real calibration
+  data) and the correct order of operations: search *before* QAT, so training
+  is not spent on layers the search would skip.
+
+### Docs — autodoc site (W9.T06)
+
+- `mkdocstrings` wired into `mkdocs.yml`; seven generated API pages covering
+  kernels (incl. runtime dispatch), optimiser, wrapping, layers/STE,
+  encoder/decoder, codec, and reporting. **`mkdocs build --strict` passes.**
+- `docs = [...]` extra added; new `docs` CI job builds the site and fails on a
+  renamed symbol rather than silently emptying a page.
+- `tests/test_docs_links.py` enforces repo-wide link integrity, mkdocs nav
+  targets, that every `:::` autodoc reference resolves, and that everything in
+  `bnn.__all__` appears in the API docs. This is what lets MkDocs skip
+  `not_found` for the root-level docs (README / ROADMAP / REPRODUCIBILITY /
+  AGENTS) that live outside `docs_dir` by design.
+- Fixed a broken `docs/GUIDE_E2E.md` link in the roadmap (the file already
+  lives in `docs/`, so the prefix doubled up).
+
+### Supply chain (W8.T07 / W10.T05)
+
+- **Build provenance attestations** on every wheel and the sdist via
+  `actions/attest-build-provenance`, so a consumer can run
+  `gh attestation verify bnn-*.whl --repo ...`. Skipped on forks, which cannot
+  mint an OIDC token.
+- **pip-audit is now a hard gate** — but scoped to `requirements.txt` (the
+  shipped dependency set) rather than the whole environment, because failing the
+  build on pip-audit's own transitive deps is noise, not security. Any advisory
+  not on the explicit triaged list fails CI; the two current ignores each carry
+  the reason and the condition for removal. A report-only full-environment sweep
+  still runs so new findings stay visible.
+
+### CI reliability
+
+- **Fast tests can no longer touch the network.** `tests/conftest.py` blocks
+  socket creation for any non-`slow`/`hf` test, with an `allow_network` opt-out
+  and a meta-test proving the guard fires. A truncated CIFAR download on the
+  macOS runner is what last turned CI red; this makes the fix structural rather
+  than conventional.
+- **CIFAR download hardened**: 60s timeout (`urlretrieve` accepts none, so a
+  stalled socket hung the runner), atomic `.part` + `os.replace` (a partial file
+  could otherwise be cached as a valid archive), exponential backoff, and exact
+  **MD5 verification** — a size floor cannot tell truncated from corrupt.
+- `tarfile.extractall` now uses `filter="data"` with a manual member-validation
+  fallback for Python 3.11 patch levels that lack it (CVE-2007-4559).
+- Real-CIFAR vision smoke restored as a `slow` test that **skips** on an
+  unreachable CDN instead of failing.
+
 ### CLI — in-process script dispatch + handler coverage
 
 - ``bnn.cli`` runs ``scripts/*.py`` in-process via small helpers
