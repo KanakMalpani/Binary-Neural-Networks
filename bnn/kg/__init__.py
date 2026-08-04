@@ -2,9 +2,10 @@
 from __future__ import annotations
 
 import json
+from collections.abc import Iterable
 from functools import lru_cache
 from pathlib import Path
-from typing import Any, Iterable
+from typing import Any
 
 _REPO_ROOT = Path(__file__).resolve().parents[2]
 _DEFAULT_KG = _REPO_ROOT / "knowledge_graph" / "bnn_kg.json"
@@ -42,9 +43,9 @@ def neighborhood(
     g = graph if graph is not None else load_kg()
     out: list[dict[str, Any]] = []
     for e in g["edges"]:
-        if direction in ("out", "both") and e["source"] == node_id:
-            out.append(e)
-        elif direction in ("in", "both") and e["target"] == node_id:
+        if (direction in ("out", "both") and e["source"] == node_id) or (
+            direction in ("in", "both") and e["target"] == node_id
+        ):
             out.append(e)
     return out
 

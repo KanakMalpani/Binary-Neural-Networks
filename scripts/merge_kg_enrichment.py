@@ -10,7 +10,7 @@ from __future__ import annotations
 
 import json
 import xml.etree.ElementTree as ET
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
 from xml.dom import minidom
@@ -109,11 +109,14 @@ def merge_node(lab: dict[str, Any], enr: dict[str, Any]) -> dict[str, Any]:
     lab_c = float(lab.get("confidence", 0))
     lab_status = str(lab.get("status", ""))
     prefer_enr = enr_c > lab_c or lab_status in ("stub", "literature", "idea_vault")
-    if prefer_enr or len(enr.get("summary", "")) > len(lab.get("summary", "")) + 40:
-        # enrichment often has ImageNet numbers — keep if denser
-        if "ImageNet" in enr.get("summary", "") or "arXiv" in enr.get("summary", "") or enr_c >= lab_c:
-            merged["summary"] = enr["summary"]
-            merged["confidence"] = max(lab_c, enr_c)
+    denser_summary = len(enr.get("summary", "")) > len(lab.get("summary", "")) + 40
+    enr_summary = enr.get("summary", "")
+    # enrichment often has ImageNet numbers — keep if denser
+    if (prefer_enr or denser_summary) and (
+        "ImageNet" in enr_summary or "arXiv" in enr_summary or enr_c >= lab_c
+    ):
+        merged["summary"] = enr["summary"]
+        merged["confidence"] = max(lab_c, enr_c)
     # union sources
     seen = set(merged.get("sources") or [])
     for s in enr.get("sources") or []:
@@ -265,7 +268,7 @@ def main() -> None:
     meta["node_types"] = sorted({n["type"] for n in nodes})
     meta["relations"] = sorted({e["relation"] for e in edges})
     meta["version"] = "1.1.0"
-    meta["merged_at"] = datetime.now(timezone.utc).isoformat()
+    meta["merged_at"] = datetime.now(UTC).isoformat()
     meta["generated_by"] = "scripts/build_bnn_kg.py + scripts/merge_kg_enrichment.py"
     runs = list(meta.get("enrichment_runs") or [])
     runs.append(
