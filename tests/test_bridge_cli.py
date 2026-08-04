@@ -93,7 +93,7 @@ def test_pareto_from_results(tmp_path: Path):
     assert payload["schema"] == "bnn_pareto_report_v1"
     assert len(payload["points"]) >= 2
     names = {p["name"] for p in payload["points"]}
-    assert "fp32_reference" in names
+    assert "reference_anchor" in names
 
 
 def test_run_bridge_rejects_bad_names():

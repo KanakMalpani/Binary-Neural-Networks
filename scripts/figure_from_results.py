@@ -15,7 +15,6 @@ from __future__ import annotations
 
 import argparse
 import json
-import sys
 from pathlib import Path
 from typing import Any
 
@@ -229,7 +228,7 @@ def build_manifest() -> dict[str, Any]:
             "Bit-identical floats across machines as pass criterion",
             "Production ASR / full ImageNet SOTA as delivered",
         ],
-        "paper_vault": "C:\\00 Research Papers (see docs/32_NOVEL_PAPER_CANDIDATES.md)",
+        "paper_vault": "docs/32_NOVEL_PAPER_CANDIDATES.md",
         "figure_cmds": [
             "bnn bridge figures --plot-dir results/figures",
             "bnn pareto --from-results --out results/pareto_from_results.json "

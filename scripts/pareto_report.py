@@ -68,14 +68,14 @@ def _load_committed_result_points() -> list[ParetoPoint]:
 
     points.append(
         ParetoPoint(
-            name="fp32_reference",
+            name="reference_anchor",
             accuracy=1.0,
             compression=1.0,
             latency_ms=None,
             energy_proxy=None,
-            notes="Reference; compression=1 means no pack",
+            notes="Synthetic FP32 anchor (not a golden); compression=1 means no pack",
             accuracy_metric="relative_ref",
-            extra={"source": "synthetic_ref"},
+            extra={"source": "synthetic_ref", "kind": "reference_anchor"},
         )
     )
 

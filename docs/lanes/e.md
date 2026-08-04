@@ -36,3 +36,4 @@
 - Lane I may further harden `scripts/bridges/llamacpp*` + pins; E only wires CLI + docs/23.
 - PNG plots need optional `matplotlib`; JSON manifests always work.
 - Integrator: apply checkbox flips in ROADMAP twin from this file.
+- **Merge note:** `docs/23_BITNET_CPP_BRIDGE.md` likely conflicts with Lane I PR #17 — prefer I’s recipe/hardening content, keep E’s `bnn bridge …` CLI section when resolving.
