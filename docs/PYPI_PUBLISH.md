@@ -68,6 +68,15 @@ Trusted Publishing is **not** configured for this project yet:
 
 The publish job uses OIDC (`id-token: write`); no long-lived API token in the repo.
 
+## Wheel matrix notes (Lane C dry-run)
+
+cibuildwheel on **macOS/Windows** sets `BNN_NO_OPENMP=1` so wheels ship
+portable SIMD kernels without Homebrew `libomp` (delocate/macOS 26 bottle
+mismatch) or MSVC `vcomp*.dll` ctypes load failures. Linux still links
+`libgomp` when available. Thesis win remains packed XNOR–popcount, not thread
+scaling. Local OpenMP: omit the env var / use `BNN_FORCE_OPENMP` on macOS via
+`compile_native`.
+
 ## Dry-run (Actions, preferred)
 
 ```bat

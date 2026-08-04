@@ -36,6 +36,22 @@ EXTENSION = Extension(
 )
 
 
+def _openmp_requested() -> bool:
+    """OpenMP is optional; cibuildwheel sets ``BNN_NO_OPENMP=1`` for portable wheels.
+
+    Thesis win is packed SIMD (XNOR–popcount), not thread scaling. Homebrew
+    ``libomp`` bottles on current macOS runners also break ``delocate`` against
+    ``MACOSX_DEPLOYMENT_TARGET=11.0``, and MSVC ``/openmp`` pulls ``vcomp*.dll``
+    that ``ctypes`` cannot always resolve in the wheel test venv.
+    """
+    return os.environ.get("BNN_NO_OPENMP", "").strip().lower() not in {
+        "1",
+        "true",
+        "yes",
+        "on",
+    }
+
+
 def _openmp_flags(compiler_type: str) -> tuple[list[str], list[str]]:
     """(compile_args, link_args) enabling OpenMP, or ([], []) if unavailable.
 
@@ -45,6 +61,8 @@ def _openmp_flags(compiler_type: str) -> tuple[list[str], list[str]]:
     ``-O3`` is appended deliberately because the last optimisation flag wins and
     the popcount loops benefit from it.
     """
+    if not _openmp_requested():
+        return [], []
     if compiler_type == "msvc":
         return ["/openmp"], []
     if sys.platform == "darwin":
@@ -93,19 +111,20 @@ class BuildExtWithOpenMPFallback(build_ext):
         saved_compile = list(ext.extra_compile_args or [])
         saved_link = list(ext.extra_link_args or [])
 
-        compile_args, link_args = _openmp_flags(compiler_type)
-        ext.extra_compile_args = saved_compile + compile_args
-        ext.extra_link_args = saved_link + link_args
-        try:
-            super().build_extension(ext)
-            if self._output_is_usable(ext):
-                return
-            print("NOTE: OpenMP build produced no usable library; retrying without it.")
-        except Exception as exc:  # noqa: BLE001 - any toolchain error is non-fatal
-            print(f"NOTE: OpenMP build failed ({exc}); retrying without it.")
+        if _openmp_requested():
+            compile_args, link_args = _openmp_flags(compiler_type)
+            ext.extra_compile_args = saved_compile + compile_args
+            ext.extra_link_args = saved_link + link_args
+            try:
+                super().build_extension(ext)
+                if self._output_is_usable(ext):
+                    return
+                print("NOTE: OpenMP build produced no usable library; retrying without it.")
+            except Exception as exc:  # noqa: BLE001 - any toolchain error is non-fatal
+                print(f"NOTE: OpenMP build failed ({exc}); retrying without it.")
+            self._discard_stale_output(ext)
+            self.force = True
 
-        self._discard_stale_output(ext)
-        self.force = True
         ext.extra_compile_args = saved_compile + _plain_flags(compiler_type)
         ext.extra_link_args = saved_link
         try:

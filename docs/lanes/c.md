@@ -51,7 +51,12 @@ golden shapes; dual-metric honesty.
 gh workflow run wheels.yml --ref lane/c-release -f publish=false
 ```
 
-- Run: https://github.com/KanakMalpani/Binary-Neural-Networks/actions/runs/30922180976
-- Branch SHA: `25f0b84`
+- First dry-run: https://github.com/KanakMalpani/Binary-Neural-Networks/actions/runs/30922180976
+  - Exposed macOS `delocate`/libomp bottle mismatch + Windows OpenMP `vcomp` ctypes load failure
+  - Fixed via `BNN_NO_OPENMP=1` on macOS/Windows cibuildwheel (SIMD still ships)
+- Re-dispatch after fix: _(filled after push)_
+- Branch tip: _(filled after push)_
 - PR: https://github.com/KanakMalpani/Binary-Neural-Networks/pull/16
-- Conclusion: _(in progress — publish job must stay skipped)_
+- Conclusion: _(await re-run; publish must stay skipped)_
+
+**Still blocked for upload:** PyPI Trusted Publisher for `bnn-lab` (project 404).

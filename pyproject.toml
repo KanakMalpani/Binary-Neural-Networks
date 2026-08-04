@@ -104,10 +104,16 @@ test-requires = ["numpy"]
 test-command = "python {project}/scripts/check_wheel_kernel.py"
 
 [tool.cibuildwheel.macos]
-# Apple clang has no OpenMP runtime; libomp is bundled by delocate when found.
-# If it is missing the build falls back to single-threaded (still SIMD).
-before-all = "brew install libomp || true"
-environment = { LIBOMP_PREFIX = "/opt/homebrew/opt/libomp", MACOSX_DEPLOYMENT_TARGET = "11.0" }
+# Match docs/MACOS_NOTES.md + CI portability: do NOT brew-install libomp.
+# Current Homebrew bottles require macOS 26+, which delocate rejects against
+# MACOSX_DEPLOYMENT_TARGET=11.0. SIMD (NEON/AVX2) still ships; OpenMP is
+# threading-only and opt-in via BNN_FORCE_OPENMP for local builds.
+environment = { MACOSX_DEPLOYMENT_TARGET = "11.0", BNN_NO_OPENMP = "1" }
+
+[tool.cibuildwheel.windows]
+# MSVC /openmp links vcomp*.dll; ctypes wheel smoke cannot always resolve it
+# in the isolated test venv. SIMD paths remain; OpenMP is local/dev opt-in.
+environment = { BNN_NO_OPENMP = "1" }
 
 [tool.cibuildwheel.linux]
 before-all = "yum install -y libgomp || apk add --no-cache libgomp || true"
