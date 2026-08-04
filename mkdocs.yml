@@ -17,6 +17,7 @@ nav:
   - Docs index: README.md
   - Optimiser quickstart: tutorials/07_OPTIMISER_QUICKSTART.md
   - HF optimiser: tutorials/08_HF_OPTIMISER.md
+  - Demos: demos/README.md
   - API reference:
       - Overview: api/README.md
       - Optimiser: api/optimise.md
@@ -25,9 +26,12 @@ nav:
       - Layers & STE: api/layers.md
       - Encoder / decoder: api/seq.md
       - Weight codec: api/codec.md
+      - Paths & safety: api/paths.md
       - Reporting & repro: api/reporting.md
   - ADRs: adr/README.md
   - Semver policy: SEMVER_AND_DEPRECATION.md
+  - Torch pin policy: TORCH_PIN_POLICY.md
+  - Optional extras: OPTIONAL_EXTRAS_MATRIX.md
   - Portable SIMD kernel: 41_PORTABLE_SIMD_KERNEL.md
   - QAT + layer search: 42_QAT_AND_LAYER_SEARCH.md
   - Memory footprint: 43_MEMORY_FOOTPRINT.md

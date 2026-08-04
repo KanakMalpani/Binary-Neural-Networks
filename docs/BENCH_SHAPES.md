@@ -22,6 +22,7 @@ Compare only to `tests/golden_floors.json` and committed `results/*.json`.
 - Re-running the **same** shapes on new hardware (floats may differ)
 - Adding **optional** probes clearly labeled non-golden
 - Soft latency budgets that do not change pass/fail goldens without CHANGELOG + justification
+  (`bnn.profile.SOFT_BUDGETS_MS` / `check_soft_budgets` — W13.T03)
 
 ## Forbidden
 

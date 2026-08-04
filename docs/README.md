@@ -48,6 +48,9 @@ Ordered path (also nested inside [`GUIDE_E2E.md`](GUIDE_E2E.md)):
 | [`adr/README.md`](adr/README.md) | Architecture Decision Records |
 | [`DATASET_CARDS.md`](DATASET_CARDS.md) | MNIST / CIFAR / synth audio cards |
 | [`COMPATIBILITY_MATRIX.md`](COMPATIBILITY_MATRIX.md) | OS × Python × torch matrix |
+| [`TORCH_PIN_POLICY.md`](TORCH_PIN_POLICY.md) | Why `torch<2.13` (W14.T03) |
+| [`OPTIONAL_EXTRAS_MATRIX.md`](OPTIONAL_EXTRAS_MATRIX.md) | transformers / torchao smoke (W14.T06) |
+| [`demos/README.md`](demos/README.md) | Asciinema / demo assets (W9.T10) |
 | [`36_ENCODER_DECODER_AND_NEXT.md`](36_ENCODER_DECODER_AND_NEXT.md) | Encoder/Decoder, `.bnnpack` codec, wrap-transformer, profile, bridges |
 
 ## Research & architecture (read order)

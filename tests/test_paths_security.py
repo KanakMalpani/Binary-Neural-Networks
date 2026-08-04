@@ -1,4 +1,4 @@
-"""Path safety + packed validation fail-fast."""
+"""Path safety + packed validation fail-fast + pickle / untrusted-pack policy."""
 
 from __future__ import annotations
 
@@ -6,15 +6,22 @@ from pathlib import Path
 
 import numpy as np
 import pytest
+import torch
+import torch.nn as nn
 
+from bnn.codec import encode_file, load_bnnpack
+from bnn.export import load_checkpoint, save_checkpoint
 from bnn.kernels.packed import binary_gemm_packed, pack_binary_pm1
+from bnn.layers import BinaryLinear
 from bnn.paths import (
     REPO_ROOT,
     PathSecurityError,
     data_path,
+    is_under_repo_trusted_pack_root,
     repo_relative,
     resolve_under,
     results_path,
+    warn_untrusted_pack,
 )
 
 
@@ -37,7 +44,7 @@ def test_resolve_under_allows_nested(tmp_path: Path):
     "escape",
     [
         "../outside.txt",
-        "a/../../outside.txt",       # escapes only after normalisation
+        "a/../../outside.txt",
         "./../outside.txt",
         "a/b/../../../outside.txt",
     ],
@@ -105,3 +112,56 @@ def test_pack_rejects_empty():
 def test_gemm_rejects_bad_ndim():
     with pytest.raises(ValueError):
         binary_gemm_packed(np.ones(8), np.ones((4, 8)))
+
+
+def test_checkpoint_roundtrip_weights_only(tmp_path: Path):
+    """Trusted STE checkpoints round-trip under weights_only=True."""
+    model = nn.Sequential(BinaryLinear(16, 8))
+    path = tmp_path / "ste.pt"
+    save_checkpoint(model, path, meta={"note": "trusted"})
+    model2 = nn.Sequential(BinaryLinear(16, 8))
+    meta = load_checkpoint(model2, path)
+    assert meta.get("note") == "trusted"
+    for (n1, p1), (n2, p2) in zip(model.named_parameters(), model2.named_parameters()):
+        assert n1 == n2
+        assert torch.equal(p1, p2)
+
+
+def test_bnnpack_refuses_unsafe_pickle_fallback(tmp_path: Path):
+    """W10.T03/T06 — corrupted / non-tensor packs must not fall back to pickle."""
+    path = tmp_path / "evil.bnnpack"
+    path.write_bytes(b"not-a-torch-pickle")
+    with pytest.raises(ValueError) as ei:
+        load_bnnpack(path)
+    msg = str(ei.value).lower()
+    assert "weights_only" in msg or "refusing" in msg or "unsafe" in msg
+
+
+def test_warn_untrusted_pack_outside_lab_roots(tmp_path: Path, capsys):
+    outsider = tmp_path / "downloaded.bnnpack"
+    outsider.write_text("x", encoding="utf-8")
+    assert is_under_repo_trusted_pack_root(outsider) is False
+    assert warn_untrusted_pack(outsider) is True
+    err = capsys.readouterr().err
+    assert "untrusted" in err.lower()
+
+
+def test_no_warn_for_results_pack(tmp_path: Path, monkeypatch, capsys):
+    """Packs under repo results/ are lab-local — no soft warning."""
+    fake_root = tmp_path / "repo"
+    (fake_root / "results").mkdir(parents=True)
+    pack = fake_root / "results" / "toy.bnnpack"
+    pack.write_text("x", encoding="utf-8")
+    monkeypatch.setattr("bnn.paths.REPO_ROOT", fake_root)
+    assert is_under_repo_trusted_pack_root(pack) is True
+    assert warn_untrusted_pack(pack) is False
+    assert "untrusted" not in capsys.readouterr().err.lower()
+
+
+def test_load_bnnpack_warns_outside_lab(tmp_path: Path, capsys):
+    model = nn.Sequential(BinaryLinear(64, 32))
+    pack = tmp_path / "outside.bnnpack"
+    encode_file(model, pack, meta={"t": 1}, min_in_features=1)
+    load_bnnpack(pack)
+    err = capsys.readouterr().err
+    assert "untrusted" in err.lower()
