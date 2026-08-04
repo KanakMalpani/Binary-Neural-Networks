@@ -2,7 +2,7 @@
 
 **Branch:** `lane/c-release`  
 **Base:** `main` @ `f40f65e` (rebased)  
-**Tip:** `4101d05` (rebased; see `git rev-parse lane/c-release`)  
+**Tip:** a0064b2  
 **Owned paths:** `.github/workflows/wheels.yml`, `docs/PYPI*`, `docs/SBOM*`,
 README packaging badge row, careful `pyproject.toml` packaging metadata,
 `docs/lanes/c.md`.
