@@ -398,9 +398,11 @@ def cmd_decode(args: argparse.Namespace) -> int:
                 return 1
             continue
         print(
-            f"  {name}: kind={type(mod).__name__} skipped (no decode check)",
+            f"ERROR {name}: unsupported module type {type(mod).__name__} "
+            "(decode expects binary_xnor / ternary_weight_only / binary_conv_packed)",
             file=sys.stderr,
         )
+        return 1
     if max_err > 0:
         print(f"ERROR non-zero packed vs FP err={max_err}", file=sys.stderr)
         return 1

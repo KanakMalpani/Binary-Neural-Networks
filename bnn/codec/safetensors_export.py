@@ -12,13 +12,7 @@ from typing import Any
 
 import torch
 
-from .packfile import (
-    KIND_BINARY_CONV,
-    KIND_BINARY_XNOR,
-    KIND_CODE,
-    KIND_TERNARY,
-    load_bnnpack,
-)
+from .packfile import KIND_CODE, load_bnnpack
 
 
 def _require_safetensors():

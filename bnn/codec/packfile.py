@@ -620,20 +620,33 @@ def load_bnnpack(
                 f"{path}: content_sha256 mismatch for layers {bad}; "
                 "file may be corrupted or tampered"
             )
+        # v2 writers must publish a container hashes map covering every layer.
+        top = payload.get("hashes")
+        layers = payload["layers"]
+        if not isinstance(top, dict) or set(top) != set(layers):
+            raise ValueError(
+                f"{path}: v2 hashes map missing or incomplete "
+                f"(hashes={None if not isinstance(top, dict) else sorted(top)}; "
+                f"layers={sorted(layers)})"
+            )
     return payload
 
 
 def verify_layer_hashes(payload: dict[str, Any]) -> list[str]:
-    """Return list of layer names whose ``content_sha256`` mismatches recomputation."""
+    """Return layer names with missing/mismatched ``content_sha256`` (v2-strict).
+
+    Also flags layers whose container ``hashes`` map disagrees with the blob hash.
+    """
     mismatches: list[str] = []
     layers = payload.get("layers") or {}
     if not isinstance(layers, dict):
         return mismatches
+    top_hashes = payload.get("hashes")
+    if not isinstance(top_hashes, dict):
+        top_hashes = {}
     for name, blob in layers.items():
         if not isinstance(blob, dict):
-            continue
-        expected = blob.get("content_sha256")
-        if not expected:
+            mismatches.append(name)
             continue
         packed = None
         for key in ("weight_packed_i64", "weight_packed_u8"):
@@ -641,10 +654,18 @@ def verify_layer_hashes(payload: dict[str, Any]) -> list[str]:
                 packed = blob[key]
                 break
         if packed is None:
+            # Packed payload required for every encoded layer.
+            mismatches.append(name)
             continue
         if not isinstance(packed, torch.Tensor):
             packed = torch.as_tensor(packed)
-        if content_sha256_tensor(packed) != expected:
+        actual = content_sha256_tensor(packed)
+        expected = blob.get("content_sha256")
+        if not expected or actual != expected:
+            mismatches.append(name)
+            continue
+        top = top_hashes.get(name)
+        if top is not None and str(top) != actual:
             mismatches.append(name)
     return mismatches
 
