@@ -1,10 +1,11 @@
-# QAT recipe + per-layer mode search (W3.T06 / W3.T07)
+# QAT recipe + per-layer mode search + distill + BN fuse (WC-O)
 
-Closes the two open WC-O polish items: a runnable QAT recipe, and an actual
-**search** over per-layer binary / ternary / skip instead of a single global mode.
+Closes WC-O polish: runnable QAT/distill recipes, per-layer
+**binary / ternary / skip** search, unified calibrate, always-on effectiveness
++ policy reasons, drop-in honesty tests, and BN fuse on the wrap path.
 
-Both are accuracy tools. Neither changes the thesis: compression numbers stay
-theoretical pack ratios, latency stays wall-clock, and the two are never mixed.
+Accuracy tools only. Thesis lock: compression numbers stay theoretical pack
+ratios; latency stays wall-clock; never claim GPU 32× from `sign()`.
 
 ---
 
@@ -55,69 +56,119 @@ is why the search exists, and why "32×" alone is never a result.
 
 ---
 
-## 2. QAT recipe
+## 2. Unified calibrate (W3.T01)
 
-PTQ alone does not recover binary FFN quality. `light_qat_recover` is a short STE
-fine-tune that runs in seconds on a toy stack; it is **not** BitDistill-scale.
+One entrypoint dispatches on the argument type:
+
+```python
+from bnn.wrap import calibrate, CalibConfig
+
+alpha = calibrate(weight_tensor, CalibConfig(method="absmean", per_channel=True))
+report = calibrate(model, CalibConfig(method="percentile"), policy="hybrid_ffn")
+print(report.to_dict()["n_layers"], report.scales_by_name().keys())
+```
+
+`calibrate_linear_scales` / `calibrate_model` remain the explicit helpers;
+`wrap_model(..., calib=CalibConfig(...))` still applies scales at pack time.
+
+---
+
+## 3. Effectiveness + policy reasons + drop-in (W3.T02–T04)
+
+Every `wrap_model` report now carries:
+
+- `effectiveness` — measured dict after `attach_effectiveness`, or an explicit
+  **unmeasured stub** (`measured=False`, `drop_in_ok=False`) so the field is
+  never missing.
+- `policy_reason` — non-empty string (auto recommender text or
+  `policy=… mode=…`).
+
+Drop-in honesty:
+
+```python
+from bnn.wrap import measure_agreement, attach_effectiveness, drop_in_ok
+
+eff = measure_agreement(teacher_logits, student_logits, drop_in_threshold=0.85)
+attach_effectiveness(report, eff)          # refuse if below threshold
+attach_effectiveness(report, eff, force=True)  # claim only with --force
+```
+
+Unmeasured stubs refuse drop-in unless `force=True`.
+
+---
+
+## 4. QAT + distill (W3.T07 / W3.T08)
+
+PTQ alone does not recover binary FFN quality. Two recovery APIs:
+
+### Light STE (`light_qat_recover`)
 
 ```python
 from bnn.wrap.qat import light_qat_recover
 
 report = light_qat_recover(
-    model,                    # mutated in place; FFN Linears swapped to BinaryLinear
-    calib_x,                  # a representative batch
-    teacher=fp32_reference,   # distillation target (or pass loss_fn=...)
+    model,
+    calib_x,
+    teacher=fp32_reference,
     steps=200,
     lr=1e-3,
 )
-# Layers come back as plain nn.Linear with the learned latent weights,
-# so the model is immediately packable.
 ```
 
-Then wrap and pack:
+### Multi-batch distill (`distill_binary_student`) — beyond `distill_sketch.py`
 
 ```python
-from bnn.wrap import wrap_model
-wrapped = wrap_model(model, mode="binary_xnor", policy="hybrid_ffn")
+from bnn.wrap import distill_binary_student, DistillConfig
+
+d = distill_binary_student(
+    student, teacher, batches,
+    cfg=DistillConfig(steps=80, temperature=2.0, lr=5e-3),
+)
+print(d.cosine_before, d.cosine_after, d.cosine_uplift)
 ```
 
-Or in one step from the CLI:
+Runnable demo:
+
+```bash
+python scripts/distill_wrap_demo.py --steps 80
+```
+
+Or CLI optimise with light QAT:
 
 ```bash
 bnn optimise --policy auto --qat-steps 200 --force
 ```
 
-### Recipe parameters that actually matter
-
-| Knob | Toy stack | Real model | Why |
-|---|---|---|---|
-| `steps` | 40–200 | 10³–10⁵ | The dominant factor; a few dozen steps only removes the worst PTQ damage |
-| `teacher` | optional | **required** | Distilling FP32 logits beats any label loss for recovery |
-| `lr` | `1e-3` | `1e-5`–`1e-4` | Latent weights are already near a good solution; large steps destroy them |
-| target layers | `ffn`/`mlp`/`fc1`/`fc2` | same | Wrapping attention is the documented accuracy trap — leave Q/K/V FP |
-| `calib_x` | random | **real data** | Random activations do not exercise the distribution the scales were fit to |
-
-`light_qat_recover` refuses to run without `teacher=` or `loss_fn=`. The old
-self-argmax cross-entropy fallback was removed because it was a no-op at best.
-
 ### Order of operations
 
-Search **before** QAT, not after:
+1. `fuse_bn_for_wrap_(model)` or `wrap_model(..., fuse_bn=True)` (W3.T09)
+2. `search_layer_modes` → which layers can be binary
+3. `distill_binary_student` / `light_qat_recover` → recover remaining binary layers
+4. `wrap_model(..., exclude_exact=report.skipped)` → pack
+5. `bnn profile` → confirm wall-clock win
 
-1. `search_layer_modes` → which layers can be binary at all
-2. `light_qat_recover` → recover the ones that stay binary
-3. `wrap_model(..., exclude_exact=report.skipped)` → pack
-4. `bnn profile` → confirm the wall-clock win is real
+---
 
-Doing QAT first wastes training on layers the search would have skipped.
+## 5. BN fuse on the optimiser / wrap path (W3.T09)
+
+```python
+from bnn.wrap import fuse_bn_for_wrap_, wrap_model
+
+fuse_bn_for_wrap_(model)          # Linear→BN1d pairs + BiRealBlock
+# or
+wrap_model(model, policy="hybrid_ffn", fuse_bn=True)
+```
+
+Eval-only fold. Does not change the thesis compression story.
+
+**Residual for integrator:** wire `OptimiseConfig.fuse_bn` /
+`OptimiseConfig.distill_steps` into `bnn/optimise.py` (outside Lane A ownership).
 
 ---
 
 ## Non-claims
 
-- The toy numbers above are a **3-Linear stack with random calibration data**;
-  they demonstrate the mechanism, not production accuracy.
-- `light_qat_recover` is a recovery aid, not a training pipeline. Production
-  binary LLMs need BitDistill-scale distillation on real corpora.
-- Compression figures are theoretical pack ratios throughout. Use `bnn profile`
-  or `bnn bench` for anything wall-clock.
+- Toy numbers demonstrate mechanisms, not production accuracy.
+- Distill / light QAT are recovery aids, not BitDistill-scale pipelines.
+- Compression figures are theoretical pack ratios. Use `bnn profile` /
+  `bnn bench` for wall-clock.
