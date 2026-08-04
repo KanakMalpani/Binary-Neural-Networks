@@ -269,11 +269,17 @@ class BinaryWeightOnlyDequantLinear(nn.Module):
 
 
 class PackedBinaryConv2d(nn.Module):
-    """Packed ±1 Conv2d weights (size win). Forward = dequant + F.conv2d."""
+    """Packed ±1 Conv2d weights (size win). Forward = dequant + F.conv2d.
+
+    Thesis: this is a **size** path (uint64 pack of ±1 kernels), not an XNOR
+    popcount Conv claim. Packed words live in ``weight_packed_i64`` for
+    ``.bnnpack`` / state_dict round-trips (W5.T09).
+    """
 
     # Buffers declared for the type checker: nn.Module.__getattr__ is
     # typed as Tensor | Module.
     weight_pm1: Tensor
+    weight_packed_i64: Tensor
     alpha: Tensor
     bias: Tensor | None
     _wp_np: np.ndarray
@@ -285,21 +291,31 @@ class PackedBinaryConv2d(nn.Module):
         *,
         stride: int = 1,
         padding: int = 0,
+        dilation: int = 1,
+        groups: int = 1,
         alpha: Tensor | None = None,
     ):
         super().__init__()
+        if groups != 1:
+            raise ValueError("PackedBinaryConv2d supports groups=1 only")
+        if dilation != 1:
+            raise ValueError("PackedBinaryConv2d supports dilation=1 only")
         out_c, in_c, kh, kw = weight.shape
         self.in_channels = in_c
         self.out_channels = out_c
         self.kernel_size = (kh, kw)
-        self.stride = stride
-        self.padding = padding
+        self.stride = int(stride)
+        self.padding = int(padding)
+        self.dilation = int(dilation)
+        self.groups = int(groups)
         w_pm1 = sign_pm1(weight.detach().float().cpu()).numpy().astype(np.float32)
         flat = w_pm1.reshape(out_c, -1)
         packed, n = pack_binary_pm1(flat, axis=1)
         self._n = n
-        self._wp_np = np.ascontiguousarray(packed)
+        wp_i64 = torch.from_numpy(np.ascontiguousarray(packed).view(np.int64).copy())
+        self.register_buffer("weight_packed_i64", wp_i64)
         self.register_buffer("weight_pm1", torch.from_numpy(w_pm1))
+        self._sync_numpy_views()
         if alpha is None:
             a = weight.detach().abs().mean(dim=(1, 2, 3)).clamp(min=1e-4).float().cpu()
         else:
@@ -312,21 +328,33 @@ class PackedBinaryConv2d(nn.Module):
         else:
             self.bias = None
 
+    def _sync_numpy_views(self) -> None:
+        wp = self.weight_packed_i64.detach().cpu().numpy()
+        self._wp_np = np.ascontiguousarray(wp.view(np.uint64))
+
+    def _load_from_state_dict(self, *args, **kwargs) -> None:
+        super()._load_from_state_dict(*args, **kwargs)
+        self._sync_numpy_views()
+
     def extra_repr(self) -> str:
         return (
             f"in={self.in_channels}, out={self.out_channels}, "
-            f"k={self.kernel_size}, mode=binary_conv_packed_dequant"
+            f"k={self.kernel_size}, mode=binary_conv_packed_dequant, "
+            f"packed_once=True"
         )
 
     def forward(self, x: Tensor) -> Tensor:
         w = self.weight_pm1.to(x.device) * self.alpha.view(-1, 1, 1, 1).to(x.device)
-        x_b = x.gt(0).to(x.dtype).mul_(2).sub_(1)
+        # Out-of-place ±1 activations — do not mutate caller tensors.
+        x_b = x.gt(0).to(x.dtype).mul(2).sub(1)
         return F.conv2d(
             x_b,
             w,
             None if self.bias is None else self.bias.to(x.device),
             stride=self.stride,
             padding=self.padding,
+            dilation=self.dilation,
+            groups=self.groups,
         )
 
     def packed_weight_bytes(self) -> int:
