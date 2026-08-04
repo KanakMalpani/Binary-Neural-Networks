@@ -1,0 +1,4 @@
+# Optional compiled pedagogy WASM (gitignored by default if huge rebuild noise)
+# Commit binary_gemm_wasm.wasm when intentionally shipping a prebuilt demo artifact.
+*.o
+*.obj
