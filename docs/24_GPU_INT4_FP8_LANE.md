@@ -18,6 +18,14 @@ Classic binary networks beating Tensor Core FP8/INT8 on datacenter GPUs. See arX
 
 Often **CPU-only** PyTorch — run GPU recipes elsewhere; keep docs honest.
 
+## CLI (preferred)
+
+```bat
+bnn bridge list
+bnn bridge gpu --probe
+bnn bridge torchao --probe
+```
+
 ## Concrete recipe script
 
 ```bat

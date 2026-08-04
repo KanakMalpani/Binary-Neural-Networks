@@ -83,6 +83,17 @@ Probe only checks for `setup_env.py` — it does **not** build or download model
   llama.cpp / bitnet.cpp replacement
 - `bnn recommend --goal cpu-llm` points here
 
+## CLI (preferred)
+
+```bat
+bnn bridge list
+bnn bridge cpu-llm
+bnn bridge bitnet
+```
+
+Aliases `cpu-llm` / `bitnet` / `llamacpp` all run the same recipe script
+(`scripts/bridges/llamacpp_bitnet_recipe.py`).
+
 ## CI / acceptance
 
 - Default CI: `pytest` validates pins schema + recipe (`tests/test_llamacpp_bitnet_bridge.py`).
@@ -96,6 +107,7 @@ Probe only checks for `setup_env.py` — it does **not** build or download model
 - [`12_WRAPPER_AND_EXISTING_MODELS.md`](12_WRAPPER_AND_EXISTING_MODELS.md)
 - [`20_NPU_VENDOR_CLOSURE.md`](20_NPU_VENDOR_CLOSURE.md) (no stock HTP ternary)
 - [`22_HF_TO_GGUF_GUIDE.md`](22_HF_TO_GGUF_GUIDE.md)
-- [`24_GPU_INT4_FP8_LANE.md`](24_GPU_INT4_FP8_LANE.md)
+- [`24_GPU_INT4_FP8_LANE.md`](24_GPU_INT4_FP8_LANE.md) (GPU lane is INT4/FP8, not XNOR)
 - [`36_ENCODER_DECODER_AND_NEXT.md`](36_ENCODER_DECODER_AND_NEXT.md)
 - [`MOONSHOT_DEFERRALS.md`](MOONSHOT_DEFERRALS.md) — submodule remains deferred by design
+- `bnn recommend --goal cpu-llm` / `bnn bridge bitnet`
