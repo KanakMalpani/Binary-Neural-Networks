@@ -64,8 +64,11 @@ Homepage = "https://github.com/KanakMalpani/Binary-Neural-Networks"
 Documentation = "https://github.com/KanakMalpani/Binary-Neural-Networks/blob/main/REPRODUCIBILITY.md"
 Repository = "https://github.com/KanakMalpani/Binary-Neural-Networks"
 Changelog = "https://github.com/KanakMalpani/Binary-Neural-Networks/blob/main/CHANGELOG.md"
+# Live once Trusted Publisher uploads; badge + URL are intentional pre-publish.
+PyPI = "https://pypi.org/project/bnn-lab/"
 "Reproduce results" = "https://github.com/KanakMalpani/Binary-Neural-Networks/blob/main/REPRODUCIBILITY.md"
 "Agent entrypoint" = "https://github.com/KanakMalpani/Binary-Neural-Networks/blob/main/AGENTS.md"
+"Publish runbook" = "https://github.com/KanakMalpani/Binary-Neural-Networks/blob/main/docs/PYPI_PUBLISH.md"
 
 [tool.setuptools.packages.find]
 where = ["."]
