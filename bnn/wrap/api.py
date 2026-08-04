@@ -9,7 +9,7 @@ import torch.nn as nn
 
 from ..kernels.packed import native_kernel_available
 from .calibrate import CalibConfig
-from .metrics import EffectivenessReport
+from .metrics import EffectivenessReport, unmeasured_effectiveness
 from .packed_linear import (
     BinaryWeightOnlyDequantLinear,
     PackedBinaryConv2d,
@@ -40,6 +40,8 @@ class WrapReport:
     effectiveness: dict | None = None
     policy_reason: str | None = None
     qat: dict | None = None
+    distill: dict | None = None
+    fuse: dict | None = None
     drop_in_ok: bool | None = None
     forced: bool = False
 
@@ -101,6 +103,8 @@ def wrap_model(
     accuracy_first: bool = False,
     exclude_exact: Iterable[str] | None = None,
     force_narrow: bool = False,
+    fuse_bn: bool = False,
+    drop_in_threshold: float = 0.85,
 ) -> tuple[nn.Module, WrapReport]:
     """Product wrap API with hybrid / aggressive / ternary_wo / auto policies.
 
@@ -109,6 +113,7 @@ def wrap_model(
 
     ``exclude_exact``: full dotted module names to never wrap (sensitivity).
     ``force_narrow``: allow binary_xnor on shapes guardrails would refuse.
+    ``fuse_bn``: fold Linear+BN1d / BiReal BN before packing (W3.T09).
     """
     import copy as _copy
 
@@ -116,18 +121,20 @@ def wrap_model(
 
     hw = detect_hardware()
     resolved_mode: WrapMode
-    policy_reason: str | None = None
+    # W3.T03 — policy_reason is always a non-empty string
+    policy_reason: str
 
     if policy == "auto" or mode == "auto":
         decision = recommend_wrap_policy(None, hw, accuracy_first=accuracy_first)
         if policy == "auto":
             policy = decision.policy
-        # Adopt recommended mode when mode is auto or unspecified
         if mode is None or mode == "auto":
             resolved_mode = decision.mode
         else:
             resolved_mode = mode  # type: ignore[assignment]
-        policy_reason = decision.reason
+        policy_reason = decision.reason or (
+            f"auto → policy={policy} mode={resolved_mode}"
+        )
         if min_in_features == 64:
             min_in_features = decision.min_in_features
         if min_out_features == 0:
@@ -143,7 +150,12 @@ def wrap_model(
     if not inplace:
         model = _copy.deepcopy(model)
 
-    # hybrid_ffn / ternary_wo / auto use allowlist via select_linears
+    fuse_payload: dict | None = None
+    if fuse_bn:
+        from .fuse import fuse_bn_for_wrap_
+
+        fuse_payload = fuse_bn_for_wrap_(model).to_dict()
+
     to_replace, skipped = select_linears(
         model,
         policy=policy,
@@ -161,6 +173,12 @@ def wrap_model(
         native_kernel=native_kernel_available(),
         calib_method=(calib.method if calib else "absmean"),
         policy_reason=policy_reason,
+        fuse=fuse_payload,
+        # W3.T02 — effectiveness always present (stub until attach_effectiveness)
+        effectiveness=unmeasured_effectiveness(
+            drop_in_threshold=drop_in_threshold
+        ).to_dict(),
+        drop_in_ok=False,
     )
 
     for name, lin in to_replace:
@@ -211,9 +229,18 @@ def attach_effectiveness(
     *,
     force: bool = False,
 ) -> WrapReport:
+    """Attach measured effectiveness; always keeps the field populated (W3.T02)."""
     report.effectiveness = eff.to_dict()
-    report.drop_in_ok = bool(eff.drop_in_ok or force)
-    report.forced = force
+    if force:
+        report.drop_in_ok = True
+        report.forced = True
+    else:
+        from .metrics import drop_in_ok as _drop_in_ok
+
+        report.drop_in_ok = _drop_in_ok(eff, force=False)
+        report.forced = False
+    if report.policy_reason is None:
+        report.policy_reason = f"policy={report.policy} mode={report.mode}"
     return report
 
 
