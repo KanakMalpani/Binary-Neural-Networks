@@ -60,7 +60,12 @@ def main() -> int:
         return 2
     print(f"native library: {lib_path.name}")
 
-    lib = ctypes.CDLL(str(lib_path))
+    # Python 3.8+ on Windows defaults to a restricted LoadLibrary search path;
+    # use winmode=0 so adjacent / system VC runtimes resolve like a normal app.
+    if sys.platform == "win32":
+        lib = ctypes.CDLL(str(lib_path), winmode=0)
+    else:
+        lib = ctypes.CDLL(str(lib_path))
     lib.binary_gemm_u64.argtypes = [
         ctypes.POINTER(ctypes.c_uint64), ctypes.POINTER(ctypes.c_uint64),
         ctypes.POINTER(ctypes.c_float),

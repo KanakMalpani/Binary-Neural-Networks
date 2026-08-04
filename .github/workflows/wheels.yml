@@ -63,13 +63,20 @@ jobs:
 
       # W8.T07 — signed SLSA build provenance, so a consumer can verify a wheel
       # was built by this workflow from this commit:
-      #   gh attestation verify bnn-*.whl --repo KanakMalpani/Binary-Neural-Networks
+      #   gh attestation verify bnn_lab-*.whl --repo KanakMalpani/Binary-Neural-Networks
+      # (PyPI / pep440 normalises the dist name to bnn_lab in filenames.)
       # Skipped on forks, which cannot mint an OIDC token.
       - name: Attest build provenance
         if: github.repository == 'KanakMalpani/Binary-Neural-Networks'
         uses: actions/attest-build-provenance@e8998f949152b193b063cb0ec769d69d929409be # v2.4.0
         with:
           subject-path: wheelhouse/*.whl
+
+      - name: List built wheels
+        run: >
+          python -c "from pathlib import Path; wh=sorted(Path('wheelhouse').glob('*.whl'));
+          assert wh, 'no wheels in wheelhouse/';
+          [print(f'{p.name}\t{p.stat().st_size}') for p in wh]"
 
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
@@ -111,11 +118,43 @@ jobs:
           path: dist/*.tar.gz
           if-no-files-found: error
 
+  # Dry-run gate: always aggregates artifacts after a successful build so a
+  # publish=false dispatch still proves wheels + sdist + attestations landed.
+  # Does not upload to PyPI. Do not invent an API-token publish path.
+  package-check:
+    needs: [wheels, sdist]
+    if: always() && needs.wheels.result == 'success' && needs.sdist.result == 'success'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
+        with:
+          path: dist
+          merge-multiple: true
+      - name: Summarise artifacts (dry-run)
+        run: |
+          set -euo pipefail
+          echo "## wheels dry-run" >> "$GITHUB_STEP_SUMMARY"
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+          echo "| file | bytes |" >> "$GITHUB_STEP_SUMMARY"
+          echo "|---|---:|" >> "$GITHUB_STEP_SUMMARY"
+          found=0
+          for f in dist/*; do
+            [ -f "$f" ] || continue
+            found=1
+            printf '| `%s` | %s |\n' "$(basename "$f")" "$(wc -c < "$f" | tr -d ' ')" >> "$GITHUB_STEP_SUMMARY"
+            ls -la "$f"
+          done
+          test "$found" -eq 1
+          # Dist name on disk is bnn_lab (underscore); import/CLI stay `bnn`.
+          ls dist/bnn_lab-*.whl dist/bnn_lab-*.tar.gz >/dev/null
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+          echo "Publish skipped unless \`workflow_dispatch\` + \`publish=true\` + Trusted Publisher." >> "$GITHUB_STEP_SUMMARY"
+
   publish:
     # Never fires on its own: requires a human to dispatch with publish=true.
-    # Set up PyPI trusted publishing for this repo and create the `pypi`
-    # environment (with required reviewers) before using it.
-    needs: [wheels, sdist]
+    # Requires PyPI Trusted Publisher for project `bnn-lab` → this repo /
+    # wheels.yml / environment `pypi`. OIDC only — no API token path.
+    needs: [wheels, sdist, package-check]
     if: github.event_name == 'workflow_dispatch' && inputs.publish
     runs-on: ubuntu-latest
     environment: pypi
