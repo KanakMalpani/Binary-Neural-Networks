@@ -83,6 +83,12 @@ def apply_patch(main_g: dict[str, Any], patch: dict[str, Any]) -> dict[str, Any]
         for k, v in fields.items():
             by_id[nid][k] = v
 
+    cleared_aliases = 0
+    for nid in patch.get("clear_lab_alias") or []:
+        if nid in by_id and "lab_alias" in by_id[nid]:
+            del by_id[nid]["lab_alias"]
+            cleared_aliases += 1
+
     added_nodes = 0
     for raw in patch.get("nodes") or []:
         n = dict(raw)
@@ -116,16 +122,23 @@ def apply_patch(main_g: dict[str, Any], patch: dict[str, Any]) -> dict[str, Any]
     remove_pairs = {
         (a, b) for a, b in (patch.get("remove_same_as_pairs") or [])
     } | {(b, a) for a, b in (patch.get("remove_same_as_pairs") or [])}
+    remove_edge_keys = {
+        (e["source"], e["target"], e["relation"]) for e in (patch.get("remove_edges") or [])
+    }
 
     edges: list[dict[str, Any]] = []
     ek: set[tuple[str, str, str]] = set()
     removed_same_as = 0
+    removed_edges = 0
     for e in main_g.get("edges") or []:
         if e.get("relation") == "same_as" and (e["source"], e["target"]) in remove_pairs:
             removed_same_as += 1
             continue
         ne = _norm_edge(e)
         k = (ne["source"], ne["target"], ne["relation"])
+        if k in remove_edge_keys:
+            removed_edges += 1
+            continue
         if k in ek:
             continue
         edges.append(ne)
@@ -164,6 +177,8 @@ def apply_patch(main_g: dict[str, Any], patch: dict[str, Any]) -> dict[str, Any]
             "integrity_added_nodes": added_nodes,
             "integrity_added_edges": added_edges,
             "integrity_removed_same_as": removed_same_as,
+            "integrity_removed_edges": removed_edges,
+            "integrity_cleared_lab_alias": cleared_aliases,
         }
     )
     meta["enrichment_runs"] = runs

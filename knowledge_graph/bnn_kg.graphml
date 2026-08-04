@@ -2755,22 +2755,17 @@
       <data key="evidence">HF checkpoint implements the 2B4T paper artifact</data>
       <data key="weight">1.0</data>
     </edge>
-    <edge id="e285" source="paper_bitnet_2b4t" target="artifact.hf_bitnet_2b">
-      <data key="relation">derived_from</data>
-      <data key="evidence">Paper describes the released HF weights</data>
-      <data key="weight">1.0</data>
-    </edge>
-    <edge id="e286" source="decision.awq_gptq_vs_binary" target="decision_wrap_tree">
+    <edge id="e285" source="decision.awq_gptq_vs_binary" target="decision_wrap_tree">
       <data key="relation">part_of</data>
       <data key="evidence">AWQ/GPTQ branch is a subset of the wrap decision tree</data>
       <data key="weight">1.0</data>
     </edge>
-    <edge id="e287" source="concept.mobile_npu_quant_reality" target="npu_no_native_1bit">
+    <edge id="e286" source="concept.mobile_npu_quant_reality" target="npu_no_native_1bit">
       <data key="relation">derived_from</data>
       <data key="evidence">Concept documents the FailureMode</data>
       <data key="weight">1.0</data>
     </edge>
-    <edge id="e288" source="npu_no_native_1bit" target="concept.mobile_npu_quant_reality">
+    <edge id="e287" source="npu_no_native_1bit" target="concept.mobile_npu_quant_reality">
       <data key="relation">part_of</data>
       <data key="evidence">FailureMode is the operational takeaway of the concept</data>
       <data key="weight">1.0</data>

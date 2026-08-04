@@ -102,7 +102,7 @@ def test_ternary_source_path(graph):
 
 
 def test_same_as_not_cross_type(graph):
-    """System↔Paper / Decision-subset / Concept↔FailureMode must not use same_as."""
+    """System↔Paper / Decision-subset / Concept↔FailureMode must not use same_as or lab_alias."""
     forbidden = {
         frozenset({"artifact.hf_bitnet_2b", "paper_bitnet_2b4t"}),
         frozenset({"decision.awq_gptq_vs_binary", "decision_wrap_tree"}),
@@ -113,6 +113,35 @@ def test_same_as_not_cross_type(graph):
             continue
         pair = frozenset({e["source"], e["target"]})
         assert pair not in forbidden, e
+    idx = {n["id"]: n for n in graph["nodes"]}
+    for nid in (
+        "artifact.hf_bitnet_2b",
+        "decision.awq_gptq_vs_binary",
+        "concept.mobile_npu_quant_reality",
+    ):
+        assert "lab_alias" not in idx[nid], nid
+    # No inverted paper→artifact derived_from (artifact implements paper instead)
+    for e in graph["edges"]:
+        if (
+            e["source"] == "paper_bitnet_2b4t"
+            and e["target"] == "artifact.hf_bitnet_2b"
+            and e["relation"] == "derived_from"
+        ):
+            raise AssertionError(f"inverted derived_from still present: {e}")
+
+
+def test_same_as_and_lab_alias_type_hygiene(graph):
+    by_id = {n["id"]: n for n in graph["nodes"]}
+    for n in graph["nodes"]:
+        alias = n.get("lab_alias")
+        if alias is None:
+            continue
+        assert alias in by_id, n["id"]
+        assert by_id[alias]["type"] == n["type"], (n["id"], alias)
+    for e in graph["edges"]:
+        if e["relation"] != "same_as":
+            continue
+        assert by_id[e["source"]]["type"] == by_id[e["target"]]["type"], e
 
 
 def test_repo_relative_sources_exist(graph):

@@ -87,6 +87,18 @@
     ["decision.awq_gptq_vs_binary", "decision_wrap_tree"],
     ["concept.mobile_npu_quant_reality", "npu_no_native_1bit"]
   ],
+  "clear_lab_alias": [
+    "artifact.hf_bitnet_2b",
+    "decision.awq_gptq_vs_binary",
+    "concept.mobile_npu_quant_reality"
+  ],
+  "remove_edges": [
+    {
+      "source": "paper_bitnet_2b4t",
+      "target": "artifact.hf_bitnet_2b",
+      "relation": "derived_from"
+    }
+  ],
   "nodes": [
     {
       "id": "decision_wc_o_gates",
@@ -366,12 +378,6 @@
       "target": "paper_bitnet_2b4t",
       "relation": "implements",
       "evidence": ["HF checkpoint implements the 2B4T paper artifact"]
-    },
-    {
-      "source": "paper_bitnet_2b4t",
-      "target": "artifact.hf_bitnet_2b",
-      "relation": "derived_from",
-      "evidence": ["Paper describes the released HF weights"]
     },
     {
       "source": "decision.awq_gptq_vs_binary",

@@ -6,7 +6,7 @@
     "thesis_lock": "Packed CPU/edge XNOR-popcount + honest STE; never claim GPU 32× from sign(); 32× compression ≠ 32× latency.",
     "generated_by": "scripts/build_bnn_kg.py + scripts/merge_kg_enrichment.py + scripts/apply_kg_integrity.py",
     "node_count": 165,
-    "edge_count": 289,
+    "edge_count": 288,
     "node_types": [
       "Algorithm",
       "Claim",
@@ -60,9 +60,21 @@
         "integrity_added_nodes": 11,
         "integrity_added_edges": 30,
         "integrity_removed_same_as": 6
+      },
+      {
+        "generated": "2026-08-04T23:50:00+05:30",
+        "researcher": "lane-kg-enrich",
+        "schema_version": "1.0",
+        "purpose": "Lab/product integrity enrichment: WC-O gates, CLI systems, GPTQ/Q-Sparse/BitDistiller, RAPL Result, moonshot non-goals, Wave 1 open-PR status honesty, broken source fixes, same_as repairs.",
+        "lab_coverage_note": "Wave 1 lanes A–I remain open PRs #16–#24 — do not claim merged. Thesis lock unchanged.",
+        "integrity_added_nodes": 0,
+        "integrity_added_edges": 0,
+        "integrity_removed_same_as": 0,
+        "integrity_removed_edges": 1,
+        "integrity_cleared_lab_alias": 3
       }
     ],
-    "integrity_patched_at": "2026-08-04T18:31:41.367984+00:00"
+    "integrity_patched_at": "2026-08-04T18:47:19.084303+00:00"
   },
   "nodes": [
     {
@@ -1979,8 +1991,7 @@
         "docs/18_DECISION_TREE_AND_COMPLETE_ROADMAP.md"
       ],
       "confidence": 0.91,
-      "status": "merged",
-      "lab_alias": "decision_wrap_tree"
+      "status": "merged"
     },
     {
       "id": "paper.sparse_bitnet.2026",
@@ -2006,8 +2017,7 @@
         "docs/14_HARDWARE_AND_ENERGY.md"
       ],
       "confidence": 0.9,
-      "status": "merged",
-      "lab_alias": "npu_no_native_1bit"
+      "status": "merged"
     },
     {
       "id": "failure.attention_binarization",
@@ -2074,8 +2084,7 @@
         "https://arxiv.org/abs/2504.12285"
       ],
       "confidence": 0.94,
-      "status": "merged",
-      "lab_alias": "paper_bitnet_2b4t"
+      "status": "merged"
     },
     {
       "id": "citation.strengthen.lab_weak",
@@ -4812,15 +4821,6 @@
       "relation": "implements",
       "evidence": [
         "HF checkpoint implements the 2B4T paper artifact"
-      ],
-      "weight": 1.0
-    },
-    {
-      "source": "paper_bitnet_2b4t",
-      "target": "artifact.hf_bitnet_2b",
-      "relation": "derived_from",
-      "evidence": [
-        "Paper describes the released HF weights"
       ],
       "weight": 1.0
     },

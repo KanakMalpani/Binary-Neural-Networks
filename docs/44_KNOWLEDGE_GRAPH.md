@@ -35,6 +35,7 @@ eval: `bnn eval-suite` → [`docs/FAIR_EVAL_PROTOCOL.md`](FAIR_EVAL_PROTOCOL.md)
 Lane progress: [`docs/lanes/kg.md`](lanes/kg.md). Wave 1 product lanes (A–I) remain
 open PRs — KG statuses say `open_pr` rather than claiming merged.
 
-External mirror index: `C:\00 Research Papers\BINARY_NEURAL_KG_INDEX.md`.
+Maintainer-local only (not required to clone/build): optional external mirror index at
+`C:\00 Research Papers\BINARY_NEURAL_KG_INDEX.md` on the primary maintainer machine.
 
 > Doc number **44** (not 41): `docs/41_*` is reserved for portable SIMD kernels.
