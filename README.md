@@ -14,7 +14,7 @@
 
 **Binary Neural Networks** packs weights (and optionally activations) to **1–1.58 bits** and runs **real** XNOR–popcount kernels on **CPU / edge** — with dual-metric reports that never confuse pack math with wall-clock.
 
-It is a lab / beta **optimiser toolkit** (`bnn 0.3.0`), not a claim that `sign()` is 32× faster on GPU.
+It is a lab **optimiser toolkit** (`bnn 1.0.0`), not a claim that `sign()` is 32× faster on GPU.
 
 <table>
 <tr>

@@ -8,8 +8,8 @@ authors:
 repository-code: "https://github.com/KanakMalpani/Binary-Neural-Networks"
 url: "https://github.com/KanakMalpani/Binary-Neural-Networks"
 license: MIT
-version: "0.3.0"
-date-released: "2026-07-25"
+version: "1.0.0"
+date-released: "2026-08-05"
 abstract: >-
   Installable lab for packed binary/ternary CPU/edge inference with honest STE
   training simulation, hybrid wrap/optimise APIs, .bnnpack codec, and dual-metric

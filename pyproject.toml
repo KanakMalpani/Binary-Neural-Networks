@@ -6,7 +6,7 @@ build-backend = "setuptools.build_meta"
 # PyPI distribution name. Import path and console script remain `bnn`.
 # The short name `bnn` is already taken on PyPI (unrelated package by Adrian Bulat).
 name = "bnn-lab"
-version = "0.3.0"
+version = "1.0.0"
 description = "Extreme low-bit inference lab: packed binary/ternary CPU kernels + STE training (honest CPU/edge speedups)"
 readme = "README.md"
 requires-python = ">=3.11"
