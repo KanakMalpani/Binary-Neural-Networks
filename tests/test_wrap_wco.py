@@ -86,6 +86,23 @@ def test_unmeasured_refuses_drop_in_without_force():
     stub = unmeasured_effectiveness()
     assert drop_in_ok(stub) is False
     assert drop_in_ok(stub, force=True) is True
+    d = stub.to_dict()
+    assert d["measured"] is False
+    assert d["cosine"] is None  # NaN serialised as null for JSON honesty
+
+
+def test_swap_and_restore_preserve_device_dtype():
+    """Linear↔BinaryLinear replacements must match source device/dtype."""
+    from bnn.wrap.qat import _restore_binary_to_linear, _swap_linear_to_binary
+
+    lin = nn.Linear(6, 3, bias=True)
+    bl = _swap_linear_to_binary(lin)
+    assert bl.weight.device == lin.weight.device
+    assert bl.weight.dtype == lin.weight.dtype
+    restored = _restore_binary_to_linear(bl)
+    assert restored.weight.device == bl.weight.device
+    assert restored.weight.dtype == bl.weight.dtype
+    assert torch.allclose(restored.weight, bl.weight)
 
 
 def test_wrap_always_sets_policy_reason():

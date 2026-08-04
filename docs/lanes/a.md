@@ -2,7 +2,7 @@
 
 Branch: `lane/a-wco`  
 Base: `main` @ `5910978`  
-Worktree: `C:\Users\mrkan\CRAZZY\bnn-lane-a-wco` (isolated from parallel lanes)
+Worktree: isolated worktree (parallel-lane checkout; not the shared main tree)
 
 Owned paths only: `bnn/wrap/**`, `scripts/*wrap*`, `scripts/distill*`, `tests/test_wrap*`, `tests/test_qat*`, `docs/42*`, this note.
 

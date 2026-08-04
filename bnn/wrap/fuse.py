@@ -68,6 +68,7 @@ def fuse_linear_bn1d_(linear: nn.Linear, bn: nn.BatchNorm1d) -> nn.Linear:
 def _fuse_ordered_pairs(
     names: list[str],
     modules: list[nn.Module],
+    skipped: list[str] | None = None,
 ) -> list[str]:
     """Fuse consecutive Linear→BN1d in a flat ordered list; return Linear names."""
     fused: list[str] = []
@@ -78,8 +79,9 @@ def _fuse_ordered_pairs(
             try:
                 fuse_linear_bn1d_(a, b)
                 fused.append(names[i])
-            except (ValueError, RuntimeError):
-                pass
+            except (ValueError, RuntimeError) as exc:
+                if skipped is not None:
+                    skipped.append(f"{names[i]}→{names[i + 1]}: {exc}")
             i += 2
         else:
             i += 1
@@ -87,23 +89,33 @@ def _fuse_ordered_pairs(
 
 
 @torch.no_grad()
-def fuse_sequential_linear_bn_(root: nn.Module, prefix: str = "") -> list[str]:
+def fuse_sequential_linear_bn_(
+    root: nn.Module,
+    prefix: str = "",
+    skipped: list[str] | None = None,
+) -> list[str]:
     """Fuse adjacent ``Linear → BatchNorm1d`` pairs under ``root``.
 
     Walks each container's **direct children in order** (Sequential or named),
     then recurses into submodules. Returns dotted names of fused Linears.
+    Failed pairs append human-readable reasons to ``skipped`` when provided.
     """
     fused: list[str] = []
+    skip_buf = skipped if skipped is not None else []
     children = list(root.named_children())
     if len(children) >= 2:
         names = [f"{prefix}.{n}" if prefix else n for n, _ in children]
         mods = [m for _, m in children]
-        fused.extend(_fuse_ordered_pairs(names, mods))
+        fused.extend(_fuse_ordered_pairs(names, mods, skipped=skip_buf))
 
     for name, child in children:
         if list(child.children()):
             child_prefix = f"{prefix}.{name}" if prefix else name
-            fused.extend(fuse_sequential_linear_bn_(child, prefix=child_prefix))
+            fused.extend(
+                fuse_sequential_linear_bn_(
+                    child, prefix=child_prefix, skipped=skip_buf
+                )
+            )
 
     seen: set[str] = set()
     out: list[str] = []
@@ -132,7 +144,9 @@ def fuse_bn_for_wrap_(
 
     if linear_bn:
         try:
-            report.linear_bn_pairs = fuse_sequential_linear_bn_(model)
+            report.linear_bn_pairs = fuse_sequential_linear_bn_(
+                model, skipped=report.skipped
+            )
         except Exception as exc:  # noqa: BLE001 — surface as skip notes
             report.skipped.append(f"linear_bn: {exc}")
 

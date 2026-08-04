@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import math
 from dataclasses import asdict, dataclass
 
 import torch.nn.functional as F
@@ -10,7 +11,14 @@ from torch import Tensor
 
 @dataclass
 class EffectivenessReport:
-    cosine: float | None
+    """Measured agreement vs an FP teacher.
+
+    ``cosine`` is always a ``float`` so callers (sensitivity, search) stay
+    mypy-clean. Unmeasured stubs use ``math.nan`` with ``measured=False``;
+    ``to_dict()`` serialises that as ``null`` for JSON honesty (W3.T02).
+    """
+
+    cosine: float
     kl_div: float | None
     top1_agreement: float | None
     n_samples: int
@@ -20,7 +28,10 @@ class EffectivenessReport:
     measured: bool = True
 
     def to_dict(self) -> dict:
-        return asdict(self)
+        d = asdict(self)
+        if not self.measured or not math.isfinite(self.cosine):
+            d["cosine"] = None
+        return d
 
 
 def unmeasured_effectiveness(
@@ -28,9 +39,13 @@ def unmeasured_effectiveness(
     drop_in_threshold: float = 0.85,
     notes: str | None = None,
 ) -> EffectivenessReport:
-    """Stub report so effectiveness is **always** present (W3.T02)."""
+    """Stub report so effectiveness is **always** present (W3.T02).
+
+    Keeps ``cosine: float`` (NaN) rather than widening the shared field to
+    ``Optional`` — measured paths stay strictly typed for mypy.
+    """
     return EffectivenessReport(
-        cosine=None,
+        cosine=float("nan"),
         kl_div=None,
         top1_agreement=None,
         n_samples=0,
@@ -92,6 +107,6 @@ def drop_in_ok(report: EffectivenessReport, *, force: bool = False) -> bool:
     """WC-O3 honesty: never claim drop-in without metrics unless ``force``."""
     if force:
         return True
-    if not report.measured or report.cosine is None:
+    if not report.measured or not math.isfinite(report.cosine):
         return False
     return bool(report.drop_in_ok)

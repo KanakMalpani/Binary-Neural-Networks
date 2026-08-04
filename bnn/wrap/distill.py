@@ -22,7 +22,7 @@ from torch import Tensor
 from ..layers import BinaryLinear
 from ..ste import clip_weights_
 from .metrics import measure_agreement
-from .qat import _swap_linear_to_binary
+from .qat import _restore_binary_to_linear, _swap_linear_to_binary
 
 
 @dataclass
@@ -192,12 +192,7 @@ def distill_binary_student(
         bl = named.get(name)
         if not isinstance(bl, BinaryLinear):
             continue
-        lin = nn.Linear(bl.in_features, bl.out_features, bias=bl.bias is not None)
-        with torch.no_grad():
-            lin.weight.copy_(bl.weight)
-            if bl.bias is not None and lin.bias is not None:
-                lin.bias.copy_(bl.bias)
-        _set_module(student, name, lin)
+        _set_module(student, name, _restore_binary_to_linear(bl))
         restored.append(name)
 
     with torch.no_grad():
@@ -205,12 +200,16 @@ def distill_binary_student(
             teacher(x0), student(x0), drop_in_threshold=cfg.drop_in_threshold
         )
 
-    uplift = float(after.cosine - before.cosine)
+    # measure_agreement always returns finite measured cosine; narrow for mypy.
+    assert before.measured and after.measured
+    cos_before = float(before.cosine)
+    cos_after = float(after.cosine)
+    uplift = cos_after - cos_before
     return DistillReport(
         steps=n_steps,
         skipped=False,
-        cosine_before=float(before.cosine),
-        cosine_after=float(after.cosine),
+        cosine_before=cos_before,
+        cosine_after=cos_after,
         cosine_uplift=uplift,
         last_loss=last_loss,
         restored_linears=restored,

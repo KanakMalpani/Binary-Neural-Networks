@@ -112,6 +112,12 @@ def calibrate_linear_scales(
 
     If ``activation_batches`` is provided, optionally blend with activation
     absmean — still weight-primary for PTQ wrap.
+
+    **Activation nudge (honest):** when ``per_channel`` scales are used, the
+    act factor is a *global* scalar ``sqrt(mean(|act|))`` clamped to
+    ``[0.5, 2.0]`` and multiplied onto every channel. It is not per-token or
+    per-channel activation calibration — only a mild distribution nudge so
+    absmean weight scales are not wildly off under atypical input ranges.
     """
     cfg = cfg or CalibConfig()
     alpha = scale_from_weight(weight, cfg)
@@ -124,6 +130,7 @@ def calibrate_linear_scales(
         if alpha.ndim == 0:
             alpha = (alpha * act_s).sqrt()
         else:
+            # Global act factor on per-channel weight scales (see docstring).
             alpha = alpha * (act_s.sqrt().clamp(0.5, 2.0))
     return alpha
 
