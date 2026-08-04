@@ -27,7 +27,9 @@ path-safety helpers/tests. Progress lives here — integrator flips ROADMAP twin
   (smoke is enough for v1 gate).
 - Real asciinema re-record on a clean machine before marketing screenshots
   (committed cast is pedagogy-fixed timings).
-- Soft budgets are **warn-only** in eval-suite unless `--strict-budgets`.
+- Soft budgets: **warn-only** in `bnn eval-suite` unless `--strict-budgets`;
+  focused pytest still hard-asserts the tiny smoke shape against loose ceilings
+  (catastrophic-regression gate, not a new golden).
 
 ## Focused tests
 

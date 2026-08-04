@@ -33,9 +33,9 @@ SOFT_BUDGETS_MS: dict[tuple[int, int, int], dict[str, float]] = {
     },
 }
 
-# Soft speedup floors vs committed benchmark.json (compute-only vs NumPy FP32).
-# Fail soft check only if a shape drops below half the historical headline —
-# never invent new golden shapes (W7.T02 / W13.T03).
+# Absolute corruption floor for committed speedup_compute_vs_numpy_fp32 rows.
+# Catches zeroed / nonsense JSON; not a relative regression vs a prior run and
+# not a new golden shape (W7.T02 / W13.T03).
 SOFT_SPEEDUP_FLOOR_FRACTION = 0.35
 
 
@@ -199,7 +199,12 @@ def profile_packed_linear(
 
 
 def check_soft_budgets(breakdown: ProfileBreakdown | dict[str, Any]) -> list[str]:
-    """Return soft-budget violations (empty ⇒ within CI ceilings). Never hard-fails goldens."""
+    """Return soft-budget violations (empty ⇒ within CI ceilings).
+
+    Callers decide severity: ``bnn eval-suite`` warns unless ``--strict-budgets``;
+    focused pytest may assert empty violations on the tiny smoke shape so CI
+    still catches catastrophic regressions. Never mutates golden floors.
+    """
     if isinstance(breakdown, ProfileBreakdown):
         d = breakdown.to_dict()
     else:
@@ -221,7 +226,13 @@ def check_committed_bench_soft_floors(
     *,
     floor_fraction: float = SOFT_SPEEDUP_FLOOR_FRACTION,
 ) -> list[str]:
-    """Soft-check committed ``results/benchmark.json`` speedups + thread curves."""
+    """Soft-check committed ``results/benchmark.json`` for corruption + thread curves.
+
+    ``floor_fraction`` is an **absolute** minimum on
+    ``speedup_compute_vs_numpy_fp32`` (default ``SOFT_SPEEDUP_FLOOR_FRACTION``),
+    not a fraction of a historical headline. It only rejects nonsense rows
+    (e.g. speedup 0). Also requires ``thread_scaling`` lists with ≥2 points.
+    """
     rows = bench.get("results") or bench.get("rows") or bench.get("benchmarks") or []
     violations: list[str] = []
     for r in rows:
@@ -230,8 +241,7 @@ def check_committed_bench_soft_floors(
         s = r.get("speedup_compute_vs_numpy_fp32")
         if not isinstance(s, (int, float)):
             continue
-        # Identity soft gate: published rows must themselves clear a tiny floor
-        # so a corrupted JSON (speedup 0) cannot silently pass CI.
+        # Absolute corruption floor — not relative to a prior machine run.
         if float(s) < floor_fraction:
             sh = r.get("shape") or {}
             violations.append(

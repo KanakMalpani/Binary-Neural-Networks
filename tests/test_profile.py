@@ -41,6 +41,12 @@ def test_profile_breakdown_keys():
 
 
 def test_soft_budgets_pass_on_smoke_shape():
+    """CI hard-assert on the tiny smoke shape; eval-suite stays warn-only by default.
+
+    Soft ceilings in ``SOFT_BUDGETS_MS`` are deliberately loose — this only fails
+    on catastrophic regression. Product ``bnn eval-suite`` still warns unless
+    ``--strict-budgets`` (see ``check_soft_budgets`` docstring).
+    """
     br = profile_packed_linear(m=8, n=256, k=256, reps=3, warmup=1)
     assert (8, 256, 256) in SOFT_BUDGETS_MS
     assert check_soft_budgets(br) == []
@@ -64,6 +70,7 @@ def test_committed_benchmark_has_thread_scaling():
     """W13.T04 — published curves live in results/benchmark.json (+ docs/34)."""
     root = Path(__file__).resolve().parents[1]
     bench = json.loads((root / "results" / "benchmark.json").read_text(encoding="utf-8"))
+    # Absolute corruption floor + thread_scaling length — not a relative golden.
     assert check_committed_bench_soft_floors(bench) == []
     rows = bench.get("results") or []
     assert rows, "committed benchmark.json missing results"

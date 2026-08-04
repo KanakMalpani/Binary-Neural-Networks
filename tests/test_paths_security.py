@@ -122,7 +122,9 @@ def test_checkpoint_roundtrip_weights_only(tmp_path: Path):
     model2 = nn.Sequential(BinaryLinear(16, 8))
     meta = load_checkpoint(model2, path)
     assert meta.get("note") == "trusted"
-    for (n1, p1), (n2, p2) in zip(model.named_parameters(), model2.named_parameters()):
+    for (n1, p1), (n2, p2) in zip(
+        model.named_parameters(), model2.named_parameters(), strict=True
+    ):
         assert n1 == n2
         assert torch.equal(p1, p2)
 
