@@ -1,14 +1,21 @@
 #!/usr/bin/env python3
 """Order-of-magnitude energy estimate: E = P_avg * t_infer.
 
-Does not read RAPL/SMI — pass measured latency and an assumed or metered power.
+Does not require RAPL/SMI — pass measured latency and an assumed or metered power.
+On Linux, ``--probe-rapl`` records whether powercap is readable (does not replace P).
 """
 
 from __future__ import annotations
 
 import argparse
 import json
+import sys
 from pathlib import Path
+
+ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(ROOT))
+
+from bnn.energy import detect_rapl, estimate_energy  # noqa: E402
 
 
 def main() -> None:
@@ -18,23 +25,25 @@ def main() -> None:
     p.add_argument("--baseline-latency-s", type=float, default=None)
     p.add_argument("--baseline-power-w", type=float, default=None)
     p.add_argument("--out", type=Path, default=None)
+    p.add_argument(
+        "--probe-rapl",
+        action="store_true",
+        help="Attach Linux RAPL domain list when readable",
+    )
     args = p.parse_args()
 
-    e_j = args.power_w * args.latency_s
-    row = {
-        "latency_s": args.latency_s,
-        "power_w": args.power_w,
-        "energy_j": e_j,
-        "energy_mj": e_j * 1e3,
-    }
-    if args.baseline_latency_s and args.baseline_power_w:
-        e0 = args.baseline_power_w * args.baseline_latency_s
-        row["baseline_energy_j"] = e0
-        row["energy_reduction_factor"] = e0 / e_j if e_j else None
-        row["note"] = (
-            "If binary lowers both P and t, E drops multiplicatively. "
-            "BitNet.cpp reports ~55–82% energy reduction on CPU (literature)."
-        )
+    row = estimate_energy(
+        latency_s=args.latency_s,
+        power_w=args.power_w,
+        baseline_latency_s=args.baseline_latency_s,
+        baseline_power_w=args.baseline_power_w,
+    )
+    if args.probe_rapl:
+        domains = detect_rapl()
+        row["rapl"] = {
+            "available": bool(domains),
+            "domains": [d.name for d in domains],
+        }
     print(json.dumps(row, indent=2))
     if args.out:
         args.out.write_text(json.dumps(row, indent=2), encoding="utf-8")
