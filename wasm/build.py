@@ -6,7 +6,7 @@ Tries, in order unless forced:
   2. clang --target=wasm32
   3. cargo + wasm32-unknown-unknown (rust/ crate)
 
-Never fails the repo gate — exit 0 with a skip message when no toolchain is
+Never fails the repo gate - exit 0 with a skip message when no toolchain is
 present. Successful builds write wasm/dist/binary_gemm_wasm.wasm.
 """
 
@@ -106,6 +106,57 @@ def build_clang() -> bool:
     return True
 
 
+def _prefer_bnn_wasm(candidates: list[Path]) -> Path | None:
+    """Prefer newest bnn_wasm_gemm.wasm-like name, else newest *.wasm."""
+    if not candidates:
+        return None
+    named = [p for p in candidates if "bnn_wasm_gemm" in p.name or p.name.startswith("bnn") and "wasm" in p.name]
+    pool = named if named else candidates
+    return max(pool, key=lambda p: p.stat().st_mtime)
+
+
+def _find_rust_wasm() -> Path:
+    """Locate cargo cdylib .wasm under default or redirected CARGO_TARGET_DIR."""
+    release_dirs: list[Path] = [
+        RUST_DIR / "target" / "wasm32-unknown-unknown" / "release",
+    ]
+    cargo_target = os.environ.get("CARGO_TARGET_DIR")
+    if cargo_target:
+        release_dirs.append(
+            Path(cargo_target) / "wasm32-unknown-unknown" / "release"
+        )
+
+    candidates: list[Path] = []
+    for d in release_dirs:
+        preferred = d / "bnn_wasm_gemm.wasm"
+        if preferred.is_file():
+            candidates.append(preferred)
+        if d.is_dir():
+            candidates.extend(p for p in d.glob("*.wasm") if p.is_file())
+
+    # Recursive fallback under RUST_DIR/target (and CARGO_TARGET_DIR if set)
+    search_roots = [RUST_DIR / "target"]
+    if cargo_target:
+        search_roots.append(Path(cargo_target))
+    for root in search_roots:
+        if not root.is_dir():
+            continue
+        for pat in ("bnn*wasm*.wasm", "*.wasm"):
+            candidates.extend(p for p in root.rglob(pat) if p.is_file())
+
+    # Deduplicate while preserving paths
+    uniq: dict[Path, Path] = {}
+    for p in candidates:
+        try:
+            uniq[p.resolve()] = p
+        except OSError:
+            uniq[p] = p
+    found = _prefer_bnn_wasm(list(uniq.values()))
+    if found is None:
+        raise FileNotFoundError("cargo built no .wasm")
+    return found
+
+
 def build_rust() -> bool:
     cargo = _which("cargo")
     if not cargo or not (RUST_DIR / "Cargo.toml").is_file():
@@ -133,22 +184,7 @@ def build_rust() -> bool:
     ]
     print("+", " ".join(cmd), f"(RUSTFLAGS={env['RUSTFLAGS']!r})")
     subprocess.check_call(cmd, env=env)
-    built = (
-        RUST_DIR
-        / "target"
-        / "wasm32-unknown-unknown"
-        / "release"
-        / "bnn_wasm_gemm.wasm"
-    )
-    if not built.is_file():
-        alt = list(
-            (RUST_DIR / "target" / "wasm32-unknown-unknown" / "release").glob(
-                "*.wasm"
-            )
-        )
-        if not alt:
-            raise FileNotFoundError("cargo built no .wasm")
-        built = alt[0]
+    built = _find_rust_wasm()
     shutil.copy2(built, OUT_WASM)
     print(f"copied {built} -> {OUT_WASM}")
     return True
@@ -182,7 +218,7 @@ def main() -> int:
         print("requested toolchain unavailable or failed", file=sys.stderr)
         return 1
     print(
-        "SKIP: no emcc/clang/cargo wasm toolchain — JS/Python scalar paths still work"
+        "SKIP: no emcc/clang/cargo wasm toolchain - JS/Python scalar paths still work"
     )
     return 0
 
