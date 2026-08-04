@@ -49,6 +49,42 @@ KIND_BINARY_XNOR = "binary_xnor"
 KIND_TERNARY = "ternary_weight_only"
 KIND_BINARY_CONV = "binary_conv_packed"
 
+# Stable int codes for safetensors side-car tags (not Python hash()).
+KIND_CODE: dict[str, int] = {
+    KIND_BINARY_XNOR: 1,
+    KIND_TERNARY: 2,
+    KIND_BINARY_CONV: 3,
+}
+
+
+def _optional_bias_tensor(bias: Any) -> torch.Tensor | None:
+    """Normalize ``nn.Parameter | Tensor | None`` → ``Tensor | None`` for mypy."""
+    if bias is None:
+        return None
+    if isinstance(bias, torch.Tensor):
+        return bias.detach()
+    return torch.as_tensor(bias).detach()
+
+
+def _symmetric_hw_int(value: Any, *, name: str) -> int:
+    """Accept scalar or equal HxW pair; reject asymmetric / string Conv2d args."""
+    if isinstance(value, str):
+        raise ValueError(
+            f"string Conv2d {name}={value!r} not supported (use integer padding/stride)"
+        )
+    if isinstance(value, (tuple, list)):
+        if len(value) == 0:
+            raise ValueError(f"empty Conv2d {name}")
+        if len(value) == 1:
+            return int(value[0])
+        if len(value) != 2 or int(value[0]) != int(value[1]):
+            raise ValueError(
+                f"asymmetric Conv2d {name}={tuple(value)!r} not supported "
+                "(encode requires equal H/W)"
+            )
+        return int(value[0])
+    return int(value)
+
 
 def unpack_binary_pm1(packed: np.ndarray, n: int) -> np.ndarray:
     """Inverse of ``pack_binary_pm1`` for 2D (rows, words) uint64 → (rows, n) ±1."""
@@ -237,7 +273,14 @@ def decode_to_packed_linear(blob: dict[str, Any]) -> PackedBinaryXNORLinear:
     in_f = int(blob["in_features"])
     out_f = int(blob["out_features"])
     fake_w = torch.ones(out_f, in_f)
-    bias = blob.get("bias")
+    bias_raw = blob.get("bias")
+    bias: torch.Tensor | None
+    if bias_raw is None:
+        bias = None
+    elif isinstance(bias_raw, torch.Tensor):
+        bias = bias_raw
+    else:
+        bias = torch.as_tensor(bias_raw)
     alpha = blob["alpha"]
     if isinstance(alpha, torch.Tensor) and alpha.numel() not in (1, out_f):
         raise ValueError(f"alpha numel {alpha.numel()} incompatible with out={out_f}")
@@ -270,8 +313,15 @@ def decode_to_ternary_linear(blob: dict[str, Any]) -> TernaryWeightOnlyLinear:
     if not isinstance(scale, torch.Tensor):
         scale = torch.as_tensor(scale, dtype=torch.float32)
     fake = torch.ones(out_f, in_f)
-    bias = blob.get("bias")
-    mod = TernaryWeightOnlyLinear(fake, bias, per_channel=per_channel)
+    bias_raw = blob.get("bias")
+    bias_t: torch.Tensor | None
+    if bias_raw is None:
+        bias_t = None
+    elif isinstance(bias_raw, torch.Tensor):
+        bias_t = bias_raw
+    else:
+        bias_t = torch.as_tensor(bias_raw)
+    mod = TernaryWeightOnlyLinear(fake, bias_t, per_channel=per_channel)
     mod.weight_q.copy_(torch.from_numpy(np.ascontiguousarray(q)))
     scale_t = scale.detach().float().cpu().reshape(-1)
     if per_channel:
@@ -306,10 +356,17 @@ def decode_to_packed_conv(blob: dict[str, Any]) -> PackedBinaryConv2d:
         packed = packed.reshape(out_c, words)
     w_pm1 = unpack_binary_pm1(packed, n).reshape(out_c, in_c, kh, kw)
     alpha = blob["alpha"]
-    bias = blob.get("bias")
+    bias_raw = blob.get("bias")
+    bias_t: torch.Tensor | None
+    if bias_raw is None:
+        bias_t = None
+    elif isinstance(bias_raw, torch.Tensor):
+        bias_t = bias_raw
+    else:
+        bias_t = torch.as_tensor(bias_raw)
     mod = PackedBinaryConv2d(
         torch.from_numpy(w_pm1),
-        bias if isinstance(bias, torch.Tensor) or bias is None else torch.as_tensor(bias),
+        bias_t,
         stride=stride,
         padding=padding,
         alpha=alpha if isinstance(alpha, torch.Tensor) else torch.as_tensor(alpha),
@@ -457,22 +514,28 @@ def encode_model_linears(
             if mod.weight.shape[1] < min_in_features:
                 continue
             a = mod.alpha.detach() if hasattr(mod, "alpha") else None
-            bias = mod.bias if getattr(mod, "bias", None) is not None else None
-            layers[name] = encode_linear_state(mod.weight, bias, alpha=a, name=name)
+            layers[name] = encode_linear_state(
+                mod.weight,
+                _optional_bias_tensor(mod.bias),
+                alpha=a,
+                name=name,
+            )
             continue
         if include_fp_linear and isinstance(mod, nn.Linear):
             if mod.weight.shape[1] < min_in_features:
                 continue
-            bias = mod.bias if getattr(mod, "bias", None) is not None else None
-            layers[name] = encode_linear_state(mod.weight, bias, name=name)
+            layers[name] = encode_linear_state(
+                mod.weight,
+                _optional_bias_tensor(mod.bias),
+                name=name,
+            )
             continue
         if include_conv and isinstance(mod, nn.Conv2d) and mod.groups == 1:
-            bias = mod.bias if getattr(mod, "bias", None) is not None else None
             layers[name] = encode_conv_state(
                 mod.weight,
-                bias,
-                stride=int(mod.stride[0] if isinstance(mod.stride, tuple) else mod.stride),
-                padding=int(mod.padding[0] if isinstance(mod.padding, tuple) else mod.padding),
+                _optional_bias_tensor(mod.bias),
+                stride=_symmetric_hw_int(mod.stride, name="stride"),
+                padding=_symmetric_hw_int(mod.padding, name="padding"),
                 name=name,
             )
     return layers
@@ -515,8 +578,16 @@ def save_bnnpack(
     return path
 
 
-def load_bnnpack(path: Path | str) -> dict[str, Any]:
-    """Load ``.bnnpack`` with ``weights_only=True`` only (no unsafe pickle fallback)."""
+def load_bnnpack(
+    path: Path | str,
+    *,
+    verify_hashes: bool = True,
+) -> dict[str, Any]:
+    """Load ``.bnnpack`` with ``weights_only=True`` only (no unsafe pickle fallback).
+
+    When ``verify_hashes`` is True (default) and the file is v2+, recompute
+    per-layer ``content_sha256`` and raise if any mismatch.
+    """
     path = Path(path)
     if not path.is_file():
         raise FileNotFoundError(path)
@@ -542,6 +613,13 @@ def load_bnnpack(path: Path | str) -> dict[str, Any]:
         )
     if "layers" not in payload or not isinstance(payload["layers"], dict):
         raise ValueError(f"{path}: missing layers")
+    if verify_hashes and ver >= BNNPACK_VERSION_V2:
+        bad = verify_layer_hashes(payload)
+        if bad:
+            raise ValueError(
+                f"{path}: content_sha256 mismatch for layers {bad}; "
+                "file may be corrupted or tampered"
+            )
     return payload
 
 

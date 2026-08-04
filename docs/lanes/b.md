@@ -40,6 +40,9 @@ Apply to twin when merging (do **not** edit ROADMAP from this lane):
 - No full ORT custom op (intentional).
 - Did not edit `docs/MOONSHOT_DEFERRALS.md` / ROADMAP twin (integrator).
 
-## Acceptance
+## Review follow-up (PR #18)
 
-Focused: `pytest tests/test_codec.py -q` — expect PASS (compression 32×, GEMM err=0, v2 hashes, ternary/conv, safetensors).
+- mypy: `_optional_bias_tensor` for Parameter→Tensor; `cmd_decode` kind-dispatch
+- `cmd_decode`: GEMM err=0 only for `binary_xnor`; ternary/conv honest forward checks
+- safetensors: stable `__kind_code` via `KIND_CODE` (not `hash()`)
+- reject asymmetric Conv2d stride/padding; `load_bnnpack(verify_hashes=True)` default for v2

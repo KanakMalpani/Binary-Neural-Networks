@@ -341,18 +341,66 @@ def cmd_encode(args: argparse.Namespace) -> int:
 
 
 def cmd_decode(args: argparse.Namespace) -> int:
-    """Load ``.bnnpack`` and assert each layer GEMM matches ±1 FP (err=0)."""
+    """Load ``.bnnpack`` and verify layers (GEMM err=0 for binary_xnor only)."""
+    import torch
+
     from bnn.codec import decode_file, packed_module_fp_err
+    from bnn.wrap.packed_linear import (
+        PackedBinaryConv2d,
+        PackedBinaryXNORLinear,
+        TernaryWeightOnlyLinear,
+    )
 
     path = Path(args.pack)
     modules, meta = decode_file(path)
     print(f"Loaded {path} layers={list(modules)} meta_keys={list(meta)}")
     max_err = 0.0
     for name, mod in modules.items():
-        err = packed_module_fp_err(mod, batch=4, seed=0)
-        comp = (mod.in_features * mod.out_features * 4) / max(mod.packed_weight_bytes(), 1)
-        print(f"  {name}: fp_err={err} compression~{comp:.2f}x")
-        max_err = max(max_err, err)
+        if isinstance(mod, PackedBinaryXNORLinear):
+            err = packed_module_fp_err(mod, batch=4, seed=0)
+            comp = (mod.in_features * mod.out_features * 4) / max(
+                mod.packed_weight_bytes(), 1
+            )
+            print(f"  {name}: kind=binary_xnor fp_err={err} compression~{comp:.2f}x")
+            max_err = max(max_err, err)
+            continue
+        if isinstance(mod, TernaryWeightOnlyLinear):
+            x = torch.randn(2, mod.in_features)
+            y = mod(x)
+            ok = bool(torch.isfinite(y).all()) and y.shape == (2, mod.out_features)
+            comp = (mod.in_features * mod.out_features * 4) / max(
+                mod.packed_weight_bytes(), 1
+            )
+            print(
+                f"  {name}: kind=ternary_weight_only "
+                f"forward_ok={ok} compression~{comp:.2f}x "
+                f"(theoretical_2bit; GEMM err=0 N/A)"
+            )
+            if not ok:
+                print(f"ERROR ternary forward check failed for {name}", file=sys.stderr)
+                return 1
+            continue
+        if isinstance(mod, PackedBinaryConv2d):
+            h = w = 8
+            x = torch.randn(1, mod.in_channels, h, w)
+            y = mod(x)
+            ok = bool(torch.isfinite(y).all()) and y.shape[1] == mod.out_channels
+            kh, kw = mod.kernel_size
+            fp = mod.in_channels * mod.out_channels * kh * kw * 4
+            comp = fp / max(mod.packed_weight_bytes(), 1)
+            print(
+                f"  {name}: kind=binary_conv_packed "
+                f"forward_ok={ok} compression~{comp:.2f}x "
+                f"(size/dequant path; GEMM err=0 N/A)"
+            )
+            if not ok:
+                print(f"ERROR conv forward check failed for {name}", file=sys.stderr)
+                return 1
+            continue
+        print(
+            f"  {name}: kind={type(mod).__name__} skipped (no decode check)",
+            file=sys.stderr,
+        )
     if max_err > 0:
         print(f"ERROR non-zero packed vs FP err={max_err}", file=sys.stderr)
         return 1

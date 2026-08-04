@@ -191,6 +191,8 @@ def test_safetensors_export_roundtrip(tmp_path: Path):
     pytest.importorskip("safetensors")
     from safetensors.torch import load_file
 
+    from bnn.codec import KIND_BINARY_XNOR, KIND_CODE
+
     blob = encode_linear_state(torch.randn(32, 64), name="linear")
     pack = tmp_path / "m.bnnpack"
     save_bnnpack({"linear": blob}, pack)
@@ -200,6 +202,7 @@ def test_safetensors_export_roundtrip(tmp_path: Path):
     tensors = load_file(str(out))
     assert "linear.weight_packed_i64" in tensors
     assert tensors["linear.weight_packed_i64"].shape == blob["weight_packed_i64"].shape
+    assert tensors["linear.__kind_code"].item() == KIND_CODE[KIND_BINARY_XNOR]
     meta_txt = meta_path.read_text(encoding="utf-8")
     assert "bnnpack_safetensors_v1" in meta_txt
     assert "content_sha256" in meta_txt
@@ -210,3 +213,24 @@ def test_unsupported_version_rejected(tmp_path: Path):
     torch.save({"magic": "BNNPACK1", "version": 99, "layers": {}}, path)
     with pytest.raises(ValueError, match="unsupported version"):
         load_bnnpack(path)
+
+
+def test_asymmetric_conv_stride_rejected():
+    class Bad(nn.Module):
+        def __init__(self):
+            super().__init__()
+            self.c = nn.Conv2d(3, 4, 3, stride=(1, 2), padding=1)
+
+    with pytest.raises(ValueError, match="asymmetric Conv2d stride"):
+        encode_model_linears(Bad(), include_conv=True, include_binary_linear=False)
+
+
+def test_load_rejects_tampered_hash(tmp_path: Path):
+    blob = encode_linear_state(torch.randn(16, 64), name="fc")
+    path = tmp_path / "tamper.bnnpack"
+    save_bnnpack({"fc": blob}, path, version=BNNPACK_VERSION_V2)
+    payload = load_bnnpack(path, verify_hashes=False)
+    payload["layers"]["fc"]["content_sha256"] = "0" * 64
+    torch.save(payload, path)
+    with pytest.raises(ValueError, match="content_sha256 mismatch"):
+        load_bnnpack(path, verify_hashes=True)

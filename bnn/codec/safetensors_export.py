@@ -12,7 +12,13 @@ from typing import Any
 
 import torch
 
-from .packfile import load_bnnpack
+from .packfile import (
+    KIND_BINARY_CONV,
+    KIND_BINARY_XNOR,
+    KIND_CODE,
+    KIND_TERNARY,
+    load_bnnpack,
+)
 
 
 def _require_safetensors():
@@ -56,10 +62,9 @@ def bnnpack_tensors_for_safetensors(payload: dict[str, Any]) -> dict[str, torch.
             if t is None:
                 continue
             tensors[f"{prefix}.{key}"] = t
-        # Tiny tag tensor so kind survives even if a consumer drops JSON meta.
-        tensors[f"{prefix}.__kind_tag"] = torch.tensor(
-            [hash(kind) & 0xFFFFFFFF], dtype=torch.int64
-        )
+        # Stable kind code (not Python hash()); JSON meta still carries the string.
+        code = int(KIND_CODE.get(kind, 0))
+        tensors[f"{prefix}.__kind_code"] = torch.tensor([code], dtype=torch.int64)
     return tensors
 
 
