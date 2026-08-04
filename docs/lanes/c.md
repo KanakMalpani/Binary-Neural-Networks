@@ -61,4 +61,6 @@ gh workflow run wheels.yml --ref lane/c-release -f publish=false
 - PR: https://github.com/KanakMalpani/Binary-Neural-Networks/pull/16
 - Conclusion: _(await re-run; publish must stay skipped)_
 
+- Also skip `cp313-macosx_x86_64` (no torch wheel → unloadable `bnn-lab`).
+
 **Still blocked for upload:** PyPI Trusted Publisher for `bnn-lab` (project 404).
