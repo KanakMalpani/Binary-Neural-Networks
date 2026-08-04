@@ -47,7 +47,11 @@ golden shapes; dual-metric honesty.
 
 ## Dry-run dispatch
 
-Record run URL / conclusion here after `gh workflow run wheels.yml -f publish=false`:
+```bat
+gh workflow run wheels.yml --ref lane/c-release -f publish=false
+```
 
-- Run: _(filled after dispatch)_
-- Conclusion: _(filled after watch)_
+- Run: https://github.com/KanakMalpani/Binary-Neural-Networks/actions/runs/30922180976
+- Branch SHA: `25f0b84`
+- PR: https://github.com/KanakMalpani/Binary-Neural-Networks/pull/16
+- Conclusion: _(in progress — publish job must stay skipped)_
