@@ -2,6 +2,15 @@
 
 ## Unreleased
 
+### Packaging — PyPI distribution name `bnn-lab` (W8.T08)
+
+- The short name `bnn` is **already taken** on PyPI (unrelated package). Distribution
+  name is now **`bnn-lab`**; import path and console script remain `bnn`.
+- GitHub Environment `pypi` created for Trusted Publishing; `docs/PYPI_PUBLISH.md`
+  rewritten with the one-time pypi.org publisher steps. Live upload still needs
+  that registration, then Actions → wheels → publish=true.
+- `twine check` PASSED for `bnn_lab-0.3.0` sdist + wheel.
+
 ### Memory footprint report (W13.T05) + arena decision (W2.T07)
 
 - **`bnn memory` / `bnn.memory.memory_report`** — per-layer footprint that keeps

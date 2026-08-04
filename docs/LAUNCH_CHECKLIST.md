@@ -23,7 +23,10 @@ Optimiser **preview** launch = **v0.3.0** (not yet world-class v1.0).
 - [x] Repo **About** description + topics (binary-neural-networks, xnor, quantization, …)
 - [x] Branch protection on `main`: required checks `quality` / `windows` / `linux-native`, no force-push/deletes, resolve conversations
 - [x] Label good first issues (`good first issue`) — W11.T08 (#1, #2)
-- [ ] Configure PyPI Trusted Publishing when ready — W8.T08
+- [~] PyPI Trusted Publishing — W8.T08
+  - [x] Distribution name **`bnn-lab`** (`bnn` taken on PyPI); GitHub env **`pypi`**; `wheels.yml` publish job
+  - [ ] Register Trusted Publisher on pypi.org, then Actions → wheels → publish=true
+- [ ] Make repository **public** (recommended) — private repos break free Code Scanning + Scorecard public badge API
 - [ ] Optional: README shields for CI / release once Actions green on tag
 
 ## Not required for v0.3 preview

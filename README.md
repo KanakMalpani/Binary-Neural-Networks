@@ -181,7 +181,7 @@ flowchart TB
   WRAP --> CODEC
 ```
 
-**Installing does not require a compiler.** `setup.py` builds the kernel when a toolchain is present and falls back to NumPy otherwise. Prebuilt wheels (Linux / macOS / Windows × x86-64 / arm64) ship via the [`wheels`](.github/workflows/wheels.yml) workflow; PyPI publish is a separate, manually gated step.
+**Installing does not require a compiler.** `setup.py` builds the kernel when a toolchain is present and falls back to NumPy otherwise. Prebuilt wheels (Linux / macOS / Windows × x86-64 / arm64) ship via the [`wheels`](.github/workflows/wheels.yml) workflow. On PyPI the distribution name is **`bnn-lab`** (`pip install bnn-lab`) — the short name `bnn` is already taken by an unrelated project; the import and CLI stay `bnn`. Live upload needs [Trusted Publishing](docs/PYPI_PUBLISH.md).
 
 ```bat
 bnn validate-native          # selected ISA path, err = 0

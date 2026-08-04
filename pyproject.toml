@@ -3,7 +3,9 @@ requires = ["setuptools>=68", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "bnn"
+# PyPI distribution name. Import path and console script remain `bnn`.
+# The short name `bnn` is already taken on PyPI (unrelated package by Adrian Bulat).
+name = "bnn-lab"
 version = "0.3.0"
 description = "Extreme low-bit inference lab: packed binary/ternary CPU kernels + STE training (honest CPU/edge speedups)"
 readme = "README.md"
@@ -84,7 +86,7 @@ markers = [
 ]
 
 [tool.cibuildwheel]
-# Wheels exist so that `pip install bnn` yields the fast kernel with no
+# Wheels exist so that `pip install bnn-lab` yields the fast kernel with no
 # compiler on the user's machine. The smoke test runs against the *shipped*
 # binary and needs only NumPy — pulling torch into every wheel's test env would
 # cost ~200 MB per target and is not available on all of them.

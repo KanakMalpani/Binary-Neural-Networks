@@ -1,7 +1,7 @@
 """Build the native packed-GEMM library into the wheel.
 
 Everything user-facing lives in pyproject.toml; this file exists only because
-the kernel is C. The goal is that `pip install bnn` gives a working fast path on
+the kernel is C. The goal is that `pip install bnn-lab` gives a working fast path on
 an ordinary machine with no compiler and no MSVC/Xcode setup.
 
 Two rules shape this file:

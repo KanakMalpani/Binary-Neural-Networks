@@ -160,7 +160,7 @@ Audit date: **2026-07-28** (SIMD/portability refresh). Status legend: `[x] DONE`
 
 | Area | Status | Evidence (paths) | Gap to world-class |
 |------|--------|------------------|--------------------|
-| Packaging / version | `[x]` | `pyproject.toml` 0.3.0, `bnn/_version.py`, console script | PyPI Trusted Publishing (prep done) |
+| Packaging / version | `[x]` | `pyproject.toml` **`bnn-lab`** 0.3.0 (import/CLI `bnn`), console script | Trusted Publisher on pypi.org (env `pypi` created) |
 | CLI surface | `[x]` | `bnn optimise` + wrap/encode/… | HF load verb optional |
 | STE layers / models | `[x]` | `bnn/ste.py`, `layers.py`, `models.py` | Broader zoo (ResNet-BiReal full, BitLinear LLM toy) |
 | Native binary GEMM | `[x]` | Win/Linux/macOS/ARM native + runtime SIMD (`docs/41`); NumPy fallback | Arena / WASM optional |
@@ -181,9 +181,9 @@ Audit date: **2026-07-28** (SIMD/portability refresh). Status legend: `[x] DONE`
 | Tutorials | `[x]` | `docs/tutorials/01`–`08` | Keep green |
 | Bridges GPU/BitNet | `[~]` | `docs/23`–`24`, `scripts/bridges/*` | First-class CLI `bnn bridge …` |
 | HF integration | `[x]` | tutorial 08 + optional hf tests | deeper calib recipes |
-| Community OSS | `[x]` | LICENSE, templates, COC, SECURITY, CODEOWNERS, CONTRIBUTING, launch checklist, Discussions, branch protection | PyPI Trusted Publishing |
+| Community OSS | `[x]` | LICENSE, templates, COC, SECURITY, CODEOWNERS, CONTRIBUTING, launch checklist, Discussions, branch protection | Make repo **public** for Scorecard/CodeQL badges; finish PyPI Trusted Publisher |
 | Security | `[x]` | SECURITY.md + SBOM + hard pip-audit + attestations | — |
-| Releases | `[x]` | `v0.3.0` + SBOM script | Attestations / PyPI upload |
+| Releases | `[x]` | `v0.3.0` + SBOM script + `wheels.yml` publish job | First `bnn-lab` upload via Trusted Publishing |
 | Papers / research series | `[~]` | `docs/32`, publication plan, CITATION.cff | Venue submit |
 | Compatibility matrix | `[x]` | docs + CI matrix 3.11–3.13 + portability | Keep matrix honest |
 | Memory arena / thread pool API | `[x]` | OpenMP thread setter + footprint report | Arena measured & declined (docs/43) |
@@ -425,7 +425,7 @@ Acceptance: every task that touches metrics must keep `bnn repro` green unless e
 | W8.T05 | Tagged GitHub Releases | M | W1 | `[x]` v0.3.0 |
 | W8.T06 | SBOM (e.g. cyclonedx) on release | M | W8.T05 | `[x]` script + docs |
 | W8.T07 | Artifact attestations | L | W8.T05 | `[x]` `attest-build-provenance` on wheels + sdist |
-| W8.T08 | PyPI publish workflow (Trusted Publishing) | L | W8.T05 | `[~]` prep docs; no upload |
+| W8.T08 | PyPI publish workflow (Trusted Publishing) | L | W8.T05 | `[~]` name `bnn-lab`; env `pypi`; publisher pending on pypi.org |
 | W8.T09 | constraints.txt discipline | S | — | `[x]` |
 | W8.T10 | Native compile in CI not `continue-on-error` when possible | M | W2.T03 | `[x]` Linux hard; Win soft |
 
@@ -713,7 +713,7 @@ Pre-checked from 2026-07-25 audit. **Agents: flip `[ ]` → `[x]` or `[~]` in PR
 - [x] Profile CLI
 - [x] Repro + golden floors + CI Win/Linux
 - [x] Tutorials 01–06
-- [x] Tutorials 07–08 + master [`GUIDE_E2E.md`](GUIDE_E2E.md)
+- [x] Tutorials 07–08 + master [`docs/GUIDE_E2E.md`](docs/GUIDE_E2E.md)
 - [x] W9.T08 BNN vs INT4 cookbook (GUIDE_E2E §8)
 - [x] W9.T09 Troubleshooting expand (GUIDE_E2E §11)
 - [x] Bridges docs + recipe scripts
@@ -821,8 +821,9 @@ attestations. (W2.T04/T05 + macOS/ARM portability CI **done** — `docs/41`.)
 1. ~~Phase A–D v0.3.0 preview~~ **DONE**
 2. ~~Human: enable GitHub Discussions (W11.T06)~~ **done**
 3. ~~W2.T04 / W2.T05 portable SIMD + portability CI~~ **DONE** (`docs/41`)
-4. PyPI Trusted Publishing when ready (W8.T08)
-5. Autodoc MkDocs expand + WC-O QAT recipe polish toward v1.0
+4. PyPI: register Trusted Publisher for **`bnn-lab`** on pypi.org (GitHub env `pypi` exists; see `docs/PYPI_PUBLISH.md`), then Actions → wheels → publish=true
+5. Make the GitHub repo **public** so CodeQL + OpenSSF Scorecard badges work without GHAS
+6. Autodoc MkDocs expand + WC-O QAT recipe polish toward v1.0
 
 ---
 

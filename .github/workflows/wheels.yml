@@ -98,7 +98,7 @@ jobs:
         # check_wheel_kernel.py needs only NumPy.
         run: |
           python -m pip install numpy
-          python -m pip install --no-binary bnn --no-deps dist/*.tar.gz
+          python -m pip install --no-binary bnn-lab --no-deps dist/*.tar.gz
           python scripts/check_wheel_kernel.py
       - name: Attest build provenance
         if: github.repository == 'KanakMalpani/Binary-Neural-Networks'
