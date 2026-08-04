@@ -26,7 +26,7 @@ Optimiser **preview** launch = **v0.3.0** (not yet world-class v1.0).
 - [~] PyPI Trusted Publishing — W8.T08
   - [x] Distribution name **`bnn-lab`** (`bnn` taken on PyPI); GitHub env **`pypi`**; `wheels.yml` publish job
   - [ ] Register Trusted Publisher on pypi.org, then Actions → wheels → publish=true
-- [ ] Make repository **public** (recommended) — private repos break free Code Scanning + Scorecard public badge API
+- [x] Repository is **public** — free Code Scanning + Scorecard public badge API work
 - [ ] Optional: README shields for CI / release once Actions green on tag
 
 ## Not required for v0.3 preview

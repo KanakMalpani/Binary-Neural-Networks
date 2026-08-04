@@ -713,7 +713,7 @@ Pre-checked from 2026-07-25 audit. **Agents: flip `[ ]` → `[x]` or `[~]` in PR
 - [x] Profile CLI
 - [x] Repro + golden floors + CI Win/Linux
 - [x] Tutorials 01–06
-- [x] Tutorials 07–08 + master [`docs/GUIDE_E2E.md`](docs/GUIDE_E2E.md)
+- [x] Tutorials 07–08 + master [`docs/GUIDE_E2E.md`](https://github.com/KanakMalpani/Binary-Neural-Networks/blob/main/docs/GUIDE_E2E.md)
 - [x] W9.T08 BNN vs INT4 cookbook (GUIDE_E2E §8)
 - [x] W9.T09 Troubleshooting expand (GUIDE_E2E §11)
 - [x] Bridges docs + recipe scripts

@@ -36,7 +36,7 @@ bnn repro
 1. Create a free account on https://pypi.org (or log in).
 2. Create GitHub Environment named **`pypi`** on
    `KanakMalpani/Binary-Neural-Networks` (Settings → Environments → New).
-   Reviewers optional; free private repos may not support required reviewers.
+   Reviewers optional (useful on a public repo; free private repos may not support them).
 3. On PyPI: **Publishing → Add a new pending publisher**:
    - PyPI project name: `bnn-lab`
    - Owner: `KanakMalpani`
@@ -74,9 +74,8 @@ Or editable:
 pip install -e ".[dev]" -c constraints.txt
 ```
 
-## Private-repo note
+## Public-repo note
 
-This repository is currently **private**. OpenSSF Scorecard’s public badge API
-and free Code Scanning expect a **public** repo (or GitHub Advanced Security on
-private). Making the repo public is recommended before relying on those badges;
-it is independent of the PyPI name/Trusted Publishing steps above.
+This repository is **public**. OpenSSF Scorecard’s public badge API and free
+Code Scanning apply; supply-chain badges no longer need a private-repo caveat.
+Trusted Publishing for **`bnn-lab`** remains a separate maintainer step above.

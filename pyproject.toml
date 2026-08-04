@@ -54,7 +54,7 @@ docs = [
   "mkdocs-material>=9.5,<10",
   "mkdocstrings[python]>=0.26,<1",
 ]
-all = ["bnn[dev,hf,docs]"]
+all = ["bnn-lab[dev,hf,docs]"]
 
 [project.scripts]
 bnn = "bnn.cli:main"
