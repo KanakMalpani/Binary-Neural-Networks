@@ -8,6 +8,7 @@ Regenerates bnn_kg.graphml. Does NOT re-run build_bnn_kg (preserves enrichment m
 from __future__ import annotations
 
 import json
+import re
 import xml.etree.ElementTree as ET
 from datetime import UTC, datetime
 from pathlib import Path
@@ -19,6 +20,25 @@ KG_DIR = ROOT / "knowledge_graph"
 MAIN_P = KG_DIR / "bnn_kg.json"
 PATCH_P = KG_DIR / "enrichment" / "integrity_wave1.json"
 GRAPHML_P = KG_DIR / "bnn_kg.graphml"
+
+_ABS_LOCAL = re.compile(r"^[A-Za-z]:[/\\]|^\\\\")
+
+
+def _is_machine_local_path(s: str) -> bool:
+    """Drive-letter / UNC paths (maintainer vault) are not portable CI sources."""
+    return bool(_ABS_LOCAL.match(s)) or "Research Papers" in s
+
+
+def _portable_sources(sources: list[Any]) -> list[str]:
+    out: list[str] = []
+    for s in sources:
+        if not isinstance(s, str):
+            continue
+        if _is_machine_local_path(s):
+            continue
+        if s not in out:
+            out.append(s)
+    return out
 
 
 def to_graphml(nodes: list[dict], edges: list[dict]) -> str:
@@ -119,6 +139,17 @@ def apply_patch(main_g: dict[str, Any], patch: dict[str, Any]) -> dict[str, Any]
             nodes.append(n)
             seen.add(nid)
 
+    # Strip maintainer-local absolute vault paths from every node (CI-safe).
+    stripped_abs = 0
+    for n in nodes:
+        before = list(n.get("sources") or [])
+        after = _portable_sources(before)
+        if not after:
+            # Never leave sources empty — keep non-absolute entries only; if none, keep before
+            after = [s for s in before if isinstance(s, str) and not _is_machine_local_path(s)] or before
+        stripped_abs += max(0, len(before) - len(after))
+        n["sources"] = after
+
     remove_pairs = {
         (a, b) for a, b in (patch.get("remove_same_as_pairs") or [])
     } | {(b, a) for a, b in (patch.get("remove_same_as_pairs") or [])}
@@ -179,6 +210,7 @@ def apply_patch(main_g: dict[str, Any], patch: dict[str, Any]) -> dict[str, Any]
             "integrity_removed_same_as": removed_same_as,
             "integrity_removed_edges": removed_edges,
             "integrity_cleared_lab_alias": cleared_aliases,
+            "integrity_stripped_abs_sources": stripped_abs,
         }
     )
     meta["enrichment_runs"] = runs

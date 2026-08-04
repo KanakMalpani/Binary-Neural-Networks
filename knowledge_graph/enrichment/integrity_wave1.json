@@ -39,6 +39,39 @@
       "docs/14_HARDWARE_AND_ENERGY.md",
       "results/energy_bound.json",
       "results/energy_bound_measured.json",
+      "docs/spikes/RAPL_ENERGY_SPIKE.md",
+      "https://github.com/KanakMalpani/Binary-Neural-Networks/pull/22"
+    ],
+    "paper_b1_honest_speedup": [
+      "docs/32_NOVEL_PAPER_CANDIDATES.md"
+    ],
+    "paper_b2_packed_xnor": [
+      "docs/32_NOVEL_PAPER_CANDIDATES.md"
+    ],
+    "paper_b3_when_not": [
+      "docs/32_NOVEL_PAPER_CANDIDATES.md"
+    ],
+    "gap_rapl_windows": [
+      "docs/spikes/RAPL_ENERGY_SPIKE.md",
+      "docs/14_HARDWARE_AND_ENERGY.md",
+      "results/energy_bound.json",
+      "https://github.com/KanakMalpani/Binary-Neural-Networks/pull/22"
+    ],
+    "energy_proxy_ept": [
+      "results/energy_bound.json",
+      "docs/14_HARDWARE_AND_ENERGY.md",
+      "docs/spikes/RAPL_ENERGY_SPIKE.md"
+    ],
+    "metric_energy_proxy_ratio": [
+      "results/energy_bound.json",
+      "docs/14_HARDWARE_AND_ENERGY.md",
+      "docs/spikes/RAPL_ENERGY_SPIKE.md"
+    ],
+    "result_energy_rapl_spike": [
+      "results/energy_bound.json",
+      "docs/14_HARDWARE_AND_ENERGY.md",
+      "docs/spikes/RAPL_ENERGY_SPIKE.md",
+      "docs/MOONSHOT_DEFERRALS.md",
       "https://github.com/KanakMalpani/Binary-Neural-Networks/pull/22"
     ]
   },
@@ -80,6 +113,10 @@
     },
     "sys_energy_module": {
       "summary": "Energy bound from wrap latency (E=P×t) on main; Lane H PR #22 adds RAPL probe + Windows CLOSED-BY-PROXY honesty. Not a golden floor."
+    },
+    "gap_rapl_windows": {
+      "status": "open_pr",
+      "summary": "Windows has no portable RAPL — proxy only. Linux RAPL lands with Lane H PR #22; spike pointer doc is stub until that merge."
     }
   },
   "remove_same_as_pairs": [
@@ -97,6 +134,16 @@
       "source": "paper_bitnet_2b4t",
       "target": "artifact.hf_bitnet_2b",
       "relation": "derived_from"
+    },
+    {
+      "source": "paper_bireal",
+      "target": "sys_vision_cifar",
+      "relation": "implements"
+    },
+    {
+      "source": "paper.bitnet_cpp.2024",
+      "target": "artifact.hf_bitnet_2b",
+      "relation": "implements"
     }
   ],
   "nodes": [
@@ -188,6 +235,7 @@
       "sources": [
         "results/energy_bound.json",
         "docs/14_HARDWARE_AND_ENERGY.md",
+        "docs/spikes/RAPL_ENERGY_SPIKE.md",
         "docs/MOONSHOT_DEFERRALS.md",
         "https://github.com/KanakMalpani/Binary-Neural-Networks/pull/22"
       ],
@@ -396,6 +444,18 @@
       "target": "concept.mobile_npu_quant_reality",
       "relation": "part_of",
       "evidence": ["FailureMode is the operational takeaway of the concept"]
+    },
+    {
+      "source": "sys_vision_cifar",
+      "target": "paper_bireal",
+      "relation": "implements",
+      "evidence": ["results/image_cifar.json — System implements Bi-Real pattern"]
+    },
+    {
+      "source": "artifact.hf_bitnet_2b",
+      "target": "paper.bitnet_cpp.2024",
+      "relation": "implements",
+      "evidence": ["HF 2B4T checkpoint is the runtime artifact cited by bitnet.cpp"]
     }
   ]
 }

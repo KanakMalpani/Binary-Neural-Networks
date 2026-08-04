@@ -390,8 +390,6 @@ def build_nodes() -> list[dict[str, Any]]:
             "compression/op-count ≠ wall-clock. Idea vault only.",
             [
                 "docs/32_NOVEL_PAPER_CANDIDATES.md",
-                "C:/00 Research Papers/BINARY_NEURAL_SERIES_README.md",
-                "C:/00 Research Papers/Stop Claiming 32x Honest Speedup Accounting for Binary Neural Networks/README.md",
             ],
             0.85,
             status="idea_vault",
@@ -404,7 +402,6 @@ def build_nodes() -> list[dict[str, Any]]:
             "golden gates for humans/AI agents. Idea vault only.",
             [
                 "docs/32_NOVEL_PAPER_CANDIDATES.md",
-                "C:/00 Research Papers/Packed XNOR on Commodity CPUs Reproducible Productization and Golden Gates/README.md",
             ],
             0.85,
             status="idea_vault",
@@ -417,7 +414,6 @@ def build_nodes() -> list[dict[str, Any]]:
             "vs INT4/FP8/GGUF / do-not-binarize. Idea vault only.",
             [
                 "docs/32_NOVEL_PAPER_CANDIDATES.md",
-                "C:/00 Research Papers/When Not to Binarize Decision Tree for Hybrid Low-Bit Wrapping/README.md",
             ],
             0.85,
             status="idea_vault",
@@ -912,10 +908,15 @@ def build_nodes() -> list[dict[str, Any]]:
             "gap_rapl_windows",
             "OpenGap: Windows Board Joules (RAPL)",
             "OpenGap",
-            "Linux RAPL spike delivered; Windows remains energy-proxy; no fake RAPL claims.",
-            ["docs/spikes/RAPL_ENERGY_SPIKE.md", "results/energy_rapl_spike.json"],
+            "Linux RAPL path is Lane H open PR; Windows remains energy-proxy; no fake RAPL claims.",
+            [
+                "docs/spikes/RAPL_ENERGY_SPIKE.md",
+                "docs/14_HARDWARE_AND_ENERGY.md",
+                "results/energy_bound.json",
+                "https://github.com/KanakMalpani/Binary-Neural-Networks/pull/22",
+            ],
             0.9,
-            status="closed_by_proxy_on_windows",
+            status="open_pr",
         ),
         N(
             "gap_venue_submit",
@@ -1137,7 +1138,7 @@ def build_nodes() -> list[dict[str, Any]]:
             "energy_proxy Relative Ratio",
             "Metric",
             "Pareto field: fp=1.0, binary=E_bin/E_fp from proxy or RAPL spike.",
-            ["results/energy_bound.json", "docs/spikes/RAPL_ENERGY_SPIKE.md"],
+            ["results/energy_bound.json", "docs/14_HARDWARE_AND_ENERGY.md", "docs/spikes/RAPL_ENERGY_SPIKE.md"],
             0.9,
         ),
         N(
@@ -1287,7 +1288,7 @@ def build_edges() -> list[dict[str, Any]]:
         E("paper_xnornet", "paper_xnornetpp", "improved_by", ["arXiv:1909.13863"], 0.8),
         E("paper_bireal", "concept_fp_shortcuts", "introduces", ["arXiv:1808.00278"], 1.0),
         E("paper_bireal", "algo_approx_sign", "introduces", ["arXiv:1808.00278"], 1.0),
-        E("paper_bireal", "sys_vision_cifar", "implements", ["results/image_cifar.json"], 0.85),
+        E("sys_vision_cifar", "paper_bireal", "implements", ["results/image_cifar.json"], 0.85),
         E("paper_reactnet", "algo_rsign_rprelu", "introduces", ["arXiv:2003.03488"], 1.0),
         E("paper_reactnet", "paper_bireal", "improves", ["arXiv:2003.03488"], 0.9),
         E("paper_reactnet", "gap_reactnet_in_repo", "not_fully_implemented_in", ["docs/13_TRAINING_QAT_DISTILL.md"], 0.8),

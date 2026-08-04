@@ -72,9 +72,22 @@
         "integrity_removed_same_as": 0,
         "integrity_removed_edges": 1,
         "integrity_cleared_lab_alias": 3
+      },
+      {
+        "generated": "2026-08-04T23:50:00+05:30",
+        "researcher": "lane-kg-enrich",
+        "schema_version": "1.0",
+        "purpose": "Lab/product integrity enrichment: WC-O gates, CLI systems, GPTQ/Q-Sparse/BitDistiller, RAPL Result, moonshot non-goals, Wave 1 open-PR status honesty, broken source fixes, same_as repairs.",
+        "lab_coverage_note": "Wave 1 lanes A–I remain open PRs #16–#24 — do not claim merged. Thesis lock unchanged.",
+        "integrity_added_nodes": 0,
+        "integrity_added_edges": 2,
+        "integrity_removed_same_as": 0,
+        "integrity_removed_edges": 2,
+        "integrity_cleared_lab_alias": 0,
+        "integrity_stripped_abs_sources": 0
       }
     ],
-    "integrity_patched_at": "2026-08-04T18:47:19.084303+00:00"
+    "integrity_patched_at": "2026-08-04T19:03:17.604225+00:00"
   },
   "nodes": [
     {
@@ -581,9 +594,7 @@
       "type": "Paper",
       "summary": "Novel claim: mandatory dual metrics + fake-binary negative control + Amdahl/energy proxies; compression/op-count ≠ wall-clock. Idea vault only.",
       "sources": [
-        "docs/32_NOVEL_PAPER_CANDIDATES.md",
-        "C:/00 Research Papers/BINARY_NEURAL_SERIES_README.md",
-        "C:/00 Research Papers/Stop Claiming 32x Honest Speedup Accounting for Binary Neural Networks/README.md"
+        "docs/32_NOVEL_PAPER_CANDIDATES.md"
       ],
       "confidence": 0.85,
       "status": "idea_vault"
@@ -594,8 +605,7 @@
       "type": "Paper",
       "summary": "Novel claim: MSVC/portable packed XNOR recipe + fair pre-pack benches + machine-checkable golden gates for humans/AI agents. Idea vault only.",
       "sources": [
-        "docs/32_NOVEL_PAPER_CANDIDATES.md",
-        "C:/00 Research Papers/Packed XNOR on Commodity CPUs Reproducible Productization and Golden Gates/README.md"
+        "docs/32_NOVEL_PAPER_CANDIDATES.md"
       ],
       "confidence": 0.85,
       "status": "idea_vault"
@@ -606,8 +616,7 @@
       "type": "Paper",
       "summary": "Novel claim: goal×hardware decision tree + hybrid FFN wrap evidence for honest wrapping vs INT4/FP8/GGUF / do-not-binarize. Idea vault only.",
       "sources": [
-        "docs/32_NOVEL_PAPER_CANDIDATES.md",
-        "C:/00 Research Papers/When Not to Binarize Decision Tree for Hybrid Low-Bit Wrapping/README.md"
+        "docs/32_NOVEL_PAPER_CANDIDATES.md"
       ],
       "confidence": 0.85,
       "status": "idea_vault"
@@ -828,6 +837,7 @@
         "docs/14_HARDWARE_AND_ENERGY.md",
         "results/energy_bound.json",
         "results/energy_bound_measured.json",
+        "docs/spikes/RAPL_ENERGY_SPIKE.md",
         "https://github.com/KanakMalpani/Binary-Neural-Networks/pull/22"
       ],
       "confidence": 0.9,
@@ -1310,13 +1320,15 @@
       "id": "gap_rapl_windows",
       "label": "OpenGap: Windows Board Joules (RAPL)",
       "type": "OpenGap",
-      "summary": "Linux RAPL spike delivered; Windows remains energy-proxy; no fake RAPL claims.",
+      "summary": "Windows has no portable RAPL — proxy only. Linux RAPL lands with Lane H PR #22; spike pointer doc is stub until that merge.",
       "sources": [
         "docs/spikes/RAPL_ENERGY_SPIKE.md",
-        "results/energy_rapl_spike.json"
+        "docs/14_HARDWARE_AND_ENERGY.md",
+        "results/energy_bound.json",
+        "https://github.com/KanakMalpani/Binary-Neural-Networks/pull/22"
       ],
       "confidence": 0.9,
-      "status": "closed_by_proxy_on_windows"
+      "status": "open_pr"
     },
     {
       "id": "gap_venue_submit",
@@ -1640,6 +1652,7 @@
       "summary": "Pareto field: fp=1.0, binary=E_bin/E_fp from proxy or RAPL spike.",
       "sources": [
         "results/energy_bound.json",
+        "docs/14_HARDWARE_AND_ENERGY.md",
         "docs/spikes/RAPL_ENERGY_SPIKE.md"
       ],
       "confidence": 0.9,
@@ -2202,6 +2215,7 @@
       "sources": [
         "results/energy_bound.json",
         "docs/14_HARDWARE_AND_ENERGY.md",
+        "docs/spikes/RAPL_ENERGY_SPIKE.md",
         "docs/MOONSHOT_DEFERRALS.md",
         "https://github.com/KanakMalpani/Binary-Neural-Networks/pull/22"
       ],
@@ -2573,15 +2587,6 @@
         "arXiv:1808.00278"
       ],
       "weight": 1.0
-    },
-    {
-      "source": "paper_bireal",
-      "target": "sys_vision_cifar",
-      "relation": "implements",
-      "evidence": [
-        "results/image_cifar.json"
-      ],
-      "weight": 0.85
     },
     {
       "source": "paper_reactnet",
@@ -4162,15 +4167,6 @@
       "weight": 1.0
     },
     {
-      "source": "paper.bitnet_cpp.2024",
-      "target": "artifact.hf_bitnet_2b",
-      "relation": "implements",
-      "evidence": [
-        "Official BitNet-b1.58-2B-4T listed in microsoft/BitNet model table (I2_S/TL kernels)."
-      ],
-      "weight": 1.0
-    },
-    {
       "source": "paper.bitdistill.2025",
       "target": "recipe.qat_158bit",
       "relation": "implements",
@@ -4848,6 +4844,24 @@
       "relation": "part_of",
       "evidence": [
         "FailureMode is the operational takeaway of the concept"
+      ],
+      "weight": 1.0
+    },
+    {
+      "source": "sys_vision_cifar",
+      "target": "paper_bireal",
+      "relation": "implements",
+      "evidence": [
+        "results/image_cifar.json — System implements Bi-Real pattern"
+      ],
+      "weight": 1.0
+    },
+    {
+      "source": "artifact.hf_bitnet_2b",
+      "target": "paper.bitnet_cpp.2024",
+      "relation": "implements",
+      "evidence": [
+        "HF 2B4T checkpoint is the runtime artifact cited by bitnet.cpp"
       ],
       "weight": 1.0
     }

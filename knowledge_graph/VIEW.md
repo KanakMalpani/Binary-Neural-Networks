@@ -176,11 +176,14 @@ flowchart LR
   LAB --> B1[B1 Stop Claiming 32×<br/>dual metrics + fake binary]
   LAB --> B2[B2 Packed XNOR productization<br/>goldens + repro contract]
   LAB --> B3[B3 When Not to Binarize<br/>decision tree + hybrid FFN]
-  B1 --> VAULT["C:\\00 Research Papers\\"]
+  B1 --> VAULT["Maintainer-local idea vault"]
   B2 --> VAULT
   B3 --> VAULT
   B1 -.->|blocked_by| VENUE[Venue LaTeX OpenGap]
 ```
+
+Idea-vault folders under `C:\00 Research Papers\` are **maintainer-local** — cite
+[`docs/32_NOVEL_PAPER_CANDIDATES.md`](../docs/32_NOVEL_PAPER_CANDIDATES.md) in-repo.
 
 ---
 

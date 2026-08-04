@@ -1,6 +1,7 @@
 """Smoke tests for the BNN knowledge graph."""
 from __future__ import annotations
 
+import re
 from pathlib import Path
 
 import pytest
@@ -147,10 +148,15 @@ def test_same_as_and_lab_alias_type_hygiene(graph):
 def test_repo_relative_sources_exist(graph):
     """Local path-like sources should resolve on the checked-out tree."""
     skip_prefixes = ("http://", "https://", "arXiv:", "arxiv:", "doi:", "hf:")
+    abs_local = re.compile(r"^[A-Za-z]:[/\\]|^\\\\")
     missing: list[str] = []
+    absolute: list[str] = []
     for n in graph["nodes"]:
         for s in n.get("sources") or []:
             if not isinstance(s, str) or s.startswith(skip_prefixes):
+                continue
+            if abs_local.match(s) or "Research Papers" in s:
+                absolute.append(f"{n['id']}: {s}")
                 continue
             # Allow bare filenames / section anchors only when they look like paths
             if "/" not in s and "\\" not in s:
@@ -162,4 +168,5 @@ def test_repo_relative_sources_exist(graph):
             p = ROOT / path_s
             if not p.exists():
                 missing.append(f"{n['id']}: {s}")
+    assert absolute == [], absolute
     assert missing == [], missing
