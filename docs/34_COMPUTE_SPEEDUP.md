@@ -16,25 +16,33 @@ Thesis lock unchanged: **32× is packing density**, not a guaranteed e2e wall-cl
 | Compile | MSVC vcvars list | + vswhere, `/DEF` exports, Linux `-fopenmp` path |
 | Bench | Fixed sizes, no scaling curve | Warmups, pack-vs-compute, thread curve, ternary |
 
-## Headline speedups vs NumPy FP32 (compute-only, 4 threads)
+## Headline speedups vs NumPy FP32 (compute-only, committed `results/benchmark.json`)
 
 | Shape (B×N×M) | Compute ms | NumPy FP32 ms | S_compute | Err |
 |---------------|----------:|--------------:|----------:|----:|
-| 128×2048×2048 | 1.79 | 9.43 | **5.28×** | 0 |
-| 64×4096×4096 | 2.92 | 23.49 | **8.05×** | 0 |
-| 32×8192×8192 | 6.04 | 84.34 | **13.96×** | 0 |
+| 128×2048×2048 | 0.61 | 7.34 | **11.99×** | 0 |
+| 64×4096×4096 | 0.60 | 14.37 | **23.86×** | 0 |
+| 32×8192×8192 | 0.94 | 27.35 | **29.25×** | 0 |
 
-Prior committed golden (single-thread era) at 64×4096×4096 was ~3.7× vs NumPy FP32.
+Prior single-thread-era golden at 64×4096×4096 was ~3.7× vs NumPy FP32.
 
 ## Thread scaling (compute-only ms → speedup vs 1 thread)
 
+Committed artifact: [`results/benchmark.json`](../results/benchmark.json) /
+[`results/benchmark.md`](../results/benchmark.md) (W13.T04). Soft CI check:
+`bnn.profile.check_committed_bench_soft_floors` requires ≥2 thread points per
+published shape. Re-run does **not** invent new golden shapes.
+
 | Shape | 1 | 2 | 4 | 8 |
 |-------|--:|--:|--:|--:|
-| 128×2048×2048 | 5.22 (1.00×) | 2.90 (1.80×) | 1.98 (2.63×) | 1.80 (2.91×) |
-| 64×4096×4096 | 7.36 (1.00×) | 5.04 (1.46×) | 3.33 (2.21×) | 2.51 (2.93×) |
-| 32×8192×8192 | 16.53 (1.00×) | 10.27 (1.61×) | 6.53 (2.53×) | 5.69 (2.91×) |
+| 128×2048×2048 | 1.93 (1.00×) | 1.19 (1.62×) | 0.85 (2.28×) | 1.31 (1.48×) |
+| 64×4096×4096 | 2.22 (1.00×) | 1.66 (1.34×) | 1.07 (2.08×) | 0.74 (2.99×) |
+| 32×8192×8192 | 3.69 (1.00×) | 2.52 (1.46×) | 1.65 (2.23×) | 1.00 (3.68×) |
 
-Plateau near ~3× on this machine is expected (memory bandwidth / OpenMP overhead). Prefer `BNN_NUM_THREADS=4`–`8`; avoid blindly matching logical CPU count.
+Plateau / non-monotonic 8-thread on smaller shapes is expected (memory bandwidth /
+OpenMP overhead). Prefer `BNN_NUM_THREADS=4`–`8`; avoid blindly matching logical
+CPU count. Numbers above are wall-clock on the commit machine — floats need not
+match bit-identically elsewhere; conclusions must.
 
 ## Ternary bitplane vs dequant FP (same shapes, err=0)
 

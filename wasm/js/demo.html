@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>BNN pedagogy — WASM / JS binary GEMM</title>
+  <style>
+    :root {
+      --bg: #0f1419;
+      --fg: #e7ecf1;
+      --muted: #8b9aab;
+      --ok: #3dd68c;
+      --accent: #5b9fd4;
+      --panel: #1a222c;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: "IBM Plex Mono", "Cascadia Code", ui-monospace, monospace;
+      background:
+        radial-gradient(1200px 600px at 10% -10%, #1c3a52 0%, transparent 55%),
+        radial-gradient(900px 500px at 100% 0%, #243028 0%, transparent 50%),
+        var(--bg);
+      color: var(--fg);
+      display: grid;
+      place-items: center;
+      padding: 2rem;
+    }
+    main {
+      width: min(40rem, 100%);
+      background: color-mix(in srgb, var(--panel) 92%, transparent);
+      border: 1px solid #2a3542;
+      padding: 1.75rem 1.5rem;
+    }
+    h1 {
+      font-size: 1.05rem;
+      font-weight: 600;
+      letter-spacing: 0.02em;
+      margin: 0 0 0.35rem;
+      color: var(--accent);
+    }
+    p { margin: 0 0 1rem; color: var(--muted); font-size: 0.85rem; line-height: 1.45; }
+    button {
+      font: inherit;
+      color: var(--bg);
+      background: var(--accent);
+      border: 0;
+      padding: 0.55rem 1rem;
+      cursor: pointer;
+    }
+    button:hover { filter: brightness(1.08); }
+    pre {
+      margin: 1rem 0 0;
+      padding: 0.85rem 1rem;
+      background: #0c1015;
+      border: 1px solid #243040;
+      font-size: 0.8rem;
+      line-height: 1.4;
+      white-space: pre-wrap;
+      min-height: 6rem;
+    }
+    .ok { color: var(--ok); }
+    .warn { color: #e6c07b; }
+  </style>
+</head>
+<body>
+  <main>
+    <h1>BNN · packed XNOR–popcount (pedagogy)</h1>
+    <p>
+      Browser demo for W2.T06 / M1. Same bit encoding as the native lab kernels,
+      but this path is <strong>not</strong> a substitute for AVX/NEON/OpenMP hosts
+      and makes no latency claims.
+    </p>
+    <button type="button" id="run">Run parity check</button>
+    <pre id="out">Click run — uses JS scalar; loads ../dist/binary_gemm_wasm.wasm when present.</pre>
+  </main>
+  <script type="module">
+    import {
+      binaryGemm,
+      binaryGemmScalar,
+      loadWasm,
+      packPm1,
+      wasmKernelId,
+    } from "./binary_gemm.mjs";
+
+    function mulberry32(a) {
+      return function () {
+        let t = (a += 0x6d2b79f5);
+        t = Math.imul(t ^ (t >>> 15), t | 1);
+        t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
+        return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+      };
+    }
+    function pm1(rows, cols, seed) {
+      const rnd = mulberry32(seed);
+      const flat = new Float32Array(rows * cols);
+      for (let i = 0; i < flat.length; i++) flat[i] = rnd() < 0.5 ? -1 : 1;
+      return flat;
+    }
+    function fp32(x, w, B, N, M) {
+      const y = new Float32Array(B * M);
+      for (let b = 0; b < B; b++)
+        for (let m = 0; m < M; m++) {
+          let s = 0;
+          for (let n = 0; n < N; n++) s += x[b * N + n] * w[m * N + n];
+          y[b * M + m] = s;
+        }
+      return y;
+    }
+    function maxAbs(a, b) {
+      let m = 0;
+      for (let i = 0; i < a.length; i++) m = Math.max(m, Math.abs(a[i] - b[i]));
+      return m;
+    }
+
+    const out = document.getElementById("out");
+    document.getElementById("run").onclick = async () => {
+      const B = 4, N = 64, M = 8;
+      const x = pm1(B, N, 7), w = pm1(M, N, 11);
+      const { packed: xp, words } = packPm1(x, B, N);
+      const { packed: wp } = packPm1(w, M, N);
+      const yFp = fp32(x, w, B, N, M);
+      const yJs = binaryGemmScalar(xp, wp, B, M, words, N);
+      let wasmLine = "wasm: not loaded";
+      try {
+        const inst = await loadWasm(new URL("../dist/binary_gemm_wasm.wasm", import.meta.url));
+        wasmLine = inst
+          ? `wasm: loaded kernel_id=${wasmKernelId()}`
+          : "wasm: artifact missing or instantiate failed";
+      } catch {
+        wasmLine = "wasm: artifact missing (optional — python wasm/build.py)";
+      }
+      const { y, backend } = binaryGemm(xp, wp, B, M, words, N);
+      const eJs = maxAbs(yJs, yFp);
+      const e = maxAbs(y, yFp);
+      const pass = eJs === 0 && e === 0;
+      out.innerHTML =
+        `shape B=${B} N=${N} M=${M} words=${words}\n` +
+        `js-scalar max|err|=${eJs}\n` +
+        `${wasmLine}\n` +
+        `backend=${backend} max|err|=${e}\n` +
+        (pass
+          ? `<span class="ok">PASS — exact ±1 parity</span>`
+          : `<span class="warn">FAIL</span>`);
+    };
+  </script>
+</body>
+</html>

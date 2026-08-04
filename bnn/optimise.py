@@ -59,6 +59,13 @@ class OptimiseConfig:
     # W3.T05 — optional layer-wise sensitivity before wrap
     sensitivity: bool = False
     sensitivity_fragile_drop: float = 0.05
+    # W3.T09 — fold Linear+BN1d / BiReal BN before packing
+    fuse_bn: bool = False
+    # W3.T08 — optional STE KD before wrap (0 = skip; toy/demo scale)
+    distill_steps: int = 0
+    distill_lr: float = 1e-3
+    distill_temperature: float = 2.0
+    distill_layer_names: list[str] | None = None
 
 
 @dataclass
@@ -84,20 +91,22 @@ def optimise_model(
     teacher: nn.Module | None = None,
     **kwargs: Any,
 ) -> OptimiseResult:
-    """Calibrate → (optional QAT) → wrap → effectiveness → optional ``.bnnpack``.
+    """Calibrate → (optional distill/QAT) → wrap → effectiveness → optional ``.bnnpack``.
 
     Parameters
     ----------
     model:
         FP (or mixed) ``nn.Module`` to optimise for CPU/edge packed inference.
     calib_inputs:
-        Optional batch used for agreement metrics and light QAT. Shape must match
-        the model's forward.
+        Optional batch used for agreement metrics, distill, and light QAT. Shape
+        must match the model's forward.
     config:
         ``OptimiseConfig``; keyword overrides also accepted via ``kwargs``.
+        ``fuse_bn`` folds BN before pack; ``distill_steps`` runs STE KD when
+        ``calib_inputs`` (and a teacher) are available.
     teacher:
-        Optional FP teacher for agreement; defaults to a deepcopy taken *before*
-        wrap when ``calib_inputs`` is provided.
+        Optional FP teacher for agreement / distill; defaults to a deepcopy
+        taken *before* wrap when ``calib_inputs`` is provided.
 
     Returns
     -------
@@ -117,9 +126,39 @@ def optimise_model(
         teacher_mod = copy.deepcopy(work)
         teacher_mod.eval()
 
-    qat_info: dict[str, Any] | None = None
+    distill_info: dict[str, Any] | None = None
     mode = cfg.mode
     policy = cfg.policy
+    use_binary_distill = (
+        cfg.distill_steps > 0
+        and policy not in ("ternary_wo",)
+        and mode not in ("ternary_weight_only",)
+    )
+    if use_binary_distill:
+        if calib_inputs is None or teacher_mod is None:
+            warnings.warn(
+                "OptimiseConfig.distill_steps>0 requires calib_inputs "
+                "(and a teacher); distillation skipped.",
+                stacklevel=2,
+            )
+        else:
+            from .wrap.distill import DistillConfig, distill_binary_student
+
+            d_report = distill_binary_student(
+                work,
+                teacher_mod,
+                calib_inputs,
+                cfg=DistillConfig(
+                    steps=cfg.distill_steps,
+                    lr=cfg.distill_lr,
+                    temperature=cfg.distill_temperature,
+                    layer_names=cfg.distill_layer_names,
+                    drop_in_threshold=cfg.drop_in_threshold,
+                ),
+            )
+            distill_info = d_report.to_dict()
+
+    qat_info: dict[str, Any] | None = None
     use_binary_qat = (
         cfg.qat_steps > 0
         and policy not in ("ternary_wo",)
@@ -179,9 +218,13 @@ def optimise_model(
         accuracy_first=cfg.accuracy_first,
         exclude_exact=exclude_exact,
         force_narrow=cfg.force,
+        fuse_bn=cfg.fuse_bn,
+        drop_in_threshold=cfg.drop_in_threshold,
     )
     after = model_param_bytes(wrapped)
 
+    if distill_info is not None:
+        report.distill = distill_info
     if qat_info is not None:
         report.qat = qat_info
 
@@ -237,6 +280,8 @@ def optimise_model(
         calib_method=report.calib_method,
         effectiveness=report.effectiveness,
         qat=report.qat,
+        distill=report.distill,
+        fuse=report.fuse,
         sensitivity=sensitivity_payload,
         param_bytes_before=before,
         param_bytes_after=after,

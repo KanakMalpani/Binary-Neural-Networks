@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import math
 from dataclasses import asdict, dataclass
 
 import torch.nn.functional as F
@@ -10,6 +11,13 @@ from torch import Tensor
 
 @dataclass
 class EffectivenessReport:
+    """Measured agreement vs an FP teacher.
+
+    ``cosine`` is always a ``float`` so callers (sensitivity, search) stay
+    mypy-clean. Unmeasured stubs use ``math.nan`` with ``measured=False``;
+    ``to_dict()`` serialises that as ``null`` for JSON honesty (W3.T02).
+    """
+
     cosine: float
     kl_div: float | None
     top1_agreement: float | None
@@ -17,9 +25,39 @@ class EffectivenessReport:
     drop_in_threshold: float
     drop_in_ok: bool
     notes: str = ""
+    measured: bool = True
 
     def to_dict(self) -> dict:
-        return asdict(self)
+        d = asdict(self)
+        if not self.measured or not math.isfinite(self.cosine):
+            d["cosine"] = None
+        return d
+
+
+def unmeasured_effectiveness(
+    *,
+    drop_in_threshold: float = 0.85,
+    notes: str | None = None,
+) -> EffectivenessReport:
+    """Stub report so effectiveness is **always** present (W3.T02).
+
+    Keeps ``cosine: float`` (NaN) rather than widening the shared field to
+    ``Optional`` — measured paths stay strictly typed for mypy.
+    """
+    return EffectivenessReport(
+        cosine=float("nan"),
+        kl_div=None,
+        top1_agreement=None,
+        n_samples=0,
+        drop_in_threshold=drop_in_threshold,
+        drop_in_ok=False,
+        notes=notes
+        or (
+            "Effectiveness not measured; pass calib logits to measure_agreement / "
+            "attach_effectiveness (refuse drop-in claim)."
+        ),
+        measured=False,
+    )
 
 
 def measure_agreement(
@@ -34,13 +72,11 @@ def measure_agreement(
     if t.shape != s.shape:
         raise ValueError(f"shape mismatch teacher {t.shape} vs student {s.shape}")
 
-    # Mean cosine over batch rows
     cos = float(F.cosine_similarity(t, s, dim=1).mean().item())
 
     kl: float | None = None
     top1: float | None = None
     if t.shape[1] >= 2:
-        # Treat last dim as class logits when reasonable
         log_p = F.log_softmax(s, dim=1)
         q = F.softmax(t, dim=1)
         kl = float(F.kl_div(log_p, q, reduction="batchmean").item())
@@ -63,8 +99,14 @@ def measure_agreement(
         drop_in_threshold=drop_in_threshold,
         drop_in_ok=ok,
         notes=notes,
+        measured=True,
     )
 
 
 def drop_in_ok(report: EffectivenessReport, *, force: bool = False) -> bool:
-    return bool(report.drop_in_ok or force)
+    """WC-O3 honesty: never claim drop-in without metrics unless ``force``."""
+    if force:
+        return True
+    if not report.measured or not math.isfinite(report.cosine):
+        return False
+    return bool(report.drop_in_ok)

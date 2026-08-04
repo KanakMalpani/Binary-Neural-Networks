@@ -2,6 +2,20 @@
 
 ## Unreleased
 
+## [1.0.0] — 2026-08-05
+
+### Wave 2 integrator + Wave 3 v1.0
+
+- Merged lanes A–I + KG enrichment: WC-O (calibrate/distill/BN fuse), codec v2 +
+  safetensors, docs/eval/safety, research bridges + `bnn bridge`, PyPI packaging
+  dry-run/attestations, WASM pedagogy, ResNet-BiReal + ImageNet protocol runner,
+  RAPL/energy-proxy, bitnet.cpp recipe pins (no giant submodule).
+- `OptimiseConfig.fuse_bn` / `distill_steps` wired into `bnn/optimise.py` with
+  report fields `fuse` / `distill`.
+- ROADMAP twin flipped from lane notes; moonshot deferrals refreshed honestly.
+- **Human residual:** PyPI Trusted Publisher registration for `bnn-lab` (see
+  `docs/PYPI_PUBLISH.md`). No API-token publish path.
+
 ### Packaging — PyPI distribution name `bnn-lab` (W8.T08)
 
 - The short name `bnn` is **already taken** on PyPI (unrelated package). Distribution
@@ -9,7 +23,7 @@
 - GitHub Environment `pypi` created for Trusted Publishing; `docs/PYPI_PUBLISH.md`
   rewritten with the one-time pypi.org publisher steps. Live upload still needs
   that registration, then Actions → wheels → publish=true.
-- `twine check` PASSED for `bnn_lab-0.3.0` sdist + wheel.
+- Wheels dry-run + attestations verified; first OIDC upload pending human publisher.
 
 ### Memory footprint report (W13.T05) + arena decision (W2.T07)
 

@@ -1,22 +1,62 @@
 {
   "lane": "cpu-llm",
+  "schema": "bnn.bridge_cpu_llamacpp_bitnet.v1",
   "thesis": "CPU chat LLMs \u2192 GGUF Q4_K_M (llama.cpp) or BitNet \u2192 bitnet.cpp. Not sign()+torch.",
+  "pins_file": "scripts/bridges/llamacpp_bitnet_pins.json",
+  "pins": {
+    "bitnet_cpp_ref": "0b341e582afbf9e1011f24744b554c96a3477eb5",
+    "bitnet_cpp_repo": "https://github.com/microsoft/BitNet.git",
+    "llama_cpp_gguf_ref": "b10262",
+    "llama_cpp_gguf_repo": "https://github.com/ggerganov/llama.cpp.git",
+    "vendored_llama_cpp_fork_ref": "390c307752ab78fd8189f359d6954c9ba1be74af",
+    "pinned_at": "2026-08-04",
+    "vendor_submodule": false
+  },
   "llama_cpp_gguf": [
-    "git clone https://github.com/ggerganov/llama.cpp",
+    "git clone https://github.com/ggerganov/llama.cpp.git llama.cpp && cd llama.cpp",
+    "git checkout b10262",
     "cmake -B build -DGGML_NATIVE=ON && cmake --build build --config Release",
-    "# Convert HF \u2192 GGUF (upstream convert scripts) then:",
+    "# Convert HF \u2192 GGUF (upstream convert scripts for the model family) then:",
     "./llama-quantize model-f16.gguf model-Q4_K_M.gguf Q4_K_M",
     "./llama-cli -m model-Q4_K_M.gguf -p 'Hello' -n 64"
   ],
   "bitnet_cpp": [
-    "git clone https://github.com/microsoft/BitNet",
-    "# Follow upstream setup_env / build for your OS",
-    "# Use native BitNet checkpoints \u2014 do not absmean-PTQ a chat Llama and ship",
+    "git clone --recursive https://github.com/microsoft/BitNet.git BitNet && cd BitNet",
+    "git checkout 0b341e582afbf9e1011f24744b554c96a3477eb5 && git submodule update --init --recursive",
+    "# Optional: conda create -n bitnet-cpp python=3.10 && conda activate bitnet-cpp",
+    "pip install -r requirements.txt",
+    "huggingface-cli download microsoft/BitNet-b1.58-2B-4T-gguf --local-dir models/BitNet-b1.58-2B-4T",
+    "python setup_env.py -md models/BitNet-b1.58-2B-4T -q i2_s",
+    "# Windows: use VS2022 Developer shell; see upstream FAQs for ClangCL",
+    "# Inference (paths vary by OS): python run_inference.py -m models/BitNet-b1.58-2B-4T/ggml-model-i2_s.gguf -p 'Hello' -n 64",
     "docs/23_BITNET_CPP_BRIDGE.md"
   ],
+  "models": {
+    "bitnet_b158_2b_4t_gguf": {
+      "hf_id": "microsoft/BitNet-b1.58-2B-4T-gguf",
+      "local_dir_hint": "models/BitNet-b1.58-2B-4T",
+      "quant_default": "i2_s"
+    },
+    "bitnet_b158_2b_4t_hf": {
+      "hf_id": "microsoft/bitnet-b1.58-2B-4T",
+      "note": "Transformers/safetensors reference; production CPU serve still goes through bitnet.cpp."
+    }
+  },
+  "requirements": {
+    "python": ">=3.9",
+    "cmake": ">=3.22",
+    "clang_recommended": "18+",
+    "windows": "Developer Command Prompt / PowerShell for VS2022; ClangCL toolchain per upstream FAQs"
+  },
   "this_repo_shims": [
     "bnn recommend --goal cpu-llm",
     "bnn encode / bnn decode \u2192 .bnnpack for lab packed Linear artifacts",
-    "TernaryLinear + ternary_pack = pedagogy/size; speed for BitNet = bitnet.cpp"
+    "TernaryLinear + ternary_pack = pedagogy/size; speed for BitNet = bitnet.cpp",
+    "python scripts/bridges/llamacpp_bitnet_recipe.py --check"
+  ],
+  "non_goals": [
+    "Do not absmean-PTQ a chat Llama and ship as BitNet",
+    "Do not claim this repo's XNOR kernels replace bitnet.cpp tokens/s",
+    "Do not vendor microsoft/BitNet as a default git submodule"
   ]
 }

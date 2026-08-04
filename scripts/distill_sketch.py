@@ -1,5 +1,10 @@
 #!/usr/bin/env python3
-"""Toy KD: FP teacher → binary student on MNIST (protocol sketch, not BitDistill)."""
+"""Toy KD: FP teacher → binary student on MNIST (protocol sketch, not BitDistill).
+
+Prefer the wrap-integrated path for WC-O work:
+  - ``bnn.wrap.distill_binary_student`` (W3.T08)
+  - ``python scripts/distill_wrap_demo.py`` (measured cosine uplift vs cold PTQ)
+"""
 
 from __future__ import annotations
 

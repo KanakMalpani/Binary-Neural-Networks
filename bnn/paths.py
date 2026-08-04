@@ -4,7 +4,12 @@ from __future__ import annotations
 
 from pathlib import Path
 
+from .logutil import warn
+
 REPO_ROOT = Path(__file__).resolve().parents[1]
+
+# Directories we treat as "lab-local" for pack / checkpoint loads (W10.T06).
+_TRUSTED_PACK_ROOTS = ("results", "checkpoints", "data")
 
 
 class PathSecurityError(ValueError):
@@ -66,3 +71,31 @@ def repo_relative(path: Path | str) -> str:
         return resolved.relative_to(REPO_ROOT).as_posix()
     except ValueError:
         return p.name
+
+
+def is_under_repo_trusted_pack_root(path: Path | str) -> bool:
+    """True when ``path`` resolves under repo ``results/``, ``checkpoints/``, or ``data/``."""
+    try:
+        resolved = Path(path).resolve()
+        rel = resolved.relative_to(REPO_ROOT.resolve())
+    except (OSError, ValueError):
+        return False
+    parts = rel.parts
+    return bool(parts) and parts[0] in _TRUSTED_PACK_ROOTS
+
+
+def warn_untrusted_pack(path: Path | str, *, kind: str = ".bnnpack") -> bool:
+    """Emit a soft warning when loading a pack/checkpoint from outside lab roots.
+
+    Returns True if a warning was emitted. Does **not** block the load —
+    ``load_bnnpack`` still enforces ``weights_only=True`` (no pickle fallback).
+    """
+    p = Path(path)
+    if is_under_repo_trusted_pack_root(p):
+        return False
+    warn(
+        f"loading {kind} from outside lab results/checkpoints/data — "
+        "treat as untrusted; refuse files you did not produce",
+        path=str(p),
+    )
+    return True

@@ -26,6 +26,21 @@ pip-audit
 CI job `supply-chain` runs soft `pip-audit` + SBOM smoke (does not fail the
 matrix until findings are triaged).
 
+## Artifact attestations (W8.T07)
+
+`wheels.yml` attaches GitHub [artifact attestations](https://docs.github.com/actions/security-guides/using-artifact-attestations)
+(SLSA provenance) to every wheel and the sdist on
+`KanakMalpani/Binary-Neural-Networks` (skipped on forks — no OIDC).
+
+```bat
+gh attestation verify bnn_lab-0.3.0-*.whl --repo KanakMalpani/Binary-Neural-Networks
+gh attestation verify bnn_lab-0.3.0.tar.gz --repo KanakMalpani/Binary-Neural-Networks
+```
+
+Filenames use the normalised dist name `bnn_lab` (PyPI project `bnn-lab`).
+Publish to PyPI remains OIDC Trusted Publishing only — see
+[`PYPI_PUBLISH.md`](PYPI_PUBLISH.md).
+
 ## Related
 
 - `SECURITY.md` — vulnerability reporting

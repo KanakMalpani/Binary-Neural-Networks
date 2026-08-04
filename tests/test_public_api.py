@@ -92,6 +92,48 @@ def test_optimise_model_smoke(tmp_path):
     assert y.shape == (4, 10)
 
 
+def test_optimise_fuse_bn_and_distill_report_fields():
+    """Integrator residual: OptimiseConfig.fuse_bn + distill_steps → report."""
+    torch.manual_seed(0)
+
+    class TinyBN(nn.Module):
+        def __init__(self):
+            super().__init__()
+            self.ffn_fc1 = nn.Linear(32, 64)
+            self.bn1 = nn.BatchNorm1d(64)
+            self.ffn_fc2 = nn.Linear(64, 32)
+            self.head = nn.Linear(32, 5)
+
+        def forward(self, x):
+            h = self.bn1(self.ffn_fc1(x))
+            return self.head(self.ffn_fc2(torch.relu(h)))
+
+    m = TinyBN()
+    for _ in range(4):
+        m.train()
+        _ = m(torch.randn(8, 32))
+    m.eval()
+    x = torch.randn(4, 32)
+    result = optimise.optimise_model(
+        m,
+        x,
+        policy="hybrid_ffn",
+        mode="binary_xnor",
+        min_in_features=16,
+        fuse_bn=True,
+        distill_steps=8,
+        qat_steps=0,
+        force=True,
+    )
+    assert result.report.fuse is not None
+    assert result.payload.get("fuse") is not None
+    assert result.report.distill is not None
+    assert result.payload.get("distill") is not None
+    assert result.report.distill.get("steps", 0) > 0
+    y = result.model(x)
+    assert y.shape == (4, 5)
+
+
 def test_schema_envelope_valid():
     from bnn.wrap.schema import envelope, is_valid_optimise_report
 

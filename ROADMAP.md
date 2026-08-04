@@ -3,7 +3,7 @@
 | Field | Value |
 |-------|-------|
 | **Status** | Canonical living plan (agents: follow when lost) |
-| **Version** | 0.3.0 → target 1.0 world-class |
+| **Version** | 1.0.0 (lab optimiser; PyPI upload human residual) |
 | **Created** | 2026-07-25 |
 | **Canonical paths** | `/ROADMAP.md` (this file) · identical twin `docs/37_WORLD_CLASS_BNN_OPTIMISER_ROADMAP.md` |
 | **Supersedes (execution)** | `docs/21` remains historical COMPLETE lab plan; **this file** is the forward “world-class optimiser” plan |
@@ -160,43 +160,43 @@ Audit date: **2026-07-28** (SIMD/portability refresh). Status legend: `[x] DONE`
 
 | Area | Status | Evidence (paths) | Gap to world-class |
 |------|--------|------------------|--------------------|
-| Packaging / version | `[x]` | `pyproject.toml` **`bnn-lab`** 0.3.0 (import/CLI `bnn`), console script | Trusted Publisher on pypi.org (env `pypi` created) |
-| CLI surface | `[x]` | `bnn optimise` + wrap/encode/… | HF load verb optional |
-| STE layers / models | `[x]` | `bnn/ste.py`, `layers.py`, `models.py` | Broader zoo (ResNet-BiReal full, BitLinear LLM toy) |
-| Native binary GEMM | `[x]` | Win/Linux/macOS/ARM native + runtime SIMD (`docs/41`); NumPy fallback | Arena / WASM optional |
-| Ternary kernels | `[~]` | `ternary_pack.py`, `ternary_gemm.py` / C bitplanes | Cross-platform polish; bitnet.cpp handoff clarity |
-| Wrap / ultra wrap | `[x]` | `bnn/wrap/*` + sensitivity W3.T05 + search W3.T06 | Distill W3.T08 |
-| Calibrate / QAT | `[~]` | `wrap/calibrate.py`, `wrap/qat.py`, recipe docs/42 | Distill integration (W3.T08) |
+| Packaging / version | `[x]` | `pyproject.toml` **`bnn-lab`** 1.0.0 (import/CLI `bnn`), console script | Trusted Publisher on pypi.org still human (env `pypi` exists) |
+| CLI surface | `[x]` | `bnn optimise` + wrap/encode/bridge/… | HF load verb optional |
+| STE layers / models | `[x]` | `bnn/ste.py`, `layers.py`, `models.py` | Broader zoo polish optional |
+| Native binary GEMM | `[x]` | Win/Linux/macOS/ARM native + runtime SIMD (`docs/41`); NumPy fallback | Arena declined; WASM pedagogy shipped |
+| Ternary kernels | `[~]` | `ternary_pack.py`, `ternary_gemm.py` / C bitplanes | Cross-platform polish |
+| Wrap / ultra wrap | `[x]` | `bnn/wrap/*` + sensitivity/search + distill + BN fuse | Richer HW detect |
+| Calibrate / QAT | `[x]` | `wrap/calibrate.py`, `wrap/qat.py`, `wrap/distill.py`, docs/42 | BitDistill-scale optional |
 | Auto policy | `[x]` | `wrap/policy.py` + `search_layer_modes` (W3.T06) | Richer HW detect |
-| Codec `.bnnpack` | `[~]` | `bnn/codec/packfile.py` v1, encode/decode CLI | v2 schema, safetensors, ONNX |
+| Codec `.bnnpack` | `[x]` | v2 + hashes + safetensors export; ONNX bridge-only | ORT custom op stays deferred |
 | Seq enc/dec | `[x]` | `bnn/seq/`, `train_seq2seq`, tutorial 06 | Scale / real NLP tasks optional |
-| Vision | `[~]` | `bnn/vision/`, CIFAR Bi-Real, TinyBinaryViT | ImageNet protocol only stub |
+| Vision | `[x]` | CIFAR Bi-Real + ResNet-BiReal ref; ImageNet protocol runner | Full ImageNet SOTA non-gate |
 | Audio | `[~]` | `bnn/audio/` synthetic tones | Real dataset optional; keep ASR non-goal |
 | Math identities | `[x]` | `bnn/math/*`, `docs/35`, tests | Keep as regression forever |
-| Profile / bench | `[x]` | profile + Pareto + memory report | RAPL Joules moonshot |
+| Profile / bench | `[x]` | profile + Pareto + memory + energy-proxy; RAPL spike | Privileged wrap-workload RAPL optional |
 | Repro / goldens | `[x]` | `scripts/repro_all.py`, `golden_floors.json`, `REPRODUCIBILITY.md`, `AGENTS.md` | Broader OS matrix |
-| CI | `[x]` | Win + Linux native hard + py3.11–3.13 + **portability** (ARM/macOS) | Attestations / hard pip-audit |
-| Docs research 00–36 | `[x]` | `docs/` | MkDocs site; fewer conflicting “master” claims |
+| CI | `[x]` | Win + Linux native hard + py3.11–3.13 + **portability** (ARM/macOS) | Attestations on wheels dry-run |
+| Docs research 00–36 | `[x]` | `docs/` + MkDocs autodoc | Venue submit optional |
 | API reference | `[x]` | docs/api autodoc (mkdocstrings) | — |
 | Tutorials | `[x]` | `docs/tutorials/01`–`08` | Keep green |
-| Bridges GPU/BitNet | `[~]` | `docs/23`–`24`, `scripts/bridges/*` | First-class CLI `bnn bridge …` |
+| Bridges GPU/BitNet | `[x]` | `bnn bridge …` + pinned bitnet recipe (no giant submodule) | Full upstream build stays local |
 | HF integration | `[x]` | tutorial 08 + optional hf tests | deeper calib recipes |
-| Community OSS | `[x]` | LICENSE, templates, COC, SECURITY, CODEOWNERS, CONTRIBUTING, launch checklist, Discussions, branch protection | Make repo **public** for Scorecard/CodeQL badges; finish PyPI Trusted Publisher |
+| Community OSS | `[x]` | LICENSE, templates, COC, SECURITY, CODEOWNERS, CONTRIBUTING, launch checklist, Discussions, branch protection | Finish PyPI Trusted Publisher (human) |
 | Security | `[x]` | SECURITY.md + SBOM + hard pip-audit + attestations | — |
-| Releases | `[x]` | `v0.3.0` + SBOM script + `wheels.yml` publish job | First `bnn-lab` upload via Trusted Publishing |
-| Papers / research series | `[~]` | `docs/32`, publication plan, CITATION.cff | Venue submit |
+| Releases | `[x]` | `v1.0.0` + SBOM + `wheels.yml` (OIDC) | First `bnn-lab` upload via Trusted Publishing |
+| Papers / research series | `[x]` | `docs/32`, publication plan, figure pipeline, CITATION.cff | Venue submit optional |
 | Compatibility matrix | `[x]` | docs + CI matrix 3.11–3.13 + portability | Keep matrix honest |
 | Memory arena / thread pool API | `[x]` | OpenMP thread setter + footprint report | Arena measured & declined (docs/43) |
-| WASM | `[ ]` | — | Optional moonshot |
-| ONNX / safetensors | `[ ]` | Explicit defer (`MOONSHOT_DEFERRALS`) | Export paths |
+| WASM | `[x]` | Pedagogy SIMD popcount (`wasm/`, `docs/spikes/WASM_SIMD.md`) | Not a native-kernel substitute |
+| ONNX / safetensors | `[~]` | safetensors shipped; ONNX bridge-only defer | ORT custom op remains deferred |
 | Leaderboard protocol | `[~]` | fair protocol + template | Community submissions |
 | Model cards / ethics | `[x]` | MODEL_CARD.md | Expand ethics essay optional |
 
 ### 2.1 Inventory snapshot (what exists)
 
-**CLI (`bnn`):** `compile-native`, `validate-native`, `bench`, `export-check`, `train`, `train-cifar`, `train-image`, `train-audio`, `train-seq2seq`, `repro`, `wrap` (+ `--ultra`), `optimise`, `pareto`, `wrap-transformer`, `encode`, `decode`, `profile`, `energy-bound`, `eval-suite`, `recommend`, `version`.
+**CLI (`bnn`):** `compile-native`, `validate-native`, `bench`, `export-check`, `train`, `train-cifar`, `train-image`, `train-audio`, `train-seq2seq`, `repro`, `wrap` (+ `--ultra`), `optimise`, `pareto`, `wrap-transformer`, `encode`, `decode`, `profile`, `energy-bound`, `eval-suite`, `recommend`, `bridge`, `kg`, `memory`, `version`.
 
-**Packages:** `bnn` core, `kernels`, `wrap`, `codec`, `seq`, `vision`, `audio`, `math`, `profile`.
+**Packages:** `bnn` core, `kernels` (+ `wasm` pedagogy), `wrap`, `codec`, `seq`, `vision`, `audio`, `math`, `profile`, `energy`.
 
 **Gates:** compression 32×, native err=0, MNIST/CIFAR/audio floors, bench regression, codec round-trip.
 
@@ -241,12 +241,12 @@ Audit date: **2026-07-28** (SIMD/portability refresh). Status legend: `[x] DONE`
 
 | # | Item | Notes |
 |---|------|-------|
-| M1 | WASM SIMD popcount demo | Browser edge pedagogy |
+| M1 | WASM SIMD popcount demo | **Delivered** (pedagogy) — `wasm/`, Node/HTML demos |
 | M2 | ~~AVX-512 VPOPCNTDQ kernel~~ **DONE** (runtime dispatch; never required) | See `docs/41` + spike note |
-| M3 | ONNX Runtime custom op | Heavy; may stay bridge-only |
+| M3 | ONNX Runtime custom op | **Deferred** bridge-only — `docs/spikes/ONNX_BRIDGE_ONLY.md` |
 | M4 | Community leaderboard | Fair protocol first (W7) |
-| M5 | RAPL / board Joules | Replace energy proxy where possible |
-| M6 | Full ResNet-18 Bi-Real ImageNet *protocol runner* | Not SOTA chase; optional |
+| M5 | RAPL / board Joules | **Spike delivered** — Linux RAPL + Windows CLOSED-BY-PROXY |
+| M6 | Full ResNet-18 Bi-Real ImageNet *protocol runner* | **Runner delivered** (smoke/proxy; no SOTA gate) |
 
 ### 3.5 Rationale (why this order)
 
@@ -294,7 +294,7 @@ Acceptance: every task that touches metrics must keep `bnn repro` green unless e
 | W2.T03 | CI job: build + `validate-native` on Linux | M | W2.T02 | `[x]` hard gate |
 | W2.T04 | ARM NEON path (Apple Silicon / aarch64 Linux) | L | W2.T02 | `[x]` `docs/41` + portability CI |
 | W2.T05 | AVX2 / AVX-512 optional runtime dispatch | XL | W2.T02 | `[x]` `docs/41` (AVX-512 never required) |
-| W2.T06 | WASM SIMD prototype (optional) | XL | W2.T02 | `[ ]` |
+| W2.T06 | WASM SIMD prototype (optional) | XL | W2.T02 | `[x]` pedagogy (`wasm/`, spike) |
 | W2.T07 | Memory arena for packed buffers | L | W2.T02 | `[x]` **measured, declined** — alloc is 1.4–1.8% of GEMM; reuse would alias `torch.from_numpy` views (see docs/43) |
 | W2.T08 | Document GPU bridge non-goal for classic BNN | S | — | `[x]` docs/24 |
 | W2.T09 | Ternary native parity tests cross-OS | M | W2.T02 | `[x]` cross-ISA bit-identity tests |
@@ -312,15 +312,15 @@ Acceptance: every task that touches metrics must keep `bnn repro` green unless e
 
 | ID | Task | Est | Deps | Status |
 |----|------|-----|------|--------|
-| W3.T01 | Unify calibrate entrypoints | M | W1 | `[~]` `wrap/calibrate.py` |
-| W3.T02 | Effectiveness report always emitted | M | W3.T01 | `[~]` |
-| W3.T03 | Auto policy reasons in report | S | — | `[~]` |
-| W3.T04 | Drop-in threshold tests | S | — | `[~]` |
+| W3.T01 | Unify calibrate entrypoints | M | W1 | `[x]` `wrap/calibrate.py` |
+| W3.T02 | Effectiveness report always emitted | M | W3.T01 | `[x]` |
+| W3.T03 | Auto policy reasons in report | S | — | `[x]` |
+| W3.T04 | Drop-in threshold tests | S | — | `[x]` `tests/test_wrap_wco.py` |
 | W3.T05 | Layer-wise sensitivity (ablate / score) | L | W3.T01 | `[x]` |
 | W3.T06 | Search: binary vs ternary vs skip per layer | L | W3.T05 | `[x]` `search_layer_modes` — docs/42 |
 | W3.T07 | QAT recipe docs + longer runnable path | M | W3.T01 | `[x]` docs/42 |
-| W3.T08 | Distill integration beyond `distill_sketch.py` | L | W3.T07 | `[ ]` |
-| W3.T09 | BN fuse in optimiser path | M | — | `[~]` fuse helpers exist |
+| W3.T08 | Distill integration beyond `distill_sketch.py` | L | W3.T07 | `[x]` `wrap/distill.py` + `OptimiseConfig.distill_steps` |
+| W3.T09 | BN fuse in optimiser path | M | — | `[x]` `wrap/fuse.py` + `OptimiseConfig.fuse_bn` |
 | W3.T10 | Guardrails: refuse known-bad shapes with message | M | W3.T03 | `[x]` |
 
 **Acceptance tests:** documented demo improves cosine with QAT; auto policy deterministic under seed; repro green.  
@@ -339,8 +339,8 @@ Acceptance: every task that touches metrics must keep `bnn repro` green unless e
 | W4.T02 | CIFAR Bi-Real CNN | S | — | `[x]` |
 | W4.T03 | Tiny Binary ViT | M | — | `[x]` |
 | W4.T04 | Binary Transformer enc/dec | M | — | `[x]` |
-| W4.T05 | ResNet-BiReal reference (CIFAR or tiny) | L | W4.T02 | `[ ]` |
-| W4.T06 | BitLinear / BitNet-style block pedagogy | M | — | `[~]` docs + bridges |
+| W4.T05 | ResNet-BiReal reference (CIFAR or tiny) | L | W4.T02 | `[x]` `ResNetBiRealCIFAR` |
+| W4.T06 | BitLinear / BitNet-style block pedagogy | M | — | `[x]` pinned bitnet.cpp recipe + `bnn bridge` |
 | W4.T07 | Diffusion note (prefer INT8/FP8) | S | — | `[x]` decision tree |
 | W4.T08 | Zoo registry JSON (name → build → recipe) | M | W4.* | `[x]` |
 
@@ -360,11 +360,11 @@ Acceptance: every task that touches metrics must keep `bnn repro` green unless e
 | W5.T02 | Security: `weights_only` load | S | — | `[x]` |
 | W5.T03 | HF tiny wrap demo | M | hf extra | `[x]` |
 | W5.T04 | HF optimiser tutorial + CI-optional test | L | W5.T03, W1 | `[x]` |
-| W5.T05 | `.bnnpack` v2 design (ternary, meta, hashes) | L | W5.T01 | `[~]` design sketch |
-| W5.T06 | safetensors export of packed tensors | L | W5.T05 | `[ ]` |
-| W5.T07 | ONNX export spike (or explicit defer) | XL | W5.T05 | `[x]` explicit defer |
+| W5.T05 | `.bnnpack` v2 design (ternary, meta, hashes) | L | W5.T01 | `[x]` ADR 0003 + v2 writers |
+| W5.T06 | safetensors export of packed tensors | L | W5.T05 | `[x]` `codec/safetensors_export.py` |
+| W5.T07 | ONNX export spike (or explicit defer) | XL | W5.T05 | `[x]` bridge-only spike |
 | W5.T08 | Round-trip tests in default pytest | M | W5.T01 | `[x]` `test_codec.py` |
-| W5.T09 | Wrap Conv2d packed path polish | M | — | `[~]` |
+| W5.T09 | Wrap Conv2d packed path polish | M | — | `[x]` |
 
 **Acceptance tests:** encode→decode err=0; HF demo optional marker `slow`; schema version field.  
 **Follow when lost:** W5.T04 → W5.T05 → W5.T06.
@@ -384,7 +384,7 @@ Acceptance: every task that touches metrics must keep `bnn repro` green unless e
 | W6.T04 | Dataset cards (MNIST/CIFAR/synth audio) | M | — | `[x]` |
 | W6.T05 | Seq reverse-task card | S | — | `[~]` in docs/36 |
 | W6.T06 | Training recipes index | M | W4, W9 | `[x]` |
-| W6.T07 | ImageNet folder protocol only | S | — | `[x]` stub |
+| W6.T07 | ImageNet folder protocol only | S | — | `[x]` runner (`scripts/imagenet_protocol.py`) |
 | W6.T08 | Never commit datasets | S | — | `[x]` policy |
 
 **Follow when lost:** W6.T04 → W6.T06 → W6.T05.
@@ -405,7 +405,7 @@ Acceptance: every task that touches metrics must keep `bnn repro` green unless e
 | W7.T05 | Fair protocol doc (warmup, threads, CPU model) | M | W7.T02 | `[x]` |
 | W7.T06 | Robustness FGSM keep as optional | S | — | `[x]` script |
 | W7.T07 | Leaderboard template (manual submissions) | L | W7.T05 | `[x]` |
-| W7.T08 | `eval-suite` includes codec + seq smokes | M | — | `[~]` |
+| W7.T08 | `eval-suite` includes codec + seq smokes | M | — | `[x]` |
 
 **Follow when lost:** W7.T02 → W7.T03 → W7.T05.
 
@@ -422,10 +422,10 @@ Acceptance: every task that touches metrics must keep `bnn repro` green unless e
 | W8.T02 | CI Windows + Linux pytest + repro | — | — | `[x]` |
 | W8.T03 | Python 3.11 / 3.12 / 3.13 matrix | M | — | `[x]` |
 | W8.T04 | macOS CI (NumPy or native) | M | W2 | `[x]` `portability` job (arm64 + x86_64) |
-| W8.T05 | Tagged GitHub Releases | M | W1 | `[x]` v0.3.0 |
+| W8.T05 | Tagged GitHub Releases | M | W1 | `[x]` v1.0.0 |
 | W8.T06 | SBOM (e.g. cyclonedx) on release | M | W8.T05 | `[x]` script + docs |
 | W8.T07 | Artifact attestations | L | W8.T05 | `[x]` `attest-build-provenance` on wheels + sdist |
-| W8.T08 | PyPI publish workflow (Trusted Publishing) | L | W8.T05 | `[~]` name `bnn-lab`; env `pypi`; publisher pending on pypi.org |
+| W8.T08 | PyPI publish workflow (Trusted Publishing) | L | W8.T05 | `[~]` workflow ready; **human** Trusted Publisher pending (`docs/PYPI_PUBLISH.md`) |
 | W8.T09 | constraints.txt discipline | S | — | `[x]` |
 | W8.T10 | Native compile in CI not `continue-on-error` when possible | M | W2.T03 | `[x]` Linux hard; Win soft |
 
@@ -449,7 +449,7 @@ Acceptance: every task that touches metrics must keep `bnn repro` green unless e
 | W9.T07 | Architecture Decision Records index | M | docs/08 | `[x]` docs/adr |
 | W9.T08 | “When to use BNN vs INT4” cookbook | M | docs/18 | `[x]` GUIDE_E2E §8 + docs/18 |
 | W9.T09 | Troubleshooting runbook expand | M | REPRODUCIBILITY | `[x]` GUIDE_E2E §11 + REPRO |
-| W9.T10 | GIF/asciinema optional demos | S | — | `[ ]` |
+| W9.T10 | GIF/asciinema optional demos | S | — | `[x]` `docs/demos/optimise_quickstart.cast` |
 
 **Follow when lost:** W9.T03 → W9.T01 → W9.T06.
 
@@ -464,10 +464,10 @@ Acceptance: every task that touches metrics must keep `bnn repro` green unless e
 |----|------|-----|------|--------|
 | W10.T01 | MODEL_CARD.md / limitations | M | — | `[x]` |
 | W10.T02 | SECURITY.md + vuln reporting | S | — | `[x]` |
-| W10.T03 | Path traversal + pickle policy tests | M | — | `[~]` |
+| W10.T03 | Path traversal + pickle policy tests | M | — | `[x]` |
 | W10.T04 | Ethics: dual-use / deployment notes | S | — | `[x]` MODEL_CARD |
 | W10.T05 | Dependency audit in CI (pip-audit) | M | W8 | `[x]` hard gate on shipped deps + triaged ignores |
-| W10.T06 | Codec untrusted-file warnings | S | W5 | `[~]` |
+| W10.T06 | Codec untrusted-file warnings | S | W5 | `[x]` `warn_untrusted_pack` |
 
 **Follow when lost:** W10.T02 → W10.T01 → W10.T05.
 
@@ -502,11 +502,11 @@ Acceptance: every task that touches metrics must keep `bnn repro` green unless e
 
 | ID | Task | Est | Deps | Status |
 |----|------|-----|------|--------|
-| W12.T01 | Link local series `C:\00 Research Papers\…` in docs | S | — | `[~]` docs/32 |
-| W12.T02 | Publication plan (venue, claims whitelist) | M | WC gates | `[x]` draft |
-| W12.T03 | Figure pipeline from `results/*.json` | L | W7 | `[~]` Pareto plot path |
-| W12.T04 | Related work table maintenance | M | docs/02 | `[~]` |
-| W12.T05 | Novel candidates triage (`docs/32`) → ship or defer | M | — | `[~]` |
+| W12.T01 | Link local series `C:\00 Research Papers\…` in docs | S | — | `[x]` docs/32 vault table |
+| W12.T02 | Publication plan (venue, claims whitelist) | M | WC gates | `[x]` claims ↔ goldens |
+| W12.T03 | Figure pipeline from `results/*.json` | L | W7 | `[x]` `figure_from_results` + `bnn bridge figures` |
+| W12.T04 | Related work table maintenance | M | docs/02 | `[x]` |
+| W12.T05 | Novel candidates triage (`docs/32`) → ship or defer | M | — | `[x]` triage table |
 | W12.T06 | Never weaken thesis for paper hype | — | — | `[x]` policy |
 
 **Follow when lost:** W12.T02 → W12.T03 → W12.T01.
@@ -522,10 +522,10 @@ Acceptance: every task that touches metrics must keep `bnn repro` green unless e
 |----|------|-----|------|--------|
 | W13.T01 | `bnn profile` pack/gemm/overhead | M | — | `[x]` |
 | W13.T02 | Flamegraph / vizdoc howto | M | W13.T01 | `[x]` |
-| W13.T03 | CI latency soft budgets | M | W7 | `[~]` bench regression |
-| W13.T04 | Thread scaling curves committed | M | — | `[~]` docs/34 |
+| W13.T03 | CI latency soft budgets | M | W7 | `[x]` soft budgets (warn; `--strict-budgets`) |
+| W13.T04 | Thread scaling curves committed | M | — | `[x]` docs/34 + committed benches |
 | W13.T05 | Memory footprint report | M | W2.T07 | `[x]` `bnn memory` / `bnn.memory` — resident + theoretical |
-| W13.T06 | Compare vs torch FP32 / INT8 baselines in report | M | W7.T03 | `[~]` compare-baseline flag |
+| W13.T06 | Compare vs torch FP32 / INT8 baselines in report | M | W7.T03 | `[x]` `compare_baselines` |
 
 **Follow when lost:** W13.T03 → W13.T02 → W13.T05.
 
@@ -540,10 +540,10 @@ Acceptance: every task that touches metrics must keep `bnn repro` green unless e
 |----|------|-----|------|--------|
 | W14.T01 | Document OS × arch × Python × torch matrix | M | — | `[x]` |
 | W14.T02 | CI Python 3.11–3.13 | M | W8.T03 | `[x]` |
-| W14.T03 | Torch upper-bound policy | S | pyproject | `[~]` pin exists |
+| W14.T03 | Torch upper-bound policy | S | pyproject | `[x]` `docs/TORCH_PIN_POLICY.md` |
 | W14.T04 | Windows MSVC Build Tools runbook | S | — | `[x]` REPRODUCIBILITY |
 | W14.T05 | macOS notes (Accelerate / fallback) | M | W2 | `[x]` |
-| W14.T06 | Optional torchao / transformers version matrix | L | W5 | `[ ]` |
+| W14.T06 | Optional torchao / transformers version matrix | L | W5 | `[x]` smoke + extras matrix (full CI optional) |
 
 **Follow when lost:** W14.T01 → W14.T02 → W14.T05.
 
@@ -762,17 +762,19 @@ Pre-checked from 2026-07-25 audit. **Agents: flip `[ ]` → `[x]` or `[~]` in PR
 ### 10.6 Phase E — Research
 
 - [x] W12.T02 Publication plan (draft)
-- [~] W12.T03 Figure pipeline (Pareto plot path)
+- [x] W12.T03 Figure pipeline (`figure_from_results` / `bnn bridge figures`)
 - [x] W11.T10 CITATION.cff
 
 ### 10.7 Phase F — Ecosystem
 
-- [~] W5.T05 `.bnnpack` v2 (design sketch only)
-- [ ] W5.T06 safetensors
-- [x] W5.T07 ONNX decision executed (explicit defer)
+- [x] W5.T05 `.bnnpack` v2
+- [x] W5.T06 safetensors
+- [x] W5.T07 ONNX decision executed (bridge-only)
 - [x] W2.T05 AVX-512 / AVX2 optional dispatch (**delivered**; dual-metric on listed shapes still honest)
-- [ ] W2.T06 WASM optional
+- [x] W2.T06 WASM pedagogy delivered
 - [x] W7.T07 Leaderboard template
+- [x] M5 RAPL / energy-proxy spike (Windows CLOSED-BY-PROXY)
+- [x] M6 ImageNet protocol runner (smoke/proxy; no SOTA gate)
 
 ### 10.8 World-class gates (§1)
 
@@ -781,18 +783,18 @@ Pre-checked from 2026-07-25 audit. **Agents: flip `[ ]` → `[x]` or `[~]` in PR
 - [x] WC-K2 err=0 when native present
 - [x] WC-K3 multi-OS native (Win+Linux+macOS/ARM via portable SIMD; NumPy fallback remains)
 - [x] WC-K4 dual-metric (Pareto + fair protocol)
-- [~] WC-O1–O4 (calib/auto/QAT sketch; sensitivity yes; full search no)
+- [x] WC-O1–O4 (calib/auto/drop-in honesty/QAT+distill demo; search yes)
 - [x] WC-R1 repro
-- [~] WC-R2–R4 (matrix+SBOM+LICENSE; PyPI upload / hard pip-audit open)
-- [~] WC-D1–D5 (tutorials+cards+community; Discussions/v1.0 tag open)
+- [~] WC-R2–R4 (matrix+SBOM+LICENSE+attestations; **PyPI Trusted Publisher upload** human residual)
+- [x] WC-D1–D5 (tutorials+cards+community+Discussions; v1.0.0 tag)
 - [x] WC-D1 tutorials + GUIDE_E2E master path
-- [~] WC-P1–P2
+- [x] WC-P1–P2 (`bnn bridge` + pinned bitnet recipe)
 
-### 10.9 Remaining for true v1.0
+### 10.9 Remaining after v1.0.0
 
-See `docs/40_ROADMAP_E2E_SESSION.md` and `docs/MOONSHOT_DEFERRALS.md`.
-Non-moonshot leftovers: harden WC-O full QAT demo, autodoc site, PyPI upload,
-attestations. (W2.T04/T05 + macOS/ARM portability CI **done** — `docs/41`.)
+See `docs/MOONSHOT_DEFERRALS.md`. Honest residuals: human PyPI Trusted Publisher
+registration + first `bnn-lab` upload; venue paper submit; privileged wrap-workload
+RAPL; BitDistill-scale KD; ORT custom op (stays deferred).
 
 ---
 
@@ -816,14 +818,13 @@ attestations. (W2.T04/T05 + macOS/ARM portability CI **done** — `docs/41`.)
 
 `ROADMAP.md` and `docs/37_WORLD_CLASS_BNN_OPTIMISER_ROADMAP.md` must remain **byte-identical** (or differ only by a one-line path banner). Prefer editing both in one PR.
 
-### 11.2 Top 5 next actions (execution resume)
+### 11.2 Top next actions (post v1.0.0)
 
-1. ~~Phase A–D v0.3.0 preview~~ **DONE**
-2. ~~Human: enable GitHub Discussions (W11.T06)~~ **done**
-3. ~~W2.T04 / W2.T05 portable SIMD + portability CI~~ **DONE** (`docs/41`)
-4. PyPI: register Trusted Publisher for **`bnn-lab`** on pypi.org (GitHub env `pypi` exists; see `docs/PYPI_PUBLISH.md`), then Actions → wheels → publish=true
-5. Make the GitHub repo **public** so CodeQL + OpenSSF Scorecard badges work without GHAS
-6. Autodoc MkDocs expand + WC-O QAT recipe polish toward v1.0
+1. ~~Wave 2 integrator (lanes A–I + KG)~~ **DONE**
+2. Tag `v1.0.0` + GitHub Release when `bnn repro` is green on the integrator tip
+3. **Human:** register Trusted Publisher for **`bnn-lab`** on pypi.org (GitHub env `pypi` exists; see `docs/PYPI_PUBLISH.md`), then Actions → wheels → `publish=true`
+4. Clean-venv smoke: `pip install bnn-lab` + `bnn repro` after first upload
+5. Optional: venue paper submit from `docs/PUBLICATION_PLAN.md`; privileged Linux wrap-workload RAPL
 
 ---
 

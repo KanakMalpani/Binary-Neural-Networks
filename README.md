@@ -5,6 +5,7 @@
 [![CI](https://github.com/KanakMalpani/Binary-Neural-Networks/actions/workflows/ci.yml/badge.svg)](https://github.com/KanakMalpani/Binary-Neural-Networks/actions/workflows/ci.yml)
 [![CodeQL](https://github.com/KanakMalpani/Binary-Neural-Networks/actions/workflows/codeql.yml/badge.svg)](https://github.com/KanakMalpani/Binary-Neural-Networks/actions/workflows/codeql.yml)
 [![OpenSSF Scorecard](https://api.securityscorecards.dev/projects/github.com/KanakMalpani/Binary-Neural-Networks/badge)](https://scorecard.dev/viewer/?uri=github.com/KanakMalpani/Binary-Neural-Networks)
+[![PyPI](https://img.shields.io/pypi/v/bnn-lab.svg)](https://pypi.org/project/bnn-lab/)
 [![Wheels](https://img.shields.io/badge/wheels-manual%20%2F%20v*%20tag-lightgrey)](https://github.com/KanakMalpani/Binary-Neural-Networks/actions/workflows/wheels.yml)
 [![Python 3.11+](https://img.shields.io/badge/python-3.11%2B-blue.svg)](https://www.python.org/downloads/)
 [![License: MIT](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
@@ -13,7 +14,7 @@
 
 **Binary Neural Networks** packs weights (and optionally activations) to **1–1.58 bits** and runs **real** XNOR–popcount kernels on **CPU / edge** — with dual-metric reports that never confuse pack math with wall-clock.
 
-It is a lab / beta **optimiser toolkit** (`bnn 0.3.0`), not a claim that `sign()` is 32× faster on GPU.
+It is a lab **optimiser toolkit** (`bnn 1.0.0`), not a claim that `sign()` is 32× faster on GPU.
 
 <table>
 <tr>

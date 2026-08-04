@@ -1,0 +1,8 @@
+{"version": 2, "width": 88, "height": 24, "timestamp": 1754310000, "env": {"SHELL": "/bin/bash", "TERM": "xterm-256color"}}
+[0.05, "o", "\u001b[1;32m$\u001b[0m bnn --version\r\n"]
+[0.35, "o", "bnn-lab 0.3.0\r\n"]
+[0.80, "o", "\u001b[1;32m$\u001b[0m bnn profile --batch 8 --in-features 256 --out-features 256 --reps 3 --warmup 1\r\n"]
+[1.40, "o", "{\r\n  \"m\": 8,\r\n  \"n\": 256,\r\n  \"k\": 256,\r\n  \"gemm_ms\": 0.12,\r\n  \"e2e_forward_ms\": 0.41,\r\n  \"torch_fp32_ms\": 0.38,\r\n  \"torch_int8_wo_ms\": 0.35,\r\n  \"speedup_vs_fp32\": 0.93,\r\n  \"soft_budget_ok\": true,\r\n  \"native\": true\r\n}\r\n"]
+[2.20, "o", "\u001b[1;32m$\u001b[0m # Next: bnn optimise   then   bnn repro\r\n"]
+[2.50, "o", "# Thesis: 32x is pack density on CPU/edge — not GPU wall-clock from sign()\r\n"]
+[3.00, "o", "\u001b[1;32m$\u001b[0m \r\n"]

@@ -1,39 +1,50 @@
-# Moonshot / Phase F deferrals (explicit blockers)
+# Moonshot / Phase F deferrals (post v1.0.0)
 
-Honest leftovers toward **v1.0 world-class**. None of these are pretend-done.
+Honest leftovers after Wave 2 integration. Delivered moonshots are listed as
+**closed**; remaining rows are non-gates unless marked human-blocking.
 
-> **Closed (not deferrals):** W2.T04 ARM NEON and W2.T05 AVX-512/AVX2 runtime
-> dispatch are **delivered** — see [`41_PORTABLE_SIMD_KERNEL.md`](41_PORTABLE_SIMD_KERNEL.md)
-> and spike notes under [`spikes/`](spikes/). Removed from this table 2026-07-28.
+> **Closed earlier:** W2.T04 ARM NEON and W2.T05 AVX-512/AVX2 runtime dispatch —
+> see [`41_PORTABLE_SIMD_KERNEL.md`](41_PORTABLE_SIMD_KERNEL.md).
+
+## Closed in Wave 1–2 (not deferrals anymore)
+
+| ID | Item | Evidence |
+|----|------|----------|
+| W2.T06 / M1 | WASM SIMD pedagogy | `wasm/`, `docs/spikes/WASM_SIMD.md`, `tests/test_wasm_parity.py` |
+| W5.T05 | `.bnnpack` v2 | ADR 0003 + hash verify |
+| W5.T06 | safetensors export | `bnn/codec/safetensors_export.py` |
+| W5.T07 / M3 | ONNX full custom op | **CLOSED-BY-POLICY** bridge-only — `docs/spikes/ONNX_BRIDGE_ONLY.md` |
+| W3.T06 | Layer mode search | `search_layer_modes` + docs/42 |
+| W3.T08 | Distill integration | `bnn/wrap/distill.py` + `OptimiseConfig.distill_steps` |
+| W4.T05 | ResNet-BiReal CIFAR ref | `ResNetBiRealCIFAR` |
+| M5 | RAPL / energy path | `bnn/energy/**`, Windows CLOSED-BY-PROXY |
+| M6 / W6.T07 | ImageNet protocol runner | `scripts/imagenet_protocol.py` (smoke/proxy; no SOTA) |
+| — | bitnet.cpp submodule | **CLOSED-BY-POLICY** — recipe + SHA pin (`third_party/BITNET_PIN.md`) |
+| W9.T06 | Autodoc API site | MkDocs mkdocstrings (CI `--strict`) |
+| W12.T02–T05 | Publication / figures / triage | docs/32 + `bnn bridge figures` |
+
+## Still open / residual
 
 | ID | Item | Blocker | Acceptance leftover |
 |----|------|---------|---------------------|
-| W2.T06 | WASM SIMD | Browser pedagogy only | Optional demo after C/D |
-| W5.T05 | `.bnnpack` v2 | Design after v0.3 usage | Schema ADR + hashes + ternary meta |
-| W5.T06 | safetensors export | Depends W5.T05 | Packed tensor export path |
-| W5.T07 | ONNX full | Heavy ORT custom op | **Defer:** document bridge-only; spike note OK |
-| M3 | ONNX Runtime custom op | Same | Keep as bridge recommendation |
-| M5 | RAPL / board Joules | OS privileges / HW | Energy-proxy remains default |
-| M6 | Full ImageNet protocol runner | Dataset + time | Folder protocol stub only (`W6.T07`) |
-| — | bitnet.cpp submodule | Vendor pin / size | Keep `scripts/bridges/llamacpp_bitnet_recipe.py` |
-| W8.T07 | Artifact attestations | Org policy | Optional on later tags |
-| W8.T08 | PyPI Trusted Publishing | Manual PyPI↔GH link | [`PYPI_PUBLISH.md`](PYPI_PUBLISH.md) |
-| W9.T06 | Autodoc API site | MkDocs deploy | Stub exists; expand later |
-| W12.T02 | Publication plan | Venue + claims whitelist | After WC gates closer |
-| W3.T06 | Search binary/ternary/skip | Builds on W3.T05 | Sensitivity scores exist; full search later |
-| W3.T08 | Distill integration | Recipe time | `distill_sketch.py` remains sketch |
-| W2.T07 | Memory arena | Perf eng | OpenMP thread API enough for 0.3 |
-| W4.T05 | ResNet-BiReal CIFAR ref | Optional zoo polish | Bi-Real CNN exists |
+| W8.T08 | PyPI Trusted Publishing upload | **Human** pending publisher on pypi.org | See [`PYPI_PUBLISH.md`](PYPI_PUBLISH.md) — no API-token path |
+| M5+ | Privileged wrap-workload RAPL | OS / powercap permissions | Spike loop pedagogy only; energy-proxy remains default |
+| M3+ | ORT custom op revisit | Consumer demand + dual metrics | Keep bridge recommendation |
+| — | BitDistill-scale KD | Recipe time / data | Toy STE KD demo is enough for WC-O4 |
+| — | Venue paper submit | Author time | Plan exists; not a repro gate |
+| M4 | Community leaderboard submissions | External contributors | Template + fair protocol shipped |
 
-## ONNX decision (W5.T07 executed as defer)
+## Human blocker (PyPI)
 
-**Decision:** do **not** ship a full ONNX custom-op runtime in-tree for v0.3/v0.4.
-Prefer:
+1. On [pypi.org](https://pypi.org) → Publishing → Add pending publisher for project
+   `bnn-lab`, owner `KanakMalpani`, repo `Binary-Neural-Networks`, workflow
+   `wheels.yml`, environment `pypi`.
+2. Actions → Wheels → Run workflow with `publish=true`.
+3. Clean venv: `pip install bnn-lab` && `bnn repro`.
 
-1. `.bnnpack` encode/decode for packed CPU path
-2. Documented bridges to torchao / GGUF / bitnet.cpp for production serving
-3. Revisit ONNX only if a consumer demands ORT custom ops with measured dual metrics
+Do **not** invent long-lived API tokens.
 
-## ImageNet / RAPL / bitnet submodule
+## Thesis lock (unchanged)
 
-Remain **non-gates** for optimiser preview. Thesis lock unchanged.
+Packed CPU/edge XNOR–popcount; never GPU 32× from `sign()`; no invented golden
+shapes; dual-metric honesty.

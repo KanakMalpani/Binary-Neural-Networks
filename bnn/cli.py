@@ -35,6 +35,56 @@ def _script_path(script: str) -> Path:
     return path
 
 
+# First-class production bridges (W12 / docs/23–24). Keys are CLI subcommands.
+BRIDGE_RECIPES: dict[str, dict[str, str]] = {
+    "gpu": {
+        "script": "torchao_int4_recipe.py",
+        "doc": "docs/24_GPU_INT4_FP8_LANE.md",
+        "lane": "gpu-server",
+        "summary": "Commodity NVIDIA → INT4/FP8 (torchao / AWQ / vLLM)",
+    },
+    "cpu-llm": {
+        "script": "llamacpp_bitnet_recipe.py",
+        "doc": "docs/23_BITNET_CPP_BRIDGE.md",
+        "lane": "cpu-llm",
+        "summary": "CPU chat LLMs → GGUF Q4 (llama.cpp) or BitNet → bitnet.cpp",
+    },
+}
+BRIDGE_ALIASES: dict[str, str] = {
+    "torchao": "gpu",
+    "bitnet": "cpu-llm",
+    "llamacpp": "cpu-llm",
+}
+
+
+def _bridge_script_path(script: str) -> Path:
+    """Resolve a bare ``*.py`` under ``scripts/bridges/`` (no path separators)."""
+    if Path(script).name != script or not script.endswith(".py"):
+        raise FileNotFoundError(f"refusing non-basename bridge script: {script!r}")
+    bridges_root = (ROOT / "scripts" / "bridges").resolve()
+    path = (bridges_root / script).resolve()
+    if not path.is_relative_to(bridges_root) or not path.is_file():
+        raise FileNotFoundError(path)
+    return path
+
+
+def _run_bridge(script: str, extra: list[str] | None = None) -> int:
+    """Run ``scripts/bridges/<script>`` in-process (same exit contract as ``_run_script``)."""
+    argv = list(extra or [])
+    path = _bridge_script_path(script)
+    print(f"> scripts/bridges/{path.name}", *argv, flush=True)
+    try:
+        main = getattr(_load_script_module(path), "main", None)
+        if not callable(main):
+            raise RuntimeError(f"{path.name} has no callable main()")
+        return _call_script_main(main, path, argv)
+    except SystemExit as exc:
+        return _exit_code(exc.code)
+    except Exception as exc:
+        print(f"ERROR {path.name}: {exc}", file=sys.stderr, flush=True)
+        return 1
+
+
 def _load_script_module(path: Path) -> ModuleType:
     """Import ``path`` once as ``bnn._scripts.<stem>``; undo cache on failure."""
     mod_name = f"bnn._scripts.{path.stem}"
@@ -168,6 +218,9 @@ def cmd_train_image(args: argparse.Namespace) -> int:
         extra.append("--approx-sign")
     if args.include_vit:
         extra.append("--include-vit")
+    if getattr(args, "include_resnet", False):
+        extra.append("--include-resnet")
+        extra += ["--resnet-width", str(args.resnet_width)]
     if args.out:
         extra += ["--out", str(args.out)]
     return _run_script("train_image.py", extra)
@@ -293,6 +346,8 @@ def cmd_eval_suite(args: argparse.Namespace) -> int:
         extra.append("--full")
     if args.skip_pytest:
         extra.append("--skip-pytest")
+    if getattr(args, "strict_budgets", False):
+        extra.append("--strict-budgets")
     return _run_script("run_eval_suite.py", extra)
 
 
@@ -341,18 +396,68 @@ def cmd_encode(args: argparse.Namespace) -> int:
 
 
 def cmd_decode(args: argparse.Namespace) -> int:
-    """Load ``.bnnpack`` and assert each layer GEMM matches ±1 FP (err=0)."""
+    """Load ``.bnnpack`` and verify layers (GEMM err=0 for binary_xnor only)."""
+    import torch
+
     from bnn.codec import decode_file, packed_module_fp_err
+    from bnn.wrap.packed_linear import (
+        PackedBinaryConv2d,
+        PackedBinaryXNORLinear,
+        TernaryWeightOnlyLinear,
+    )
 
     path = Path(args.pack)
     modules, meta = decode_file(path)
     print(f"Loaded {path} layers={list(modules)} meta_keys={list(meta)}")
     max_err = 0.0
     for name, mod in modules.items():
-        err = packed_module_fp_err(mod, batch=4, seed=0)
-        comp = (mod.in_features * mod.out_features * 4) / max(mod.packed_weight_bytes(), 1)
-        print(f"  {name}: fp_err={err} compression~{comp:.2f}x")
-        max_err = max(max_err, err)
+        if isinstance(mod, PackedBinaryXNORLinear):
+            err = packed_module_fp_err(mod, batch=4, seed=0)
+            comp = (mod.in_features * mod.out_features * 4) / max(
+                mod.packed_weight_bytes(), 1
+            )
+            print(f"  {name}: kind=binary_xnor fp_err={err} compression~{comp:.2f}x")
+            max_err = max(max_err, err)
+            continue
+        if isinstance(mod, TernaryWeightOnlyLinear):
+            x = torch.randn(2, mod.in_features)
+            y = mod(x)
+            ok = bool(torch.isfinite(y).all()) and y.shape == (2, mod.out_features)
+            comp = (mod.in_features * mod.out_features * 4) / max(
+                mod.packed_weight_bytes(), 1
+            )
+            print(
+                f"  {name}: kind=ternary_weight_only "
+                f"forward_ok={ok} compression~{comp:.2f}x "
+                f"(theoretical_2bit; GEMM err=0 N/A)"
+            )
+            if not ok:
+                print(f"ERROR ternary forward check failed for {name}", file=sys.stderr)
+                return 1
+            continue
+        if isinstance(mod, PackedBinaryConv2d):
+            h = w = 8
+            x = torch.randn(1, mod.in_channels, h, w)
+            y = mod(x)
+            ok = bool(torch.isfinite(y).all()) and y.shape[1] == mod.out_channels
+            kh, kw = mod.kernel_size
+            fp = mod.in_channels * mod.out_channels * kh * kw * 4
+            comp = fp / max(mod.packed_weight_bytes(), 1)
+            print(
+                f"  {name}: kind=binary_conv_packed "
+                f"forward_ok={ok} compression~{comp:.2f}x "
+                f"(size/dequant path; GEMM err=0 N/A)"
+            )
+            if not ok:
+                print(f"ERROR conv forward check failed for {name}", file=sys.stderr)
+                return 1
+            continue
+        print(
+            f"ERROR {name}: unsupported module type {type(mod).__name__} "
+            "(decode expects binary_xnor / ternary_weight_only / binary_conv_packed)",
+            file=sys.stderr,
+        )
+        return 1
     if max_err > 0:
         print(f"ERROR non-zero packed vs FP err={max_err}", file=sys.stderr)
         return 1
@@ -363,7 +468,7 @@ def cmd_decode(args: argparse.Namespace) -> int:
 def cmd_profile(args: argparse.Namespace) -> int:
     import json
 
-    from bnn.profile import profile_packed_linear
+    from bnn.profile import check_soft_budgets, profile_packed_linear
 
     br = profile_packed_linear(
         m=args.batch,
@@ -371,8 +476,14 @@ def cmd_profile(args: argparse.Namespace) -> int:
         k=args.out_features,
         reps=args.reps,
         warmup=args.warmup,
+        compare_baselines=not getattr(args, "no_baselines", False),
     )
     d = br.to_dict()
+    soft = check_soft_budgets(br)
+    d["soft_budget_ok"] = not soft
+    if soft:
+        d["soft_budget_violations"] = soft
+        print("WARN soft latency budget:", "; ".join(soft), file=sys.stderr)
     print(json.dumps(d, indent=2))
     if args.out:
         Path(args.out).parent.mkdir(parents=True, exist_ok=True)
@@ -510,21 +621,64 @@ def cmd_kg(args: argparse.Namespace) -> int:
 
 
 def cmd_pareto(args: argparse.Namespace) -> int:
-    """Emit dual-metric Pareto JSON (W7.T03)."""
+    """Emit dual-metric Pareto JSON (W7.T03 / W12.T03)."""
     extra = ["--out", str(args.out)]
     if args.demo:
         extra.append("--demo")
     for path in args.from_optimise or []:
         extra += ["--from-optimise", str(path)]
+    if getattr(args, "from_results", False):
+        extra.append("--from-results")
     if args.plot:
         extra += ["--plot", str(args.plot)]
     if args.warmup is not None:
         extra += ["--warmup", str(args.warmup)]
     if args.threads is not None:
         extra += ["--threads", str(args.threads)]
-    if not args.demo and not (args.from_optimise or []):
+    has_points = (
+        args.demo
+        or bool(args.from_optimise or [])
+        or bool(getattr(args, "from_results", False))
+    )
+    if not has_points:
         extra.append("--demo")
     return _run_script("pareto_report.py", extra)
+
+
+def cmd_bridge(args: argparse.Namespace) -> int:
+    """First-class production bridges over ``scripts/bridges/*`` (W12)."""
+    action = getattr(args, "bridge_action", None)
+    if action == "list":
+        rows = []
+        for key, meta in BRIDGE_RECIPES.items():
+            aliases = [a for a, canon in BRIDGE_ALIASES.items() if canon == key]
+            alias_note = f" (aliases: {', '.join(aliases)})" if aliases else ""
+            rows.append(
+                f"  {key:<8} → scripts/bridges/{meta['script']}  "
+                f"[{meta['lane']}] {meta['summary']}{alias_note}\n"
+                f"           doc: {meta['doc']}"
+            )
+        print("bnn bridge recipes:\n" + "\n".join(rows))
+        print("\nAlso: bnn recommend --goal {gpu-server,cpu-llm,…}")
+        return 0
+
+    if action == "figures":
+        fig_extra: list[str] = ["--out", str(args.out)] if args.out else []
+        if args.plot_dir:
+            fig_extra += ["--plot-dir", str(args.plot_dir)]
+        return _run_script("figure_from_results.py", fig_extra)
+
+    name = BRIDGE_ALIASES.get(action or "", action or "")
+    recipe = BRIDGE_RECIPES.get(name or "")
+    if recipe is None:
+        print(f"ERROR unknown bridge {action!r}; try: bnn bridge list", file=sys.stderr)
+        return 2
+    bridge_extra: list[str] = []
+    if getattr(args, "probe", False) and name == "gpu":
+        bridge_extra.append("--probe")
+    if getattr(args, "out", None):
+        bridge_extra += ["--out", str(args.out)]
+    return _run_bridge(recipe["script"], bridge_extra)
 
 
 def build_parser() -> argparse.ArgumentParser:
@@ -582,7 +736,10 @@ def build_parser() -> argparse.ArgumentParser:
     c.add_argument("--batch-size", type=int, default=128)
     c.set_defaults(func=cmd_train_cifar)
 
-    img = sub.add_parser("train-image", help="Image lane: CIFAR-10 FP vs Bi-Real (+ optional ViT)")
+    img = sub.add_parser(
+        "train-image",
+        help="Image lane: CIFAR-10 FP vs Bi-Real (+ optional ViT / ResNet-BiReal)",
+    )
     img.add_argument("--epochs", type=int, default=8)
     img.add_argument("--subset", type=int, default=30000, help="0 = full 50k")
     img.add_argument("--batch-size", type=int, default=128)
@@ -590,6 +747,12 @@ def build_parser() -> argparse.ArgumentParser:
     img.add_argument("--seed", type=int, default=0)
     img.add_argument("--approx-sign", action="store_true")
     img.add_argument("--include-vit", action="store_true")
+    img.add_argument(
+        "--include-resnet",
+        action="store_true",
+        help="Also train ResNet-BiReal CIFAR reference (W4.T05)",
+    )
+    img.add_argument("--resnet-width", type=int, default=16)
     img.add_argument("--out", type=Path, default=None)
     img.set_defaults(func=cmd_train_image)
 
@@ -711,6 +874,11 @@ def build_parser() -> argparse.ArgumentParser:
     e.add_argument("--out", type=Path, default=ROOT / "results" / "SUMMARY.md")
     e.add_argument("--full", action="store_true", help="Include short image/audio smokes")
     e.add_argument("--skip-pytest", action="store_true")
+    e.add_argument(
+        "--strict-budgets",
+        action="store_true",
+        help="Fail when soft latency budgets are exceeded (W13.T03; default warn-only)",
+    )
     e.set_defaults(func=cmd_eval_suite)
 
     pa = sub.add_parser(
@@ -726,6 +894,11 @@ def build_parser() -> argparse.ArgumentParser:
         help="Load point(s) from bnn_optimise_report_v1 JSON",
     )
     pa.add_argument(
+        "--from-results",
+        action="store_true",
+        help="Load dual-metric points from committed results/*.json (no invented shapes)",
+    )
+    pa.add_argument(
         "--out",
         type=Path,
         default=ROOT / "results" / "pareto_report.json",
@@ -734,6 +907,45 @@ def build_parser() -> argparse.ArgumentParser:
     pa.add_argument("--warmup", type=int, default=3)
     pa.add_argument("--threads", type=int, default=None)
     pa.set_defaults(func=cmd_pareto)
+
+    br = sub.add_parser(
+        "bridge",
+        help="Production bridges (GPU INT4/FP8, CPU LLM / bitnet.cpp) — not classic BNN",
+    )
+    br_sub = br.add_subparsers(dest="bridge_action", required=True)
+    br_sub.add_parser("list", help="List bridge recipes").set_defaults(func=cmd_bridge)
+    for key, meta in BRIDGE_RECIPES.items():
+        bp = br_sub.add_parser(key, help=meta["summary"])
+        bp.add_argument("--out", type=Path, default=None, help="Write recipe JSON")
+        if key == "gpu":
+            bp.add_argument(
+                "--probe",
+                action="store_true",
+                help="Check whether torchao is importable",
+            )
+        bp.set_defaults(func=cmd_bridge)
+    for alias, canon in BRIDGE_ALIASES.items():
+        ap = br_sub.add_parser(alias, help=f"Alias for `bnn bridge {canon}`")
+        ap.add_argument("--out", type=Path, default=None)
+        if canon == "gpu":
+            ap.add_argument("--probe", action="store_true")
+        ap.set_defaults(func=cmd_bridge)
+    fig = br_sub.add_parser(
+        "figures",
+        help="Build figure manifest / plots from committed results/*.json (W12.T03)",
+    )
+    fig.add_argument(
+        "--out",
+        type=Path,
+        default=ROOT / "results" / "figures_manifest.json",
+    )
+    fig.add_argument(
+        "--plot-dir",
+        type=Path,
+        default=None,
+        help="Optional directory for PNG plots (matplotlib)",
+    )
+    fig.set_defaults(func=cmd_bridge)
 
     r = sub.add_parser("recommend", help="Recommend stack for a deployment goal")
     r.add_argument(
@@ -756,10 +968,18 @@ def build_parser() -> argparse.ArgumentParser:
     dec.add_argument("--pack", type=Path, required=True)
     dec.set_defaults(func=cmd_decode)
 
-    pr = sub.add_parser("profile", help="Pack / GEMM / overhead breakdown vs torch FP32")
+    pr = sub.add_parser(
+        "profile",
+        help="Pack / GEMM / overhead breakdown vs torch FP32 + INT8-WO baselines",
+    )
     pr.add_argument("--batch", type=int, default=64)
     pr.add_argument("--in-features", type=int, default=4096)
     pr.add_argument("--out-features", type=int, default=4096)
+    pr.add_argument(
+        "--no-baselines",
+        action="store_true",
+        help="Skip FP32/INT8-WO baseline timings (W13.T06 compare is on by default)",
+    )
     pr.add_argument("--reps", type=int, default=20)
     pr.add_argument("--warmup", type=int, default=5)
     pr.add_argument("--out", type=Path, default=None)

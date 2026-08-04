@@ -17,12 +17,27 @@ from ..ste import clip_weights_
 
 
 def _swap_linear_to_binary(lin: nn.Linear) -> BinaryLinear:
-    bl = BinaryLinear(lin.in_features, lin.out_features, bias=lin.bias is not None)
+    """Replace ``nn.Linear`` with ``BinaryLinear`` on the same device/dtype."""
+    bl = BinaryLinear(
+        lin.in_features, lin.out_features, bias=lin.bias is not None
+    ).to(device=lin.weight.device, dtype=lin.weight.dtype)
     with torch.no_grad():
         bl.weight.copy_(lin.weight)
         if lin.bias is not None and bl.bias is not None:
             bl.bias.copy_(lin.bias)
     return bl
+
+
+def _restore_binary_to_linear(bl: BinaryLinear) -> nn.Linear:
+    """Restore packable ``nn.Linear`` from STE ``BinaryLinear`` (same device/dtype)."""
+    lin = nn.Linear(
+        bl.in_features, bl.out_features, bias=bl.bias is not None
+    ).to(device=bl.weight.device, dtype=bl.weight.dtype)
+    with torch.no_grad():
+        lin.weight.copy_(bl.weight)
+        if bl.bias is not None and lin.bias is not None:
+            lin.bias.copy_(bl.bias)
+    return lin
 
 
 def light_qat_recover(
@@ -114,12 +129,7 @@ def light_qat_recover(
         bl = dict(model.named_modules())[name]
         if not isinstance(bl, BinaryLinear):
             continue
-        lin = nn.Linear(bl.in_features, bl.out_features, bias=bl.bias is not None)
-        with torch.no_grad():
-            lin.weight.copy_(bl.weight)
-            if bl.bias is not None and lin.bias is not None:
-                lin.bias.copy_(bl.bias)
-        _set(model, name, lin)
+        _set(model, name, _restore_binary_to_linear(bl))
         restored.append(name)
 
     return {

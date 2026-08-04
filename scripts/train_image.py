@@ -22,6 +22,7 @@ from bnn.ste import clip_weights_, set_approx_sign  # noqa: E402
 from bnn.vision.models import (  # noqa: E402
     FP32CIFARCNN,
     BinaryCIFARCNN,
+    ResNetBiRealCIFAR,
     TinyBinaryViT,
 )
 
@@ -98,6 +99,17 @@ def main():
     p.add_argument("--seed", type=int, default=0)
     p.add_argument("--approx-sign", action="store_true", help="Use Bi-Real ApproxSign STE")
     p.add_argument("--include-vit", action="store_true", help="Also train tiny binary ViT")
+    p.add_argument(
+        "--include-resnet",
+        action="store_true",
+        help="Also train ResNet-BiReal CIFAR reference (W4.T05)",
+    )
+    p.add_argument(
+        "--resnet-width",
+        type=int,
+        default=16,
+        help="Base width for ResNet-BiReal CIFAR (default 16)",
+    )
     p.add_argument("--data-dir", type=Path, default=ROOT / "data")
     p.add_argument("--out", type=Path, default=ROOT / "results" / "image_cifar.json")
     args = p.parse_args()
@@ -120,12 +132,28 @@ def main():
     ]
     if args.include_vit:
         jobs.append(("tiny_vit_binary", lambda: TinyBinaryViT(dim=64, depth=2)))
+    if args.include_resnet:
+        w = args.resnet_width
+        jobs.append(
+            (
+                "resnet_bireal_cifar",
+                lambda width=w: ResNetBiRealCIFAR(num_classes=10, width=width),
+            )
+        )
 
     results = [
         train_one(n, ctor().to(device), train_loader, test_loader, args.epochs, args.lr, device)
         for n, ctor in jobs
     ]
     gap = results[0]["test_acc"] - results[1]["test_acc"]
+    by_name = {r["model"]: r for r in results}
+    resnet_note = ""
+    if "resnet_bireal_cifar" in by_name:
+        ra = by_name["resnet_bireal_cifar"]["test_acc"]
+        resnet_note = (
+            f" ResNet-BiReal CIFAR ref: {ra:.2f}% "
+            "(compare to published image_cifar binary floor; not a new golden)."
+        )
     payload = {
         "modality": "image",
         "dataset": "CIFAR-10",
@@ -138,6 +166,7 @@ def main():
             f"Bi-Real binary within {gap:.2f} pp of FP CNN twin. "
             "Packed Linear kernels apply to ViT FFN / MLP heads; Conv path is STE-sim "
             "(BinaryConv wrap available for size — see wrapper)."
+            + resnet_note
         ),
     }
     args.out.parent.mkdir(parents=True, exist_ok=True)
