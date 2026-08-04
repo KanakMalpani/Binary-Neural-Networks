@@ -1,0 +1,505 @@
+{
+  "meta": {
+    "generated": "2026-08-04T20:46:00+05:30",
+    "researcher": "gap-parallel",
+    "schema_version": "1.0",
+    "purpose": "Enrichment overlay for lab BNN KG: precise citations, ImageNet/LLM numbers, tool FPS/W, and failure-mode detail under-represented in docs/",
+    "lab_coverage_note": "docs/02_SOTA_SURVEY.md, docs/03_FAILURE_ANALYSIS.md, docs/13–16, docs/20, docs/23 name most topics at survey depth; this file strengthens arXiv IDs, tables, and decision edges."
+  },
+  "nodes": [
+    {
+      "id": "paper.bireal.eccv2018",
+      "label": "Bi-Real Net (ECCV 2018 / IJCV)",
+      "type": "paper",
+      "summary": "1-bit CNN with full-precision identity shortcuts around every binary conv (≈2× real-valued paths vs BinaryNet). ApproxSign piecewise-polynomial STE. ImageNet ResNet-18: 56.4% top-1 / 79.5% top-5 (vs XNOR-Net 51.2% / BinaryNet 42.2% / FP ResNet-18 ~69.3%). ResNet-34: 62.2% top-1 / 83.9% top-5. Codes: github.com/liuzechun/Bi-Real-net. Lab uses Bi-Real residuals on MNIST/CIFAR proxies; full ImageNet train is ACCEPTED-NON-GOAL.",
+      "sources": [
+        "https://arxiv.org/abs/1808.00278",
+        "https://arxiv.org/abs/1811.01335",
+        "docs/02_SOTA_SURVEY.md",
+        "docs/03_FAILURE_ANALYSIS.md"
+      ],
+      "confidence": 0.95,
+      "status": "verified"
+    },
+    {
+      "id": "paper.real2bin.iclr2020",
+      "label": "Real-to-Binary Network (ICLR 2020)",
+      "type": "paper",
+      "summary": "Martinez et al. train binary ResNet-18 via progressive attention matching to a real teacher + data-driven gating/re-scaling of binary-conv outputs using pre-binarization real activations. ImageNet top-1 **65.4%** / top-5 **86.2%** (strong baseline alone 60.9%); FP ResNet-18 69.3% → ~3.9 pp gap. CIFAR-100 Real-to-Bin** 76.2%. arXiv:2003.11535; OpenReview BJg4NgBKvH; code github.com/brais-martinez/real2binary. Often cited loosely as 'Real-to-Bin' without ID — strengthen all lab refs to this paper.",
+      "sources": [
+        "https://arxiv.org/abs/2003.11535",
+        "https://openreview.net/forum?id=BJg4NgBKvH",
+        "https://github.com/brais-martinez/real2binary"
+      ],
+      "confidence": 0.95,
+      "status": "verified"
+    },
+    {
+      "id": "paper.reactnet.eccv2020",
+      "label": "ReActNet (ECCV 2020)",
+      "type": "paper",
+      "summary": "Generalizes Sign→RSign and PReLU→RPReLU (learnable channel-wise thresholds/slopes) + distributional KL loss vs real teacher. MobileNetV1-based ReActNet-A: **69.4%** ImageNet top-1 at **0.87×10^8 OPs** (~3.0 pp below real MobileNet twin 72.4%). ReActNet-B 70.1% @ 1.63e8 OPs; ReActNet-C 71.4% @ 2.14e8 OPs. ReAct on Bi-Real-18 → 65.5% (+9.1 pp). Comparison anchors: XNOR 51.2%, Bi-Real-18 56.4%, Real-to-Binary 65.4%, MeliusNet29 65.8%. Two-step training (acts then W+A). Code: github.com/liuzechun/ReActNet. Lab docs say '~71% claimed' — precise figures: A=69.4, C=71.4.",
+      "sources": [
+        "https://arxiv.org/abs/2003.03488",
+        "https://github.com/liuzechun/ReActNet",
+        "docs/02_SOTA_SURVEY.md"
+      ],
+      "confidence": 0.96,
+      "status": "verified"
+    },
+    {
+      "id": "metric.imagenet.bnn_ladder",
+      "label": "ImageNet 1-bit CNN accuracy ladder",
+      "type": "metric_table",
+      "summary": "Canonical ImageNet top-1 ladder for W1A1 (unless noted): BinaryNet 42.2% → XNOR-Net 51.2% → Bi-Real-18 56.4% → Real-to-Binary 65.4% → ReActNet-A 69.4% / ReActNet-C 71.4%. OPs metric = BOPs/64 + FLOPs. Lab should cite this ladder instead of vague 'within 3% of FP MobileNet' alone.",
+      "sources": [
+        "https://arxiv.org/abs/2003.03488",
+        "https://arxiv.org/abs/2003.11535",
+        "https://arxiv.org/abs/1808.00278"
+      ],
+      "confidence": 0.94,
+      "status": "verified"
+    },
+    {
+      "id": "paper.bitnet.2023",
+      "label": "BitNet (1-bit Transformer, 2023)",
+      "type": "paper",
+      "summary": "Wang et al. replace nn.Linear with BitLinear (1-bit weights, higher-bit acts). Foundational proof that Transformers can train with extreme weight quantization. arXiv:2310.11453. Superseded for quality by ternary BitNet b1.58; keep distinction: original BitNet ≈ ±1, b1.58 adds 0.",
+      "sources": [
+        "https://arxiv.org/abs/2310.11453",
+        "docs/02_SOTA_SURVEY.md"
+      ],
+      "confidence": 0.9,
+      "status": "verified"
+    },
+    {
+      "id": "paper.bitnet_b158.2024",
+      "label": "BitNet b1.58 (Ma et al., 2024)",
+      "type": "paper",
+      "summary": "Ternary weights {-1,0,1} via absmean RoundClip; 8-bit activations; LLaMA-alike (RMSNorm, SwiGLU, RoPE, no bias). At equal size+100B RedPajama tokens: 3B BitNet matches FP16 LLaMA twin (PPL 9.91 vs 10.04; avg zero-shot 50.2 vs 49.7) with **3.55×** less memory and **2.71×** lower latency (FasterTransformer+2-bit Ladder kernel on GPU). 70B: **11×** max batch → **8.9×** throughput vs FP16 on 2×A100. Arithmetic energy model: ~**71.4×** lower matmul energy on 7nm (INT8 add vs FP16 mul/add) — chip model, not SoC. Equivalence heuristic: 13B b1.58 cheaper than 3B FP16; 30B vs 7B; 70B vs 13B. Caveat: headline GPU latency/memory from research kernels; production CPU path is bitnet.cpp.",
+      "sources": [
+        "https://arxiv.org/abs/2402.17764",
+        "docs/02_SOTA_SURVEY.md",
+        "docs/14_HARDWARE_AND_ENERGY.md"
+      ],
+      "confidence": 0.95,
+      "status": "verified"
+    },
+    {
+      "id": "paper.bitnet_a48.2024",
+      "label": "BitNet a4.8 (4-bit activations, 2024)",
+      "type": "paper",
+      "summary": "Wang/Ma/Wei hybrid: INT4 (or FP4) activations into attention/FFN inputs; TopK sparsify + INT8 on intermediate states (attn out-proj, FFN down). Continue-train from W1.58A8 → W1.58A4 (e.g. 95B+5B tokens). Matches b1.58 quality at same token budget; ~**55%** activated params (7B: 3.4B active); supports **3-bit KV** with negligible avg loss. Enables INT4/FP4 kernels. arXiv:2411.04965. Follow-on: BitNet v2 (arXiv:2504.18415) native 4-bit acts + Hadamard.",
+      "sources": [
+        "https://arxiv.org/abs/2411.04965",
+        "https://arxiv.org/abs/2504.18415"
+      ],
+      "confidence": 0.92,
+      "status": "verified"
+    },
+    {
+      "id": "paper.bitnet_cpp.2024",
+      "label": "bitnet.cpp / 1-bit AI Infra (2024–2025)",
+      "type": "paper",
+      "summary": "Wang et al. arXiv:2410.16144 — ternary CPU kernels (TL1/TL2) vs llama.cpp FP16. **Cite carefully with device+thread context:** Apple M2 Ultra unlimited threads: speedup **1.37×–5.07×** (125M→70B); Intel i7-13700H: **2.37×–6.17×**. Energy J/token savings: M2 **55.4%/64.6%/70.0%** (700M/7B/70B); i7 **71.9%/82.2%** (700M/7B). 100B ternary on M2 ~6.58 tok/s unlimited (human-reading class). Lossless vs FP32 kernel on WildChat token match (TL1/TL2 100% vs TQ1_0 1.4%). ACL follow-up arXiv:2502.11880. Official HF: microsoft/bitnet-b1.58-2B-4T (+gguf). Lab docs cite ranges correctly; add hardware footnotes + J/token table.",
+      "sources": [
+        "https://arxiv.org/abs/2410.16144",
+        "https://arxiv.org/abs/2502.11880",
+        "https://github.com/microsoft/BitNet",
+        "https://hf.co/microsoft/bitnet-b1.58-2B-4T",
+        "docs/23_BITNET_CPP_BRIDGE.md"
+      ],
+      "confidence": 0.96,
+      "status": "verified"
+    },
+    {
+      "id": "paper.bitdistill.2025",
+      "label": "BitNet Distillation / BitDistill (2025)",
+      "type": "paper",
+      "summary": "Wu et al. arXiv:2510.13998 — convert off-the-shelf FP LLMs (Qwen3 0.6–4B) to 1.58-bit for **task-specific** finetune without full BitNet pretrain. Three stages: (1) SubLN before MHSA/FFN out-projections; (2) continue-pretrain ~10B Falcon tokens; (3) CE + KL logits distill (τ=5) + MiniLM-style multi-head attention-relation distill (prefer **single late layer**). Naive BitNet-SFT gaps ~13–15 pp and worsen with scale; BitDistill recovers FP16-SFT parity on MNLI/QNLI/SST-2 and CNNDM ROUGE while claiming ~**10×** memory and **~2.65×** CPU tok/s (paper table: 427→1135 tok/s, 1.20→0.11 G). Complementary to GPTQ/AWQ init. Distinct from BitDistiller (arXiv:2402.10631, sub-4-bit self-distill).",
+      "sources": [
+        "https://arxiv.org/abs/2510.13998",
+        "https://hf.co/papers/2510.13998",
+        "docs/13_TRAINING_QAT_DISTILL.md"
+      ],
+      "confidence": 0.93,
+      "status": "verified"
+    },
+    {
+      "id": "recipe.qat_158bit",
+      "label": "1.58-bit QAT / distill recipe checklist",
+      "type": "recipe",
+      "summary": "Production-leaning path: (A) From-scratch BitNet b1.58 if you control pretrain tokens (≥100B–2T) and need general LLM. (B) BitDistill for downstream: SubLN → short CPT → logits+attention distill; do **not** absmean-PTQ a chat Llama and ship. (C) Gradual λ / STE with absmean ternary + INT8 acts. Keep stem/embed/LM-head higher precision unless proven otherwise. Prefer bitnet.cpp TL kernels for CPU serve. Lab TernaryLinear is pedagogy/size only.",
+      "sources": [
+        "https://arxiv.org/abs/2510.13998",
+        "https://arxiv.org/abs/2402.17764",
+        "docs/23_BITNET_CPP_BRIDGE.md",
+        "docs/13_TRAINING_QAT_DISTILL.md"
+      ],
+      "confidence": 0.9,
+      "status": "verified"
+    },
+    {
+      "id": "paper.bibert.2022",
+      "label": "BiBERT (fully binarized BERT, 2022)",
+      "type": "paper",
+      "summary": "Qin et al. arXiv:2203.06390 — first accurate **W1 E1 A1** BERT. Failure diagnosis: (1) attention-weight information collapse under direct Sign; (2) distillation direction mismatch when using products of two binary activations. Fixes: **Bi-Attention** (maximize entropy of binary attention reps) + **Direction-Matching Distillation (DMD)**. Claims **56.3×** FLOPs and **31.2×** size savings; beats BinaryBERT W1A1 by ~20.4 pp avg GLUE and Q2BERT W2A8 by ~13.3 pp. Lab docs mention BiBERT briefly — strengthen with these failure modes and numbers.",
+      "sources": [
+        "https://arxiv.org/abs/2203.06390",
+        "https://github.com/htqin/BiBERT",
+        "docs/13_TRAINING_QAT_DISTILL.md"
+      ],
+      "confidence": 0.92,
+      "status": "verified"
+    },
+    {
+      "id": "concept.binary_transformers",
+      "label": "Binary / ternary transformers landscape",
+      "type": "concept",
+      "summary": "Three distinct lines: (1) BiBERT-style full W/A/E binarization of encoder BERT (hardest — attention). (2) BitNet Transformer: BitLinear replaces Linear; attention softmax/KV usually higher bit. (3) BitNet b1.58 / a4.8 / BitDistill for generative LLMs. Do not conflate GLUE BiBERT wins with LLM chat quality. Lab tiny binary-ViT sketch is pedagogical only.",
+      "sources": [
+        "https://arxiv.org/abs/2203.06390",
+        "https://arxiv.org/abs/2310.11453",
+        "https://arxiv.org/abs/2402.17764",
+        "docs/13_TRAINING_QAT_DISTILL.md"
+      ],
+      "confidence": 0.9,
+      "status": "verified"
+    },
+    {
+      "id": "paper.finn.fpga2017",
+      "label": "FINN FPGA BNN framework (FPGA 2017+)",
+      "type": "paper",
+      "summary": "Umuroglu et al. streaming heterogeneous dataflow for BNNs on Zynq. Optimizations: XNOR+popcount MVTU; BN+sign→thresholds; maxpool→OR. ZC706 @~200 MHz wall power: **SFC-max MNIST 12.3M FPS**, 0.31 µs latency, Pchip 7.3 W / Pwall 21.2 W → **~583k FPS/W wall** / **~1.69M FPS/W chip**; LFC-max 1.56M FPS; **CNV-max CIFAR-10/SVHN 21.9k FPS**, 283 µs, Pchip 3.6 W / Pwall 11.7 W → **~1.87k FPS/W wall**. Modern FINN: Brevitas→ONNX→FINN IR→HLS/RTL; github.com/Xilinx/finn. Lab docs cite FPS class correctly; add FPS/W and power rails.",
+      "sources": [
+        "https://arxiv.org/abs/1612.07119",
+        "https://xilinx.github.io/finn/",
+        "https://github.com/Xilinx/finn",
+        "docs/14_HARDWARE_AND_ENERGY.md"
+      ],
+      "confidence": 0.93,
+      "status": "verified"
+    },
+    {
+      "id": "tool.larq_lce",
+      "label": "Larq + Larq Compute Engine",
+      "type": "tool",
+      "summary": "TF/Keras BNN training (Larq) + TFLite custom ops for ARM BGEMM (LCE). Hand-tuned tiling/vectorization/multithreading; documented 8.5–18.5× class wins on Pixel/RPi vs FP baselines in ecosystem surveys. Upstream Larq archived ~2026 — pin commit / vendor fork. Best stock path for mobile **CPU** W+A binary CNNs. Not a BitNet LLM stack.",
+      "sources": [
+        "https://github.com/larq/compute-engine",
+        "https://docs.larq.dev/",
+        "docs/16_ECOSYSTEM_AND_TOOLING.md"
+      ],
+      "confidence": 0.88,
+      "status": "verified"
+    },
+    {
+      "id": "tool.brevitas_finn",
+      "label": "Brevitas → FINN (QAT→FPGA)",
+      "type": "tool",
+      "summary": "Brevitas (Xilinx/AMD): PyTorch QAT/PTQ with per-tensor bitwidth control including 1-bit; QuantConv/Linear/MHA/RNN. Export ONNX into FINN for FPGA dataflow. End-to-end: train in Brevitas → tidy/streamline → HW layers → fold for FPS target → Vivado/PYNQ deploy. Preferred industrial vision edge path when FPGA available. Heavy vs this repo's teaching kernels.",
+      "sources": [
+        "https://github.com/Xilinx/brevitas",
+        "https://finn-dev.readthedocs.io/en/latest/end_to_end_flow.html",
+        "docs/16_ECOSYSTEM_AND_TOOLING.md"
+      ],
+      "confidence": 0.9,
+      "status": "verified"
+    },
+    {
+      "id": "decision.awq_gptq_vs_binary",
+      "label": "When AWQ/GPTQ/torchao win vs binary/ternary",
+      "type": "decision",
+      "summary": "GPU datacenter LLM serve (2024–2026): prefer FP8/INT4 via torchao, AWQ, GPTQ, vLLM/TensorRT — Tensor Cores beat research XNOR. AWQ protects salient weights via activation magnitude (~1% channels); GPTQ second-order weight fit — GPTQ can overfit calib domain more than AWQ. CPU/edge LLM: BitNet b1.58 + bitnet.cpp. Mobile NPU: stock INT8/INT4, not XNOR. Vision MCU/FPGA fixed topology: FINN/Larq binary. Hybrid: PTQ INT4 for GPU API + ternary FFN on CPU rare; usually pick one stack. Binary rarely wins end-to-end on NVIDIA TC GPUs (arXiv:1911.04477).",
+      "sources": [
+        "https://arxiv.org/abs/2306.00978",
+        "https://arxiv.org/abs/2210.17323",
+        "docs/16_ECOSYSTEM_AND_TOOLING.md",
+        "docs/02_SOTA_SURVEY.md",
+        "docs/18_DECISION_TREE_AND_COMPLETE_ROADMAP.md"
+      ],
+      "confidence": 0.91,
+      "status": "verified"
+    },
+    {
+      "id": "paper.sparse_bitnet.2026",
+      "label": "Sparse-BitNet (N:M + 1.58-bit, 2026)",
+      "type": "paper",
+      "summary": "Zhang et al. arXiv:2603.05168 — ternary BitNet naturally ~42% zeros; more N:M-friendly than BF16. Sparse-BitLinear: magnitude mask from master weights each step, quant-then-mask, **dual STE** (gradients through masked weights). At 2:4, BF16 +18.8% norm PPL vs BitNet +5.7%; BitNet collapses later under N:8 sweeps. Custom 6:8 sparse TC kernels: up to **~1.30×** e2e on Qwen2.5-3B. Related: Q-Sparse (arXiv:2407.10969). Lab mentions Sparse-BitNet once — add these deltas.",
+      "sources": [
+        "https://arxiv.org/abs/2603.05168",
+        "https://arxiv.org/abs/2407.10969",
+        "docs/02_SOTA_SURVEY.md"
+      ],
+      "confidence": 0.9,
+      "status": "verified"
+    },
+    {
+      "id": "concept.mobile_npu_quant_reality",
+      "label": "Mobile NPU INT8/INT4 reality (not 1-bit)",
+      "type": "concept",
+      "summary": "Qualcomm HTP/QNN, Apple ANE/CoreML, Arm Ethos-U: document INT8/INT4/FP16 paths — **no stock 1-bit XNOR**. Ternary BitNet on Snapdragon needs custom Hexagon kernels (ENERZAi/QCS6490 class reports). Product tree: phone NPU → INT8; classic BNN CNN → CPU LCE / FPGA FINN; ternary LLM → bitnet.cpp or custom DSP. Aligns with lab docs/20 CLOSED-BY-PROXY.",
+      "sources": [
+        "docs/20_NPU_VENDOR_CLOSURE.md",
+        "docs/14_HARDWARE_AND_ENERGY.md"
+      ],
+      "confidence": 0.9,
+      "status": "verified"
+    },
+    {
+      "id": "failure.attention_binarization",
+      "label": "Failure: attention binarization",
+      "type": "failure_mode",
+      "summary": "Sign on Q/K/attention maps destroys selective focus (BiBERT analysis: attention-weight information nearly collapses). Distilling using products of two binary activations causes STE direction mismatch (DMD needed). Practical mitigations: keep attention scores / softmax / KV higher bit (BitNet default); Bi-Attention+DMD for full binary BERT; a4.8 uses sparse INT8 intermediates on attn out-proj. Lab F8 Amdahl already notes softmax — elevate attention-specific citations.",
+      "sources": [
+        "https://arxiv.org/abs/2203.06390",
+        "https://arxiv.org/abs/2411.04965",
+        "docs/03_FAILURE_ANALYSIS.md"
+      ],
+      "confidence": 0.92,
+      "status": "verified"
+    },
+    {
+      "id": "failure.small_k_layers",
+      "label": "Failure: small-K / thin layers",
+      "type": "failure_mode",
+      "summary": "Packed XNOR–popcount amortizes poorly when inner dim K ≪ 64/128 or layers are stem/head-sized: packing overhead + FP residual ops dominate; measured wall-clock can be <1× vs FP BLAS. Standard recipe: leave first/last layers FP (≥8-bit); only binarize wide matmuls. Lab G15/G18 document re-pack and Python overhead — connect to K-threshold guidance in kernels docs.",
+      "sources": [
+        "docs/03_FAILURE_ANALYSIS.md",
+        "docs/34_COMPUTE_SPEEDUP.md",
+        "docs/06_CALCULATED_SPEEDUP_MODEL.md"
+      ],
+      "confidence": 0.88,
+      "status": "verified"
+    },
+    {
+      "id": "failure.bn_sensitivity",
+      "label": "Failure: BatchNorm sensitivity in BNNs",
+      "type": "failure_mode",
+      "summary": "Without BN after binary layers, training almost always fails (discrete noisy acts). Running stats/momentum matter: Larq guides often use momentum ≈0.9. Prefer Adam on latent weights. On FPGA FINN, BN+sign folds to thresholds — training-time BN still required. Lab G7 CLOSED; keep as KG failure node with Larq/FINN citations.",
+      "sources": [
+        "docs/03_FAILURE_ANALYSIS.md",
+        "docs/09_GAP_REGISTER.md",
+        "https://docs.larq.dev/",
+        "https://arxiv.org/abs/1612.07119"
+      ],
+      "confidence": 0.9,
+      "status": "verified"
+    },
+    {
+      "id": "failure.ptq_to_ternary",
+      "label": "Failure: naive PTQ into ternary BitNet",
+      "type": "failure_mode",
+      "summary": "Absmean-PTQ or direct QAT of chat Llama into {-1,0,1} without SubLN/CPT/distill is unstable; BitDistill shows gaps ~14 pp that **widen** with scale (0.6B→4B). Sub-4-bit PTQ (GPTQ/AWQ alone) also collapses quality. Use BitDistill recipe or train BitNet from scratch. Lab F13 / docs/23 already warn — cite 2510.13998 numbers.",
+      "sources": [
+        "https://arxiv.org/abs/2510.13998",
+        "docs/23_BITNET_CPP_BRIDGE.md",
+        "docs/17_EVALUATION_ROBUSTNESS_ECONOMICS.md"
+      ],
+      "confidence": 0.93,
+      "status": "verified"
+    },
+    {
+      "id": "artifact.hf_bitnet_2b",
+      "label": "HF microsoft/bitnet-b1.58-2B-4T",
+      "type": "artifact",
+      "summary": "Official 2.4B BitNet b1.58 trained 4T tokens (arXiv:2504.12285). Variants: safetensors, bf16, gguf. Primary public checkpoint for bitnet.cpp demos. Prefer this over unofficial PTQ '1-bit' conversions.",
+      "sources": [
+        "https://hf.co/microsoft/bitnet-b1.58-2B-4T",
+        "https://hf.co/microsoft/bitnet-b1.58-2B-4T-gguf",
+        "https://arxiv.org/abs/2504.12285"
+      ],
+      "confidence": 0.94,
+      "status": "verified"
+    },
+    {
+      "id": "citation.strengthen.lab_weak",
+      "label": "Lab citation strengthen list",
+      "type": "meta",
+      "summary": "Papers named in docs without stable IDs or precise numbers: Real-to-Binary → arXiv:2003.11535 + 65.4%; ReActNet → 2003.03488 + 69.4/71.4; Bi-Real → 1808.00278 + 56.4/62.2; BitDistill → 2510.13998 (not BitDistiller 2402.10631); bitnet.cpp energy → 2410.16144 tables with CPU model; FINN → 1612.07119 + FPS/W; BiBERT → 2203.06390; Sparse-BitNet → 2603.05168; BitNet a4.8 → 2411.04965. Prefer these IDs in KG edges over 'Microsoft reports'.",
+      "sources": [
+        "docs/02_SOTA_SURVEY.md",
+        "docs/13_TRAINING_QAT_DISTILL.md",
+        "docs/14_HARDWARE_AND_ENERGY.md"
+      ],
+      "confidence": 0.95,
+      "status": "verified"
+    }
+  ],
+  "edges": [
+    {
+      "source": "paper.bireal.eccv2018",
+      "target": "metric.imagenet.bnn_ladder",
+      "relation": "contributes_metric",
+      "evidence": "Bi-Real-18 = 56.4% ImageNet top-1 (ECCV 2018 Table 2)."
+    },
+    {
+      "source": "paper.real2bin.iclr2020",
+      "target": "metric.imagenet.bnn_ladder",
+      "relation": "contributes_metric",
+      "evidence": "Real-to-Bin ResNet-18 = 65.4% top-1 ImageNet (ICLR 2020)."
+    },
+    {
+      "source": "paper.reactnet.eccv2020",
+      "target": "metric.imagenet.bnn_ladder",
+      "relation": "contributes_metric",
+      "evidence": "ReActNet-A 69.4%, ReActNet-C 71.4% ImageNet top-1."
+    },
+    {
+      "source": "paper.reactnet.eccv2020",
+      "target": "paper.bireal.eccv2018",
+      "relation": "improves_upon",
+      "evidence": "RSign/RPReLU on Bi-Real-18 lifts 56.4% → 65.5%; MobileNet redesign exceeds Real-to-Binary."
+    },
+    {
+      "source": "paper.reactnet.eccv2020",
+      "target": "paper.real2bin.iclr2020",
+      "relation": "outperforms_on_metric",
+      "evidence": "ReActNet-A 69.4% vs Real-to-Binary 65.4% at lower OPs (0.87e8 vs ~1.65e8)."
+    },
+    {
+      "source": "paper.bitnet.2023",
+      "target": "paper.bitnet_b158.2024",
+      "relation": "precedes",
+      "evidence": "BitNet ±1 → b1.58 adds 0 for feature filtering / quality parity."
+    },
+    {
+      "source": "paper.bitnet_b158.2024",
+      "target": "paper.bitnet_a48.2024",
+      "relation": "extends",
+      "evidence": "a4.8 continue-trains from W1.58A8 to 4-bit activations + sparsity."
+    },
+    {
+      "source": "paper.bitnet_b158.2024",
+      "target": "paper.bitnet_cpp.2024",
+      "relation": "enabled_by_runtime",
+      "evidence": "bitnet.cpp provides lossless CPU ternary kernels for b1.58 models."
+    },
+    {
+      "source": "paper.bitnet_cpp.2024",
+      "target": "artifact.hf_bitnet_2b",
+      "relation": "runs_artifact",
+      "evidence": "Official BitNet-b1.58-2B-4T listed in microsoft/BitNet model table (I2_S/TL kernels)."
+    },
+    {
+      "source": "paper.bitdistill.2025",
+      "target": "recipe.qat_158bit",
+      "relation": "defines_recipe",
+      "evidence": "SubLN + CPT + logits/attention distill stages."
+    },
+    {
+      "source": "paper.bitdistill.2025",
+      "target": "failure.ptq_to_ternary",
+      "relation": "mitigates",
+      "evidence": "Closes BitNet-SFT gap that widens with scale; recovers FP16-SFT task accuracy."
+    },
+    {
+      "source": "paper.bitdistill.2025",
+      "target": "decision.awq_gptq_vs_binary",
+      "relation": "complements",
+      "evidence": "Paper Table 4: BitDistill works with GPTQ/AWQ/Block-Quant inits."
+    },
+    {
+      "source": "paper.bibert.2022",
+      "target": "failure.attention_binarization",
+      "relation": "diagnoses",
+      "evidence": "Bi-Attention + DMD address attention entropy collapse and distill direction mismatch."
+    },
+    {
+      "source": "paper.bibert.2022",
+      "target": "concept.binary_transformers",
+      "relation": "instance_of",
+      "evidence": "Full W1A1E1 encoder BERT line distinct from BitLinear LLMs."
+    },
+    {
+      "source": "paper.bitnet.2023",
+      "target": "concept.binary_transformers",
+      "relation": "instance_of",
+      "evidence": "BitLinear Transformer path (weights extreme, attention often higher bit)."
+    },
+    {
+      "source": "paper.finn.fpga2017",
+      "target": "tool.brevitas_finn",
+      "relation": "deployed_via",
+      "evidence": "Modern flow trains in Brevitas then compiles with FINN."
+    },
+    {
+      "source": "tool.larq_lce",
+      "target": "concept.mobile_npu_quant_reality",
+      "relation": "alternative_to",
+      "evidence": "When NPU lacks 1-bit, Larq CE on ARM CPU is the stock BNN path."
+    },
+    {
+      "source": "decision.awq_gptq_vs_binary",
+      "target": "paper.bitnet_cpp.2024",
+      "relation": "prefers_when_cpu_llm",
+      "evidence": "Decision tree: GPU→AWQ/GPTQ/torchao; CPU LLM→bitnet.cpp."
+    },
+    {
+      "source": "decision.awq_gptq_vs_binary",
+      "target": "paper.finn.fpga2017",
+      "relation": "prefers_when_fpga_vision",
+      "evidence": "Fixed vision topologies on FPGA: FINN FPS/W dominates GPU BOM."
+    },
+    {
+      "source": "paper.sparse_bitnet.2026",
+      "target": "paper.bitnet_b158.2024",
+      "relation": "hybridizes_with",
+      "evidence": "Adds N:M masks + sparse TC kernels on ternary BitLinear."
+    },
+    {
+      "source": "failure.bn_sensitivity",
+      "target": "paper.bireal.eccv2018",
+      "relation": "mitigated_in_architecture",
+      "evidence": "BN after binary conv is standard in Bi-Real / ReAct / Larq recipes."
+    },
+    {
+      "source": "failure.small_k_layers",
+      "target": "decision.awq_gptq_vs_binary",
+      "relation": "constrains",
+      "evidence": "Thin layers should stay FP/INT8; binary only where K is wide enough for popcount win."
+    },
+    {
+      "source": "citation.strengthen.lab_weak",
+      "target": "paper.real2bin.iclr2020",
+      "relation": "requires_cite",
+      "evidence": "Lab named Real-to-Bin without arXiv:2003.11535 / 65.4%."
+    },
+    {
+      "source": "citation.strengthen.lab_weak",
+      "target": "paper.bitdistill.2025",
+      "relation": "requires_cite",
+      "evidence": "docs/13 mentions BitDistill without arXiv:2510.13998; avoid conflating BitDistiller."
+    },
+    {
+      "source": "citation.strengthen.lab_weak",
+      "target": "paper.bitnet_cpp.2024",
+      "relation": "requires_cite",
+      "evidence": "Energy −55–82% must be footnoted to M2/i7 tables in 2410.16144."
+    },
+    {
+      "source": "paper.bitnet_a48.2024",
+      "target": "failure.attention_binarization",
+      "relation": "partially_avoids",
+      "evidence": "Keeps intermediate attn/FFN states sparse-INT8 rather than full INT4."
+    },
+    {
+      "source": "concept.mobile_npu_quant_reality",
+      "target": "decision.awq_gptq_vs_binary",
+      "relation": "informs",
+      "evidence": "Phone NPU → INT8/INT4 stock path in decision tree."
+    },
+    {
+      "source": "recipe.qat_158bit",
+      "target": "paper.bitnet_b158.2024",
+      "relation": "uses",
+      "evidence": "From-scratch branch follows b1.58 absmean ternary + INT8 acts."
+    },
+    {
+      "source": "tool.brevitas_finn",
+      "target": "paper.finn.fpga2017",
+      "relation": "implements_flow_of",
+      "evidence": "Brevitas is the PyTorch QAT front-end for modern FINN."
+    }
+  ]
+}
