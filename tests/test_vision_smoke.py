@@ -10,14 +10,25 @@ import torch.nn as nn
 from torch.utils.data import DataLoader, TensorDataset
 
 from bnn.ste import set_approx_sign
-from bnn.vision.models import FP32CIFARCNN, BinaryCIFARCNN, TinyBinaryViT, build_vision_model
+from bnn.vision.models import (
+    FP32CIFARCNN,
+    BinaryCIFARCNN,
+    ResNetBiReal,
+    TinyBinaryViT,
+    build_vision_model,
+)
 from bnn.wrapper import wrap_conv_modules
 
 
 def test_vision_forward_shapes():
     set_approx_sign(False)
     x = torch.randn(2, 3, 32, 32)
-    for m in (FP32CIFARCNN(32), BinaryCIFARCNN(32), TinyBinaryViT(dim=32, depth=1)):
+    for m in (
+        FP32CIFARCNN(32),
+        BinaryCIFARCNN(32),
+        TinyBinaryViT(dim=32, depth=1),
+        build_vision_model("resnet_bireal_cifar", width=8),
+    ):
         y = m(x)
         assert y.shape == (2, 10)
 
@@ -35,6 +46,7 @@ def test_vision_approx_sign_forward():
 def test_build_vision_model():
     assert isinstance(build_vision_model("binary_cifar", channels=16), BinaryCIFARCNN)
     assert isinstance(build_vision_model("tiny_vit_binary", dim=32, depth=1), TinyBinaryViT)
+    assert isinstance(build_vision_model("resnet_bireal_cifar", width=8), ResNetBiReal)
 
 
 def test_wrap_binary_conv_compression():

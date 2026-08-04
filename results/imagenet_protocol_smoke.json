@@ -1,0 +1,90 @@
+{
+  "protocol": "imagenet_folder_v1",
+  "mode": "smoke",
+  "contract": {
+    "schema": "bnn_imagenet_folder_contract_v1",
+    "name": "imagenet_imagefolder",
+    "layout": {
+      "train": "train/<classname>/*.{jpg,jpeg,png,...}",
+      "val": "val/<classname>/*.{jpg,jpeg,png,...}"
+    },
+    "full_imagenet_reference": {
+      "num_classes": 1000,
+      "train_images_approx": 1281167,
+      "val_images": 50000,
+      "canonical_input_size": 224,
+      "note": "Reference sizes only \u2014 not required for protocol smoke."
+    },
+    "proxy_minimum": {
+      "num_classes": 2,
+      "images_per_class_per_split": 1,
+      "input_sizes_ok": [
+        32,
+        64,
+        224
+      ],
+      "sufficient_for": [
+        "layout check",
+        "forward smoke",
+        "1-step STE train"
+      ]
+    },
+    "pass_gates": {
+      "layout_ok": true,
+      "smoke_forward_finite": true,
+      "sota_top1": false,
+      "full_train_required": false,
+      "invented_goldens": false
+    },
+    "non_goals": [
+      "Full ImageNet SOTA as CI / repro gate",
+      "Committing ImageNet under data/",
+      "Claiming GPU 32\u00d7 from sign()"
+    ],
+    "in_repo_evidence": "CIFAR-10 Bi-Real via bnn train-image (results/image_cifar.json floors)"
+  },
+  "sota_gate": false,
+  "thesis_note": "Packed CPU/edge XNOR-popcount; never claim GPU 32\u00d7 from sign(). ImageNet SOTA is not a pass gate.",
+  "folder": {
+    "ok": true,
+    "layout_ok": true,
+    "images_ok": true,
+    "meets_proxy_minimum": true,
+    "train_classes": 4,
+    "val_classes": 4,
+    "train_images": 8,
+    "val_images": 8,
+    "contract_schema": "bnn_imagenet_folder_contract_v1",
+    "hint": "ImageNet-style layout expected under data\\_imagenet_proxy_smoke:\n  train/<classname>/*.jpg|png|jpeg\n  val/<classname>/*.jpg|png|jpeg\nFull ImageNet Bi-Real train is an ADR ACCEPTED-NON-GOAL.\nUse CIFAR-10 via `bnn train-image` / `bnn train-cifar` for in-repo evidence.\nProtocol runner: `python scripts/imagenet_protocol.py --mode smoke`.",
+    "proxy": true,
+    "class_names": [
+      "n0000",
+      "n0001",
+      "n0002",
+      "n0003"
+    ],
+    "root": "data/_imagenet_proxy_smoke"
+  },
+  "smoke": {
+    "arch": "resnet_bireal_cifar",
+    "num_classes": 4,
+    "image_size": 32,
+    "width": 8,
+    "batch_size": 2,
+    "loss": 1.289945125579834,
+    "logits_finite": true,
+    "logits_shape": [
+      2,
+      4
+    ],
+    "train_step_seconds": 0.11682049999944866,
+    "params": {
+      "total_params": 176492,
+      "binary_or_ternary_weight_params": 171648,
+      "fp_params": 4844,
+      "theoretical_weight_bytes_if_packed": 40832,
+      "fp32_weight_bytes": 705968
+    }
+  },
+  "verdict": "PASS protocol smoke"
+}
