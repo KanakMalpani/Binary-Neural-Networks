@@ -1,0 +1,17 @@
+[package]
+name = "bnn-wasm-gemm"
+version = "0.1.0"
+edition = "2021"
+description = "Pedagogy WASM SIMD popcount binary GEMM (W2.T06) — not a native kernel replacement"
+license = "MIT"
+publish = false
+
+[lib]
+crate-type = ["cdylib"]
+path = "src/lib.rs"
+
+[profile.release]
+opt-level = 2
+lto = true
+codegen-units = 1
+strip = true
