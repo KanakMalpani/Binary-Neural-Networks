@@ -116,6 +116,13 @@ thesis — previously unlinked from this index.
 | [`spikes/ARM_NEON_SPIKE.md`](spikes/ARM_NEON_SPIKE.md) | ARM NEON note (delivered) |
 | [`spikes/AVX512_MOONSHOT.md`](spikes/AVX512_MOONSHOT.md) | AVX-512 note (delivered) |
 
+## Knowledge graph
+
+| Doc | Topic |
+|-----|-------|
+| [`44_KNOWLEDGE_GRAPH.md`](44_KNOWLEDGE_GRAPH.md) | Pointer to `knowledge_graph/` (JSON + GraphML + VIEW) |
+| [`../knowledge_graph/README.md`](../knowledge_graph/README.md) | How to query / merge enrichment / thesis lock |
+
 ## Thesis lock (never reopen as a “win”)
 
 Packed CPU/edge kernels are the product story. Commodity GPU → INT4/FP8.

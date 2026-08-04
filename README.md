@@ -77,6 +77,7 @@ flowchart LR
 | **Human path** | [`docs/GUIDE_E2E.md`](docs/GUIDE_E2E.md) — install → repro → optimise |
 | **Reproduce** | [`REPRODUCIBILITY.md`](REPRODUCIBILITY.md) · `bnn repro` |
 | **AI agents** | [`AGENTS.md`](AGENTS.md) |
+| **Knowledge graph** | [`knowledge_graph/`](knowledge_graph/) · [`docs/44_KNOWLEDGE_GRAPH.md`](docs/44_KNOWLEDGE_GRAPH.md) |
 | **Roadmap** | [`ROADMAP.md`](ROADMAP.md) |
 | **Compatibility** | [`docs/COMPATIBILITY_MATRIX.md`](docs/COMPATIBILITY_MATRIX.md) — Win/Linux/macOS × x86-64/arm64 |
 | **Limits** | [`MODEL_CARD.md`](MODEL_CARD.md) |

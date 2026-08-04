@@ -1,0 +1,4526 @@
+{
+  "meta": {
+    "name": "Binary Neural Networks Lab Knowledge Graph",
+    "version": "1.1.0",
+    "repo": "https://github.com/KanakMalpani/Binary-Neural-Networks",
+    "thesis_lock": "Packed CPU/edge XNOR-popcount + honest STE; never claim GPU 32× from sign(); 32× compression ≠ 32× latency.",
+    "generated_by": "scripts/build_bnn_kg.py + scripts/merge_kg_enrichment.py",
+    "node_count": 154,
+    "edge_count": 265,
+    "node_types": [
+      "Algorithm",
+      "Claim",
+      "Concept",
+      "Dataset",
+      "Decision",
+      "FailureMode",
+      "Hardware",
+      "Method",
+      "Metric",
+      "OpenGap",
+      "Paper",
+      "PersonOrg",
+      "Result",
+      "System",
+      "Tool"
+    ],
+    "relations": [
+      "alternative_to",
+      "blocked_by",
+      "cites",
+      "contradicts",
+      "derived_from",
+      "implements",
+      "improves",
+      "measured_on",
+      "part_of",
+      "recommends_for",
+      "requires",
+      "same_as"
+    ],
+    "merged_at": "2026-08-04T15:33:20.421038+00:00",
+    "enrichment_runs": [
+      {
+        "generated": "2026-08-04T20:46:00+05:30",
+        "researcher": "gap-parallel",
+        "schema_version": "1.0",
+        "purpose": "Enrichment overlay for lab BNN KG: precise citations, ImageNet/LLM numbers, tool FPS/W, and failure-mode detail under-represented in docs/",
+        "lab_coverage_note": "docs/02_SOTA_SURVEY.md, docs/03_FAILURE_ANALYSIS.md, docs/13–16, docs/20, docs/23 name most topics at survey depth; this file strengthens arXiv IDs, tables, and decision edges.",
+        "merged_added_nodes": 24,
+        "merged_updated_lab_nodes": 16,
+        "merged_added_edges": 61,
+        "same_as_aliases": 16
+      }
+    ]
+  },
+  "nodes": [
+    {
+      "id": "thesis_lock",
+      "label": "Thesis Lock: Packed CPU/edge XNOR + honest STE",
+      "type": "Claim",
+      "summary": "Speedups come from packed kernels on CPU/edge; never claim GPU 32× from sign(); compression 32× ≠ latency; STE trains latents, inference uses pack+popcount.",
+      "sources": [
+        "ROADMAP.md",
+        "AGENTS.md",
+        "docs/08_ADR.md",
+        "docs/05_PERFECTED_CONCEPT.md"
+      ],
+      "confidence": 1.0,
+      "status": "locked"
+    },
+    {
+      "id": "dual_metric_culture",
+      "label": "Honest Dual-Metric Culture",
+      "type": "Concept",
+      "summary": "Always report theoretical word reduction / weight compression separately from measured wall-clock S_compute and S_e2e; never advertise 32×/64× as latency.",
+      "sources": [
+        "docs/06_CALCULATED_SPEEDUP_MODEL.md",
+        "docs/FAIR_EVAL_PROTOCOL.md",
+        "results/SUMMARY.md"
+      ],
+      "confidence": 1.0,
+      "status": "established"
+    },
+    {
+      "id": "bnn_lab_system",
+      "label": "bnn-lab (Binary Neural Network Optimiser Lab)",
+      "type": "System",
+      "summary": "Installable PyTorch lab (v0.3.0): packed XNOR kernels, wrap/optimise, .bnnpack, vision/audio/seq lanes, repro gates, bridges to BitNet/GGUF/torchao.",
+      "sources": [
+        "README.md",
+        "ROADMAP.md",
+        "pyproject.toml"
+      ],
+      "confidence": 1.0,
+      "status": "established",
+      "version": "0.3.0"
+    },
+    {
+      "id": "world_class_v1",
+      "label": "World-Class Optimiser v1.0 Bar",
+      "type": "Decision",
+      "summary": "Acceptance gates WC-A/K/O/R/D/P in ROADMAP §1; until all pass, claim only lab/beta.",
+      "sources": [
+        "ROADMAP.md#1-definition-of-world-class-acceptance-bar"
+      ],
+      "confidence": 0.95,
+      "status": "target"
+    },
+    {
+      "id": "xnor_popcount_identity",
+      "label": "XNOR–Popcount Dot-Product Identity",
+      "type": "Concept",
+      "summary": "For ±1 vectors with bit0↦+1, bit1↦−1: ⟨w,x⟩ = N − 2·popcount(w⊕x). Pad bits encode +1 so they do not inflate disagreement count.",
+      "sources": [
+        "docs/01_FIRST_PRINCIPLES.md",
+        "docs/35_BINARY_MATH_EFFECTIVENESS.md",
+        "bnn/math/"
+      ],
+      "confidence": 1.0,
+      "status": "established"
+    },
+    {
+      "id": "amdahl_law",
+      "label": "Amdahl Bound on End-to-End Speedup",
+      "type": "Concept",
+      "summary": "S_e2e = 1/((1−f)+f/S_k). Non-binary layers (softmax, LN, attn, embed) cap e2e gains even when kernel S_k is large.",
+      "sources": [
+        "docs/01_FIRST_PRINCIPLES.md",
+        "docs/06_CALCULATED_SPEEDUP_MODEL.md",
+        "results/SUMMARY.md"
+      ],
+      "confidence": 1.0,
+      "status": "established"
+    },
+    {
+      "id": "bandwidth_bound",
+      "label": "Memory-Bandwidth Bound Inference",
+      "type": "Concept",
+      "summary": "Large models / batch-1 decode often limited by DRAM bytes/s, not peak FLOPs. 32× denser weights can move kernels from DRAM-bound to L2/L3-bound.",
+      "sources": [
+        "docs/01_FIRST_PRINCIPLES.md",
+        "docs/14_HARDWARE_AND_ENERGY.md"
+      ],
+      "confidence": 0.95,
+      "status": "established"
+    },
+    {
+      "id": "compression_32x",
+      "label": "Exact 32× Weight Compression (uint64 pack)",
+      "type": "Metric",
+      "summary": "Aligned binary pack: FP32 4 bytes → 1 bit = 32.00× exact. Gate in golden_floors.json.",
+      "sources": [
+        "tests/golden_floors.json",
+        "results/benchmark.json",
+        "AGENTS.md"
+      ],
+      "confidence": 1.0,
+      "status": "established"
+    },
+    {
+      "id": "theoretical_word_reduction_64x",
+      "label": "Theoretical ~64× Word-Op Reduction",
+      "type": "Metric",
+      "summary": "64 binary MACs per uint64 XNOR+popcount vs scalar FP32 MAC counting — NOT a wall-clock claim.",
+      "sources": [
+        "docs/06_CALCULATED_SPEEDUP_MODEL.md",
+        "results/benchmark.json"
+      ],
+      "confidence": 1.0,
+      "status": "established"
+    },
+    {
+      "id": "energy_proxy_ept",
+      "label": "Energy Proxy E = P · t",
+      "type": "Metric",
+      "summary": "Board Joules closed-by-proxy: measured wrap latency × assumed power brackets + lit anchors. RAPL optional on Linux; Windows stays proxy.",
+      "sources": [
+        "results/energy_bound.json",
+        "docs/14_HARDWARE_AND_ENERGY.md",
+        "docs/spikes/RAPL_ENERGY_SPIKE.md"
+      ],
+      "confidence": 0.9,
+      "status": "established"
+    },
+    {
+      "id": "fake_binary_sign",
+      "label": "Fake Binary: sign() + FP GEMM",
+      "type": "FailureMode",
+      "summary": "PyTorch w.sign() @ x.sign() still uses FP32 GEMM — no packing → no speedup, often slowdown (extra sign kernels). Negative control in benches.",
+      "sources": [
+        "docs/03_FAILURE_ANALYSIS.md",
+        "results/benchmark.json",
+        "docs/06_CALCULATED_SPEEDUP_MODEL.md"
+      ],
+      "confidence": 1.0,
+      "status": "established"
+    },
+    {
+      "id": "accuracy_collapse",
+      "label": "Accuracy Collapse from Information Loss",
+      "type": "FailureMode",
+      "summary": "sign destroys magnitude; deep binary stacks lose capacity (historically 10–20+ pp ImageNet).",
+      "sources": [
+        "docs/03_FAILURE_ANALYSIS.md",
+        "docs/02_SOTA_SURVEY.md"
+      ],
+      "confidence": 0.95,
+      "status": "established"
+    },
+    {
+      "id": "ste_mismatch",
+      "label": "STE Gradient Mismatch",
+      "type": "FailureMode",
+      "summary": "True ∂sign/∂x = 0 a.e.; STE pretends identity on |x|≤1 → suboptimal minima risk.",
+      "sources": [
+        "docs/03_FAILURE_ANALYSIS.md",
+        "docs/13_TRAINING_QAT_DISTILL.md",
+        "results/math_ste_compare.json"
+      ],
+      "confidence": 0.95,
+      "status": "established"
+    },
+    {
+      "id": "gpu_tensor_core_reality",
+      "label": "GPU Tensor Cores Beat Naive XNOR",
+      "type": "FailureMode",
+      "summary": "On A100/H100, FP16/BF16/FP8/INT8 Tensor Cores dominate; unoptimized binary popcount rarely beats cuDNN/cuBLAS end-to-end.",
+      "sources": [
+        "docs/03_FAILURE_ANALYSIS.md",
+        "docs/14_HARDWARE_AND_ENERGY.md",
+        "arXiv:1911.04477"
+      ],
+      "confidence": 0.95,
+      "status": "established"
+    },
+    {
+      "id": "first_last_layer_trap",
+      "label": "Binarizing Stem/Head Trap",
+      "type": "FailureMode",
+      "summary": "Stem/head are small compute but critical for accuracy; always keep FP or ≥8-bit.",
+      "sources": [
+        "docs/03_FAILURE_ANALYSIS.md",
+        "bnn/models.py"
+      ],
+      "confidence": 1.0,
+      "status": "established"
+    },
+    {
+      "id": "ptq_ternary_llm_wipe",
+      "label": "PTQ-Only Ternary LLM Quality Wipe",
+      "type": "FailureMode",
+      "summary": "Absmean-PTQ or direct QAT of chat Llama into {-1,0,1} without SubLN/CPT/distill is unstable; BitDistill shows gaps ~14 pp that **widen** with scale (0.6B→4B). Sub-4-bit PTQ (GPTQ/AWQ alone) also collapses quality. Use BitDistill recipe or train BitNet from scratch. Lab F13 / docs/23 already warn — cite 2510.13998 numbers.",
+      "sources": [
+        "docs/18_DECISION_TREE_AND_COMPLETE_ROADMAP.md",
+        "docs/12_WRAPPER_AND_EXISTING_MODELS.md",
+        "arXiv:2510.13998",
+        "https://arxiv.org/abs/2510.13998",
+        "docs/23_BITNET_CPP_BRIDGE.md",
+        "docs/17_EVALUATION_ROBUSTNESS_ECONOMICS.md"
+      ],
+      "confidence": 0.93,
+      "status": "merged",
+      "enrichment_id": "failure.ptq_to_ternary"
+    },
+    {
+      "id": "npu_no_native_1bit",
+      "label": "Stock NPU: No Native 1-bit",
+      "type": "FailureMode",
+      "summary": "Qualcomm HTP / Apple ANE / Arm Ethos-U are INT8/INT4/FP16-first; native XNOR not drop-in.",
+      "sources": [
+        "docs/20_NPU_VENDOR_CLOSURE.md",
+        "docs/14_HARDWARE_AND_ENERGY.md"
+      ],
+      "confidence": 1.0,
+      "status": "merged",
+      "enrichment_id": "concept.mobile_npu_quant_reality"
+    },
+    {
+      "id": "paper_bnn_2016",
+      "label": "Binarized Neural Networks (Courbariaux et al. 2016)",
+      "type": "Paper",
+      "summary": "Foundational W+A ±1 with STE; GPU kernel demo era.",
+      "sources": [
+        "arXiv:1602.02830",
+        "docs/02_SOTA_SURVEY.md"
+      ],
+      "confidence": 1.0,
+      "status": "established",
+      "arxiv": "1602.02830"
+    },
+    {
+      "id": "paper_xnornet",
+      "label": "XNOR-Net (Rastegari et al. ECCV 2016)",
+      "type": "Paper",
+      "summary": "Channel-wise scaling α; claims ~58× faster conv ops and 32× memory on ImageNet AlexNet class.",
+      "sources": [
+        "arXiv:1603.05279",
+        "docs/02_SOTA_SURVEY.md"
+      ],
+      "confidence": 1.0,
+      "status": "established",
+      "arxiv": "1603.05279"
+    },
+    {
+      "id": "paper_bireal",
+      "label": "Bi-Real Net (Liu et al. ECCV 2018 / IJCV)",
+      "type": "Paper",
+      "summary": "1-bit CNN with full-precision identity shortcuts around every binary conv (≈2× real-valued paths vs BinaryNet). ApproxSign piecewise-polynomial STE. ImageNet ResNet-18: 56.4% top-1 / 79.5% top-5 (vs XNOR-Net 51.2% / BinaryNet 42.2% / FP ResNet-18 ~69.3%). ResNet-34: 62.2% top-1 / 83.9% top-5. Codes: github.com/liuzechun/Bi-Real-net. Lab uses Bi-Real residuals on MNIST/CIFAR proxies; full ImageNet train is ACCEPTED-NON-GOAL.",
+      "sources": [
+        "arXiv:1808.00278",
+        "arXiv:1811.01335",
+        "docs/02_SOTA_SURVEY.md",
+        "https://arxiv.org/abs/1808.00278",
+        "https://arxiv.org/abs/1811.01335",
+        "docs/03_FAILURE_ANALYSIS.md"
+      ],
+      "confidence": 1.0,
+      "status": "merged",
+      "arxiv": "1808.00278",
+      "enrichment_id": "paper.bireal.eccv2018"
+    },
+    {
+      "id": "paper_reactnet",
+      "label": "ReActNet (Liu et al. ECCV 2020)",
+      "type": "Paper",
+      "summary": "Generalizes Sign→RSign and PReLU→RPReLU (learnable channel-wise thresholds/slopes) + distributional KL loss vs real teacher. MobileNetV1-based ReActNet-A: **69.4%** ImageNet top-1 at **0.87×10^8 OPs** (~3.0 pp below real MobileNet twin 72.4%). ReActNet-B 70.1% @ 1.63e8 OPs; ReActNet-C 71.4% @ 2.14e8 OPs. ReAct on Bi-Real-18 → 65.5% (+9.1 pp). Comparison anchors: XNOR 51.2%, Bi-Real-18 56.4%, Real-to-Binary 65.4%, MeliusNet29 65.8%. Two-step training (acts then W+A). Code: github.com/liuzechun/ReActNet. Lab docs say '~71% claimed' — precise figures: A=69.4, C=71.4.",
+      "sources": [
+        "arXiv:2003.03488",
+        "docs/02_SOTA_SURVEY.md",
+        "docs/13_TRAINING_QAT_DISTILL.md",
+        "https://arxiv.org/abs/2003.03488",
+        "https://github.com/liuzechun/ReActNet"
+      ],
+      "confidence": 1.0,
+      "status": "merged",
+      "arxiv": "2003.03488",
+      "enrichment_id": "paper.reactnet.eccv2020"
+    },
+    {
+      "id": "paper_irnet",
+      "label": "IR-Net (Qin et al. CVPR 2020)",
+      "type": "Paper",
+      "summary": "Information Retention Network; Error Decay Estimator (EDE) / tanh-soft STE schedule.",
+      "sources": [
+        "arXiv:1909.10788",
+        "docs/13_TRAINING_QAT_DISTILL.md",
+        "docs/35_BINARY_MATH_EFFECTIVENESS.md"
+      ],
+      "confidence": 0.95,
+      "status": "established",
+      "arxiv": "1909.10788"
+    },
+    {
+      "id": "paper_xnornetpp",
+      "label": "XNOR-Net++ (Bulat & Tzimiropoulos BMVC 2019)",
+      "type": "Paper",
+      "summary": "Learned fused scale factors instead of analytic α; up to ~6% ImageNet gain vs XNOR-Net.",
+      "sources": [
+        "arXiv:1909.13863",
+        "docs/02_SOTA_SURVEY.md"
+      ],
+      "confidence": 0.9,
+      "status": "established",
+      "arxiv": "1909.13863"
+    },
+    {
+      "id": "paper_bibert",
+      "label": "BiBERT: Accurate Fully Binarized BERT (Qin et al. 2022)",
+      "type": "Paper",
+      "summary": "Qin et al. arXiv:2203.06390 — first accurate **W1 E1 A1** BERT. Failure diagnosis: (1) attention-weight information collapse under direct Sign; (2) distillation direction mismatch when using products of two binary activations. Fixes: **Bi-Attention** (maximize entropy of binary attention reps) + **Direction-Matching Distillation (DMD)**. Claims **56.3×** FLOPs and **31.2×** size savings; beats BinaryBERT W1A1 by ~20.4 pp avg GLUE and Q2BERT W2A8 by ~13.3 pp. Lab docs mention BiBERT briefly — strengthen with these failure modes and numbers.",
+      "sources": [
+        "arXiv:2203.06390",
+        "docs/02_SOTA_SURVEY.md",
+        "https://arxiv.org/abs/2203.06390",
+        "https://github.com/htqin/BiBERT",
+        "docs/13_TRAINING_QAT_DISTILL.md"
+      ],
+      "confidence": 0.95,
+      "status": "merged",
+      "arxiv": "2203.06390",
+      "enrichment_id": "paper.bibert.2022"
+    },
+    {
+      "id": "paper_bitnet",
+      "label": "BitNet: Scaling 1-bit Transformers (Wang et al. 2023)",
+      "type": "Paper",
+      "summary": "Wang et al. replace nn.Linear with BitLinear (1-bit weights, higher-bit acts). Foundational proof that Transformers can train with extreme weight quantization. arXiv:2310.11453. Superseded for quality by ternary BitNet b1.58; keep distinction: original BitNet ≈ ±1, b1.58 adds 0.",
+      "sources": [
+        "arXiv:2310.11453",
+        "docs/02_SOTA_SURVEY.md",
+        "https://arxiv.org/abs/2310.11453"
+      ],
+      "confidence": 1.0,
+      "status": "merged",
+      "arxiv": "2310.11453",
+      "enrichment_id": "paper.bitnet.2023"
+    },
+    {
+      "id": "paper_bitnet_b158",
+      "label": "BitNet b1.58 (Ma et al. 2024)",
+      "type": "Paper",
+      "summary": "Ternary {−1,0,1} weights; matches FP16 LLaMA-class from ~3B+ at equal tokens; memory ~3.55×, latency ~2.71× at 3B; 0 enables feature gating.",
+      "sources": [
+        "arXiv:2402.17764",
+        "docs/02_SOTA_SURVEY.md",
+        "docs/01_FIRST_PRINCIPLES.md",
+        "https://arxiv.org/abs/2402.17764",
+        "docs/14_HARDWARE_AND_ENERGY.md"
+      ],
+      "confidence": 1.0,
+      "status": "merged",
+      "arxiv": "2402.17764",
+      "enrichment_id": "paper.bitnet_b158.2024"
+    },
+    {
+      "id": "paper_bitnet_cpp",
+      "label": "1-bit AI Infra / bitnet.cpp (Wang et al. 2024)",
+      "type": "Paper",
+      "summary": "Wang et al. arXiv:2410.16144 — ternary CPU kernels (TL1/TL2) vs llama.cpp FP16. **Cite carefully with device+thread context:** Apple M2 Ultra unlimited threads: speedup **1.37×–5.07×** (125M→70B); Intel i7-13700H: **2.37×–6.17×**. Energy J/token savings: M2 **55.4%/64.6%/70.0%** (700M/7B/70B); i7 **71.9%/82.2%** (700M/7B). 100B ternary on M2 ~6.58 tok/s unlimited (human-reading class). Lossless vs FP32 kernel on WildChat token match (TL1/TL2 100% vs TQ1_0 1.4%). ACL follow-up arXiv:2502.11880. Official HF: microsoft/bitnet-b1.58-2B-4T (+gguf). Lab docs cite ranges correctly; add hardware footnotes + J/token table.",
+      "sources": [
+        "arXiv:2410.16144",
+        "docs/23_BITNET_CPP_BRIDGE.md",
+        "docs/02_SOTA_SURVEY.md",
+        "https://arxiv.org/abs/2410.16144",
+        "https://arxiv.org/abs/2502.11880",
+        "https://github.com/microsoft/BitNet",
+        "https://hf.co/microsoft/bitnet-b1.58-2B-4T"
+      ],
+      "confidence": 1.0,
+      "status": "merged",
+      "arxiv": "2410.16144",
+      "enrichment_id": "paper.bitnet_cpp.2024"
+    },
+    {
+      "id": "paper_bitnet_a48",
+      "label": "BitNet a4.8 (Wang et al. 2024)",
+      "type": "Paper",
+      "summary": "Wang/Ma/Wei hybrid: INT4 (or FP4) activations into attention/FFN inputs; TopK sparsify + INT8 on intermediate states (attn out-proj, FFN down). Continue-train from W1.58A8 → W1.58A4 (e.g. 95B+5B tokens). Matches b1.58 quality at same token budget; ~**55%** activated params (7B: 3.4B active); supports **3-bit KV** with negligible avg loss. Enables INT4/FP4 kernels. arXiv:2411.04965. Follow-on: BitNet v2 (arXiv:2504.18415) native 4-bit acts + Hadamard.",
+      "sources": [
+        "arXiv:2411.04965",
+        "https://arxiv.org/abs/2411.04965",
+        "https://arxiv.org/abs/2504.18415"
+      ],
+      "confidence": 0.92,
+      "status": "merged",
+      "arxiv": "2411.04965",
+      "enrichment_id": "paper.bitnet_a48.2024"
+    },
+    {
+      "id": "paper_bitnet_2b4t",
+      "label": "BitNet b1.58 2B4T Technical Report (2025)",
+      "type": "Paper",
+      "summary": "Official 2.4B BitNet b1.58 trained 4T tokens (arXiv:2504.12285). Variants: safetensors, bf16, gguf. Primary public checkpoint for bitnet.cpp demos. Prefer this over unofficial PTQ '1-bit' conversions.",
+      "sources": [
+        "arXiv:2504.12285",
+        "docs/02_SOTA_SURVEY.md",
+        "https://hf.co/microsoft/bitnet-b1.58-2B-4T",
+        "https://hf.co/microsoft/bitnet-b1.58-2B-4T-gguf",
+        "https://arxiv.org/abs/2504.12285"
+      ],
+      "confidence": 0.95,
+      "status": "merged",
+      "arxiv": "2504.12285",
+      "enrichment_id": "artifact.hf_bitnet_2b"
+    },
+    {
+      "id": "paper_bitdistill",
+      "label": "BitNet Distillation / BitDistill (Wu et al. 2025)",
+      "type": "Paper",
+      "summary": "Wu et al. arXiv:2510.13998 — convert off-the-shelf FP LLMs (Qwen3 0.6–4B) to 1.58-bit for **task-specific** finetune without full BitNet pretrain. Three stages: (1) SubLN before MHSA/FFN out-projections; (2) continue-pretrain ~10B Falcon tokens; (3) CE + KL logits distill (τ=5) + MiniLM-style multi-head attention-relation distill (prefer **single late layer**). Naive BitNet-SFT gaps ~13–15 pp and worsen with scale; BitDistill recovers FP16-SFT parity on MNLI/QNLI/SST-2 and CNNDM ROUGE while claiming ~**10×** memory and **~2.65×** CPU tok/s (paper table: 427→1135 tok/s, 1.20→0.11 G). Complementary to GPTQ/AWQ init. Distinct from BitDistiller (arXiv:2402.10631, sub-4-bit self-distill).",
+      "sources": [
+        "arXiv:2510.13998",
+        "docs/18_DECISION_TREE_AND_COMPLETE_ROADMAP.md",
+        "https://arxiv.org/abs/2510.13998",
+        "https://hf.co/papers/2510.13998",
+        "docs/13_TRAINING_QAT_DISTILL.md"
+      ],
+      "confidence": 0.95,
+      "status": "merged",
+      "arxiv": "2510.13998",
+      "enrichment_id": "paper.bitdistill.2025"
+    },
+    {
+      "id": "paper_sparse_bitnet",
+      "label": "Sparse-BitNet (2026)",
+      "type": "Paper",
+      "summary": "Zhang et al. arXiv:2603.05168 — ternary BitNet naturally ~42% zeros; more N:M-friendly than BF16. Sparse-BitLinear: magnitude mask from master weights each step, quant-then-mask, **dual STE** (gradients through masked weights). At 2:4, BF16 +18.8% norm PPL vs BitNet +5.7%; BitNet collapses later under N:8 sweeps. Custom 6:8 sparse TC kernels: up to **~1.30×** e2e on Qwen2.5-3B. Related: Q-Sparse (arXiv:2407.10969). Lab mentions Sparse-BitNet once — add these deltas.",
+      "sources": [
+        "arXiv:2603.05168",
+        "docs/02_SOTA_SURVEY.md",
+        "https://arxiv.org/abs/2603.05168",
+        "https://arxiv.org/abs/2407.10969"
+      ],
+      "confidence": 0.9,
+      "status": "merged",
+      "arxiv": "2603.05168",
+      "enrichment_id": "paper.sparse_bitnet.2026"
+    },
+    {
+      "id": "paper_larq_ce",
+      "label": "Larq Compute Engine (Bannink et al. 2020)",
+      "type": "Paper",
+      "summary": "Fastest open BNN inference engine of its era; ARM BGEMM 8.5–18.5× vs FP on Pixel-class.",
+      "sources": [
+        "arXiv:2011.09398",
+        "docs/02_SOTA_SURVEY.md",
+        "docs/16_ECOSYSTEM_AND_TOOLING.md"
+      ],
+      "confidence": 0.95,
+      "status": "established",
+      "arxiv": "2011.09398"
+    },
+    {
+      "id": "paper_finn",
+      "label": "FINN (Umuroglu et al. FPGA'17)",
+      "type": "Paper",
+      "summary": "Umuroglu et al. streaming heterogeneous dataflow for BNNs on Zynq. Optimizations: XNOR+popcount MVTU; BN+sign→thresholds; maxpool→OR. ZC706 @~200 MHz wall power: **SFC-max MNIST 12.3M FPS**, 0.31 µs latency, Pchip 7.3 W / Pwall 21.2 W → **~583k FPS/W wall** / **~1.69M FPS/W chip**; LFC-max 1.56M FPS; **CNV-max CIFAR-10/SVHN 21.9k FPS**, 283 µs, Pchip 3.6 W / Pwall 11.7 W → **~1.87k FPS/W wall**. Modern FINN: Brevitas→ONNX→FINN IR→HLS/RTL; github.com/Xilinx/finn. Lab docs cite FPS class correctly; add FPS/W and power rails.",
+      "sources": [
+        "docs/14_HARDWARE_AND_ENERGY.md",
+        "docs/16_ECOSYSTEM_AND_TOOLING.md",
+        "https://arxiv.org/abs/1612.07119",
+        "https://xilinx.github.io/finn/",
+        "https://github.com/Xilinx/finn"
+      ],
+      "confidence": 0.93,
+      "status": "merged",
+      "note": "Classic FPGA'17; arXiv companion commonly cited as 1612.07119",
+      "enrichment_id": "paper.finn.fpga2017"
+    },
+    {
+      "id": "paper_litespark",
+      "label": "Litespark Inference (2026)",
+      "type": "Paper",
+      "summary": "SIMD ternary CPU kernels; survey cites ~18× Apple Silicon / extreme x86 vs naive PyTorch — not reproduced in this lab (OpenGap for local numbers).",
+      "sources": [
+        "arXiv:2605.06485",
+        "docs/02_SOTA_SURVEY.md"
+      ],
+      "confidence": 0.65,
+      "status": "literature",
+      "arxiv": "2605.06485"
+    },
+    {
+      "id": "paper_awq",
+      "label": "AWQ: Activation-aware Weight Quantization",
+      "type": "Paper",
+      "summary": "Production GPU INT4 path for LLMs; default alternative when binary wrap is wrong tool.",
+      "sources": [
+        "docs/24_GPU_INT4_FP8_LANE.md",
+        "docs/18_DECISION_TREE_AND_COMPLETE_ROADMAP.md"
+      ],
+      "confidence": 0.95,
+      "status": "established"
+    },
+    {
+      "id": "paper_b1_honest_speedup",
+      "label": "B1 — Stop Claiming 32× (Honest Speedup Accounting)",
+      "type": "Paper",
+      "summary": "Novel claim: mandatory dual metrics + fake-binary negative control + Amdahl/energy proxies; compression/op-count ≠ wall-clock. Idea vault only.",
+      "sources": [
+        "docs/32_NOVEL_PAPER_CANDIDATES.md",
+        "C:/00 Research Papers/BINARY_NEURAL_SERIES_README.md",
+        "C:/00 Research Papers/Stop Claiming 32x Honest Speedup Accounting for Binary Neural Networks/README.md"
+      ],
+      "confidence": 0.85,
+      "status": "idea_vault"
+    },
+    {
+      "id": "paper_b2_packed_xnor",
+      "label": "B2 — Packed XNOR on Commodity CPUs (Productization + Goldens)",
+      "type": "Paper",
+      "summary": "Novel claim: MSVC/portable packed XNOR recipe + fair pre-pack benches + machine-checkable golden gates for humans/AI agents. Idea vault only.",
+      "sources": [
+        "docs/32_NOVEL_PAPER_CANDIDATES.md",
+        "C:/00 Research Papers/Packed XNOR on Commodity CPUs Reproducible Productization and Golden Gates/README.md"
+      ],
+      "confidence": 0.85,
+      "status": "idea_vault"
+    },
+    {
+      "id": "paper_b3_when_not",
+      "label": "B3 — When Not to Binarize (Decision Tree + Hybrid Wrap)",
+      "type": "Paper",
+      "summary": "Novel claim: goal×hardware decision tree + hybrid FFN wrap evidence for honest wrapping vs INT4/FP8/GGUF / do-not-binarize. Idea vault only.",
+      "sources": [
+        "docs/32_NOVEL_PAPER_CANDIDATES.md",
+        "C:/00 Research Papers/When Not to Binarize Decision Tree for Hybrid Low-Bit Wrapping/README.md"
+      ],
+      "confidence": 0.85,
+      "status": "idea_vault"
+    },
+    {
+      "id": "algo_ste_clip",
+      "label": "Clipped STE (BinaryNet)",
+      "type": "Algorithm",
+      "summary": "Backward: 1_|x|≤1. Default in bnn.ste binary_sign.",
+      "sources": [
+        "docs/13_TRAINING_QAT_DISTILL.md",
+        "bnn/ste.py",
+        "results/math_ste_compare.json"
+      ],
+      "confidence": 1.0,
+      "status": "established"
+    },
+    {
+      "id": "algo_approx_sign",
+      "label": "ApproxSign (Bi-Real)",
+      "type": "Algorithm",
+      "summary": "Piecewise-polynomial / tent surrogate 2−2|x| on [−1,1]; better match to sharp teacher in lab compare.",
+      "sources": [
+        "arXiv:1808.00278",
+        "docs/13_TRAINING_QAT_DISTILL.md",
+        "results/math_ste_compare.json"
+      ],
+      "confidence": 0.95,
+      "status": "established"
+    },
+    {
+      "id": "algo_irnet_ede",
+      "label": "IR-Net EDE / TanhSoft",
+      "type": "Algorithm",
+      "summary": "kt(1−tanh²(tx)) schedule; set_sign_mode('tanh_soft') / irnet_ede_schedule.",
+      "sources": [
+        "arXiv:1909.10788",
+        "docs/13_TRAINING_QAT_DISTILL.md",
+        "bnn/ste.py"
+      ],
+      "confidence": 0.9,
+      "status": "established"
+    },
+    {
+      "id": "algo_rsign_rprelu",
+      "label": "RSign / RPReLU (ReActNet)",
+      "type": "Algorithm",
+      "summary": "Channel-wise learnable thresholds/slopes for activation distribution reshape; documented, not default in this repo.",
+      "sources": [
+        "arXiv:2003.03488",
+        "docs/13_TRAINING_QAT_DISTILL.md"
+      ],
+      "confidence": 0.9,
+      "status": "documented_not_default"
+    },
+    {
+      "id": "algo_xnor_gemm",
+      "label": "Packed uint64 XNOR+Popcount GEMM",
+      "type": "Algorithm",
+      "summary": "Pre-pack weights once; XOR+popcount accumulate; native MSVC/GCC/portable SIMD + NumPy fallback.",
+      "sources": [
+        "bnn/kernels/",
+        "docs/41_PORTABLE_SIMD_KERNEL.md",
+        "results/benchmark.json"
+      ],
+      "confidence": 1.0,
+      "status": "established"
+    },
+    {
+      "id": "algo_ternary_bitplane",
+      "label": "Ternary Bitplane Pack / GEMM",
+      "type": "Algorithm",
+      "summary": "2-bit / bitplane ternary path for {−1,0,+1}; ~16× compression vs FP32 when packed.",
+      "sources": [
+        "bnn/ternary_pack.py",
+        "results/ternary_pack.json",
+        "tests/golden_floors.json"
+      ],
+      "confidence": 0.9,
+      "status": "established"
+    },
+    {
+      "id": "algo_hybrid_ffn_wrap",
+      "label": "Hybrid FFN-Only Wrap Protocol",
+      "type": "Algorithm",
+      "summary": "Replace FFN Linear with packed binary after short STE QAT; skip embed/attn/lm_head.",
+      "sources": [
+        "results/hybrid_ffn_wrap.json",
+        "docs/12_WRAPPER_AND_EXISTING_MODELS.md",
+        "docs/33_ULTRA_WRAP_LAYER.md"
+      ],
+      "confidence": 0.95,
+      "status": "established"
+    },
+    {
+      "id": "algo_amdahl_calculator",
+      "label": "Amdahl / Speedup Calculators",
+      "type": "Algorithm",
+      "summary": "Machine-checked helpers in bnn.math for S_e2e(f,S_k) and bandwidth bounds.",
+      "sources": [
+        "bnn/math/",
+        "docs/35_BINARY_MATH_EFFECTIVENESS.md"
+      ],
+      "confidence": 1.0,
+      "status": "established"
+    },
+    {
+      "id": "sys_packed_kernels",
+      "label": "Native Packed Kernel Runtime",
+      "type": "System",
+      "summary": "Win/Linux/macOS/ARM portable SIMD dispatch (AVX-512→AVX2→NEON→scalar); OpenMP threads; err=0 vs ±1 FP.",
+      "sources": [
+        "docs/41_PORTABLE_SIMD_KERNEL.md",
+        "results/benchmark.json",
+        "docs/34_COMPUTE_SPEEDUP.md"
+      ],
+      "confidence": 1.0,
+      "status": "established"
+    },
+    {
+      "id": "sys_optimise_api",
+      "label": "bnn.optimise / Public Optimiser API",
+      "type": "System",
+      "summary": "Stable entry: calibrate → policy → optional QAT → pack → report; preferred over legacy wrap --ultra.",
+      "sources": [
+        "docs/api/optimise.md",
+        "bnn/optimise.py",
+        "docs/adr/0001_public_optimiser_api.md"
+      ],
+      "confidence": 0.95,
+      "status": "established"
+    },
+    {
+      "id": "sys_ultra_wrap",
+      "label": "Ultra Wrap Layer",
+      "type": "System",
+      "summary": "Hybrid binary/ternary wrap with calibration, sensitivity, layer search sketch.",
+      "sources": [
+        "docs/33_ULTRA_WRAP_LAYER.md",
+        "results/ultra_wrap.json",
+        "bnn/wrap/"
+      ],
+      "confidence": 0.9,
+      "status": "established"
+    },
+    {
+      "id": "sys_bnnpack",
+      "label": ".bnnpack Codec v1",
+      "type": "System",
+      "summary": "Portable packed weight container encode/decode CLI; v2 schema deferred (moonshot).",
+      "sources": [
+        "docs/api/codec.md",
+        "bnn/codec/packfile.py",
+        "docs/BNNPACK_V2_DESIGN.md"
+      ],
+      "confidence": 0.9,
+      "status": "established"
+    },
+    {
+      "id": "sys_repro_gates",
+      "label": "bnn repro + Golden Floors",
+      "type": "System",
+      "summary": "Machine-checkable gates: compression 32×, native err=0, MNIST/CIFAR/audio floors.",
+      "sources": [
+        "AGENTS.md",
+        "tests/golden_floors.json",
+        "REPRODUCIBILITY.md",
+        "scripts/repro_all.py"
+      ],
+      "confidence": 1.0,
+      "status": "established"
+    },
+    {
+      "id": "sys_seq_encdec",
+      "label": "Encoder–Decoder Seq Lane",
+      "type": "System",
+      "summary": "Toy seq2seq with binary-capable layers; tutorial 06; pedagogy not production NLP.",
+      "sources": [
+        "docs/36_ENCODER_DECODER_AND_NEXT.md",
+        "docs/tutorials/06_encoder_decoder.md",
+        "results/seq2seq_encoder_decoder.json"
+      ],
+      "confidence": 0.9,
+      "status": "established"
+    },
+    {
+      "id": "sys_vision_cifar",
+      "label": "Vision / CIFAR Bi-Real Lane",
+      "type": "System",
+      "summary": "CIFAR-10 Bi-Real CNN: FP 71.14% vs binary 61.14% (10 pp gap); ImageNet protocol stub only.",
+      "sources": [
+        "results/image_cifar.json",
+        "docs/tutorials/04_image_cifar.md",
+        "bnn/vision/"
+      ],
+      "confidence": 0.95,
+      "status": "established"
+    },
+    {
+      "id": "sys_audio_synth",
+      "label": "Audio Synthetic Tones Lane",
+      "type": "System",
+      "summary": "Synthetic tone CNN canary (not ASR); binary can match/exceed FP on this toy task.",
+      "sources": [
+        "results/audio_synth.json",
+        "docs/tutorials/05_audio.md",
+        "bnn/audio/"
+      ],
+      "confidence": 0.9,
+      "status": "established"
+    },
+    {
+      "id": "sys_energy_module",
+      "label": "bnn.energy (Proxy + RAPL Spike)",
+      "type": "System",
+      "summary": "Energy bound from wrap latency; Linux RAPL probe; Windows CLOSED-BY-PROXY.",
+      "sources": [
+        "bnn/energy/",
+        "results/energy_bound.json",
+        "results/energy_rapl_spike.json",
+        "docs/spikes/RAPL_ENERGY_SPIKE.md"
+      ],
+      "confidence": 0.9,
+      "status": "established"
+    },
+    {
+      "id": "tool_bitnet_cpp",
+      "label": "bitnet.cpp",
+      "type": "Tool",
+      "summary": "Microsoft official ternary LLM CPU(+GPU) inference; bridge recipes in scripts/bridges.",
+      "sources": [
+        "docs/23_BITNET_CPP_BRIDGE.md",
+        "arXiv:2410.16144",
+        "third_party/BITNET_PIN.md"
+      ],
+      "confidence": 0.95,
+      "status": "established"
+    },
+    {
+      "id": "tool_gguf_llamacpp",
+      "label": "GGUF / llama.cpp",
+      "type": "Tool",
+      "summary": "Default local CPU LLM path (Q4_K_M etc.) when checkpoint is not BitNet.",
+      "sources": [
+        "docs/22_HF_TO_GGUF_GUIDE.md",
+        "docs/18_DECISION_TREE_AND_COMPLETE_ROADMAP.md"
+      ],
+      "confidence": 0.95,
+      "status": "established"
+    },
+    {
+      "id": "tool_torchao",
+      "label": "torchao (FP8/INT4/INT8)",
+      "type": "Tool",
+      "summary": "PyTorch native quant stack for GPU serve; bridge JSON in results/bridge_gpu_torchao.json.",
+      "sources": [
+        "docs/24_GPU_INT4_FP8_LANE.md",
+        "results/bridge_gpu_torchao.json"
+      ],
+      "confidence": 0.9,
+      "status": "established"
+    },
+    {
+      "id": "tool_vllm_trt",
+      "label": "vLLM / TensorRT / SGLang",
+      "type": "Tool",
+      "summary": "Production NVIDIA LLM serve; prefer FP8/AWQ-INT4 over classic BNN simulation.",
+      "sources": [
+        "docs/18_DECISION_TREE_AND_COMPLETE_ROADMAP.md",
+        "docs/24_GPU_INT4_FP8_LANE.md"
+      ],
+      "confidence": 0.9,
+      "status": "established"
+    },
+    {
+      "id": "tool_larq",
+      "label": "Larq + Larq Compute Engine",
+      "type": "Tool",
+      "summary": "TF/Keras BNN training (Larq) + TFLite custom ops for ARM BGEMM (LCE). Hand-tuned tiling/vectorization/multithreading; documented 8.5–18.5× class wins on Pixel/RPi vs FP baselines in ecosystem surveys. Upstream Larq archived ~2026 — pin commit / vendor fork. Best stock path for mobile **CPU** W+A binary CNNs. Not a BitNet LLM stack.",
+      "sources": [
+        "arXiv:2011.09398",
+        "docs/16_ECOSYSTEM_AND_TOOLING.md",
+        "docs/02_SOTA_SURVEY.md",
+        "https://github.com/larq/compute-engine",
+        "https://docs.larq.dev/"
+      ],
+      "confidence": 0.88,
+      "status": "merged",
+      "enrichment_id": "tool.larq_lce"
+    },
+    {
+      "id": "tool_brevitas_finn",
+      "label": "Brevitas → FINN",
+      "type": "Tool",
+      "summary": "Brevitas (Xilinx/AMD): PyTorch QAT/PTQ with per-tensor bitwidth control including 1-bit; QuantConv/Linear/MHA/RNN. Export ONNX into FINN for FPGA dataflow. End-to-end: train in Brevitas → tidy/streamline → HW layers → fold for FPS target → Vivado/PYNQ deploy. Preferred industrial vision edge path when FPGA available. Heavy vs this repo's teaching kernels.",
+      "sources": [
+        "docs/14_HARDWARE_AND_ENERGY.md",
+        "docs/18_DECISION_TREE_AND_COMPLETE_ROADMAP.md",
+        "https://github.com/Xilinx/brevitas",
+        "https://finn-dev.readthedocs.io/en/latest/end_to_end_flow.html",
+        "docs/16_ECOSYSTEM_AND_TOOLING.md"
+      ],
+      "confidence": 0.9,
+      "status": "merged",
+      "enrichment_id": "tool.brevitas_finn"
+    },
+    {
+      "id": "tool_tflite_openvino_ort",
+      "label": "TFLite / OpenVINO / ORT INT8",
+      "type": "Tool",
+      "summary": "Default edge/CPU INT8 paths when retrain-for-binary is unavailable.",
+      "sources": [
+        "docs/18_DECISION_TREE_AND_COMPLETE_ROADMAP.md",
+        "docs/16_ECOSYSTEM_AND_TOOLING.md"
+      ],
+      "confidence": 0.9,
+      "status": "established"
+    },
+    {
+      "id": "hw_cpu_x86_popcnt",
+      "label": "x86 POPCNT / Portable SIMD CPU",
+      "type": "Hardware",
+      "summary": "Primary honest demo target for this lab; MSVC __popcnt64 + OpenMP + AVX2/512 dispatch.",
+      "sources": [
+        "docs/14_HARDWARE_AND_ENERGY.md",
+        "docs/41_PORTABLE_SIMD_KERNEL.md",
+        "results/benchmark.json"
+      ],
+      "confidence": 1.0,
+      "status": "established"
+    },
+    {
+      "id": "hw_arm_neon",
+      "label": "ARM NEON / CNT",
+      "type": "Hardware",
+      "summary": "Edge phone CPU path; LCE and bitnet.cpp report multi-×; portable NEON in docs/41.",
+      "sources": [
+        "docs/41_PORTABLE_SIMD_KERNEL.md",
+        "docs/spikes/ARM_NEON_SPIKE.md",
+        "arXiv:2011.09398"
+      ],
+      "confidence": 0.9,
+      "status": "established"
+    },
+    {
+      "id": "hw_nvidia_gpu",
+      "label": "NVIDIA Datacenter GPU (Tensor Cores)",
+      "type": "Hardware",
+      "summary": "Prefer INT4/FP8 serve; forbid claiming 32× from sign() BNNs.",
+      "sources": [
+        "docs/14_HARDWARE_AND_ENERGY.md",
+        "docs/24_GPU_INT4_FP8_LANE.md",
+        "ROADMAP.md"
+      ],
+      "confidence": 1.0,
+      "status": "established"
+    },
+    {
+      "id": "hw_phone_npu",
+      "label": "Phone NPU (HTP / ANE / Ethos-U)",
+      "type": "Hardware",
+      "summary": "INT8-first stock SDKs; custom Hexagon for BitNet ternary is non-trivial.",
+      "sources": [
+        "docs/20_NPU_VENDOR_CLOSURE.md"
+      ],
+      "confidence": 1.0,
+      "status": "established"
+    },
+    {
+      "id": "hw_fpga_finn",
+      "label": "FPGA via FINN",
+      "type": "Hardware",
+      "summary": "Native binary datapath; extreme FPS/W on small nets; LLM-scale still research.",
+      "sources": [
+        "docs/14_HARDWARE_AND_ENERGY.md"
+      ],
+      "confidence": 0.85,
+      "status": "established"
+    },
+    {
+      "id": "result_kernel_speedups",
+      "label": "Measured Kernel Speedups (benchmark.json)",
+      "type": "Result",
+      "summary": "Prepacked compute vs NumPy FP32: ~12× (2048), ~24× (4096), ~29× (8192); err=0; fake_binary slower than torch FP (~1.4× slower ratio).",
+      "sources": [
+        "results/benchmark.json",
+        "results/SUMMARY.md"
+      ],
+      "confidence": 1.0,
+      "status": "established"
+    },
+    {
+      "id": "result_openmp_scaling",
+      "label": "OpenMP Thread Scaling Curve",
+      "type": "Result",
+      "summary": "Thread scaling recorded per shape; gains taper / can regress at 8 threads on some shapes (overhead / memory). Dual-metric: report threads with S_compute.",
+      "sources": [
+        "results/benchmark.json",
+        "docs/34_COMPUTE_SPEEDUP.md"
+      ],
+      "confidence": 0.95,
+      "status": "established"
+    },
+    {
+      "id": "result_mnist",
+      "label": "MNIST Accuracies (committed)",
+      "type": "Result",
+      "summary": "fp32_mlp 97.67%, binary_mlp 96.36%, ternary_mlp 97.16% — within golden floors.",
+      "sources": [
+        "results/train_results.json",
+        "tests/golden_floors.json"
+      ],
+      "confidence": 1.0,
+      "status": "established"
+    },
+    {
+      "id": "result_cifar",
+      "label": "CIFAR-10 Bi-Real Gap",
+      "type": "Result",
+      "summary": "FP CNN 71.14% vs Bi-Real binary 61.14% (10.00 pp) — canary not ImageNet SOTA.",
+      "sources": [
+        "results/image_cifar.json",
+        "tests/golden_floors.json"
+      ],
+      "confidence": 1.0,
+      "status": "established"
+    },
+    {
+      "id": "result_audio",
+      "label": "Audio Synth Accuracies",
+      "type": "Result",
+      "summary": "FP 94.5% vs binary 96.0% on synthetic tones; NOT production ASR.",
+      "sources": [
+        "results/audio_synth.json",
+        "tests/golden_floors.json"
+      ],
+      "confidence": 0.95,
+      "status": "established"
+    },
+    {
+      "id": "result_wrap_e2e",
+      "label": "Wrap Demo E2E Latency",
+      "type": "Result",
+      "summary": "FP 34.14 ms → wrapped 7.09 ms (e2e ~4.82×); weight compression 32×; cosine ~0.31 without QAT.",
+      "sources": [
+        "results/wrap_demo.json",
+        "results/SUMMARY.md"
+      ],
+      "confidence": 1.0,
+      "status": "established"
+    },
+    {
+      "id": "result_hybrid_ffn",
+      "label": "Hybrid FFN Wrap Evidence",
+      "type": "Result",
+      "summary": "Replaced ffn_fc1/fc2 only; 32× on replaced weights; skipped attn/embed/lm_head; STE sketch→packed closed architecture gap.",
+      "sources": [
+        "results/hybrid_ffn_wrap.json"
+      ],
+      "confidence": 0.95,
+      "status": "established"
+    },
+    {
+      "id": "result_energy_bound",
+      "label": "Energy Bound Proxy Result",
+      "type": "Result",
+      "summary": "Latency-only same-power energy reduction ~4.82×; with assumed P brackets ~6.74×; board_joules_status CLOSED-BY-PROXY.",
+      "sources": [
+        "results/energy_bound.json"
+      ],
+      "confidence": 0.9,
+      "status": "established"
+    },
+    {
+      "id": "result_ste_compare",
+      "label": "STE / ApproxSign / TanhSoft Compare",
+      "type": "Result",
+      "summary": "Gradient cosines and short train curves; ApproxSign closer to sharp teacher (0.83 vs STE 0.60).",
+      "sources": [
+        "results/math_ste_compare.json",
+        "docs/35_BINARY_MATH_EFFECTIVENESS.md"
+      ],
+      "confidence": 0.95,
+      "status": "established"
+    },
+    {
+      "id": "metric_s_compute",
+      "label": "S_compute (Prepacked Kernel Speedup)",
+      "type": "Metric",
+      "summary": "Wall-clock of packed GEMM vs FP baseline with weights pre-packed once.",
+      "sources": [
+        "docs/06_CALCULATED_SPEEDUP_MODEL.md",
+        "docs/FAIR_EVAL_PROTOCOL.md"
+      ],
+      "confidence": 1.0,
+      "status": "established"
+    },
+    {
+      "id": "metric_s_e2e",
+      "label": "S_e2e (End-to-End Speedup)",
+      "type": "Metric",
+      "summary": "Whole-forward wall-clock including act pack / non-binary layers.",
+      "sources": [
+        "docs/06_CALCULATED_SPEEDUP_MODEL.md",
+        "results/wrap_demo.json"
+      ],
+      "confidence": 1.0,
+      "status": "established"
+    },
+    {
+      "id": "data_mnist",
+      "label": "MNIST",
+      "type": "Dataset",
+      "summary": "Primary tiny accuracy canary; floors in golden_floors.json.",
+      "sources": [
+        "docs/DATASET_CARDS.md",
+        "tests/golden_floors.json"
+      ],
+      "confidence": 1.0,
+      "status": "established"
+    },
+    {
+      "id": "data_cifar10",
+      "label": "CIFAR-10",
+      "type": "Dataset",
+      "summary": "Vision Bi-Real proxy; subset+epochs committed for repro.",
+      "sources": [
+        "docs/DATASET_CARDS.md",
+        "results/image_cifar.json"
+      ],
+      "confidence": 1.0,
+      "status": "established"
+    },
+    {
+      "id": "data_audio_synth",
+      "label": "Synthetic Audio Tones",
+      "type": "Dataset",
+      "summary": "Pedagogy dataset; not LibriSpeech/ASR.",
+      "sources": [
+        "docs/DATASET_CARDS.md",
+        "results/audio_synth.json"
+      ],
+      "confidence": 0.95,
+      "status": "established"
+    },
+    {
+      "id": "data_imagenet",
+      "label": "ImageNet (protocol stub only)",
+      "type": "Dataset",
+      "summary": "Full ImageNet SOTA is explicit non-goal; protocol folder stub for future.",
+      "sources": [
+        "docs/imagenet_protocol.md",
+        "docs/MOONSHOT_DEFERRALS.md",
+        "ROADMAP.md"
+      ],
+      "confidence": 0.8,
+      "status": "non_goal_gate"
+    },
+    {
+      "id": "decision_wrap_tree",
+      "label": "Goal × Hardware Decision Tree",
+      "type": "Decision",
+      "summary": "GPU datacenter LLM serve (2024–2026): prefer FP8/INT4 via torchao, AWQ, GPTQ, vLLM/TensorRT — Tensor Cores beat research XNOR. AWQ protects salient weights via activation magnitude (~1% channels); GPTQ second-order weight fit — GPTQ can overfit calib domain more than AWQ. CPU/edge LLM: BitNet b1.58 + bitnet.cpp. Mobile NPU: stock INT8/INT4, not XNOR. Vision MCU/FPGA fixed topology: FINN/Larq binary. Hybrid: PTQ INT4 for GPU API + ternary FFN on CPU rare; usually pick one stack. Binary rarely wins end-to-end on NVIDIA TC GPUs (arXiv:1911.04477).",
+      "sources": [
+        "docs/18_DECISION_TREE_AND_COMPLETE_ROADMAP.md",
+        "docs/25_ONEPAGER.md",
+        "docs/32_NOVEL_PAPER_CANDIDATES.md",
+        "https://arxiv.org/abs/2306.00978",
+        "https://arxiv.org/abs/2210.17323",
+        "docs/16_ECOSYSTEM_AND_TOOLING.md",
+        "docs/02_SOTA_SURVEY.md"
+      ],
+      "confidence": 1.0,
+      "status": "merged",
+      "enrichment_id": "decision.awq_gptq_vs_binary"
+    },
+    {
+      "id": "decision_prefer_optimise",
+      "label": "Prefer bnn optimise over wrap --ultra",
+      "type": "Decision",
+      "summary": "Public API / docs should guide users to optimise; ultra remains legacy surface.",
+      "sources": [
+        "AGENTS.md",
+        "docs/GUIDE_E2E.md",
+        "docs/adr/0001_public_optimiser_api.md"
+      ],
+      "confidence": 1.0,
+      "status": "established"
+    },
+    {
+      "id": "decision_onnx_defer",
+      "label": "Defer Full ONNX Custom-Op Runtime",
+      "type": "Decision",
+      "summary": "Keep .bnnpack + bridges; revisit ORT custom ops only if consumer demands measured dual metrics.",
+      "sources": [
+        "docs/MOONSHOT_DEFERRALS.md"
+      ],
+      "confidence": 0.95,
+      "status": "established"
+    },
+    {
+      "id": "decision_no_gpu_32x",
+      "label": "Forbidden: GPU 32× from sign()",
+      "type": "Decision",
+      "summary": "Immutable non-goal / thesis lock forever.",
+      "sources": [
+        "ROADMAP.md",
+        "AGENTS.md"
+      ],
+      "confidence": 1.0,
+      "status": "locked"
+    },
+    {
+      "id": "roadmap_v030",
+      "label": "v0.3.0 Lab Complete (Phases C+D)",
+      "type": "Decision",
+      "summary": "Portable SIMD delivered; WC-K3 met; public optimiser preview; community OSS files present.",
+      "sources": [
+        "docs/40_ROADMAP_E2E_SESSION.md",
+        "CHANGELOG.md",
+        "ROADMAP.md"
+      ],
+      "confidence": 0.95,
+      "status": "established"
+    },
+    {
+      "id": "gap_wasm",
+      "label": "OpenGap: WASM SIMD Demo",
+      "type": "OpenGap",
+      "summary": "Optional browser pedagogy (W2.T06); not blocking v1.0 core.",
+      "sources": [
+        "docs/MOONSHOT_DEFERRALS.md",
+        "docs/spikes/WASM_SIMD.md"
+      ],
+      "confidence": 0.8,
+      "status": "open"
+    },
+    {
+      "id": "gap_bnnpack_v2",
+      "label": "OpenGap: .bnnpack v2 + safetensors",
+      "type": "OpenGap",
+      "summary": "Schema ADR + hashes + ternary meta + safetensors export still deferred.",
+      "sources": [
+        "docs/MOONSHOT_DEFERRALS.md",
+        "docs/BNNPACK_V2_DESIGN.md"
+      ],
+      "confidence": 0.85,
+      "status": "open"
+    },
+    {
+      "id": "gap_distill_integration",
+      "label": "OpenGap: Distill Integration (W3.T08)",
+      "type": "OpenGap",
+      "summary": "distill_sketch.py exists; full BitDistill-scale integration not shipped.",
+      "sources": [
+        "docs/MOONSHOT_DEFERRALS.md",
+        "results/distill_sketch.json"
+      ],
+      "confidence": 0.85,
+      "status": "open"
+    },
+    {
+      "id": "gap_pypi_trusted",
+      "label": "OpenGap: First PyPI Trusted Publisher Upload",
+      "type": "OpenGap",
+      "summary": "wheels.yml + docs ready; first bnn-lab upload via Trusted Publishing pending manual link.",
+      "sources": [
+        "docs/PYPI_PUBLISH.md",
+        "ROADMAP.md"
+      ],
+      "confidence": 0.9,
+      "status": "open"
+    },
+    {
+      "id": "gap_litespark_local",
+      "label": "OpenGap: Local Litespark / Sparse-BitNet Numbers",
+      "type": "OpenGap",
+      "summary": "Survey cites extreme SIMD/sparse gains; this lab has not reproduced — no invented metrics.",
+      "sources": [
+        "docs/02_SOTA_SURVEY.md",
+        "arXiv:2605.06485",
+        "arXiv:2603.05168"
+      ],
+      "confidence": 0.7,
+      "status": "open"
+    },
+    {
+      "id": "gap_imagenet_sota",
+      "label": "OpenGap / Non-goal: Full ImageNet SOTA Schedule",
+      "type": "OpenGap",
+      "summary": "Explicitly accepted non-goal for gates; protocol stub only.",
+      "sources": [
+        "ROADMAP.md",
+        "docs/MOONSHOT_DEFERRALS.md"
+      ],
+      "confidence": 0.95,
+      "status": "accepted_non_goal"
+    },
+    {
+      "id": "gap_rapl_windows",
+      "label": "OpenGap: Windows Board Joules (RAPL)",
+      "type": "OpenGap",
+      "summary": "Linux RAPL spike delivered; Windows remains energy-proxy; no fake RAPL claims.",
+      "sources": [
+        "docs/spikes/RAPL_ENERGY_SPIKE.md",
+        "results/energy_rapl_spike.json"
+      ],
+      "confidence": 0.9,
+      "status": "closed_by_proxy_on_windows"
+    },
+    {
+      "id": "gap_venue_submit",
+      "label": "OpenGap: Venue Submission of B1–B3",
+      "type": "OpenGap",
+      "summary": "Idea vault + sources only; no venue LaTeX yet; claims must match measured goldens.",
+      "sources": [
+        "docs/32_NOVEL_PAPER_CANDIDATES.md",
+        "docs/PUBLICATION_PLAN.md"
+      ],
+      "confidence": 0.85,
+      "status": "open"
+    },
+    {
+      "id": "gap_reactnet_in_repo",
+      "label": "OpenGap: Full ReActNet RSign/RPReLU in bnn.ste",
+      "type": "OpenGap",
+      "summary": "Documented in training docs; not default implementation — ApproxSign/STE shipped.",
+      "sources": [
+        "docs/13_TRAINING_QAT_DISTILL.md",
+        "arXiv:2003.03488"
+      ],
+      "confidence": 0.8,
+      "status": "open"
+    },
+    {
+      "id": "concept_ste_vs_inference",
+      "label": "STE Training ≠ Inference Throughput",
+      "type": "Concept",
+      "summary": "Training keeps FP latents + surrogate grads; measured speed needs packed inference kernels.",
+      "sources": [
+        "ROADMAP.md",
+        "docs/05_PERFECTED_CONCEPT.md",
+        "docs/13_TRAINING_QAT_DISTILL.md"
+      ],
+      "confidence": 1.0,
+      "status": "established"
+    },
+    {
+      "id": "concept_fp_shortcuts",
+      "label": "Full-Precision Residual Shortcuts",
+      "type": "Concept",
+      "summary": "Bi-Real/ReActNet pattern: restore information past sign bottlenecks.",
+      "sources": [
+        "arXiv:1808.00278",
+        "arXiv:2003.03488",
+        "docs/03_FAILURE_ANALYSIS.md"
+      ],
+      "confidence": 1.0,
+      "status": "established"
+    },
+    {
+      "id": "concept_ternary_zero_gate",
+      "label": "Ternary Zero as Feature Gate",
+      "type": "Concept",
+      "summary": "BitNet b1.58 insight: explicit 0 enables filtering and closes quality gap vs pure ±1.",
+      "sources": [
+        "arXiv:2402.17764",
+        "docs/02_SOTA_SURVEY.md"
+      ],
+      "confidence": 0.95,
+      "status": "established"
+    },
+    {
+      "id": "concept_prepack_once",
+      "label": "Fair Bench: Pre-pack Weights Once",
+      "type": "Concept",
+      "summary": "Re-packing every forward creates false slowdowns; goldens require prepacked timing.",
+      "sources": [
+        "docs/06_CALCULATED_SPEEDUP_MODEL.md",
+        "paper_b2_packed_xnor",
+        "results/benchmark.json"
+      ],
+      "confidence": 1.0,
+      "status": "established"
+    },
+    {
+      "id": "org_microsoft_bitnet",
+      "label": "Microsoft BitNet Team",
+      "type": "PersonOrg",
+      "summary": "BitNet / b1.58 / bitnet.cpp / BitDistill / 2B4T line of work.",
+      "sources": [
+        "arXiv:2310.11453",
+        "arXiv:2402.17764",
+        "arXiv:2410.16144",
+        "arXiv:2510.13998"
+      ],
+      "confidence": 0.95,
+      "status": "established"
+    },
+    {
+      "id": "org_plumerai_larq",
+      "label": "Plumerai / Larq",
+      "type": "PersonOrg",
+      "summary": "Larq training + Larq Compute Engine BNN deploy stack.",
+      "sources": [
+        "arXiv:2011.09398",
+        "docs/16_ECOSYSTEM_AND_TOOLING.md"
+      ],
+      "confidence": 0.85,
+      "status": "established"
+    },
+    {
+      "id": "paper_binaryconnect",
+      "label": "BinaryConnect (Courbariaux et al. 2015)",
+      "type": "Paper",
+      "summary": "Binary weights only, FP activations — memory win, limited compute win.",
+      "sources": [
+        "docs/02_SOTA_SURVEY.md",
+        "docs/13_TRAINING_QAT_DISTILL.md"
+      ],
+      "confidence": 0.95,
+      "status": "established"
+    },
+    {
+      "id": "paper_dorefa",
+      "label": "DoReFa-Net (Zhou et al. 2016)",
+      "type": "Paper",
+      "summary": "Flexible multi-bit QAT for weights and activations.",
+      "sources": [
+        "docs/02_SOTA_SURVEY.md",
+        "docs/13_TRAINING_QAT_DISTILL.md"
+      ],
+      "confidence": 0.9,
+      "status": "established"
+    },
+    {
+      "id": "paper_fbi_llm",
+      "label": "FBI-LLM: Fully Binarized LLMs (Ma et al. 2024)",
+      "type": "Paper",
+      "summary": "Scale fully binarized LLMs from scratch via autoregressive distillation.",
+      "sources": [
+        "arXiv:2407.07093"
+      ],
+      "confidence": 0.8,
+      "status": "literature",
+      "arxiv": "2407.07093"
+    },
+    {
+      "id": "paper_bitnet_v2",
+      "label": "BitNet v2 (Wang et al. 2025)",
+      "type": "Paper",
+      "summary": "H-BitLinear with online Hadamard transform for native 4-bit activations on 1-bit LLMs.",
+      "sources": [
+        "arXiv:2504.18415"
+      ],
+      "confidence": 0.85,
+      "status": "established",
+      "arxiv": "2504.18415"
+    },
+    {
+      "id": "method_tmac",
+      "label": "T-MAC / LUT Ternary Kernels",
+      "type": "Method",
+      "summary": "Lookup-table / conditional-add kernels for ternary matmul on CPU; complementary to bitnet.cpp.",
+      "sources": [
+        "docs/02_SOTA_SURVEY.md",
+        "docs/16_ECOSYSTEM_AND_TOOLING.md"
+      ],
+      "confidence": 0.75,
+      "status": "literature"
+    },
+    {
+      "id": "method_surge",
+      "label": "SURGE / DPGC Learnable Surrogate Gradients",
+      "type": "Method",
+      "summary": "ICML 2026 learnable dual-path surrogate gradients addressing STE mismatch; not in-repo.",
+      "sources": [
+        "docs/02_SOTA_SURVEY.md",
+        "docs/03_FAILURE_ANALYSIS.md",
+        "docs/13_TRAINING_QAT_DISTILL.md"
+      ],
+      "confidence": 0.7,
+      "status": "literature"
+    },
+    {
+      "id": "method_absmean_ptq",
+      "label": "Absmean PTQ for Ternary",
+      "type": "Method",
+      "summary": "Naive absmean PTQ of FP→ternary — insufficient for chat LLMs; antithesis of BitDistill.",
+      "sources": [
+        "docs/18_DECISION_TREE_AND_COMPLETE_ROADMAP.md"
+      ],
+      "confidence": 0.9,
+      "status": "established"
+    },
+    {
+      "id": "sys_guide_e2e",
+      "label": "GUIDE_E2E User Narrative",
+      "type": "System",
+      "summary": "Primary human path: install → repro → optimise → encode/decode → modalities → metrics.",
+      "sources": [
+        "docs/GUIDE_E2E.md",
+        "docs/39_GUIDE_E2E_COMPLETION.md",
+        "AGENTS.md"
+      ],
+      "confidence": 1.0,
+      "status": "established"
+    },
+    {
+      "id": "sys_wrap_policy",
+      "label": "Auto Wrap Policy (binary/ternary/skip)",
+      "type": "System",
+      "summary": "policy.py chooses binary vs ternary vs skip with reasons; sensitivity + layer search sketches.",
+      "sources": [
+        "bnn/wrap/policy.py",
+        "docs/42_QAT_AND_LAYER_SEARCH.md",
+        "results/ultra_wrap.json"
+      ],
+      "confidence": 0.9,
+      "status": "established"
+    },
+    {
+      "id": "sys_calibrate_qat",
+      "label": "Calibration + Short QAT Path",
+      "type": "System",
+      "summary": "wrap/calibrate.py + wrap/qat.py; short STE QAT improves cosine vs cold PTQ on demos.",
+      "sources": [
+        "bnn/wrap/calibrate.py",
+        "bnn/wrap/qat.py",
+        "docs/42_QAT_AND_LAYER_SEARCH.md",
+        "docs/api/wrap.md"
+      ],
+      "confidence": 0.9,
+      "status": "established"
+    },
+    {
+      "id": "sys_profile_pareto",
+      "label": "Profile + Pareto + Memory Report",
+      "type": "System",
+      "summary": "Dual-metric profiling, Pareto fronts, memory footprint report (arena measured & declined).",
+      "sources": [
+        "bnn/profile.py",
+        "docs/43_MEMORY_FOOTPRINT.md",
+        "results/profile.json"
+      ],
+      "confidence": 0.9,
+      "status": "established"
+    },
+    {
+      "id": "sys_hf_optimiser",
+      "label": "Hugging Face Optimiser UX",
+      "type": "System",
+      "summary": "Tutorial 08 + optional hf tests: load → calibrate → policy → encode → report.",
+      "sources": [
+        "docs/tutorials/08_HF_OPTIMISER.md",
+        "results/hf_tiny_wrap.json",
+        "ROADMAP.md"
+      ],
+      "confidence": 0.9,
+      "status": "established"
+    },
+    {
+      "id": "sys_bridge_recipes",
+      "label": "Bridge Recipes (torchao / llama.cpp / bitnet)",
+      "type": "System",
+      "summary": "scripts/bridges/* with committed JSON results — first-class 'use this instead when…'.",
+      "sources": [
+        "docs/23_BITNET_CPP_BRIDGE.md",
+        "docs/24_GPU_INT4_FP8_LANE.md",
+        "results/bridge_gpu_torchao.json",
+        "results/bridge_cpu_llamacpp_bitnet.json"
+      ],
+      "confidence": 0.9,
+      "status": "established"
+    },
+    {
+      "id": "result_ultra_wrap",
+      "label": "Ultra Wrap Suite Goldens",
+      "type": "Result",
+      "summary": "Binary compression 32×; ternary 16×; ternary cosine ≥0.85; hybrid cosine ≥0.55 floors.",
+      "sources": [
+        "results/ultra_wrap.json",
+        "tests/golden_floors.json"
+      ],
+      "confidence": 0.95,
+      "status": "established"
+    },
+    {
+      "id": "result_robustness_fgsm",
+      "label": "FGSM Robustness Canary",
+      "type": "Result",
+      "summary": "Binary MLP drop comparable to FP on FGSM canary — not a robustness SOTA claim.",
+      "sources": [
+        "results/robustness_fgsm.json",
+        "results/SUMMARY.md",
+        "docs/17_EVALUATION_ROBUSTNESS_ECONOMICS.md"
+      ],
+      "confidence": 0.85,
+      "status": "established"
+    },
+    {
+      "id": "result_ternary_pack",
+      "label": "Ternary Pack Compression Result",
+      "type": "Result",
+      "summary": "Committed ternary pack measurements; floor 16× exact when packed.",
+      "sources": [
+        "results/ternary_pack.json",
+        "tests/golden_floors.json"
+      ],
+      "confidence": 0.9,
+      "status": "established"
+    },
+    {
+      "id": "metric_cosine_vs_fp",
+      "label": "Output Cosine vs FP Reference",
+      "type": "Metric",
+      "summary": "Drop-in honesty metric; low cosine without QAT expected — never claim transparent wrap.",
+      "sources": [
+        "results/wrap_demo.json",
+        "tests/golden_floors.json",
+        "docs/FAIR_EVAL_PROTOCOL.md"
+      ],
+      "confidence": 1.0,
+      "status": "established"
+    },
+    {
+      "id": "metric_energy_proxy_ratio",
+      "label": "energy_proxy Relative Ratio",
+      "type": "Metric",
+      "summary": "Pareto field: fp=1.0, binary=E_bin/E_fp from proxy or RAPL spike.",
+      "sources": [
+        "results/energy_bound.json",
+        "docs/spikes/RAPL_ENERGY_SPIKE.md"
+      ],
+      "confidence": 0.9,
+      "status": "established"
+    },
+    {
+      "id": "concept_sim_vs_packed",
+      "label": "Sim Mode vs Packed Mode Separation",
+      "type": "Concept",
+      "summary": "Trainable STE simulation must not be timed as acceleration; packed mode is the speed path.",
+      "sources": [
+        "docs/03_FAILURE_ANALYSIS.md",
+        "docs/05_PERFECTED_CONCEPT.md"
+      ],
+      "confidence": 1.0,
+      "status": "established"
+    },
+    {
+      "id": "concept_word_vs_wallclock",
+      "label": "Op-Count Speedup vs Wall-Clock",
+      "type": "Concept",
+      "summary": "Explicit contradiction pair: theoretical word reduction / packing factor ≠ measured latency.",
+      "sources": [
+        "results/SUMMARY.md",
+        "docs/06_CALCULATED_SPEEDUP_MODEL.md",
+        "paper_b1_honest_speedup"
+      ],
+      "confidence": 1.0,
+      "status": "established"
+    },
+    {
+      "id": "hw_wasm",
+      "label": "WebAssembly SIMD (deferred)",
+      "type": "Hardware",
+      "summary": "Browser pedagogy target; spike notes exist; not shipped as gate.",
+      "sources": [
+        "docs/spikes/WASM_SIMD.md",
+        "docs/MOONSHOT_DEFERRALS.md"
+      ],
+      "confidence": 0.7,
+      "status": "deferred"
+    },
+    {
+      "id": "decision_int8_npu_first",
+      "label": "INT8-First on Stock Phone NPU",
+      "type": "Decision",
+      "summary": "Product rule from vendor closure: stock SDK → INT8/INT4; 1-bit → CPU LCE/lab or FPGA FINN.",
+      "sources": [
+        "docs/20_NPU_VENDOR_CLOSURE.md",
+        "docs/18_DECISION_TREE_AND_COMPLETE_ROADMAP.md"
+      ],
+      "confidence": 1.0,
+      "status": "established"
+    },
+    {
+      "id": "decision_fair_eval",
+      "label": "Fair Eval Protocol (published shapes only)",
+      "type": "Decision",
+      "summary": "No invented goldens; same shapes / same conclusions; floats need not be bit-identical.",
+      "sources": [
+        "docs/FAIR_EVAL_PROTOCOL.md",
+        "AGENTS.md",
+        "tests/golden_floors.json"
+      ],
+      "confidence": 1.0,
+      "status": "established"
+    },
+    {
+      "id": "gap_layer_search_full",
+      "label": "OpenGap: Full Layer-wise Binary/Ternary Search",
+      "type": "OpenGap",
+      "summary": "Sensitivity scores exist (W3.T05); full search W3.T06 still enrichable.",
+      "sources": [
+        "docs/MOONSHOT_DEFERRALS.md",
+        "docs/42_QAT_AND_LAYER_SEARCH.md"
+      ],
+      "confidence": 0.8,
+      "status": "open"
+    },
+    {
+      "id": "gap_bitnet_submodule",
+      "label": "OpenGap: bitnet.cpp as Git Submodule",
+      "type": "OpenGap",
+      "summary": "Vendor pin/size; keep bridge recipe scripts instead of vendoring full tree.",
+      "sources": [
+        "docs/MOONSHOT_DEFERRALS.md",
+        "third_party/BITNET_PIN.md"
+      ],
+      "confidence": 0.85,
+      "status": "open"
+    },
+    {
+      "id": "gap_fbi_llm_repro",
+      "label": "OpenGap: FBI-LLM / Full Binary LLM Repro",
+      "type": "OpenGap",
+      "summary": "Literature path for fully binary LLMs; not a lab gate; cite only.",
+      "sources": [
+        "arXiv:2407.07093",
+        "ROADMAP.md non-goals"
+      ],
+      "confidence": 0.75,
+      "status": "open"
+    },
+    {
+      "id": "tool_executorch",
+      "label": "ExecuTorch / Mobile Deployment",
+      "type": "Tool",
+      "summary": "Mobile deploy path typically torchao INT4/8 — not classic 1-bit XNOR.",
+      "sources": [
+        "docs/14_HARDWARE_AND_ENERGY.md",
+        "docs/16_ECOSYSTEM_AND_TOOLING.md"
+      ],
+      "confidence": 0.8,
+      "status": "established"
+    },
+    {
+      "id": "dataset_glue_downstream",
+      "label": "Downstream NLP Tasks (GLUE-class)",
+      "type": "Dataset",
+      "summary": "BitDistill evaluates task-specific ternary FT; not run as lab golden.",
+      "sources": [
+        "arXiv:2510.13998"
+      ],
+      "confidence": 0.7,
+      "status": "literature"
+    },
+    {
+      "id": "paper.bireal.eccv2018",
+      "label": "Bi-Real Net (ECCV 2018 / IJCV)",
+      "type": "Paper",
+      "summary": "1-bit CNN with full-precision identity shortcuts around every binary conv (≈2× real-valued paths vs BinaryNet). ApproxSign piecewise-polynomial STE. ImageNet ResNet-18: 56.4% top-1 / 79.5% top-5 (vs XNOR-Net 51.2% / BinaryNet 42.2% / FP ResNet-18 ~69.3%). ResNet-34: 62.2% top-1 / 83.9% top-5. Codes: github.com/liuzechun/Bi-Real-net. Lab uses Bi-Real residuals on MNIST/CIFAR proxies; full ImageNet train is ACCEPTED-NON-GOAL.",
+      "sources": [
+        "https://arxiv.org/abs/1808.00278",
+        "https://arxiv.org/abs/1811.01335",
+        "docs/02_SOTA_SURVEY.md",
+        "docs/03_FAILURE_ANALYSIS.md"
+      ],
+      "confidence": 0.95,
+      "status": "merged",
+      "lab_alias": "paper_bireal"
+    },
+    {
+      "id": "paper.real2bin.iclr2020",
+      "label": "Real-to-Binary Network (ICLR 2020)",
+      "type": "Paper",
+      "summary": "Martinez et al. train binary ResNet-18 via progressive attention matching to a real teacher + data-driven gating/re-scaling of binary-conv outputs using pre-binarization real activations. ImageNet top-1 **65.4%** / top-5 **86.2%** (strong baseline alone 60.9%); FP ResNet-18 69.3% → ~3.9 pp gap. CIFAR-100 Real-to-Bin** 76.2%. arXiv:2003.11535; OpenReview BJg4NgBKvH; code github.com/brais-martinez/real2binary. Often cited loosely as 'Real-to-Bin' without ID — strengthen all lab refs to this paper.",
+      "sources": [
+        "https://arxiv.org/abs/2003.11535",
+        "https://openreview.net/forum?id=BJg4NgBKvH",
+        "https://github.com/brais-martinez/real2binary"
+      ],
+      "confidence": 0.95,
+      "status": "verified"
+    },
+    {
+      "id": "paper.reactnet.eccv2020",
+      "label": "ReActNet (ECCV 2020)",
+      "type": "Paper",
+      "summary": "Generalizes Sign→RSign and PReLU→RPReLU (learnable channel-wise thresholds/slopes) + distributional KL loss vs real teacher. MobileNetV1-based ReActNet-A: **69.4%** ImageNet top-1 at **0.87×10^8 OPs** (~3.0 pp below real MobileNet twin 72.4%). ReActNet-B 70.1% @ 1.63e8 OPs; ReActNet-C 71.4% @ 2.14e8 OPs. ReAct on Bi-Real-18 → 65.5% (+9.1 pp). Comparison anchors: XNOR 51.2%, Bi-Real-18 56.4%, Real-to-Binary 65.4%, MeliusNet29 65.8%. Two-step training (acts then W+A). Code: github.com/liuzechun/ReActNet. Lab docs say '~71% claimed' — precise figures: A=69.4, C=71.4.",
+      "sources": [
+        "https://arxiv.org/abs/2003.03488",
+        "https://github.com/liuzechun/ReActNet",
+        "docs/02_SOTA_SURVEY.md"
+      ],
+      "confidence": 0.96,
+      "status": "merged",
+      "lab_alias": "paper_reactnet"
+    },
+    {
+      "id": "metric.imagenet.bnn_ladder",
+      "label": "ImageNet 1-bit CNN accuracy ladder",
+      "type": "Metric",
+      "summary": "Canonical ImageNet top-1 ladder for W1A1 (unless noted): BinaryNet 42.2% → XNOR-Net 51.2% → Bi-Real-18 56.4% → Real-to-Binary 65.4% → ReActNet-A 69.4% / ReActNet-C 71.4%. OPs metric = BOPs/64 + FLOPs. Lab should cite this ladder instead of vague 'within 3% of FP MobileNet' alone.",
+      "sources": [
+        "https://arxiv.org/abs/2003.03488",
+        "https://arxiv.org/abs/2003.11535",
+        "https://arxiv.org/abs/1808.00278"
+      ],
+      "confidence": 0.94,
+      "status": "verified"
+    },
+    {
+      "id": "paper.bitnet.2023",
+      "label": "BitNet (1-bit Transformer, 2023)",
+      "type": "Paper",
+      "summary": "Wang et al. replace nn.Linear with BitLinear (1-bit weights, higher-bit acts). Foundational proof that Transformers can train with extreme weight quantization. arXiv:2310.11453. Superseded for quality by ternary BitNet b1.58; keep distinction: original BitNet ≈ ±1, b1.58 adds 0.",
+      "sources": [
+        "https://arxiv.org/abs/2310.11453",
+        "docs/02_SOTA_SURVEY.md"
+      ],
+      "confidence": 0.9,
+      "status": "merged",
+      "lab_alias": "paper_bitnet"
+    },
+    {
+      "id": "paper.bitnet_b158.2024",
+      "label": "BitNet b1.58 (Ma et al., 2024)",
+      "type": "Paper",
+      "summary": "Ternary weights {-1,0,1} via absmean RoundClip; 8-bit activations; LLaMA-alike (RMSNorm, SwiGLU, RoPE, no bias). At equal size+100B RedPajama tokens: 3B BitNet matches FP16 LLaMA twin (PPL 9.91 vs 10.04; avg zero-shot 50.2 vs 49.7) with **3.55×** less memory and **2.71×** lower latency (FasterTransformer+2-bit Ladder kernel on GPU). 70B: **11×** max batch → **8.9×** throughput vs FP16 on 2×A100. Arithmetic energy model: ~**71.4×** lower matmul energy on 7nm (INT8 add vs FP16 mul/add) — chip model, not SoC. Equivalence heuristic: 13B b1.58 cheaper than 3B FP16; 30B vs 7B; 70B vs 13B. Caveat: headline GPU latency/memory from research kernels; production CPU path is bitnet.cpp.",
+      "sources": [
+        "https://arxiv.org/abs/2402.17764",
+        "docs/02_SOTA_SURVEY.md",
+        "docs/14_HARDWARE_AND_ENERGY.md"
+      ],
+      "confidence": 0.95,
+      "status": "merged",
+      "lab_alias": "paper_bitnet_b158"
+    },
+    {
+      "id": "paper.bitnet_a48.2024",
+      "label": "BitNet a4.8 (4-bit activations, 2024)",
+      "type": "Paper",
+      "summary": "Wang/Ma/Wei hybrid: INT4 (or FP4) activations into attention/FFN inputs; TopK sparsify + INT8 on intermediate states (attn out-proj, FFN down). Continue-train from W1.58A8 → W1.58A4 (e.g. 95B+5B tokens). Matches b1.58 quality at same token budget; ~**55%** activated params (7B: 3.4B active); supports **3-bit KV** with negligible avg loss. Enables INT4/FP4 kernels. arXiv:2411.04965. Follow-on: BitNet v2 (arXiv:2504.18415) native 4-bit acts + Hadamard.",
+      "sources": [
+        "https://arxiv.org/abs/2411.04965",
+        "https://arxiv.org/abs/2504.18415"
+      ],
+      "confidence": 0.92,
+      "status": "merged",
+      "lab_alias": "paper_bitnet_a48"
+    },
+    {
+      "id": "paper.bitnet_cpp.2024",
+      "label": "bitnet.cpp / 1-bit AI Infra (2024–2025)",
+      "type": "Paper",
+      "summary": "Wang et al. arXiv:2410.16144 — ternary CPU kernels (TL1/TL2) vs llama.cpp FP16. **Cite carefully with device+thread context:** Apple M2 Ultra unlimited threads: speedup **1.37×–5.07×** (125M→70B); Intel i7-13700H: **2.37×–6.17×**. Energy J/token savings: M2 **55.4%/64.6%/70.0%** (700M/7B/70B); i7 **71.9%/82.2%** (700M/7B). 100B ternary on M2 ~6.58 tok/s unlimited (human-reading class). Lossless vs FP32 kernel on WildChat token match (TL1/TL2 100% vs TQ1_0 1.4%). ACL follow-up arXiv:2502.11880. Official HF: microsoft/bitnet-b1.58-2B-4T (+gguf). Lab docs cite ranges correctly; add hardware footnotes + J/token table.",
+      "sources": [
+        "https://arxiv.org/abs/2410.16144",
+        "https://arxiv.org/abs/2502.11880",
+        "https://github.com/microsoft/BitNet",
+        "https://hf.co/microsoft/bitnet-b1.58-2B-4T",
+        "docs/23_BITNET_CPP_BRIDGE.md"
+      ],
+      "confidence": 0.96,
+      "status": "merged",
+      "lab_alias": "paper_bitnet_cpp"
+    },
+    {
+      "id": "paper.bitdistill.2025",
+      "label": "BitNet Distillation / BitDistill (2025)",
+      "type": "Paper",
+      "summary": "Wu et al. arXiv:2510.13998 — convert off-the-shelf FP LLMs (Qwen3 0.6–4B) to 1.58-bit for **task-specific** finetune without full BitNet pretrain. Three stages: (1) SubLN before MHSA/FFN out-projections; (2) continue-pretrain ~10B Falcon tokens; (3) CE + KL logits distill (τ=5) + MiniLM-style multi-head attention-relation distill (prefer **single late layer**). Naive BitNet-SFT gaps ~13–15 pp and worsen with scale; BitDistill recovers FP16-SFT parity on MNLI/QNLI/SST-2 and CNNDM ROUGE while claiming ~**10×** memory and **~2.65×** CPU tok/s (paper table: 427→1135 tok/s, 1.20→0.11 G). Complementary to GPTQ/AWQ init. Distinct from BitDistiller (arXiv:2402.10631, sub-4-bit self-distill).",
+      "sources": [
+        "https://arxiv.org/abs/2510.13998",
+        "https://hf.co/papers/2510.13998",
+        "docs/13_TRAINING_QAT_DISTILL.md"
+      ],
+      "confidence": 0.93,
+      "status": "merged",
+      "lab_alias": "paper_bitdistill"
+    },
+    {
+      "id": "recipe.qat_158bit",
+      "label": "1.58-bit QAT / distill recipe checklist",
+      "type": "Method",
+      "summary": "Production-leaning path: (A) From-scratch BitNet b1.58 if you control pretrain tokens (≥100B–2T) and need general LLM. (B) BitDistill for downstream: SubLN → short CPT → logits+attention distill; do **not** absmean-PTQ a chat Llama and ship. (C) Gradual λ / STE with absmean ternary + INT8 acts. Keep stem/embed/LM-head higher precision unless proven otherwise. Prefer bitnet.cpp TL kernels for CPU serve. Lab TernaryLinear is pedagogy/size only.",
+      "sources": [
+        "https://arxiv.org/abs/2510.13998",
+        "https://arxiv.org/abs/2402.17764",
+        "docs/23_BITNET_CPP_BRIDGE.md",
+        "docs/13_TRAINING_QAT_DISTILL.md"
+      ],
+      "confidence": 0.9,
+      "status": "verified"
+    },
+    {
+      "id": "paper.bibert.2022",
+      "label": "BiBERT (fully binarized BERT, 2022)",
+      "type": "Paper",
+      "summary": "Qin et al. arXiv:2203.06390 — first accurate **W1 E1 A1** BERT. Failure diagnosis: (1) attention-weight information collapse under direct Sign; (2) distillation direction mismatch when using products of two binary activations. Fixes: **Bi-Attention** (maximize entropy of binary attention reps) + **Direction-Matching Distillation (DMD)**. Claims **56.3×** FLOPs and **31.2×** size savings; beats BinaryBERT W1A1 by ~20.4 pp avg GLUE and Q2BERT W2A8 by ~13.3 pp. Lab docs mention BiBERT briefly — strengthen with these failure modes and numbers.",
+      "sources": [
+        "https://arxiv.org/abs/2203.06390",
+        "https://github.com/htqin/BiBERT",
+        "docs/13_TRAINING_QAT_DISTILL.md"
+      ],
+      "confidence": 0.92,
+      "status": "merged",
+      "lab_alias": "paper_bibert"
+    },
+    {
+      "id": "concept.binary_transformers",
+      "label": "Binary / ternary transformers landscape",
+      "type": "Concept",
+      "summary": "Three distinct lines: (1) BiBERT-style full W/A/E binarization of encoder BERT (hardest — attention). (2) BitNet Transformer: BitLinear replaces Linear; attention softmax/KV usually higher bit. (3) BitNet b1.58 / a4.8 / BitDistill for generative LLMs. Do not conflate GLUE BiBERT wins with LLM chat quality. Lab tiny binary-ViT sketch is pedagogical only.",
+      "sources": [
+        "https://arxiv.org/abs/2203.06390",
+        "https://arxiv.org/abs/2310.11453",
+        "https://arxiv.org/abs/2402.17764",
+        "docs/13_TRAINING_QAT_DISTILL.md"
+      ],
+      "confidence": 0.9,
+      "status": "verified"
+    },
+    {
+      "id": "paper.finn.fpga2017",
+      "label": "FINN FPGA BNN framework (FPGA 2017+)",
+      "type": "Paper",
+      "summary": "Umuroglu et al. streaming heterogeneous dataflow for BNNs on Zynq. Optimizations: XNOR+popcount MVTU; BN+sign→thresholds; maxpool→OR. ZC706 @~200 MHz wall power: **SFC-max MNIST 12.3M FPS**, 0.31 µs latency, Pchip 7.3 W / Pwall 21.2 W → **~583k FPS/W wall** / **~1.69M FPS/W chip**; LFC-max 1.56M FPS; **CNV-max CIFAR-10/SVHN 21.9k FPS**, 283 µs, Pchip 3.6 W / Pwall 11.7 W → **~1.87k FPS/W wall**. Modern FINN: Brevitas→ONNX→FINN IR→HLS/RTL; github.com/Xilinx/finn. Lab docs cite FPS class correctly; add FPS/W and power rails.",
+      "sources": [
+        "https://arxiv.org/abs/1612.07119",
+        "https://xilinx.github.io/finn/",
+        "https://github.com/Xilinx/finn",
+        "docs/14_HARDWARE_AND_ENERGY.md"
+      ],
+      "confidence": 0.93,
+      "status": "merged",
+      "lab_alias": "paper_finn"
+    },
+    {
+      "id": "tool.larq_lce",
+      "label": "Larq + Larq Compute Engine",
+      "type": "Tool",
+      "summary": "TF/Keras BNN training (Larq) + TFLite custom ops for ARM BGEMM (LCE). Hand-tuned tiling/vectorization/multithreading; documented 8.5–18.5× class wins on Pixel/RPi vs FP baselines in ecosystem surveys. Upstream Larq archived ~2026 — pin commit / vendor fork. Best stock path for mobile **CPU** W+A binary CNNs. Not a BitNet LLM stack.",
+      "sources": [
+        "https://github.com/larq/compute-engine",
+        "https://docs.larq.dev/",
+        "docs/16_ECOSYSTEM_AND_TOOLING.md"
+      ],
+      "confidence": 0.88,
+      "status": "merged",
+      "lab_alias": "tool_larq"
+    },
+    {
+      "id": "tool.brevitas_finn",
+      "label": "Brevitas → FINN (QAT→FPGA)",
+      "type": "Tool",
+      "summary": "Brevitas (Xilinx/AMD): PyTorch QAT/PTQ with per-tensor bitwidth control including 1-bit; QuantConv/Linear/MHA/RNN. Export ONNX into FINN for FPGA dataflow. End-to-end: train in Brevitas → tidy/streamline → HW layers → fold for FPS target → Vivado/PYNQ deploy. Preferred industrial vision edge path when FPGA available. Heavy vs this repo's teaching kernels.",
+      "sources": [
+        "https://github.com/Xilinx/brevitas",
+        "https://finn-dev.readthedocs.io/en/latest/end_to_end_flow.html",
+        "docs/16_ECOSYSTEM_AND_TOOLING.md"
+      ],
+      "confidence": 0.9,
+      "status": "merged",
+      "lab_alias": "tool_brevitas_finn"
+    },
+    {
+      "id": "decision.awq_gptq_vs_binary",
+      "label": "When AWQ/GPTQ/torchao win vs binary/ternary",
+      "type": "Decision",
+      "summary": "GPU datacenter LLM serve (2024–2026): prefer FP8/INT4 via torchao, AWQ, GPTQ, vLLM/TensorRT — Tensor Cores beat research XNOR. AWQ protects salient weights via activation magnitude (~1% channels); GPTQ second-order weight fit — GPTQ can overfit calib domain more than AWQ. CPU/edge LLM: BitNet b1.58 + bitnet.cpp. Mobile NPU: stock INT8/INT4, not XNOR. Vision MCU/FPGA fixed topology: FINN/Larq binary. Hybrid: PTQ INT4 for GPU API + ternary FFN on CPU rare; usually pick one stack. Binary rarely wins end-to-end on NVIDIA TC GPUs (arXiv:1911.04477).",
+      "sources": [
+        "https://arxiv.org/abs/2306.00978",
+        "https://arxiv.org/abs/2210.17323",
+        "docs/16_ECOSYSTEM_AND_TOOLING.md",
+        "docs/02_SOTA_SURVEY.md",
+        "docs/18_DECISION_TREE_AND_COMPLETE_ROADMAP.md"
+      ],
+      "confidence": 0.91,
+      "status": "merged",
+      "lab_alias": "decision_wrap_tree"
+    },
+    {
+      "id": "paper.sparse_bitnet.2026",
+      "label": "Sparse-BitNet (N:M + 1.58-bit, 2026)",
+      "type": "Paper",
+      "summary": "Zhang et al. arXiv:2603.05168 — ternary BitNet naturally ~42% zeros; more N:M-friendly than BF16. Sparse-BitLinear: magnitude mask from master weights each step, quant-then-mask, **dual STE** (gradients through masked weights). At 2:4, BF16 +18.8% norm PPL vs BitNet +5.7%; BitNet collapses later under N:8 sweeps. Custom 6:8 sparse TC kernels: up to **~1.30×** e2e on Qwen2.5-3B. Related: Q-Sparse (arXiv:2407.10969). Lab mentions Sparse-BitNet once — add these deltas.",
+      "sources": [
+        "https://arxiv.org/abs/2603.05168",
+        "https://arxiv.org/abs/2407.10969",
+        "docs/02_SOTA_SURVEY.md"
+      ],
+      "confidence": 0.9,
+      "status": "merged",
+      "lab_alias": "paper_sparse_bitnet"
+    },
+    {
+      "id": "concept.mobile_npu_quant_reality",
+      "label": "Mobile NPU INT8/INT4 reality (not 1-bit)",
+      "type": "Concept",
+      "summary": "Qualcomm HTP/QNN, Apple ANE/CoreML, Arm Ethos-U: document INT8/INT4/FP16 paths — **no stock 1-bit XNOR**. Ternary BitNet on Snapdragon needs custom Hexagon kernels (ENERZAi/QCS6490 class reports). Product tree: phone NPU → INT8; classic BNN CNN → CPU LCE / FPGA FINN; ternary LLM → bitnet.cpp or custom DSP. Aligns with lab docs/20 CLOSED-BY-PROXY.",
+      "sources": [
+        "docs/20_NPU_VENDOR_CLOSURE.md",
+        "docs/14_HARDWARE_AND_ENERGY.md"
+      ],
+      "confidence": 0.9,
+      "status": "merged",
+      "lab_alias": "npu_no_native_1bit"
+    },
+    {
+      "id": "failure.attention_binarization",
+      "label": "Failure: attention binarization",
+      "type": "FailureMode",
+      "summary": "Sign on Q/K/attention maps destroys selective focus (BiBERT analysis: attention-weight information nearly collapses). Distilling using products of two binary activations causes STE direction mismatch (DMD needed). Practical mitigations: keep attention scores / softmax / KV higher bit (BitNet default); Bi-Attention+DMD for full binary BERT; a4.8 uses sparse INT8 intermediates on attn out-proj. Lab F8 Amdahl already notes softmax — elevate attention-specific citations.",
+      "sources": [
+        "https://arxiv.org/abs/2203.06390",
+        "https://arxiv.org/abs/2411.04965",
+        "docs/03_FAILURE_ANALYSIS.md"
+      ],
+      "confidence": 0.92,
+      "status": "verified"
+    },
+    {
+      "id": "failure.small_k_layers",
+      "label": "Failure: small-K / thin layers",
+      "type": "FailureMode",
+      "summary": "Packed XNOR–popcount amortizes poorly when inner dim K ≪ 64/128 or layers are stem/head-sized: packing overhead + FP residual ops dominate; measured wall-clock can be <1× vs FP BLAS. Standard recipe: leave first/last layers FP (≥8-bit); only binarize wide matmuls. Lab G15/G18 document re-pack and Python overhead — connect to K-threshold guidance in kernels docs.",
+      "sources": [
+        "docs/03_FAILURE_ANALYSIS.md",
+        "docs/34_COMPUTE_SPEEDUP.md",
+        "docs/06_CALCULATED_SPEEDUP_MODEL.md"
+      ],
+      "confidence": 0.88,
+      "status": "verified"
+    },
+    {
+      "id": "failure.bn_sensitivity",
+      "label": "Failure: BatchNorm sensitivity in BNNs",
+      "type": "FailureMode",
+      "summary": "Without BN after binary layers, training almost always fails (discrete noisy acts). Running stats/momentum matter: Larq guides often use momentum ≈0.9. Prefer Adam on latent weights. On FPGA FINN, BN+sign folds to thresholds — training-time BN still required. Lab G7 CLOSED; keep as KG failure node with Larq/FINN citations.",
+      "sources": [
+        "docs/03_FAILURE_ANALYSIS.md",
+        "docs/09_GAP_REGISTER.md",
+        "https://docs.larq.dev/",
+        "https://arxiv.org/abs/1612.07119"
+      ],
+      "confidence": 0.9,
+      "status": "verified"
+    },
+    {
+      "id": "failure.ptq_to_ternary",
+      "label": "Failure: naive PTQ into ternary BitNet",
+      "type": "FailureMode",
+      "summary": "Absmean-PTQ or direct QAT of chat Llama into {-1,0,1} without SubLN/CPT/distill is unstable; BitDistill shows gaps ~14 pp that **widen** with scale (0.6B→4B). Sub-4-bit PTQ (GPTQ/AWQ alone) also collapses quality. Use BitDistill recipe or train BitNet from scratch. Lab F13 / docs/23 already warn — cite 2510.13998 numbers.",
+      "sources": [
+        "https://arxiv.org/abs/2510.13998",
+        "docs/23_BITNET_CPP_BRIDGE.md",
+        "docs/17_EVALUATION_ROBUSTNESS_ECONOMICS.md"
+      ],
+      "confidence": 0.93,
+      "status": "merged",
+      "lab_alias": "ptq_ternary_llm_wipe"
+    },
+    {
+      "id": "artifact.hf_bitnet_2b",
+      "label": "HF microsoft/bitnet-b1.58-2B-4T",
+      "type": "System",
+      "summary": "Official 2.4B BitNet b1.58 trained 4T tokens (arXiv:2504.12285). Variants: safetensors, bf16, gguf. Primary public checkpoint for bitnet.cpp demos. Prefer this over unofficial PTQ '1-bit' conversions.",
+      "sources": [
+        "https://hf.co/microsoft/bitnet-b1.58-2B-4T",
+        "https://hf.co/microsoft/bitnet-b1.58-2B-4T-gguf",
+        "https://arxiv.org/abs/2504.12285"
+      ],
+      "confidence": 0.94,
+      "status": "merged",
+      "lab_alias": "paper_bitnet_2b4t"
+    },
+    {
+      "id": "citation.strengthen.lab_weak",
+      "label": "Lab citation strengthen list",
+      "type": "Decision",
+      "summary": "Papers named in docs without stable IDs or precise numbers: Real-to-Binary → arXiv:2003.11535 + 65.4%; ReActNet → 2003.03488 + 69.4/71.4; Bi-Real → 1808.00278 + 56.4/62.2; BitDistill → 2510.13998 (not BitDistiller 2402.10631); bitnet.cpp energy → 2410.16144 tables with CPU model; FINN → 1612.07119 + FPS/W; BiBERT → 2203.06390; Sparse-BitNet → 2603.05168; BitNet a4.8 → 2411.04965. Prefer these IDs in KG edges over 'Microsoft reports'.",
+      "sources": [
+        "docs/02_SOTA_SURVEY.md",
+        "docs/13_TRAINING_QAT_DISTILL.md",
+        "docs/14_HARDWARE_AND_ENERGY.md"
+      ],
+      "confidence": 0.95,
+      "status": "verified"
+    }
+  ],
+  "edges": [
+    {
+      "source": "thesis_lock",
+      "target": "dual_metric_culture",
+      "relation": "requires",
+      "evidence": [
+        "ROADMAP.md",
+        "AGENTS.md"
+      ],
+      "weight": 1.0
+    },
+    {
+      "source": "thesis_lock",
+      "target": "algo_xnor_gemm",
+      "relation": "requires",
+      "evidence": [
+        "ROADMAP.md"
+      ],
+      "weight": 1.0
+    },
+    {
+      "source": "thesis_lock",
+      "target": "decision_no_gpu_32x",
+      "relation": "part_of",
+      "evidence": [
+        "ROADMAP.md"
+      ],
+      "weight": 1.0
+    },
+    {
+      "source": "thesis_lock",
+      "target": "fake_binary_sign",
+      "relation": "contradicts",
+      "evidence": [
+        "docs/03_FAILURE_ANALYSIS.md"
+      ],
+      "weight": 1.0
+    },
+    {
+      "source": "bnn_lab_system",
+      "target": "thesis_lock",
+      "relation": "implements",
+      "evidence": [
+        "README.md",
+        "ROADMAP.md"
+      ],
+      "weight": 1.0
+    },
+    {
+      "source": "bnn_lab_system",
+      "target": "world_class_v1",
+      "relation": "part_of",
+      "evidence": [
+        "ROADMAP.md"
+      ],
+      "weight": 0.8
+    },
+    {
+      "source": "dual_metric_culture",
+      "target": "compression_32x",
+      "relation": "measured_on",
+      "evidence": [
+        "results/SUMMARY.md"
+      ],
+      "weight": 1.0
+    },
+    {
+      "source": "dual_metric_culture",
+      "target": "metric_s_compute",
+      "relation": "requires",
+      "evidence": [
+        "docs/FAIR_EVAL_PROTOCOL.md"
+      ],
+      "weight": 1.0
+    },
+    {
+      "source": "dual_metric_culture",
+      "target": "metric_s_e2e",
+      "relation": "requires",
+      "evidence": [
+        "docs/FAIR_EVAL_PROTOCOL.md"
+      ],
+      "weight": 1.0
+    },
+    {
+      "source": "compression_32x",
+      "target": "theoretical_word_reduction_64x",
+      "relation": "contradicts",
+      "evidence": [
+        "results/SUMMARY.md — same table: do not claim either as e2e latency"
+      ],
+      "weight": 0.9
+    },
+    {
+      "source": "theoretical_word_reduction_64x",
+      "target": "metric_s_e2e",
+      "relation": "contradicts",
+      "evidence": [
+        "docs/06 — op-count ≠ wall-clock"
+      ],
+      "weight": 1.0
+    },
+    {
+      "source": "xnor_popcount_identity",
+      "target": "algo_xnor_gemm",
+      "relation": "derived_from",
+      "evidence": [
+        "docs/35_BINARY_MATH_EFFECTIVENESS.md"
+      ],
+      "weight": 1.0
+    },
+    {
+      "source": "xnor_popcount_identity",
+      "target": "compression_32x",
+      "relation": "improves",
+      "evidence": [
+        "docs/01_FIRST_PRINCIPLES.md"
+      ],
+      "weight": 0.8
+    },
+    {
+      "source": "amdahl_law",
+      "target": "metric_s_e2e",
+      "relation": "requires",
+      "evidence": [
+        "docs/06_CALCULATED_SPEEDUP_MODEL.md"
+      ],
+      "weight": 1.0
+    },
+    {
+      "source": "amdahl_law",
+      "target": "result_wrap_e2e",
+      "relation": "derived_from",
+      "evidence": [
+        "results/SUMMARY.md"
+      ],
+      "weight": 0.9,
+      "relation_original": "explains"
+    },
+    {
+      "source": "bandwidth_bound",
+      "target": "compression_32x",
+      "relation": "improves",
+      "evidence": [
+        "docs/01_FIRST_PRINCIPLES.md"
+      ],
+      "weight": 0.85
+    },
+    {
+      "source": "bandwidth_bound",
+      "target": "hw_cpu_x86_popcnt",
+      "relation": "recommends_for",
+      "evidence": [
+        "docs/14_HARDWARE_AND_ENERGY.md"
+      ],
+      "weight": 0.8
+    },
+    {
+      "source": "algo_amdahl_calculator",
+      "target": "amdahl_law",
+      "relation": "implements",
+      "evidence": [
+        "bnn/math/"
+      ],
+      "weight": 1.0
+    },
+    {
+      "source": "fake_binary_sign",
+      "target": "result_kernel_speedups",
+      "relation": "measured_on",
+      "evidence": [
+        "results/benchmark.json fake_binary_vs_torch_fp32 ~1.44 (slower)"
+      ],
+      "weight": 1.0
+    },
+    {
+      "source": "fake_binary_sign",
+      "target": "algo_xnor_gemm",
+      "relation": "alternative_to",
+      "evidence": [
+        "docs/03_FAILURE_ANALYSIS.md"
+      ],
+      "weight": 1.0
+    },
+    {
+      "source": "fake_binary_sign",
+      "target": "gpu_tensor_core_reality",
+      "relation": "part_of",
+      "evidence": [
+        "docs/03_FAILURE_ANALYSIS.md"
+      ],
+      "weight": 0.7
+    },
+    {
+      "source": "accuracy_collapse",
+      "target": "concept_fp_shortcuts",
+      "relation": "blocked_by",
+      "evidence": [
+        "docs/03_FAILURE_ANALYSIS.md"
+      ],
+      "weight": 0.9
+    },
+    {
+      "source": "accuracy_collapse",
+      "target": "first_last_layer_trap",
+      "relation": "part_of",
+      "evidence": [
+        "docs/03_FAILURE_ANALYSIS.md"
+      ],
+      "weight": 0.8
+    },
+    {
+      "source": "ste_mismatch",
+      "target": "algo_ste_clip",
+      "relation": "requires",
+      "evidence": [
+        "docs/13_TRAINING_QAT_DISTILL.md"
+      ],
+      "weight": 0.7
+    },
+    {
+      "source": "ste_mismatch",
+      "target": "algo_approx_sign",
+      "relation": "improves",
+      "evidence": [
+        "results/math_ste_compare.json"
+      ],
+      "weight": 0.85
+    },
+    {
+      "source": "ste_mismatch",
+      "target": "algo_irnet_ede",
+      "relation": "improves",
+      "evidence": [
+        "docs/13_TRAINING_QAT_DISTILL.md"
+      ],
+      "weight": 0.8
+    },
+    {
+      "source": "ptq_ternary_llm_wipe",
+      "target": "paper_bitdistill",
+      "relation": "blocked_by",
+      "evidence": [
+        "arXiv:2510.13998"
+      ],
+      "weight": 0.9
+    },
+    {
+      "source": "npu_no_native_1bit",
+      "target": "hw_phone_npu",
+      "relation": "measured_on",
+      "evidence": [
+        "docs/20_NPU_VENDOR_CLOSURE.md"
+      ],
+      "weight": 1.0
+    },
+    {
+      "source": "npu_no_native_1bit",
+      "target": "tool_tflite_openvino_ort",
+      "relation": "recommends_for",
+      "evidence": [
+        "docs/20_NPU_VENDOR_CLOSURE.md"
+      ],
+      "weight": 0.9
+    },
+    {
+      "source": "gpu_tensor_core_reality",
+      "target": "tool_torchao",
+      "relation": "recommends_for",
+      "evidence": [
+        "docs/24_GPU_INT4_FP8_LANE.md"
+      ],
+      "weight": 0.95
+    },
+    {
+      "source": "gpu_tensor_core_reality",
+      "target": "paper_awq",
+      "relation": "recommends_for",
+      "evidence": [
+        "docs/18_DECISION_TREE_AND_COMPLETE_ROADMAP.md"
+      ],
+      "weight": 0.9
+    },
+    {
+      "source": "paper_bnn_2016",
+      "target": "algo_ste_clip",
+      "relation": "derived_from",
+      "evidence": [
+        "arXiv:1602.02830"
+      ],
+      "weight": 1.0,
+      "relation_original": "introduces"
+    },
+    {
+      "source": "paper_xnornet",
+      "target": "xnor_popcount_identity",
+      "relation": "cites",
+      "evidence": [
+        "arXiv:1603.05279"
+      ],
+      "weight": 0.9,
+      "relation_original": "popularizes"
+    },
+    {
+      "source": "paper_xnornet",
+      "target": "paper_xnornetpp",
+      "relation": "improves",
+      "evidence": [
+        "arXiv:1909.13863"
+      ],
+      "weight": 0.8,
+      "relation_original": "improved_by"
+    },
+    {
+      "source": "paper_bireal",
+      "target": "concept_fp_shortcuts",
+      "relation": "derived_from",
+      "evidence": [
+        "arXiv:1808.00278"
+      ],
+      "weight": 1.0,
+      "relation_original": "introduces"
+    },
+    {
+      "source": "paper_bireal",
+      "target": "algo_approx_sign",
+      "relation": "derived_from",
+      "evidence": [
+        "arXiv:1808.00278"
+      ],
+      "weight": 1.0,
+      "relation_original": "introduces"
+    },
+    {
+      "source": "paper_bireal",
+      "target": "sys_vision_cifar",
+      "relation": "implements",
+      "evidence": [
+        "results/image_cifar.json"
+      ],
+      "weight": 0.85
+    },
+    {
+      "source": "paper_reactnet",
+      "target": "algo_rsign_rprelu",
+      "relation": "derived_from",
+      "evidence": [
+        "arXiv:2003.03488"
+      ],
+      "weight": 1.0,
+      "relation_original": "introduces"
+    },
+    {
+      "source": "paper_reactnet",
+      "target": "paper_bireal",
+      "relation": "improves",
+      "evidence": [
+        "arXiv:2003.03488"
+      ],
+      "weight": 0.9
+    },
+    {
+      "source": "paper_reactnet",
+      "target": "gap_reactnet_in_repo",
+      "relation": "blocked_by",
+      "evidence": [
+        "docs/13_TRAINING_QAT_DISTILL.md"
+      ],
+      "weight": 0.8,
+      "relation_original": "not_fully_implemented_in"
+    },
+    {
+      "source": "paper_irnet",
+      "target": "algo_irnet_ede",
+      "relation": "derived_from",
+      "evidence": [
+        "arXiv:1909.10788"
+      ],
+      "weight": 1.0,
+      "relation_original": "introduces"
+    },
+    {
+      "source": "paper_bibert",
+      "target": "paper_bnn_2016",
+      "relation": "cites",
+      "evidence": [
+        "arXiv:2203.06390"
+      ],
+      "weight": 0.7
+    },
+    {
+      "source": "paper_bitnet",
+      "target": "org_microsoft_bitnet",
+      "relation": "part_of",
+      "evidence": [
+        "arXiv:2310.11453"
+      ],
+      "weight": 1.0,
+      "relation_original": "authored_by"
+    },
+    {
+      "source": "paper_bitnet_b158",
+      "target": "paper_bitnet",
+      "relation": "improves",
+      "evidence": [
+        "arXiv:2402.17764"
+      ],
+      "weight": 1.0
+    },
+    {
+      "source": "paper_bitnet_b158",
+      "target": "concept_ternary_zero_gate",
+      "relation": "derived_from",
+      "evidence": [
+        "arXiv:2402.17764"
+      ],
+      "weight": 1.0,
+      "relation_original": "introduces"
+    },
+    {
+      "source": "paper_bitnet_b158",
+      "target": "algo_ternary_bitplane",
+      "relation": "derived_from",
+      "evidence": [
+        "docs/02_SOTA_SURVEY.md"
+      ],
+      "weight": 0.7,
+      "relation_original": "motivates"
+    },
+    {
+      "source": "paper_bitnet_cpp",
+      "target": "tool_bitnet_cpp",
+      "relation": "implements",
+      "evidence": [
+        "arXiv:2410.16144"
+      ],
+      "weight": 1.0
+    },
+    {
+      "source": "paper_bitnet_cpp",
+      "target": "paper_bitnet_b158",
+      "relation": "requires",
+      "evidence": [
+        "arXiv:2410.16144"
+      ],
+      "weight": 0.9
+    },
+    {
+      "source": "paper_bitnet_a48",
+      "target": "paper_bitnet_b158",
+      "relation": "improves",
+      "evidence": [
+        "arXiv:2411.04965"
+      ],
+      "weight": 0.85
+    },
+    {
+      "source": "paper_bitnet_2b4t",
+      "target": "paper_bitnet_b158",
+      "relation": "derived_from",
+      "evidence": [
+        "arXiv:2504.12285"
+      ],
+      "weight": 0.9
+    },
+    {
+      "source": "paper_bitdistill",
+      "target": "paper_bitnet_b158",
+      "relation": "requires",
+      "evidence": [
+        "arXiv:2510.13998"
+      ],
+      "weight": 0.9
+    },
+    {
+      "source": "paper_bitdistill",
+      "target": "ptq_ternary_llm_wipe",
+      "relation": "improves",
+      "evidence": [
+        "arXiv:2510.13998"
+      ],
+      "weight": 0.95,
+      "relation_original": "mitigates"
+    },
+    {
+      "source": "paper_sparse_bitnet",
+      "target": "paper_bitnet_b158",
+      "relation": "improves",
+      "evidence": [
+        "arXiv:2603.05168"
+      ],
+      "weight": 0.7
+    },
+    {
+      "source": "paper_sparse_bitnet",
+      "target": "gap_litespark_local",
+      "relation": "blocked_by",
+      "evidence": [
+        "GAPS: not locally reproduced"
+      ],
+      "weight": 0.8
+    },
+    {
+      "source": "paper_larq_ce",
+      "target": "tool_larq",
+      "relation": "implements",
+      "evidence": [
+        "arXiv:2011.09398"
+      ],
+      "weight": 1.0
+    },
+    {
+      "source": "paper_larq_ce",
+      "target": "hw_arm_neon",
+      "relation": "measured_on",
+      "evidence": [
+        "arXiv:2011.09398"
+      ],
+      "weight": 0.9
+    },
+    {
+      "source": "paper_finn",
+      "target": "tool_brevitas_finn",
+      "relation": "implements",
+      "evidence": [
+        "docs/14_HARDWARE_AND_ENERGY.md"
+      ],
+      "weight": 0.9
+    },
+    {
+      "source": "paper_finn",
+      "target": "hw_fpga_finn",
+      "relation": "recommends_for",
+      "evidence": [
+        "docs/14_HARDWARE_AND_ENERGY.md"
+      ],
+      "weight": 1.0
+    },
+    {
+      "source": "paper_litespark",
+      "target": "gap_litespark_local",
+      "relation": "blocked_by",
+      "evidence": [
+        "docs/02_SOTA_SURVEY.md"
+      ],
+      "weight": 0.85
+    },
+    {
+      "source": "paper_awq",
+      "target": "tool_torchao",
+      "relation": "alternative_to",
+      "evidence": [
+        "docs/24_GPU_INT4_FP8_LANE.md"
+      ],
+      "weight": 0.7
+    },
+    {
+      "source": "paper_awq",
+      "target": "tool_vllm_trt",
+      "relation": "recommends_for",
+      "evidence": [
+        "docs/18_DECISION_TREE_AND_COMPLETE_ROADMAP.md"
+      ],
+      "weight": 0.85
+    },
+    {
+      "source": "paper_b1_honest_speedup",
+      "target": "dual_metric_culture",
+      "relation": "derived_from",
+      "evidence": [
+        "docs/32_NOVEL_PAPER_CANDIDATES.md"
+      ],
+      "weight": 1.0
+    },
+    {
+      "source": "paper_b1_honest_speedup",
+      "target": "fake_binary_sign",
+      "relation": "requires",
+      "evidence": [
+        "B1 README"
+      ],
+      "weight": 1.0
+    },
+    {
+      "source": "paper_b1_honest_speedup",
+      "target": "result_kernel_speedups",
+      "relation": "measured_on",
+      "evidence": [
+        "results/benchmark.json"
+      ],
+      "weight": 1.0
+    },
+    {
+      "source": "paper_b1_honest_speedup",
+      "target": "energy_proxy_ept",
+      "relation": "requires",
+      "evidence": [
+        "results/energy_bound.json"
+      ],
+      "weight": 0.9
+    },
+    {
+      "source": "paper_b1_honest_speedup",
+      "target": "gap_venue_submit",
+      "relation": "blocked_by",
+      "evidence": [
+        "docs/32_NOVEL_PAPER_CANDIDATES.md"
+      ],
+      "weight": 0.8
+    },
+    {
+      "source": "paper_b2_packed_xnor",
+      "target": "sys_packed_kernels",
+      "relation": "derived_from",
+      "evidence": [
+        "docs/32_NOVEL_PAPER_CANDIDATES.md"
+      ],
+      "weight": 1.0
+    },
+    {
+      "source": "paper_b2_packed_xnor",
+      "target": "sys_repro_gates",
+      "relation": "requires",
+      "evidence": [
+        "AGENTS.md",
+        "tests/golden_floors.json"
+      ],
+      "weight": 1.0
+    },
+    {
+      "source": "paper_b2_packed_xnor",
+      "target": "concept_prepack_once",
+      "relation": "requires",
+      "evidence": [
+        "B2 README"
+      ],
+      "weight": 1.0
+    },
+    {
+      "source": "paper_b2_packed_xnor",
+      "target": "result_mnist",
+      "relation": "measured_on",
+      "evidence": [
+        "results/train_results.json"
+      ],
+      "weight": 0.7
+    },
+    {
+      "source": "paper_b3_when_not",
+      "target": "decision_wrap_tree",
+      "relation": "derived_from",
+      "evidence": [
+        "docs/18_DECISION_TREE_AND_COMPLETE_ROADMAP.md"
+      ],
+      "weight": 1.0
+    },
+    {
+      "source": "paper_b3_when_not",
+      "target": "algo_hybrid_ffn_wrap",
+      "relation": "measured_on",
+      "evidence": [
+        "results/hybrid_ffn_wrap.json"
+      ],
+      "weight": 1.0
+    },
+    {
+      "source": "paper_b3_when_not",
+      "target": "npu_no_native_1bit",
+      "relation": "requires",
+      "evidence": [
+        "docs/20_NPU_VENDOR_CLOSURE.md"
+      ],
+      "weight": 0.9
+    },
+    {
+      "source": "paper_b3_when_not",
+      "target": "tool_gguf_llamacpp",
+      "relation": "recommends_for",
+      "evidence": [
+        "docs/18_DECISION_TREE_AND_COMPLETE_ROADMAP.md"
+      ],
+      "weight": 0.8
+    },
+    {
+      "source": "algo_xnor_gemm",
+      "target": "sys_packed_kernels",
+      "relation": "implements",
+      "evidence": [
+        "bnn/kernels/",
+        "results/benchmark.json"
+      ],
+      "weight": 1.0
+    },
+    {
+      "source": "algo_xnor_gemm",
+      "target": "result_kernel_speedups",
+      "relation": "measured_on",
+      "evidence": [
+        "results/benchmark.json"
+      ],
+      "weight": 1.0
+    },
+    {
+      "source": "algo_xnor_gemm",
+      "target": "hw_cpu_x86_popcnt",
+      "relation": "requires",
+      "evidence": [
+        "docs/41_PORTABLE_SIMD_KERNEL.md"
+      ],
+      "weight": 0.95
+    },
+    {
+      "source": "algo_ternary_bitplane",
+      "target": "sys_ultra_wrap",
+      "relation": "part_of",
+      "evidence": [
+        "results/ultra_wrap.json"
+      ],
+      "weight": 0.7
+    },
+    {
+      "source": "algo_hybrid_ffn_wrap",
+      "target": "result_hybrid_ffn",
+      "relation": "measured_on",
+      "evidence": [
+        "results/hybrid_ffn_wrap.json"
+      ],
+      "weight": 1.0
+    },
+    {
+      "source": "algo_hybrid_ffn_wrap",
+      "target": "sys_ultra_wrap",
+      "relation": "part_of",
+      "evidence": [
+        "docs/33_ULTRA_WRAP_LAYER.md"
+      ],
+      "weight": 0.8
+    },
+    {
+      "source": "algo_ste_clip",
+      "target": "concept_ste_vs_inference",
+      "relation": "part_of",
+      "evidence": [
+        "docs/13_TRAINING_QAT_DISTILL.md"
+      ],
+      "weight": 0.8
+    },
+    {
+      "source": "algo_approx_sign",
+      "target": "result_ste_compare",
+      "relation": "measured_on",
+      "evidence": [
+        "results/math_ste_compare.json"
+      ],
+      "weight": 1.0
+    },
+    {
+      "source": "algo_irnet_ede",
+      "target": "result_ste_compare",
+      "relation": "measured_on",
+      "evidence": [
+        "results/math_ste_compare.json"
+      ],
+      "weight": 0.9
+    },
+    {
+      "source": "algo_rsign_rprelu",
+      "target": "gap_reactnet_in_repo",
+      "relation": "blocked_by",
+      "evidence": [
+        "docs/13_TRAINING_QAT_DISTILL.md"
+      ],
+      "weight": 0.85
+    },
+    {
+      "source": "sys_optimise_api",
+      "target": "sys_ultra_wrap",
+      "relation": "improves",
+      "evidence": [
+        "docs/adr/0001_public_optimiser_api.md"
+      ],
+      "weight": 0.85
+    },
+    {
+      "source": "sys_optimise_api",
+      "target": "decision_prefer_optimise",
+      "relation": "implements",
+      "evidence": [
+        "AGENTS.md"
+      ],
+      "weight": 1.0
+    },
+    {
+      "source": "sys_optimise_api",
+      "target": "sys_bnnpack",
+      "relation": "requires",
+      "evidence": [
+        "docs/api/optimise.md"
+      ],
+      "weight": 0.7
+    },
+    {
+      "source": "sys_bnnpack",
+      "target": "gap_bnnpack_v2",
+      "relation": "blocked_by",
+      "evidence": [
+        "docs/MOONSHOT_DEFERRALS.md"
+      ],
+      "weight": 0.8
+    },
+    {
+      "source": "sys_repro_gates",
+      "target": "result_mnist",
+      "relation": "measured_on",
+      "evidence": [
+        "tests/golden_floors.json"
+      ],
+      "weight": 1.0
+    },
+    {
+      "source": "sys_repro_gates",
+      "target": "result_cifar",
+      "relation": "measured_on",
+      "evidence": [
+        "tests/golden_floors.json"
+      ],
+      "weight": 1.0
+    },
+    {
+      "source": "sys_repro_gates",
+      "target": "result_audio",
+      "relation": "measured_on",
+      "evidence": [
+        "tests/golden_floors.json"
+      ],
+      "weight": 1.0
+    },
+    {
+      "source": "sys_repro_gates",
+      "target": "compression_32x",
+      "relation": "requires",
+      "evidence": [
+        "AGENTS.md"
+      ],
+      "weight": 1.0
+    },
+    {
+      "source": "sys_vision_cifar",
+      "target": "data_cifar10",
+      "relation": "measured_on",
+      "evidence": [
+        "results/image_cifar.json"
+      ],
+      "weight": 1.0
+    },
+    {
+      "source": "sys_vision_cifar",
+      "target": "paper_bireal",
+      "relation": "derived_from",
+      "evidence": [
+        "docs/tutorials/04_image_cifar.md"
+      ],
+      "weight": 0.9
+    },
+    {
+      "source": "sys_audio_synth",
+      "target": "data_audio_synth",
+      "relation": "measured_on",
+      "evidence": [
+        "results/audio_synth.json"
+      ],
+      "weight": 1.0
+    },
+    {
+      "source": "sys_seq_encdec",
+      "target": "bnn_lab_system",
+      "relation": "part_of",
+      "evidence": [
+        "docs/36_ENCODER_DECODER_AND_NEXT.md"
+      ],
+      "weight": 0.8
+    },
+    {
+      "source": "sys_energy_module",
+      "target": "energy_proxy_ept",
+      "relation": "implements",
+      "evidence": [
+        "bnn/energy/",
+        "results/energy_bound.json"
+      ],
+      "weight": 1.0
+    },
+    {
+      "source": "sys_energy_module",
+      "target": "result_energy_bound",
+      "relation": "measured_on",
+      "evidence": [
+        "results/energy_bound.json"
+      ],
+      "weight": 1.0
+    },
+    {
+      "source": "sys_energy_module",
+      "target": "gap_rapl_windows",
+      "relation": "blocked_by",
+      "evidence": [
+        "docs/spikes/RAPL_ENERGY_SPIKE.md"
+      ],
+      "weight": 0.7
+    },
+    {
+      "source": "sys_packed_kernels",
+      "target": "result_openmp_scaling",
+      "relation": "measured_on",
+      "evidence": [
+        "results/benchmark.json"
+      ],
+      "weight": 0.9
+    },
+    {
+      "source": "sys_packed_kernels",
+      "target": "hw_arm_neon",
+      "relation": "implements",
+      "evidence": [
+        "docs/41_PORTABLE_SIMD_KERNEL.md"
+      ],
+      "weight": 0.85,
+      "relation_original": "supports"
+    },
+    {
+      "source": "bnn_lab_system",
+      "target": "sys_optimise_api",
+      "relation": "part_of",
+      "evidence": [
+        "ROADMAP.md"
+      ],
+      "weight": 0.9
+    },
+    {
+      "source": "bnn_lab_system",
+      "target": "sys_packed_kernels",
+      "relation": "part_of",
+      "evidence": [
+        "ROADMAP.md"
+      ],
+      "weight": 1.0
+    },
+    {
+      "source": "bnn_lab_system",
+      "target": "sys_repro_gates",
+      "relation": "part_of",
+      "evidence": [
+        "AGENTS.md"
+      ],
+      "weight": 1.0
+    },
+    {
+      "source": "decision_wrap_tree",
+      "target": "hw_nvidia_gpu",
+      "relation": "recommends_for",
+      "evidence": [
+        "docs/18 — FP8/AWQ path"
+      ],
+      "weight": 0.9
+    },
+    {
+      "source": "decision_wrap_tree",
+      "target": "tool_bitnet_cpp",
+      "relation": "recommends_for",
+      "evidence": [
+        "docs/18 — BitNet checkpoint"
+      ],
+      "weight": 0.9
+    },
+    {
+      "source": "decision_wrap_tree",
+      "target": "tool_gguf_llamacpp",
+      "relation": "recommends_for",
+      "evidence": [
+        "docs/18 — non-BitNet CPU LLM"
+      ],
+      "weight": 0.9
+    },
+    {
+      "source": "decision_wrap_tree",
+      "target": "tool_larq",
+      "relation": "recommends_for",
+      "evidence": [
+        "docs/18 — edge vision retrainable"
+      ],
+      "weight": 0.8
+    },
+    {
+      "source": "decision_wrap_tree",
+      "target": "tool_brevitas_finn",
+      "relation": "recommends_for",
+      "evidence": [
+        "docs/18 — FPGA"
+      ],
+      "weight": 0.8
+    },
+    {
+      "source": "decision_wrap_tree",
+      "target": "bnn_lab_system",
+      "relation": "recommends_for",
+      "evidence": [
+        "docs/18 — research/teach XNOR"
+      ],
+      "weight": 1.0
+    },
+    {
+      "source": "decision_wrap_tree",
+      "target": "paper_bitdistill",
+      "relation": "recommends_for",
+      "evidence": [
+        "docs/18 — convert HF LLM to 1.58"
+      ],
+      "weight": 0.85
+    },
+    {
+      "source": "decision_wrap_tree",
+      "target": "tool_tflite_openvino_ort",
+      "relation": "recommends_for",
+      "evidence": [
+        "docs/18 — cannot retrain"
+      ],
+      "weight": 0.85
+    },
+    {
+      "source": "decision_no_gpu_32x",
+      "target": "fake_binary_sign",
+      "relation": "contradicts",
+      "evidence": [
+        "ROADMAP.md"
+      ],
+      "weight": 1.0,
+      "relation_original": "forbids"
+    },
+    {
+      "source": "decision_onnx_defer",
+      "target": "gap_bnnpack_v2",
+      "relation": "part_of",
+      "evidence": [
+        "docs/MOONSHOT_DEFERRALS.md"
+      ],
+      "weight": 0.6,
+      "relation_original": "related_to"
+    },
+    {
+      "source": "roadmap_v030",
+      "target": "world_class_v1",
+      "relation": "part_of",
+      "evidence": [
+        "ROADMAP.md"
+      ],
+      "weight": 0.8
+    },
+    {
+      "source": "roadmap_v030",
+      "target": "sys_packed_kernels",
+      "relation": "implements",
+      "evidence": [
+        "docs/40_ROADMAP_E2E_SESSION.md"
+      ],
+      "weight": 0.9
+    },
+    {
+      "source": "world_class_v1",
+      "target": "gap_pypi_trusted",
+      "relation": "blocked_by",
+      "evidence": [
+        "ROADMAP.md scorecard"
+      ],
+      "weight": 0.7
+    },
+    {
+      "source": "world_class_v1",
+      "target": "gap_distill_integration",
+      "relation": "blocked_by",
+      "evidence": [
+        "docs/MOONSHOT_DEFERRALS.md"
+      ],
+      "weight": 0.7
+    },
+    {
+      "source": "world_class_v1",
+      "target": "gap_bnnpack_v2",
+      "relation": "blocked_by",
+      "evidence": [
+        "docs/MOONSHOT_DEFERRALS.md"
+      ],
+      "weight": 0.6
+    },
+    {
+      "source": "gap_wasm",
+      "target": "sys_packed_kernels",
+      "relation": "alternative_to",
+      "evidence": [
+        "docs/spikes/WASM_SIMD.md"
+      ],
+      "weight": 0.5
+    },
+    {
+      "source": "gap_imagenet_sota",
+      "target": "data_imagenet",
+      "relation": "blocked_by",
+      "evidence": [
+        "ROADMAP.md non-goals"
+      ],
+      "weight": 0.9
+    },
+    {
+      "source": "gap_venue_submit",
+      "target": "paper_b1_honest_speedup",
+      "relation": "blocked_by",
+      "evidence": [
+        "docs/PUBLICATION_PLAN.md"
+      ],
+      "weight": 0.8
+    },
+    {
+      "source": "gap_venue_submit",
+      "target": "paper_b2_packed_xnor",
+      "relation": "blocked_by",
+      "evidence": [
+        "docs/PUBLICATION_PLAN.md"
+      ],
+      "weight": 0.8
+    },
+    {
+      "source": "gap_venue_submit",
+      "target": "paper_b3_when_not",
+      "relation": "blocked_by",
+      "evidence": [
+        "docs/PUBLICATION_PLAN.md"
+      ],
+      "weight": 0.8
+    },
+    {
+      "source": "result_kernel_speedups",
+      "target": "metric_s_compute",
+      "relation": "measured_on",
+      "evidence": [
+        "results/benchmark.json"
+      ],
+      "weight": 1.0
+    },
+    {
+      "source": "result_wrap_e2e",
+      "target": "metric_s_e2e",
+      "relation": "measured_on",
+      "evidence": [
+        "results/wrap_demo.json"
+      ],
+      "weight": 1.0
+    },
+    {
+      "source": "result_wrap_e2e",
+      "target": "compression_32x",
+      "relation": "measured_on",
+      "evidence": [
+        "results/wrap_demo.json"
+      ],
+      "weight": 1.0
+    },
+    {
+      "source": "result_energy_bound",
+      "target": "result_wrap_e2e",
+      "relation": "derived_from",
+      "evidence": [
+        "results/energy_bound.json"
+      ],
+      "weight": 1.0
+    },
+    {
+      "source": "result_mnist",
+      "target": "data_mnist",
+      "relation": "measured_on",
+      "evidence": [
+        "results/train_results.json"
+      ],
+      "weight": 1.0
+    },
+    {
+      "source": "result_cifar",
+      "target": "accuracy_collapse",
+      "relation": "measured_on",
+      "evidence": [
+        "results/image_cifar.json 10pp gap"
+      ],
+      "weight": 0.7,
+      "relation_original": "exemplifies"
+    },
+    {
+      "source": "result_openmp_scaling",
+      "target": "sys_packed_kernels",
+      "relation": "measured_on",
+      "evidence": [
+        "results/benchmark.json thread_scaling"
+      ],
+      "weight": 0.9
+    },
+    {
+      "source": "org_microsoft_bitnet",
+      "target": "paper_bitnet",
+      "relation": "part_of",
+      "evidence": [
+        "arXiv:2310.11453"
+      ],
+      "weight": 1.0,
+      "relation_original": "authored"
+    },
+    {
+      "source": "org_microsoft_bitnet",
+      "target": "tool_bitnet_cpp",
+      "relation": "implements",
+      "evidence": [
+        "https://github.com/microsoft/BitNet"
+      ],
+      "weight": 1.0,
+      "relation_original": "maintains"
+    },
+    {
+      "source": "org_plumerai_larq",
+      "target": "tool_larq",
+      "relation": "implements",
+      "evidence": [
+        "arXiv:2011.09398"
+      ],
+      "weight": 0.9,
+      "relation_original": "maintains"
+    },
+    {
+      "source": "hw_cpu_x86_popcnt",
+      "target": "algo_xnor_gemm",
+      "relation": "recommends_for",
+      "evidence": [
+        "docs/14_HARDWARE_AND_ENERGY.md"
+      ],
+      "weight": 1.0
+    },
+    {
+      "source": "hw_nvidia_gpu",
+      "target": "decision_no_gpu_32x",
+      "relation": "requires",
+      "evidence": [
+        "ROADMAP.md"
+      ],
+      "weight": 1.0
+    },
+    {
+      "source": "hw_phone_npu",
+      "target": "npu_no_native_1bit",
+      "relation": "measured_on",
+      "evidence": [
+        "docs/20_NPU_VENDOR_CLOSURE.md"
+      ],
+      "weight": 1.0,
+      "relation_original": "exhibits"
+    },
+    {
+      "source": "hw_fpga_finn",
+      "target": "paper_finn",
+      "relation": "recommends_for",
+      "evidence": [
+        "docs/14_HARDWARE_AND_ENERGY.md"
+      ],
+      "weight": 0.9,
+      "relation_original": "enables"
+    },
+    {
+      "source": "concept_ste_vs_inference",
+      "target": "thesis_lock",
+      "relation": "part_of",
+      "evidence": [
+        "ROADMAP.md"
+      ],
+      "weight": 1.0
+    },
+    {
+      "source": "concept_fp_shortcuts",
+      "target": "sys_vision_cifar",
+      "relation": "implements",
+      "evidence": [
+        "bnn/vision/"
+      ],
+      "weight": 0.85
+    },
+    {
+      "source": "concept_prepack_once",
+      "target": "result_kernel_speedups",
+      "relation": "requires",
+      "evidence": [
+        "results/benchmark.json"
+      ],
+      "weight": 1.0
+    },
+    {
+      "source": "concept_ternary_zero_gate",
+      "target": "paper_bitnet_b158",
+      "relation": "derived_from",
+      "evidence": [
+        "arXiv:2402.17764"
+      ],
+      "weight": 1.0
+    },
+    {
+      "source": "tool_bitnet_cpp",
+      "target": "bnn_lab_system",
+      "relation": "alternative_to",
+      "evidence": [
+        "docs/23_BITNET_CPP_BRIDGE.md"
+      ],
+      "weight": 0.75
+    },
+    {
+      "source": "tool_gguf_llamacpp",
+      "target": "bnn_lab_system",
+      "relation": "alternative_to",
+      "evidence": [
+        "docs/22_HF_TO_GGUF_GUIDE.md"
+      ],
+      "weight": 0.7
+    },
+    {
+      "source": "tool_torchao",
+      "target": "algo_xnor_gemm",
+      "relation": "alternative_to",
+      "evidence": [
+        "docs/24_GPU_INT4_FP8_LANE.md"
+      ],
+      "weight": 0.8
+    },
+    {
+      "source": "tool_vllm_trt",
+      "target": "fake_binary_sign",
+      "relation": "alternative_to",
+      "evidence": [
+        "docs/18_DECISION_TREE_AND_COMPLETE_ROADMAP.md"
+      ],
+      "weight": 0.85
+    },
+    {
+      "source": "paper_binaryconnect",
+      "target": "paper_bnn_2016",
+      "relation": "part_of",
+      "evidence": [
+        "docs/02_SOTA_SURVEY.md"
+      ],
+      "weight": 0.8
+    },
+    {
+      "source": "paper_binaryconnect",
+      "target": "compression_32x",
+      "relation": "improves",
+      "evidence": [
+        "docs/02 — weight-only memory"
+      ],
+      "weight": 0.5
+    },
+    {
+      "source": "paper_dorefa",
+      "target": "paper_bnn_2016",
+      "relation": "improves",
+      "evidence": [
+        "docs/02_SOTA_SURVEY.md"
+      ],
+      "weight": 0.6
+    },
+    {
+      "source": "paper_fbi_llm",
+      "target": "paper_bitnet",
+      "relation": "alternative_to",
+      "evidence": [
+        "arXiv:2407.07093"
+      ],
+      "weight": 0.7
+    },
+    {
+      "source": "paper_fbi_llm",
+      "target": "gap_fbi_llm_repro",
+      "relation": "blocked_by",
+      "evidence": [
+        "ROADMAP non-goals"
+      ],
+      "weight": 0.8
+    },
+    {
+      "source": "paper_bitnet_v2",
+      "target": "paper_bitnet_a48",
+      "relation": "improves",
+      "evidence": [
+        "arXiv:2504.18415"
+      ],
+      "weight": 0.85
+    },
+    {
+      "source": "paper_bitnet_v2",
+      "target": "org_microsoft_bitnet",
+      "relation": "part_of",
+      "evidence": [
+        "arXiv:2504.18415"
+      ],
+      "weight": 0.9
+    },
+    {
+      "source": "method_tmac",
+      "target": "tool_bitnet_cpp",
+      "relation": "alternative_to",
+      "evidence": [
+        "docs/02_SOTA_SURVEY.md"
+      ],
+      "weight": 0.7
+    },
+    {
+      "source": "method_tmac",
+      "target": "algo_ternary_bitplane",
+      "relation": "part_of",
+      "evidence": [
+        "docs/16_ECOSYSTEM_AND_TOOLING.md"
+      ],
+      "weight": 0.5,
+      "relation_original": "related_to"
+    },
+    {
+      "source": "method_surge",
+      "target": "ste_mismatch",
+      "relation": "improves",
+      "evidence": [
+        "docs/03_FAILURE_ANALYSIS.md"
+      ],
+      "weight": 0.75
+    },
+    {
+      "source": "method_surge",
+      "target": "algo_ste_clip",
+      "relation": "alternative_to",
+      "evidence": [
+        "docs/13_TRAINING_QAT_DISTILL.md"
+      ],
+      "weight": 0.7
+    },
+    {
+      "source": "method_absmean_ptq",
+      "target": "ptq_ternary_llm_wipe",
+      "relation": "part_of",
+      "evidence": [
+        "docs/18_DECISION_TREE_AND_COMPLETE_ROADMAP.md"
+      ],
+      "weight": 1.0
+    },
+    {
+      "source": "method_absmean_ptq",
+      "target": "paper_bitdistill",
+      "relation": "contradicts",
+      "evidence": [
+        "arXiv:2510.13998 — CPT+distill needed"
+      ],
+      "weight": 0.95
+    },
+    {
+      "source": "sys_guide_e2e",
+      "target": "sys_optimise_api",
+      "relation": "recommends_for",
+      "evidence": [
+        "docs/GUIDE_E2E.md"
+      ],
+      "weight": 1.0
+    },
+    {
+      "source": "sys_guide_e2e",
+      "target": "sys_repro_gates",
+      "relation": "requires",
+      "evidence": [
+        "AGENTS.md"
+      ],
+      "weight": 1.0
+    },
+    {
+      "source": "sys_guide_e2e",
+      "target": "bnn_lab_system",
+      "relation": "part_of",
+      "evidence": [
+        "docs/39_GUIDE_E2E_COMPLETION.md"
+      ],
+      "weight": 0.9
+    },
+    {
+      "source": "sys_wrap_policy",
+      "target": "sys_optimise_api",
+      "relation": "part_of",
+      "evidence": [
+        "docs/42_QAT_AND_LAYER_SEARCH.md"
+      ],
+      "weight": 0.9
+    },
+    {
+      "source": "sys_wrap_policy",
+      "target": "algo_hybrid_ffn_wrap",
+      "relation": "recommends_for",
+      "evidence": [
+        "bnn/wrap/policy.py"
+      ],
+      "weight": 0.8
+    },
+    {
+      "source": "sys_wrap_policy",
+      "target": "gap_layer_search_full",
+      "relation": "blocked_by",
+      "evidence": [
+        "docs/MOONSHOT_DEFERRALS.md"
+      ],
+      "weight": 0.7
+    },
+    {
+      "source": "sys_calibrate_qat",
+      "target": "metric_cosine_vs_fp",
+      "relation": "improves",
+      "evidence": [
+        "docs/42_QAT_AND_LAYER_SEARCH.md"
+      ],
+      "weight": 0.9
+    },
+    {
+      "source": "sys_calibrate_qat",
+      "target": "algo_ste_clip",
+      "relation": "requires",
+      "evidence": [
+        "bnn/wrap/qat.py"
+      ],
+      "weight": 0.8
+    },
+    {
+      "source": "sys_calibrate_qat",
+      "target": "result_ultra_wrap",
+      "relation": "measured_on",
+      "evidence": [
+        "results/ultra_wrap.json"
+      ],
+      "weight": 0.85
+    },
+    {
+      "source": "sys_profile_pareto",
+      "target": "dual_metric_culture",
+      "relation": "implements",
+      "evidence": [
+        "docs/FAIR_EVAL_PROTOCOL.md"
+      ],
+      "weight": 0.9
+    },
+    {
+      "source": "sys_profile_pareto",
+      "target": "metric_energy_proxy_ratio",
+      "relation": "measured_on",
+      "evidence": [
+        "results/energy_bound.json"
+      ],
+      "weight": 0.8
+    },
+    {
+      "source": "sys_hf_optimiser",
+      "target": "sys_optimise_api",
+      "relation": "implements",
+      "evidence": [
+        "docs/tutorials/08_HF_OPTIMISER.md"
+      ],
+      "weight": 0.9
+    },
+    {
+      "source": "sys_hf_optimiser",
+      "target": "sys_bnnpack",
+      "relation": "requires",
+      "evidence": [
+        "docs/api/codec.md"
+      ],
+      "weight": 0.7
+    },
+    {
+      "source": "sys_bridge_recipes",
+      "target": "tool_torchao",
+      "relation": "implements",
+      "evidence": [
+        "results/bridge_gpu_torchao.json"
+      ],
+      "weight": 0.9
+    },
+    {
+      "source": "sys_bridge_recipes",
+      "target": "tool_bitnet_cpp",
+      "relation": "implements",
+      "evidence": [
+        "results/bridge_cpu_llamacpp_bitnet.json"
+      ],
+      "weight": 0.9
+    },
+    {
+      "source": "sys_bridge_recipes",
+      "target": "decision_wrap_tree",
+      "relation": "part_of",
+      "evidence": [
+        "docs/18_DECISION_TREE_AND_COMPLETE_ROADMAP.md"
+      ],
+      "weight": 0.85
+    },
+    {
+      "source": "result_ultra_wrap",
+      "target": "sys_ultra_wrap",
+      "relation": "measured_on",
+      "evidence": [
+        "results/ultra_wrap.json"
+      ],
+      "weight": 1.0
+    },
+    {
+      "source": "result_ultra_wrap",
+      "target": "algo_ternary_bitplane",
+      "relation": "measured_on",
+      "evidence": [
+        "tests/golden_floors.json ternary 16×"
+      ],
+      "weight": 0.9
+    },
+    {
+      "source": "result_robustness_fgsm",
+      "target": "result_mnist",
+      "relation": "measured_on",
+      "evidence": [
+        "results/robustness_fgsm.json"
+      ],
+      "weight": 0.7
+    },
+    {
+      "source": "result_ternary_pack",
+      "target": "algo_ternary_bitplane",
+      "relation": "measured_on",
+      "evidence": [
+        "results/ternary_pack.json"
+      ],
+      "weight": 1.0
+    },
+    {
+      "source": "metric_cosine_vs_fp",
+      "target": "result_wrap_e2e",
+      "relation": "measured_on",
+      "evidence": [
+        "results/wrap_demo.json cosine~0.31"
+      ],
+      "weight": 1.0
+    },
+    {
+      "source": "metric_cosine_vs_fp",
+      "target": "dual_metric_culture",
+      "relation": "part_of",
+      "evidence": [
+        "docs/FAIR_EVAL_PROTOCOL.md"
+      ],
+      "weight": 0.8
+    },
+    {
+      "source": "metric_energy_proxy_ratio",
+      "target": "energy_proxy_ept",
+      "relation": "derived_from",
+      "evidence": [
+        "results/energy_bound.json"
+      ],
+      "weight": 1.0
+    },
+    {
+      "source": "concept_sim_vs_packed",
+      "target": "fake_binary_sign",
+      "relation": "contradicts",
+      "evidence": [
+        "docs/03_FAILURE_ANALYSIS.md"
+      ],
+      "weight": 1.0
+    },
+    {
+      "source": "concept_sim_vs_packed",
+      "target": "algo_xnor_gemm",
+      "relation": "requires",
+      "evidence": [
+        "docs/05_PERFECTED_CONCEPT.md"
+      ],
+      "weight": 1.0
+    },
+    {
+      "source": "concept_word_vs_wallclock",
+      "target": "theoretical_word_reduction_64x",
+      "relation": "contradicts",
+      "evidence": [
+        "results/SUMMARY.md"
+      ],
+      "weight": 1.0
+    },
+    {
+      "source": "concept_word_vs_wallclock",
+      "target": "metric_s_compute",
+      "relation": "requires",
+      "evidence": [
+        "docs/06_CALCULATED_SPEEDUP_MODEL.md"
+      ],
+      "weight": 0.9
+    },
+    {
+      "source": "concept_word_vs_wallclock",
+      "target": "paper_b1_honest_speedup",
+      "relation": "part_of",
+      "evidence": [
+        "docs/32_NOVEL_PAPER_CANDIDATES.md"
+      ],
+      "weight": 1.0
+    },
+    {
+      "source": "hw_wasm",
+      "target": "gap_wasm",
+      "relation": "part_of",
+      "evidence": [
+        "docs/MOONSHOT_DEFERRALS.md"
+      ],
+      "weight": 1.0
+    },
+    {
+      "source": "decision_int8_npu_first",
+      "target": "hw_phone_npu",
+      "relation": "recommends_for",
+      "evidence": [
+        "docs/20_NPU_VENDOR_CLOSURE.md"
+      ],
+      "weight": 1.0
+    },
+    {
+      "source": "decision_int8_npu_first",
+      "target": "npu_no_native_1bit",
+      "relation": "derived_from",
+      "evidence": [
+        "docs/20_NPU_VENDOR_CLOSURE.md"
+      ],
+      "weight": 1.0
+    },
+    {
+      "source": "decision_fair_eval",
+      "target": "sys_repro_gates",
+      "relation": "requires",
+      "evidence": [
+        "docs/FAIR_EVAL_PROTOCOL.md"
+      ],
+      "weight": 1.0
+    },
+    {
+      "source": "decision_fair_eval",
+      "target": "thesis_lock",
+      "relation": "part_of",
+      "evidence": [
+        "AGENTS.md"
+      ],
+      "weight": 1.0
+    },
+    {
+      "source": "gap_layer_search_full",
+      "target": "sys_wrap_policy",
+      "relation": "blocked_by",
+      "evidence": [
+        "docs/MOONSHOT_DEFERRALS.md"
+      ],
+      "weight": 0.75
+    },
+    {
+      "source": "gap_bitnet_submodule",
+      "target": "tool_bitnet_cpp",
+      "relation": "blocked_by",
+      "evidence": [
+        "third_party/BITNET_PIN.md"
+      ],
+      "weight": 0.8
+    },
+    {
+      "source": "gap_fbi_llm_repro",
+      "target": "paper_fbi_llm",
+      "relation": "blocked_by",
+      "evidence": [
+        "ROADMAP.md"
+      ],
+      "weight": 0.8
+    },
+    {
+      "source": "tool_executorch",
+      "target": "tool_torchao",
+      "relation": "requires",
+      "evidence": [
+        "docs/14_HARDWARE_AND_ENERGY.md"
+      ],
+      "weight": 0.7
+    },
+    {
+      "source": "tool_executorch",
+      "target": "hw_phone_npu",
+      "relation": "recommends_for",
+      "evidence": [
+        "docs/16_ECOSYSTEM_AND_TOOLING.md"
+      ],
+      "weight": 0.6
+    },
+    {
+      "source": "dataset_glue_downstream",
+      "target": "paper_bitdistill",
+      "relation": "measured_on",
+      "evidence": [
+        "arXiv:2510.13998"
+      ],
+      "weight": 0.85
+    },
+    {
+      "source": "paper_awq",
+      "target": "method_absmean_ptq",
+      "relation": "alternative_to",
+      "evidence": [
+        "docs/24 — AWQ for GPU INT4"
+      ],
+      "weight": 0.75
+    },
+    {
+      "source": "sys_energy_module",
+      "target": "metric_energy_proxy_ratio",
+      "relation": "implements",
+      "evidence": [
+        "docs/spikes/RAPL_ENERGY_SPIKE.md"
+      ],
+      "weight": 0.9
+    },
+    {
+      "source": "bnn_lab_system",
+      "target": "sys_guide_e2e",
+      "relation": "part_of",
+      "evidence": [
+        "docs/GUIDE_E2E.md"
+      ],
+      "weight": 0.9
+    },
+    {
+      "source": "bnn_lab_system",
+      "target": "sys_bridge_recipes",
+      "relation": "part_of",
+      "evidence": [
+        "ROADMAP.md WC-P2"
+      ],
+      "weight": 0.85
+    },
+    {
+      "source": "org_microsoft_bitnet",
+      "target": "paper_bitdistill",
+      "relation": "part_of",
+      "evidence": [
+        "arXiv:2510.13998"
+      ],
+      "weight": 0.95,
+      "relation_original": "authored"
+    },
+    {
+      "source": "org_microsoft_bitnet",
+      "target": "paper_bitnet_2b4t",
+      "relation": "part_of",
+      "evidence": [
+        "arXiv:2504.12285"
+      ],
+      "weight": 0.95,
+      "relation_original": "authored"
+    },
+    {
+      "source": "paper.bireal.eccv2018",
+      "target": "metric.imagenet.bnn_ladder",
+      "relation": "measured_on",
+      "evidence": [
+        "Bi-Real-18 = 56.4% ImageNet top-1 (ECCV 2018 Table 2)."
+      ],
+      "weight": 1.0,
+      "relation_original": "contributes_metric"
+    },
+    {
+      "source": "paper.real2bin.iclr2020",
+      "target": "metric.imagenet.bnn_ladder",
+      "relation": "measured_on",
+      "evidence": [
+        "Real-to-Bin ResNet-18 = 65.4% top-1 ImageNet (ICLR 2020)."
+      ],
+      "weight": 1.0,
+      "relation_original": "contributes_metric"
+    },
+    {
+      "source": "paper.reactnet.eccv2020",
+      "target": "metric.imagenet.bnn_ladder",
+      "relation": "measured_on",
+      "evidence": [
+        "ReActNet-A 69.4%, ReActNet-C 71.4% ImageNet top-1."
+      ],
+      "weight": 1.0,
+      "relation_original": "contributes_metric"
+    },
+    {
+      "source": "paper.reactnet.eccv2020",
+      "target": "paper.bireal.eccv2018",
+      "relation": "improves",
+      "evidence": [
+        "RSign/RPReLU on Bi-Real-18 lifts 56.4% → 65.5%; MobileNet redesign exceeds Real-to-Binary."
+      ],
+      "weight": 1.0,
+      "relation_original": "improves_upon"
+    },
+    {
+      "source": "paper.reactnet.eccv2020",
+      "target": "paper.real2bin.iclr2020",
+      "relation": "improves",
+      "evidence": [
+        "ReActNet-A 69.4% vs Real-to-Binary 65.4% at lower OPs (0.87e8 vs ~1.65e8)."
+      ],
+      "weight": 1.0,
+      "relation_original": "outperforms_on_metric"
+    },
+    {
+      "source": "paper.bitnet.2023",
+      "target": "paper.bitnet_b158.2024",
+      "relation": "derived_from",
+      "evidence": [
+        "BitNet ±1 → b1.58 adds 0 for feature filtering / quality parity."
+      ],
+      "weight": 1.0,
+      "relation_original": "precedes"
+    },
+    {
+      "source": "paper.bitnet_b158.2024",
+      "target": "paper.bitnet_a48.2024",
+      "relation": "improves",
+      "evidence": [
+        "a4.8 continue-trains from W1.58A8 to 4-bit activations + sparsity."
+      ],
+      "weight": 1.0,
+      "relation_original": "extends"
+    },
+    {
+      "source": "paper.bitnet_b158.2024",
+      "target": "paper.bitnet_cpp.2024",
+      "relation": "requires",
+      "evidence": [
+        "bitnet.cpp provides lossless CPU ternary kernels for b1.58 models."
+      ],
+      "weight": 1.0,
+      "relation_original": "enabled_by_runtime"
+    },
+    {
+      "source": "paper.bitnet_cpp.2024",
+      "target": "artifact.hf_bitnet_2b",
+      "relation": "implements",
+      "evidence": [
+        "Official BitNet-b1.58-2B-4T listed in microsoft/BitNet model table (I2_S/TL kernels)."
+      ],
+      "weight": 1.0,
+      "relation_original": "runs_artifact"
+    },
+    {
+      "source": "paper.bitdistill.2025",
+      "target": "recipe.qat_158bit",
+      "relation": "implements",
+      "evidence": [
+        "SubLN + CPT + logits/attention distill stages."
+      ],
+      "weight": 1.0,
+      "relation_original": "defines_recipe"
+    },
+    {
+      "source": "paper.bitdistill.2025",
+      "target": "failure.ptq_to_ternary",
+      "relation": "improves",
+      "evidence": [
+        "Closes BitNet-SFT gap that widens with scale; recovers FP16-SFT task accuracy."
+      ],
+      "weight": 1.0,
+      "relation_original": "mitigates"
+    },
+    {
+      "source": "paper.bitdistill.2025",
+      "target": "decision.awq_gptq_vs_binary",
+      "relation": "alternative_to",
+      "evidence": [
+        "Paper Table 4: BitDistill works with GPTQ/AWQ/Block-Quant inits."
+      ],
+      "weight": 1.0,
+      "relation_original": "complements"
+    },
+    {
+      "source": "paper.bibert.2022",
+      "target": "failure.attention_binarization",
+      "relation": "derived_from",
+      "evidence": [
+        "Bi-Attention + DMD address attention entropy collapse and distill direction mismatch."
+      ],
+      "weight": 1.0,
+      "relation_original": "diagnoses"
+    },
+    {
+      "source": "paper.bibert.2022",
+      "target": "concept.binary_transformers",
+      "relation": "part_of",
+      "evidence": [
+        "Full W1A1E1 encoder BERT line distinct from BitLinear LLMs."
+      ],
+      "weight": 1.0,
+      "relation_original": "instance_of"
+    },
+    {
+      "source": "paper.bitnet.2023",
+      "target": "concept.binary_transformers",
+      "relation": "part_of",
+      "evidence": [
+        "BitLinear Transformer path (weights extreme, attention often higher bit)."
+      ],
+      "weight": 1.0,
+      "relation_original": "instance_of"
+    },
+    {
+      "source": "paper.finn.fpga2017",
+      "target": "tool.brevitas_finn",
+      "relation": "implements",
+      "evidence": [
+        "Modern flow trains in Brevitas then compiles with FINN."
+      ],
+      "weight": 1.0,
+      "relation_original": "deployed_via"
+    },
+    {
+      "source": "tool.larq_lce",
+      "target": "concept.mobile_npu_quant_reality",
+      "relation": "alternative_to",
+      "evidence": [
+        "When NPU lacks 1-bit, Larq CE on ARM CPU is the stock BNN path."
+      ],
+      "weight": 1.0
+    },
+    {
+      "source": "decision.awq_gptq_vs_binary",
+      "target": "paper.bitnet_cpp.2024",
+      "relation": "recommends_for",
+      "evidence": [
+        "Decision tree: GPU→AWQ/GPTQ/torchao; CPU LLM→bitnet.cpp."
+      ],
+      "weight": 1.0,
+      "relation_original": "prefers_when_cpu_llm"
+    },
+    {
+      "source": "decision.awq_gptq_vs_binary",
+      "target": "paper.finn.fpga2017",
+      "relation": "recommends_for",
+      "evidence": [
+        "Fixed vision topologies on FPGA: FINN FPS/W dominates GPU BOM."
+      ],
+      "weight": 1.0,
+      "relation_original": "prefers_when_fpga_vision"
+    },
+    {
+      "source": "paper.sparse_bitnet.2026",
+      "target": "paper.bitnet_b158.2024",
+      "relation": "improves",
+      "evidence": [
+        "Adds N:M masks + sparse TC kernels on ternary BitLinear."
+      ],
+      "weight": 1.0,
+      "relation_original": "hybridizes_with"
+    },
+    {
+      "source": "failure.bn_sensitivity",
+      "target": "paper.bireal.eccv2018",
+      "relation": "improves",
+      "evidence": [
+        "BN after binary conv is standard in Bi-Real / ReAct / Larq recipes."
+      ],
+      "weight": 1.0,
+      "relation_original": "mitigated_in_architecture"
+    },
+    {
+      "source": "failure.small_k_layers",
+      "target": "decision.awq_gptq_vs_binary",
+      "relation": "requires",
+      "evidence": [
+        "Thin layers should stay FP/INT8; binary only where K is wide enough for popcount win."
+      ],
+      "weight": 1.0,
+      "relation_original": "constrains"
+    },
+    {
+      "source": "citation.strengthen.lab_weak",
+      "target": "paper.real2bin.iclr2020",
+      "relation": "cites",
+      "evidence": [
+        "Lab named Real-to-Bin without arXiv:2003.11535 / 65.4%."
+      ],
+      "weight": 1.0,
+      "relation_original": "requires_cite"
+    },
+    {
+      "source": "citation.strengthen.lab_weak",
+      "target": "paper.bitdistill.2025",
+      "relation": "cites",
+      "evidence": [
+        "docs/13 mentions BitDistill without arXiv:2510.13998; avoid conflating BitDistiller."
+      ],
+      "weight": 1.0,
+      "relation_original": "requires_cite"
+    },
+    {
+      "source": "citation.strengthen.lab_weak",
+      "target": "paper.bitnet_cpp.2024",
+      "relation": "cites",
+      "evidence": [
+        "Energy −55–82% must be footnoted to M2/i7 tables in 2410.16144."
+      ],
+      "weight": 1.0,
+      "relation_original": "requires_cite"
+    },
+    {
+      "source": "paper.bitnet_a48.2024",
+      "target": "failure.attention_binarization",
+      "relation": "improves",
+      "evidence": [
+        "Keeps intermediate attn/FFN states sparse-INT8 rather than full INT4."
+      ],
+      "weight": 1.0,
+      "relation_original": "partially_avoids"
+    },
+    {
+      "source": "concept.mobile_npu_quant_reality",
+      "target": "decision.awq_gptq_vs_binary",
+      "relation": "part_of",
+      "evidence": [
+        "Phone NPU → INT8/INT4 stock path in decision tree."
+      ],
+      "weight": 1.0,
+      "relation_original": "informs"
+    },
+    {
+      "source": "recipe.qat_158bit",
+      "target": "paper.bitnet_b158.2024",
+      "relation": "requires",
+      "evidence": [
+        "From-scratch branch follows b1.58 absmean ternary + INT8 acts."
+      ],
+      "weight": 1.0,
+      "relation_original": "uses"
+    },
+    {
+      "source": "tool.brevitas_finn",
+      "target": "paper.finn.fpga2017",
+      "relation": "implements",
+      "evidence": [
+        "Brevitas is the PyTorch QAT front-end for modern FINN."
+      ],
+      "weight": 1.0,
+      "relation_original": "implements_flow_of"
+    },
+    {
+      "source": "paper.bireal.eccv2018",
+      "target": "paper_bireal",
+      "relation": "same_as",
+      "evidence": [
+        "enrichment↔lab ID alias (merge_kg_enrichment.py)"
+      ],
+      "weight": 1.0
+    },
+    {
+      "source": "paper_bireal",
+      "target": "paper.bireal.eccv2018",
+      "relation": "same_as",
+      "evidence": [
+        "enrichment↔lab ID alias (merge_kg_enrichment.py)"
+      ],
+      "weight": 1.0
+    },
+    {
+      "source": "paper.reactnet.eccv2020",
+      "target": "paper_reactnet",
+      "relation": "same_as",
+      "evidence": [
+        "enrichment↔lab ID alias (merge_kg_enrichment.py)"
+      ],
+      "weight": 1.0
+    },
+    {
+      "source": "paper_reactnet",
+      "target": "paper.reactnet.eccv2020",
+      "relation": "same_as",
+      "evidence": [
+        "enrichment↔lab ID alias (merge_kg_enrichment.py)"
+      ],
+      "weight": 1.0
+    },
+    {
+      "source": "paper.bitnet.2023",
+      "target": "paper_bitnet",
+      "relation": "same_as",
+      "evidence": [
+        "enrichment↔lab ID alias (merge_kg_enrichment.py)"
+      ],
+      "weight": 1.0
+    },
+    {
+      "source": "paper_bitnet",
+      "target": "paper.bitnet.2023",
+      "relation": "same_as",
+      "evidence": [
+        "enrichment↔lab ID alias (merge_kg_enrichment.py)"
+      ],
+      "weight": 1.0
+    },
+    {
+      "source": "paper.bitnet_b158.2024",
+      "target": "paper_bitnet_b158",
+      "relation": "same_as",
+      "evidence": [
+        "enrichment↔lab ID alias (merge_kg_enrichment.py)"
+      ],
+      "weight": 1.0
+    },
+    {
+      "source": "paper_bitnet_b158",
+      "target": "paper.bitnet_b158.2024",
+      "relation": "same_as",
+      "evidence": [
+        "enrichment↔lab ID alias (merge_kg_enrichment.py)"
+      ],
+      "weight": 1.0
+    },
+    {
+      "source": "paper.bitnet_a48.2024",
+      "target": "paper_bitnet_a48",
+      "relation": "same_as",
+      "evidence": [
+        "enrichment↔lab ID alias (merge_kg_enrichment.py)"
+      ],
+      "weight": 1.0
+    },
+    {
+      "source": "paper_bitnet_a48",
+      "target": "paper.bitnet_a48.2024",
+      "relation": "same_as",
+      "evidence": [
+        "enrichment↔lab ID alias (merge_kg_enrichment.py)"
+      ],
+      "weight": 1.0
+    },
+    {
+      "source": "paper.bitnet_cpp.2024",
+      "target": "paper_bitnet_cpp",
+      "relation": "same_as",
+      "evidence": [
+        "enrichment↔lab ID alias (merge_kg_enrichment.py)"
+      ],
+      "weight": 1.0
+    },
+    {
+      "source": "paper_bitnet_cpp",
+      "target": "paper.bitnet_cpp.2024",
+      "relation": "same_as",
+      "evidence": [
+        "enrichment↔lab ID alias (merge_kg_enrichment.py)"
+      ],
+      "weight": 1.0
+    },
+    {
+      "source": "paper.bitdistill.2025",
+      "target": "paper_bitdistill",
+      "relation": "same_as",
+      "evidence": [
+        "enrichment↔lab ID alias (merge_kg_enrichment.py)"
+      ],
+      "weight": 1.0
+    },
+    {
+      "source": "paper_bitdistill",
+      "target": "paper.bitdistill.2025",
+      "relation": "same_as",
+      "evidence": [
+        "enrichment↔lab ID alias (merge_kg_enrichment.py)"
+      ],
+      "weight": 1.0
+    },
+    {
+      "source": "paper.bibert.2022",
+      "target": "paper_bibert",
+      "relation": "same_as",
+      "evidence": [
+        "enrichment↔lab ID alias (merge_kg_enrichment.py)"
+      ],
+      "weight": 1.0
+    },
+    {
+      "source": "paper_bibert",
+      "target": "paper.bibert.2022",
+      "relation": "same_as",
+      "evidence": [
+        "enrichment↔lab ID alias (merge_kg_enrichment.py)"
+      ],
+      "weight": 1.0
+    },
+    {
+      "source": "paper.finn.fpga2017",
+      "target": "paper_finn",
+      "relation": "same_as",
+      "evidence": [
+        "enrichment↔lab ID alias (merge_kg_enrichment.py)"
+      ],
+      "weight": 1.0
+    },
+    {
+      "source": "paper_finn",
+      "target": "paper.finn.fpga2017",
+      "relation": "same_as",
+      "evidence": [
+        "enrichment↔lab ID alias (merge_kg_enrichment.py)"
+      ],
+      "weight": 1.0
+    },
+    {
+      "source": "paper.sparse_bitnet.2026",
+      "target": "paper_sparse_bitnet",
+      "relation": "same_as",
+      "evidence": [
+        "enrichment↔lab ID alias (merge_kg_enrichment.py)"
+      ],
+      "weight": 1.0
+    },
+    {
+      "source": "paper_sparse_bitnet",
+      "target": "paper.sparse_bitnet.2026",
+      "relation": "same_as",
+      "evidence": [
+        "enrichment↔lab ID alias (merge_kg_enrichment.py)"
+      ],
+      "weight": 1.0
+    },
+    {
+      "source": "tool.larq_lce",
+      "target": "tool_larq",
+      "relation": "same_as",
+      "evidence": [
+        "enrichment↔lab ID alias (merge_kg_enrichment.py)"
+      ],
+      "weight": 1.0
+    },
+    {
+      "source": "tool_larq",
+      "target": "tool.larq_lce",
+      "relation": "same_as",
+      "evidence": [
+        "enrichment↔lab ID alias (merge_kg_enrichment.py)"
+      ],
+      "weight": 1.0
+    },
+    {
+      "source": "tool.brevitas_finn",
+      "target": "tool_brevitas_finn",
+      "relation": "same_as",
+      "evidence": [
+        "enrichment↔lab ID alias (merge_kg_enrichment.py)"
+      ],
+      "weight": 1.0
+    },
+    {
+      "source": "tool_brevitas_finn",
+      "target": "tool.brevitas_finn",
+      "relation": "same_as",
+      "evidence": [
+        "enrichment↔lab ID alias (merge_kg_enrichment.py)"
+      ],
+      "weight": 1.0
+    },
+    {
+      "source": "failure.ptq_to_ternary",
+      "target": "ptq_ternary_llm_wipe",
+      "relation": "same_as",
+      "evidence": [
+        "enrichment↔lab ID alias (merge_kg_enrichment.py)"
+      ],
+      "weight": 1.0
+    },
+    {
+      "source": "ptq_ternary_llm_wipe",
+      "target": "failure.ptq_to_ternary",
+      "relation": "same_as",
+      "evidence": [
+        "enrichment↔lab ID alias (merge_kg_enrichment.py)"
+      ],
+      "weight": 1.0
+    },
+    {
+      "source": "concept.mobile_npu_quant_reality",
+      "target": "npu_no_native_1bit",
+      "relation": "same_as",
+      "evidence": [
+        "enrichment↔lab ID alias (merge_kg_enrichment.py)"
+      ],
+      "weight": 1.0
+    },
+    {
+      "source": "npu_no_native_1bit",
+      "target": "concept.mobile_npu_quant_reality",
+      "relation": "same_as",
+      "evidence": [
+        "enrichment↔lab ID alias (merge_kg_enrichment.py)"
+      ],
+      "weight": 1.0
+    },
+    {
+      "source": "decision.awq_gptq_vs_binary",
+      "target": "decision_wrap_tree",
+      "relation": "same_as",
+      "evidence": [
+        "enrichment↔lab ID alias (merge_kg_enrichment.py)"
+      ],
+      "weight": 1.0
+    },
+    {
+      "source": "decision_wrap_tree",
+      "target": "decision.awq_gptq_vs_binary",
+      "relation": "same_as",
+      "evidence": [
+        "enrichment↔lab ID alias (merge_kg_enrichment.py)"
+      ],
+      "weight": 1.0
+    },
+    {
+      "source": "artifact.hf_bitnet_2b",
+      "target": "paper_bitnet_2b4t",
+      "relation": "same_as",
+      "evidence": [
+        "enrichment↔lab ID alias (merge_kg_enrichment.py)"
+      ],
+      "weight": 1.0
+    },
+    {
+      "source": "paper_bitnet_2b4t",
+      "target": "artifact.hf_bitnet_2b",
+      "relation": "same_as",
+      "evidence": [
+        "enrichment↔lab ID alias (merge_kg_enrichment.py)"
+      ],
+      "weight": 1.0
+    }
+  ]
+}
