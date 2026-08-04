@@ -8,7 +8,7 @@
 | **Owns** | `wasm/**`, `bnn/kernels/wasm/**`, WASM docs/spike, `docs/lanes/f.md`, `tests/test_wasm_parity.py` |
 | **May read** | `bnn/kernels/binary_gemm.c` (read-only) |
 | **Status** | **Delivered (pedagogy)** — 2026-08-04 |
-| **HEAD** | _(updated on push; see PR tip)_ |
+| **HEAD** | `f0d11005971128ddb653122ec6836eab9978af7f` |
 | **PR** | https://github.com/KanakMalpani/Binary-Neural-Networks/pull/24 |
 
 ## Tasks
