@@ -77,9 +77,10 @@ mismatch) or MSVC `vcomp*.dll` ctypes load failures. Linux still links
 scaling. Local OpenMP: omit the env var / use `BNN_FORCE_OPENMP` on macOS via
 `compile_native`.
 
-**Skipped target:** `cp313-macosx_x86_64` — PyTorch has no wheel there, so a
-`bnn-lab` install (hard-deps `torch`) cannot succeed; we do not publish that
-tag. Use cp311/cp312 on Intel Mac, or cp313 on Apple Silicon / Win / Linux.
+**Skipped targets:** `*musllinux*` and `cp313-macosx_x86_64` — PyTorch has no
+wheels there, so a `bnn-lab` install (hard-deps `torch`) cannot succeed; we do
+not publish unloadable artifacts. Use manylinux / Win / macOS arm64 (and
+cp311–312 on Intel Mac).
 
 `hf` optional extra includes `safetensors` for Lane B packed export.
 

@@ -104,11 +104,16 @@ build-frontend = "build"
 # Single source of truth for target versions — matches the classifiers and the
 # CI matrix. Do not also set CIBW_BUILD in the workflow or the two can drift.
 build = ["cp311-*", "cp312-*", "cp313-*"]
-# PyPy: no torch. i686/win32: 32-bit, and a 32-bit DLL under 64-bit Python is
-# the WinError 193 trap. Free-threaded (t) builds lack reliable NumPy wheels.
-# cp313 macOS x86_64: PyTorch publishes no wheel yet, so `pip install bnn-lab`
-# (hard-deps torch) cannot succeed — do not ship an unloadable artifact.
-skip = ["*_i686", "*-win32", "*t-*", "cp313-macosx_x86_64"]
+# PyPy: no torch (and not in build=). i686/win32: 32-bit WinError 193 trap.
+# Free-threaded (t): unreliable NumPy. musllinux: PyTorch has no musl wheels, so
+# `pip install bnn-lab` cannot succeed. cp313 macOS x86_64: same (no torch wheel).
+skip = [
+  "*_i686",
+  "*-win32",
+  "*t-*",
+  "*musllinux*",
+  "cp313-macosx_x86_64",
+]
 test-requires = ["numpy"]
 test-command = "python {project}/scripts/check_wheel_kernel.py"
 

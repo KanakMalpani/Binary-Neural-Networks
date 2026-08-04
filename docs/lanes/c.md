@@ -59,7 +59,7 @@ gh workflow run wheels.yml --ref lane/c-release -f publish=false
 - Re-dispatch after fix: https://github.com/KanakMalpani/Binary-Neural-Networks/actions/runs/30924842591 (prior 30922905099 failed on cp313-macosx_x86_64 torch)
 - Branch tip: `8c2cd04`
 - PR: https://github.com/KanakMalpani/Binary-Neural-Networks/pull/16
-- Conclusion: _(await 30924842591; publish must stay skipped)_
+- Conclusion: run 30924842591 **failed** (linux musllinux torch gap; mac/win/sdist green; publish skipped). Re-dispatch after musllinux skip.
 
 - Also skip `cp313-macosx_x86_64` (no torch wheel → unloadable `bnn-lab`).
 
