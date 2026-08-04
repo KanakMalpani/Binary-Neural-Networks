@@ -16,6 +16,16 @@ For **ternary / 1.58-bit LLMs**, production CPU inference is **bitnet.cpp** (Mic
 - Portable lab artifacts: `bnn encode` / `bnn decode` (`.bnnpack`) — not a
   llama.cpp replacement
 
+## CLI (preferred)
+
+```bat
+bnn bridge list
+bnn bridge cpu-llm
+bnn bridge bitnet
+```
+
+Aliases `cpu-llm` / `bitnet` / `llamacpp` all run the same recipe script.
+
 ## Concrete recipe script
 
 ```bat
@@ -28,5 +38,6 @@ Writes `results/bridge_cpu_llamacpp_bitnet.json` with clone/build/quantize steps
 
 - `docs/12_WRAPPER_AND_EXISTING_MODELS.md`
 - `docs/20_NPU_VENDOR_CLOSURE.md` (no stock HTP ternary)
+- `docs/24_GPU_INT4_FP8_LANE.md` (GPU lane is INT4/FP8, not XNOR)
 - `docs/36_ENCODER_DECODER_AND_NEXT.md`
 - `bnn recommend --goal cpu-llm`

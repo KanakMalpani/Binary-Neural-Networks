@@ -27,6 +27,7 @@ def test_cli_help_lists_repro():
     assert "repro" in help_txt
     assert "optimise" in help_txt
     assert "pareto" in help_txt
+    assert "bridge" in help_txt
     assert "packed" in help_txt.lower() or "CPU" in help_txt or "edge" in help_txt
 
 

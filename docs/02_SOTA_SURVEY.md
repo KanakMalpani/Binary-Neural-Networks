@@ -1,5 +1,7 @@
 # State of the Art Survey (2016 → 2026)
 
+**Last reviewed (W12.T04):** 2026-08-04 — positioning row for this lab + bridge CLI; no invented goldens.
+
 ## Classic CNN BNNs (vision)
 
 | Method | Year | Weights | Activations | Key idea | Practical note |
@@ -65,7 +67,18 @@ Ternary (not pure ±1) matters: the **0** enables feature filtering and closes t
 | **Brevitas** | PyTorch | Flexible QAT including 1-bit | Need export path for real speed |
 | **torchao** | PyTorch | FP8/INT4/INT8, QAT, sparsity | Not a full 1-bit BNN stack; best for 4–8 bit GPU |
 | **bitnet.cpp** | C++/CUDA | Ternary LLM inference | Best open path for BitNet-style LLMs |
-| **This repo** | Pure PyTorch + NumPy packed kernels | Teach + measure real CPU XNOR speedups | Educational / research scaffold |
+| **This repo (`bnn-lab`)** | Pure PyTorch + NumPy packed kernels | Teach + measure real CPU XNOR speedups; `bnn bridge` → GPU INT4 / bitnet.cpp | Educational / research scaffold — not a llama.cpp replacement |
+
+## Related-work maintenance (W12.T04)
+
+| Axis | This lab’s honest position | Cite / do not claim |
+|------|----------------------------|---------------------|
+| Classic BNN accuracy | Canaries (MNIST / CIFAR proxy / synth audio) within `tests/golden_floors.json` | Not ImageNet SOTA; not production ASR |
+| Packed CPU speedup | Wall-clock from `results/benchmark.json`; dual-metric vs theory 32× | Never advertise theory pack ratio as latency |
+| LLM serve | Bridge to bitnet.cpp / GGUF (`bnn bridge cpu-llm`) | Not sign()+torch chat models |
+| GPU datacenter | Bridge to torchao / AWQ / vLLM (`bnn bridge gpu`) | Classic BNN XNOR is a non-goal on Tensor Cores |
+
+Refresh this table when new SOTA papers land; keep claims whitelist in [`docs/PUBLICATION_PLAN.md`](PUBLICATION_PLAN.md).
 
 ## What “works” in 2024–2026 practice (decision tree)
 
