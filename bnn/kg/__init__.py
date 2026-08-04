@@ -95,6 +95,7 @@ def validate_graph(graph: dict[str, Any] | None = None) -> list[str]:
     ids = [n["id"] for n in g["nodes"]]
     if len(ids) != len(set(ids)):
         errors.append("duplicate node ids")
+    by_id = {n["id"]: n for n in g["nodes"]}
     for e in dangling_edges(g):
         errors.append(f"dangling edge {e['source']} -> {e['target']}")
     for oid in orphan_nodes(g):
@@ -120,6 +121,15 @@ def validate_graph(graph: dict[str, Any] | None = None) -> list[str]:
         c = n.get("confidence")
         if not isinstance(c, (int, float)) or not (0.0 <= float(c) <= 1.0):
             errors.append(f"node {n.get('id')} bad confidence {c}")
+        alias = n.get("lab_alias")
+        if alias is not None:
+            if alias not in by_id:
+                errors.append(f"node {n.get('id')} lab_alias missing target {alias}")
+            elif by_id[alias].get("type") != n.get("type"):
+                errors.append(
+                    f"node {n.get('id')} lab_alias type mismatch "
+                    f"{n.get('type')} -> {by_id[alias].get('type')} ({alias})"
+                )
     for e in g["edges"]:
         for field in ("source", "target", "relation", "evidence"):
             if field not in e:
@@ -129,4 +139,11 @@ def validate_graph(graph: dict[str, Any] | None = None) -> list[str]:
             errors.append(f"unknown relation {e.get('relation')} on {e.get('source')}->{e.get('target')}")
         if not isinstance(e.get("evidence"), list) or not e["evidence"]:
             errors.append(f"edge {e.get('source')}->{e.get('target')} needs evidence list")
+        if e.get("relation") == "same_as":
+            src, tgt = by_id.get(e.get("source", "")), by_id.get(e.get("target", ""))
+            if src and tgt and src.get("type") != tgt.get("type"):
+                errors.append(
+                    f"same_as type mismatch {e.get('source')}({src.get('type')}) -> "
+                    f"{e.get('target')}({tgt.get('type')})"
+                )
     return errors

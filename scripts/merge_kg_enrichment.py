@@ -61,6 +61,8 @@ REL_MAP = {
 }
 
 # enrichment dotted id → lab snake_case id
+# Only true ID aliases (same entity). Cross-type / subset links belong as
+# implements / part_of / derived_from — applied by apply_kg_integrity.py.
 SAME_AS: dict[str, str] = {
     "paper.bireal.eccv2018": "paper_bireal",
     "paper.reactnet.eccv2020": "paper_reactnet",
@@ -75,9 +77,6 @@ SAME_AS: dict[str, str] = {
     "tool.larq_lce": "tool_larq",
     "tool.brevitas_finn": "tool_brevitas_finn",
     "failure.ptq_to_ternary": "ptq_ternary_llm_wipe",
-    "concept.mobile_npu_quant_reality": "npu_no_native_1bit",
-    "decision.awq_gptq_vs_binary": "decision_wrap_tree",
-    "artifact.hf_bitnet_2b": "paper_bitnet_2b4t",
 }
 
 

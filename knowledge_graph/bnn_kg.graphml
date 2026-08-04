@@ -296,7 +296,7 @@
       <data key="summary">Novel claim: mandatory dual metrics + fake-binary negative control + Amdahl/energy proxies; compression/op-count ≠ wall-clock. Idea vault only.</data>
       <data key="confidence">0.85</data>
       <data key="status">idea_vault</data>
-      <data key="sources">docs/32_NOVEL_PAPER_CANDIDATES.md | C:/00 Research Papers/BINARY_NEURAL_SERIES_README.md | C:/00 Research Papers/Stop Claiming 32x Honest Speedup Accounting for Binary Neural Networks/README.md</data>
+      <data key="sources">docs/32_NOVEL_PAPER_CANDIDATES.md</data>
     </node>
     <node id="paper_b2_packed_xnor">
       <data key="label">B2 — Packed XNOR on Commodity CPUs (Productization + Goldens)</data>
@@ -304,7 +304,7 @@
       <data key="summary">Novel claim: MSVC/portable packed XNOR recipe + fair pre-pack benches + machine-checkable golden gates for humans/AI agents. Idea vault only.</data>
       <data key="confidence">0.85</data>
       <data key="status">idea_vault</data>
-      <data key="sources">docs/32_NOVEL_PAPER_CANDIDATES.md | C:/00 Research Papers/Packed XNOR on Commodity CPUs Reproducible Productization and Golden Gates/README.md</data>
+      <data key="sources">docs/32_NOVEL_PAPER_CANDIDATES.md</data>
     </node>
     <node id="paper_b3_when_not">
       <data key="label">B3 — When Not to Binarize (Decision Tree + Hybrid Wrap)</data>
@@ -312,7 +312,7 @@
       <data key="summary">Novel claim: goal×hardware decision tree + hybrid FFN wrap evidence for honest wrapping vs INT4/FP8/GGUF / do-not-binarize. Idea vault only.</data>
       <data key="confidence">0.85</data>
       <data key="status">idea_vault</data>
-      <data key="sources">docs/32_NOVEL_PAPER_CANDIDATES.md | C:/00 Research Papers/When Not to Binarize Decision Tree for Hybrid Low-Bit Wrapping/README.md</data>
+      <data key="sources">docs/32_NOVEL_PAPER_CANDIDATES.md</data>
     </node>
     <node id="algo_ste_clip">
       <data key="label">Clipped STE (BinaryNet)</data>
@@ -360,7 +360,7 @@
       <data key="summary">2-bit / bitplane ternary path for {−1,0,+1}; ~16× compression vs FP32 when packed.</data>
       <data key="confidence">0.9</data>
       <data key="status">established</data>
-      <data key="sources">bnn/ternary_pack.py | results/ternary_pack.json | tests/golden_floors.json</data>
+      <data key="sources">bnn/kernels/ternary_pack.py | results/ternary_pack.json | tests/golden_floors.json</data>
     </node>
     <node id="algo_hybrid_ffn_wrap">
       <data key="label">Hybrid FFN-Only Wrap Protocol</data>
@@ -429,7 +429,7 @@
     <node id="sys_vision_cifar">
       <data key="label">Vision / CIFAR Bi-Real Lane</data>
       <data key="type">System</data>
-      <data key="summary">CIFAR-10 Bi-Real CNN: FP 71.14% vs binary 61.14% (10 pp gap); ImageNet protocol stub only.</data>
+      <data key="summary">CIFAR-10 Bi-Real CNN canary on main; Lane G PR #21 extends ResNet-BiReal + ImageNet protocol runner. No ImageNet SOTA golden.</data>
       <data key="confidence">0.95</data>
       <data key="status">established</data>
       <data key="sources">results/image_cifar.json | docs/tutorials/04_image_cifar.md | bnn/vision/</data>
@@ -445,10 +445,10 @@
     <node id="sys_energy_module">
       <data key="label">bnn.energy (Proxy + RAPL Spike)</data>
       <data key="type">System</data>
-      <data key="summary">Energy bound from wrap latency; Linux RAPL probe; Windows CLOSED-BY-PROXY.</data>
+      <data key="summary">Energy bound from wrap latency (E=P×t) on main; Lane H PR #22 adds RAPL probe + Windows CLOSED-BY-PROXY honesty. Not a golden floor.</data>
       <data key="confidence">0.9</data>
       <data key="status">established</data>
-      <data key="sources">bnn/energy/ | results/energy_bound.json | results/energy_rapl_spike.json | docs/spikes/RAPL_ENERGY_SPIKE.md</data>
+      <data key="sources">docs/14_HARDWARE_AND_ENERGY.md | results/energy_bound.json | results/energy_bound_measured.json | docs/spikes/RAPL_ENERGY_SPIKE.md | https://github.com/KanakMalpani/Binary-Neural-Networks/pull/22</data>
     </node>
     <node id="tool_bitnet_cpp">
       <data key="label">bitnet.cpp</data>
@@ -456,7 +456,7 @@
       <data key="summary">Microsoft official ternary LLM CPU(+GPU) inference; bridge recipes in scripts/bridges.</data>
       <data key="confidence">0.95</data>
       <data key="status">established</data>
-      <data key="sources">docs/23_BITNET_CPP_BRIDGE.md | arXiv:2410.16144 | third_party/BITNET_PIN.md</data>
+      <data key="sources">docs/23_BITNET_CPP_BRIDGE.md | arXiv:2410.16144 | https://github.com/KanakMalpani/Binary-Neural-Networks/pull/17</data>
     </node>
     <node id="tool_gguf_llamacpp">
       <data key="label">GGUF / llama.cpp</data>
@@ -661,7 +661,7 @@
     <node id="data_imagenet">
       <data key="label">ImageNet (protocol stub only)</data>
       <data key="type">Dataset</data>
-      <data key="summary">Full ImageNet SOTA is explicit non-goal; protocol folder stub for future.</data>
+      <data key="summary">Full ImageNet SOTA is an explicit non-goal. Protocol stub/docs on main; Lane G PR #21 adds runner — protocol ≠ SOTA claim.</data>
       <data key="confidence">0.8</data>
       <data key="status">non_goal_gate</data>
       <data key="sources">docs/imagenet_protocol.md | docs/MOONSHOT_DEFERRALS.md | ROADMAP.md</data>
@@ -709,31 +709,31 @@
     <node id="gap_wasm">
       <data key="label">OpenGap: WASM SIMD Demo</data>
       <data key="type">OpenGap</data>
-      <data key="summary">Optional browser pedagogy (W2.T06); not blocking v1.0 core.</data>
+      <data key="summary">Optional browser pedagogy (W2.T06); Lane F open PR #24 — spike/WASM tree not on main yet; not a v1.0 core gate.</data>
       <data key="confidence">0.8</data>
-      <data key="status">open</data>
-      <data key="sources">docs/MOONSHOT_DEFERRALS.md | docs/spikes/WASM_SIMD.md</data>
+      <data key="status">open_pr</data>
+      <data key="sources">docs/MOONSHOT_DEFERRALS.md | https://github.com/KanakMalpani/Binary-Neural-Networks/pull/24</data>
     </node>
     <node id="gap_bnnpack_v2">
       <data key="label">OpenGap: .bnnpack v2 + safetensors</data>
       <data key="type">OpenGap</data>
-      <data key="summary">Schema ADR + hashes + ternary meta + safetensors export still deferred.</data>
+      <data key="summary">Schema ADR + hashes + ternary meta + safetensors — Lane B open PR #18; not merged to main yet.</data>
       <data key="confidence">0.85</data>
-      <data key="status">open</data>
+      <data key="status">open_pr</data>
       <data key="sources">docs/MOONSHOT_DEFERRALS.md | docs/BNNPACK_V2_DESIGN.md</data>
     </node>
     <node id="gap_distill_integration">
       <data key="label">OpenGap: Distill Integration (W3.T08)</data>
       <data key="type">OpenGap</data>
-      <data key="summary">distill_sketch.py exists; full BitDistill-scale integration not shipped.</data>
+      <data key="summary">distill_sketch.py on main; Lane A PR #19 extends distill/BN-fuse/WC-O — full BitDistill-scale still not a golden.</data>
       <data key="confidence">0.85</data>
-      <data key="status">open</data>
+      <data key="status">open_pr</data>
       <data key="sources">docs/MOONSHOT_DEFERRALS.md | results/distill_sketch.json</data>
     </node>
     <node id="gap_pypi_trusted">
       <data key="label">OpenGap: First PyPI Trusted Publisher Upload</data>
       <data key="type">OpenGap</data>
-      <data key="summary">wheels.yml + docs ready; first bnn-lab upload via Trusted Publishing pending manual link.</data>
+      <data key="summary">wheels.yml + docs ready; Lane C PR #16 dry-run/attestations. First bnn-lab upload still needs human Trusted Publisher on pypi.org.</data>
       <data key="confidence">0.9</data>
       <data key="status">open</data>
       <data key="sources">docs/PYPI_PUBLISH.md | ROADMAP.md</data>
@@ -757,10 +757,10 @@
     <node id="gap_rapl_windows">
       <data key="label">OpenGap: Windows Board Joules (RAPL)</data>
       <data key="type">OpenGap</data>
-      <data key="summary">Linux RAPL spike delivered; Windows remains energy-proxy; no fake RAPL claims.</data>
+      <data key="summary">Windows has no portable RAPL — proxy only. Linux RAPL lands with Lane H PR #22; spike pointer doc is stub until that merge.</data>
       <data key="confidence">0.9</data>
-      <data key="status">closed_by_proxy_on_windows</data>
-      <data key="sources">docs/spikes/RAPL_ENERGY_SPIKE.md | results/energy_rapl_spike.json</data>
+      <data key="status">open_pr</data>
+      <data key="sources">docs/spikes/RAPL_ENERGY_SPIKE.md | docs/14_HARDWARE_AND_ENERGY.md | results/energy_bound.json | https://github.com/KanakMalpani/Binary-Neural-Networks/pull/22</data>
     </node>
     <node id="gap_venue_submit">
       <data key="label">OpenGap: Venue Submission of B1–B3</data>
@@ -968,7 +968,7 @@
       <data key="summary">Pareto field: fp=1.0, binary=E_bin/E_fp from proxy or RAPL spike.</data>
       <data key="confidence">0.9</data>
       <data key="status">established</data>
-      <data key="sources">results/energy_bound.json | docs/spikes/RAPL_ENERGY_SPIKE.md</data>
+      <data key="sources">results/energy_bound.json | docs/14_HARDWARE_AND_ENERGY.md | docs/spikes/RAPL_ENERGY_SPIKE.md</data>
     </node>
     <node id="concept_sim_vs_packed">
       <data key="label">Sim Mode vs Packed Mode Separation</data>
@@ -989,10 +989,10 @@
     <node id="hw_wasm">
       <data key="label">WebAssembly SIMD (deferred)</data>
       <data key="type">Hardware</data>
-      <data key="summary">Browser pedagogy target; spike notes exist; not shipped as gate.</data>
+      <data key="summary">Browser pedagogy target; Lane F PR #24 in progress. Not shipped as a golden gate.</data>
       <data key="confidence">0.7</data>
-      <data key="status">deferred</data>
-      <data key="sources">docs/spikes/WASM_SIMD.md | docs/MOONSHOT_DEFERRALS.md</data>
+      <data key="status">open_pr</data>
+      <data key="sources">docs/MOONSHOT_DEFERRALS.md | https://github.com/KanakMalpani/Binary-Neural-Networks/pull/24</data>
     </node>
     <node id="decision_int8_npu_first">
       <data key="label">INT8-First on Stock Phone NPU</data>
@@ -1013,18 +1013,18 @@
     <node id="gap_layer_search_full">
       <data key="label">OpenGap: Full Layer-wise Binary/Ternary Search</data>
       <data key="type">OpenGap</data>
-      <data key="summary">Sensitivity scores exist (W3.T05); full search W3.T06 still enrichable.</data>
+      <data key="summary">Sensitivity (W3.T05) on main; full binary/ternary/skip search W3.T06 in Lane A PR #19 — do not invent search goldens.</data>
       <data key="confidence">0.8</data>
-      <data key="status">open</data>
+      <data key="status">open_pr</data>
       <data key="sources">docs/MOONSHOT_DEFERRALS.md | docs/42_QAT_AND_LAYER_SEARCH.md</data>
     </node>
     <node id="gap_bitnet_submodule">
       <data key="label">OpenGap: bitnet.cpp as Git Submodule</data>
       <data key="type">OpenGap</data>
-      <data key="summary">Vendor pin/size; keep bridge recipe scripts instead of vendoring full tree.</data>
+      <data key="summary">Prefer thin pin + bridge recipes over full BitNet submodule. Lane I PR #17 hardens pins; BITNET_PIN.md lands with that PR.</data>
       <data key="confidence">0.85</data>
-      <data key="status">open</data>
-      <data key="sources">docs/MOONSHOT_DEFERRALS.md | third_party/BITNET_PIN.md</data>
+      <data key="status">open_pr</data>
+      <data key="sources">docs/MOONSHOT_DEFERRALS.md | docs/23_BITNET_CPP_BRIDGE.md | https://github.com/KanakMalpani/Binary-Neural-Networks/pull/17</data>
     </node>
     <node id="gap_fbi_llm_repro">
       <data key="label">OpenGap: FBI-LLM / Full Binary LLM Repro</data>
@@ -1032,7 +1032,7 @@
       <data key="summary">Literature path for fully binary LLMs; not a lab gate; cite only.</data>
       <data key="confidence">0.75</data>
       <data key="status">open</data>
-      <data key="sources">arXiv:2407.07093 | ROADMAP.md non-goals</data>
+      <data key="sources">arXiv:2407.07093 | ROADMAP.md | docs/MOONSHOT_DEFERRALS.md</data>
     </node>
     <node id="tool_executorch">
       <data key="label">ExecuTorch / Mobile Deployment</data>
@@ -1242,6 +1242,94 @@
       <data key="status">verified</data>
       <data key="sources">docs/02_SOTA_SURVEY.md | docs/13_TRAINING_QAT_DISTILL.md | docs/14_HARDWARE_AND_ENERGY.md</data>
     </node>
+    <node id="decision_wc_o_gates">
+      <data key="label">WC-O Optimiser Quality Gates (O1–O4)</data>
+      <data key="type">Decision</data>
+      <data key="summary">Calibration metrics, auto binary/ternary/skip policy, drop-in honesty thresholds, and short QAT vs cold PTQ — ROADMAP §1.3. Partial on main; Lane A PR #19 hardens — do not claim WC-O closed until integrator merges.</data>
+      <data key="confidence">0.9</data>
+      <data key="status">open_pr</data>
+      <data key="sources">ROADMAP.md | docs/42_QAT_AND_LAYER_SEARCH.md | https://github.com/KanakMalpani/Binary-Neural-Networks/pull/19</data>
+    </node>
+    <node id="sys_recommend_stack">
+      <data key="label">bnn recommend (stack router)</data>
+      <data key="type">System</data>
+      <data key="summary">CLI over recommend_stack.py — goal→hardware routing aligned with the wrap decision tree; bridges when BNN is the wrong tool.</data>
+      <data key="confidence">0.95</data>
+      <data key="status">established</data>
+      <data key="sources">scripts/recommend_stack.py | bnn/cli.py | docs/18_DECISION_TREE_AND_COMPLETE_ROADMAP.md</data>
+    </node>
+    <node id="sys_eval_suite">
+      <data key="label">bnn eval-suite</data>
+      <data key="type">System</data>
+      <data key="summary">Published-shape eval runner; dual-metric / fair-protocol companion to repro gates — no new golden shapes.</data>
+      <data key="confidence">0.95</data>
+      <data key="status">established</data>
+      <data key="sources">scripts/run_eval_suite.py | bnn/cli.py | docs/FAIR_EVAL_PROTOCOL.md | results/SUMMARY.md</data>
+    </node>
+    <node id="sys_kg">
+      <data key="label">Knowledge Graph (bnn.kg + CI)</data>
+      <data key="type">System</data>
+      <data key="summary">Validated lab corpus map in knowledge_graph/; loader bnn.kg; kg_validate + tests/test_kg.py gated in CI so integrity cannot silently drift.</data>
+      <data key="confidence">0.95</data>
+      <data key="status">established</data>
+      <data key="sources">knowledge_graph/bnn_kg.json | bnn/kg/__init__.py | scripts/kg_validate.py | tests/test_kg.py | docs/44_KNOWLEDGE_GRAPH.md</data>
+    </node>
+    <node id="paper_bitdistiller">
+      <data key="label">BitDistiller (Du et al., 2024)</data>
+      <data key="type">Paper</data>
+      <data key="summary">Sub-4-bit self-distillation arXiv:2402.10631 — distinct from BitNet Distillation (BitDistill, 2510.13998). Do not conflate names in lab docs.</data>
+      <data key="confidence">0.9</data>
+      <data key="status">literature</data>
+      <data key="sources">https://arxiv.org/abs/2402.10631 | knowledge_graph/enrichment/SOURCES.md | knowledge_graph/enrichment/NOTES.md</data>
+    </node>
+    <node id="paper_gptq">
+      <data key="label">GPTQ (Frantar et al., 2022)</data>
+      <data key="type">Paper</data>
+      <data key="summary">Second-order weight PTQ for LLM INT4; calib-domain sensitivity. Prefer with AWQ on GPU serve vs binary/ternary research paths.</data>
+      <data key="confidence">0.95</data>
+      <data key="status">literature</data>
+      <data key="sources">https://arxiv.org/abs/2210.17323 | docs/24_GPU_INT4_FP8_LANE.md</data>
+    </node>
+    <node id="paper_qsparse">
+      <data key="label">Q-Sparse (Wang et al., 2024)</data>
+      <data key="type">Paper</data>
+      <data key="summary">Activation sparsity for efficient LLMs (arXiv:2407.10969). Decision-tree neighbor to Sparse-BitNet / 2:4 sparsity — literature only; no local invented speedups.</data>
+      <data key="confidence">0.85</data>
+      <data key="status">literature</data>
+      <data key="sources">https://arxiv.org/abs/2407.10969 | docs/02_SOTA_SURVEY.md</data>
+    </node>
+    <node id="result_energy_rapl_spike">
+      <data key="label">RAPL Spike Result (Linux measure / Windows proxy)</data>
+      <data key="type">Result</data>
+      <data key="summary">Lane H PR #22: RAPL when powercap available; Windows CLOSED-BY-PROXY. Main tip still has latency energy_bound only — not a golden floor; do not invent board Joules.</data>
+      <data key="confidence">0.85</data>
+      <data key="status">open_pr</data>
+      <data key="sources">results/energy_bound.json | docs/14_HARDWARE_AND_ENERGY.md | docs/spikes/RAPL_ENERGY_SPIKE.md | docs/MOONSHOT_DEFERRALS.md | https://github.com/KanakMalpani/Binary-Neural-Networks/pull/22</data>
+    </node>
+    <node id="decision_nongoal_asr_whisper">
+      <data key="label">Non-goal: Production ASR / Whisper replacement</data>
+      <data key="type">Decision</data>
+      <data key="summary">Audio lane is packing/QAT pedagogy on features — not a production Whisper/ASR product. Prefer INT8 Whisper/ORT when ASR is the goal.</data>
+      <data key="confidence">0.95</data>
+      <data key="status">locked</data>
+      <data key="sources">docs/28_IMAGE_AUDIO_COMPLETION.md | ROADMAP.md | docs/MOONSHOT_DEFERRALS.md</data>
+    </node>
+    <node id="decision_nongoal_memory_arena">
+      <data key="label">Non-goal: Custom memory arena allocator</data>
+      <data key="type">Decision</data>
+      <data key="summary">Memory work stays footprint measurement + packed weight accounting (docs/43). Declined custom arena; do not reopen as a v1 gate.</data>
+      <data key="confidence">0.9</data>
+      <data key="status">locked</data>
+      <data key="sources">docs/43_MEMORY_FOOTPRINT.md | docs/MOONSHOT_DEFERRALS.md</data>
+    </node>
+    <node id="decision_imagenet_protocol_not_sota">
+      <data key="label">ImageNet protocol ≠ SOTA gate</data>
+      <data key="type">Decision</data>
+      <data key="summary">Keep ImageNet protocol runner/stub for honesty; never promote full ImageNet SOTA training schedule as a golden or WC gate.</data>
+      <data key="confidence">0.95</data>
+      <data key="status">locked</data>
+      <data key="sources">docs/imagenet_protocol.md | docs/MOONSHOT_DEFERRALS.md | ROADMAP.md</data>
+    </node>
     <edge id="e0" source="thesis_lock" target="dual_metric_culture">
       <data key="relation">requires</data>
       <data key="evidence">ROADMAP.md | AGENTS.md</data>
@@ -1422,1149 +1510,1264 @@
       <data key="evidence">arXiv:1808.00278</data>
       <data key="weight">1.0</data>
     </edge>
-    <edge id="e36" source="paper_bireal" target="sys_vision_cifar">
-      <data key="relation">implements</data>
-      <data key="evidence">results/image_cifar.json</data>
-      <data key="weight">0.85</data>
-    </edge>
-    <edge id="e37" source="paper_reactnet" target="algo_rsign_rprelu">
+    <edge id="e36" source="paper_reactnet" target="algo_rsign_rprelu">
       <data key="relation">derived_from</data>
       <data key="evidence">arXiv:2003.03488</data>
       <data key="weight">1.0</data>
     </edge>
-    <edge id="e38" source="paper_reactnet" target="paper_bireal">
+    <edge id="e37" source="paper_reactnet" target="paper_bireal">
       <data key="relation">improves</data>
       <data key="evidence">arXiv:2003.03488</data>
       <data key="weight">0.9</data>
     </edge>
-    <edge id="e39" source="paper_reactnet" target="gap_reactnet_in_repo">
+    <edge id="e38" source="paper_reactnet" target="gap_reactnet_in_repo">
       <data key="relation">blocked_by</data>
       <data key="evidence">docs/13_TRAINING_QAT_DISTILL.md</data>
       <data key="weight">0.8</data>
     </edge>
-    <edge id="e40" source="paper_irnet" target="algo_irnet_ede">
+    <edge id="e39" source="paper_irnet" target="algo_irnet_ede">
       <data key="relation">derived_from</data>
       <data key="evidence">arXiv:1909.10788</data>
       <data key="weight">1.0</data>
     </edge>
-    <edge id="e41" source="paper_bibert" target="paper_bnn_2016">
+    <edge id="e40" source="paper_bibert" target="paper_bnn_2016">
       <data key="relation">cites</data>
       <data key="evidence">arXiv:2203.06390</data>
       <data key="weight">0.7</data>
     </edge>
-    <edge id="e42" source="paper_bitnet" target="org_microsoft_bitnet">
+    <edge id="e41" source="paper_bitnet" target="org_microsoft_bitnet">
       <data key="relation">part_of</data>
       <data key="evidence">arXiv:2310.11453</data>
       <data key="weight">1.0</data>
     </edge>
-    <edge id="e43" source="paper_bitnet_b158" target="paper_bitnet">
+    <edge id="e42" source="paper_bitnet_b158" target="paper_bitnet">
       <data key="relation">improves</data>
       <data key="evidence">arXiv:2402.17764</data>
       <data key="weight">1.0</data>
     </edge>
-    <edge id="e44" source="paper_bitnet_b158" target="concept_ternary_zero_gate">
+    <edge id="e43" source="paper_bitnet_b158" target="concept_ternary_zero_gate">
       <data key="relation">derived_from</data>
       <data key="evidence">arXiv:2402.17764</data>
       <data key="weight">1.0</data>
     </edge>
-    <edge id="e45" source="paper_bitnet_b158" target="algo_ternary_bitplane">
+    <edge id="e44" source="paper_bitnet_b158" target="algo_ternary_bitplane">
       <data key="relation">derived_from</data>
       <data key="evidence">docs/02_SOTA_SURVEY.md</data>
       <data key="weight">0.7</data>
     </edge>
-    <edge id="e46" source="paper_bitnet_cpp" target="tool_bitnet_cpp">
+    <edge id="e45" source="paper_bitnet_cpp" target="tool_bitnet_cpp">
       <data key="relation">implements</data>
       <data key="evidence">arXiv:2410.16144</data>
       <data key="weight">1.0</data>
     </edge>
-    <edge id="e47" source="paper_bitnet_cpp" target="paper_bitnet_b158">
+    <edge id="e46" source="paper_bitnet_cpp" target="paper_bitnet_b158">
       <data key="relation">requires</data>
       <data key="evidence">arXiv:2410.16144</data>
       <data key="weight">0.9</data>
     </edge>
-    <edge id="e48" source="paper_bitnet_a48" target="paper_bitnet_b158">
+    <edge id="e47" source="paper_bitnet_a48" target="paper_bitnet_b158">
       <data key="relation">improves</data>
       <data key="evidence">arXiv:2411.04965</data>
       <data key="weight">0.85</data>
     </edge>
-    <edge id="e49" source="paper_bitnet_2b4t" target="paper_bitnet_b158">
+    <edge id="e48" source="paper_bitnet_2b4t" target="paper_bitnet_b158">
       <data key="relation">derived_from</data>
       <data key="evidence">arXiv:2504.12285</data>
       <data key="weight">0.9</data>
     </edge>
-    <edge id="e50" source="paper_bitdistill" target="paper_bitnet_b158">
+    <edge id="e49" source="paper_bitdistill" target="paper_bitnet_b158">
       <data key="relation">requires</data>
       <data key="evidence">arXiv:2510.13998</data>
       <data key="weight">0.9</data>
     </edge>
-    <edge id="e51" source="paper_bitdistill" target="ptq_ternary_llm_wipe">
+    <edge id="e50" source="paper_bitdistill" target="ptq_ternary_llm_wipe">
       <data key="relation">improves</data>
       <data key="evidence">arXiv:2510.13998</data>
       <data key="weight">0.95</data>
     </edge>
-    <edge id="e52" source="paper_sparse_bitnet" target="paper_bitnet_b158">
+    <edge id="e51" source="paper_sparse_bitnet" target="paper_bitnet_b158">
       <data key="relation">improves</data>
       <data key="evidence">arXiv:2603.05168</data>
       <data key="weight">0.7</data>
     </edge>
-    <edge id="e53" source="paper_sparse_bitnet" target="gap_litespark_local">
+    <edge id="e52" source="paper_sparse_bitnet" target="gap_litespark_local">
       <data key="relation">blocked_by</data>
       <data key="evidence">GAPS: not locally reproduced</data>
       <data key="weight">0.8</data>
     </edge>
-    <edge id="e54" source="paper_larq_ce" target="tool_larq">
+    <edge id="e53" source="paper_larq_ce" target="tool_larq">
       <data key="relation">implements</data>
       <data key="evidence">arXiv:2011.09398</data>
       <data key="weight">1.0</data>
     </edge>
-    <edge id="e55" source="paper_larq_ce" target="hw_arm_neon">
+    <edge id="e54" source="paper_larq_ce" target="hw_arm_neon">
       <data key="relation">measured_on</data>
       <data key="evidence">arXiv:2011.09398</data>
       <data key="weight">0.9</data>
     </edge>
-    <edge id="e56" source="paper_finn" target="tool_brevitas_finn">
+    <edge id="e55" source="paper_finn" target="tool_brevitas_finn">
       <data key="relation">implements</data>
       <data key="evidence">docs/14_HARDWARE_AND_ENERGY.md</data>
       <data key="weight">0.9</data>
     </edge>
-    <edge id="e57" source="paper_finn" target="hw_fpga_finn">
+    <edge id="e56" source="paper_finn" target="hw_fpga_finn">
       <data key="relation">recommends_for</data>
       <data key="evidence">docs/14_HARDWARE_AND_ENERGY.md</data>
       <data key="weight">1.0</data>
     </edge>
-    <edge id="e58" source="paper_litespark" target="gap_litespark_local">
+    <edge id="e57" source="paper_litespark" target="gap_litespark_local">
       <data key="relation">blocked_by</data>
       <data key="evidence">docs/02_SOTA_SURVEY.md</data>
       <data key="weight">0.85</data>
     </edge>
-    <edge id="e59" source="paper_awq" target="tool_torchao">
+    <edge id="e58" source="paper_awq" target="tool_torchao">
       <data key="relation">alternative_to</data>
       <data key="evidence">docs/24_GPU_INT4_FP8_LANE.md</data>
       <data key="weight">0.7</data>
     </edge>
-    <edge id="e60" source="paper_awq" target="tool_vllm_trt">
+    <edge id="e59" source="paper_awq" target="tool_vllm_trt">
       <data key="relation">recommends_for</data>
       <data key="evidence">docs/18_DECISION_TREE_AND_COMPLETE_ROADMAP.md</data>
       <data key="weight">0.85</data>
     </edge>
-    <edge id="e61" source="paper_b1_honest_speedup" target="dual_metric_culture">
+    <edge id="e60" source="paper_b1_honest_speedup" target="dual_metric_culture">
       <data key="relation">derived_from</data>
       <data key="evidence">docs/32_NOVEL_PAPER_CANDIDATES.md</data>
       <data key="weight">1.0</data>
     </edge>
-    <edge id="e62" source="paper_b1_honest_speedup" target="fake_binary_sign">
+    <edge id="e61" source="paper_b1_honest_speedup" target="fake_binary_sign">
       <data key="relation">requires</data>
       <data key="evidence">B1 README</data>
       <data key="weight">1.0</data>
     </edge>
-    <edge id="e63" source="paper_b1_honest_speedup" target="result_kernel_speedups">
+    <edge id="e62" source="paper_b1_honest_speedup" target="result_kernel_speedups">
       <data key="relation">measured_on</data>
       <data key="evidence">results/benchmark.json</data>
       <data key="weight">1.0</data>
     </edge>
-    <edge id="e64" source="paper_b1_honest_speedup" target="energy_proxy_ept">
+    <edge id="e63" source="paper_b1_honest_speedup" target="energy_proxy_ept">
       <data key="relation">requires</data>
       <data key="evidence">results/energy_bound.json</data>
       <data key="weight">0.9</data>
     </edge>
-    <edge id="e65" source="paper_b1_honest_speedup" target="gap_venue_submit">
+    <edge id="e64" source="paper_b1_honest_speedup" target="gap_venue_submit">
       <data key="relation">blocked_by</data>
       <data key="evidence">docs/32_NOVEL_PAPER_CANDIDATES.md</data>
       <data key="weight">0.8</data>
     </edge>
-    <edge id="e66" source="paper_b2_packed_xnor" target="sys_packed_kernels">
+    <edge id="e65" source="paper_b2_packed_xnor" target="sys_packed_kernels">
       <data key="relation">derived_from</data>
       <data key="evidence">docs/32_NOVEL_PAPER_CANDIDATES.md</data>
       <data key="weight">1.0</data>
     </edge>
-    <edge id="e67" source="paper_b2_packed_xnor" target="sys_repro_gates">
+    <edge id="e66" source="paper_b2_packed_xnor" target="sys_repro_gates">
       <data key="relation">requires</data>
       <data key="evidence">AGENTS.md | tests/golden_floors.json</data>
       <data key="weight">1.0</data>
     </edge>
-    <edge id="e68" source="paper_b2_packed_xnor" target="concept_prepack_once">
+    <edge id="e67" source="paper_b2_packed_xnor" target="concept_prepack_once">
       <data key="relation">requires</data>
       <data key="evidence">B2 README</data>
       <data key="weight">1.0</data>
     </edge>
-    <edge id="e69" source="paper_b2_packed_xnor" target="result_mnist">
+    <edge id="e68" source="paper_b2_packed_xnor" target="result_mnist">
       <data key="relation">measured_on</data>
       <data key="evidence">results/train_results.json</data>
       <data key="weight">0.7</data>
     </edge>
-    <edge id="e70" source="paper_b3_when_not" target="decision_wrap_tree">
+    <edge id="e69" source="paper_b3_when_not" target="decision_wrap_tree">
       <data key="relation">derived_from</data>
       <data key="evidence">docs/18_DECISION_TREE_AND_COMPLETE_ROADMAP.md</data>
       <data key="weight">1.0</data>
     </edge>
-    <edge id="e71" source="paper_b3_when_not" target="algo_hybrid_ffn_wrap">
+    <edge id="e70" source="paper_b3_when_not" target="algo_hybrid_ffn_wrap">
       <data key="relation">measured_on</data>
       <data key="evidence">results/hybrid_ffn_wrap.json</data>
       <data key="weight">1.0</data>
     </edge>
-    <edge id="e72" source="paper_b3_when_not" target="npu_no_native_1bit">
+    <edge id="e71" source="paper_b3_when_not" target="npu_no_native_1bit">
       <data key="relation">requires</data>
       <data key="evidence">docs/20_NPU_VENDOR_CLOSURE.md</data>
       <data key="weight">0.9</data>
     </edge>
-    <edge id="e73" source="paper_b3_when_not" target="tool_gguf_llamacpp">
+    <edge id="e72" source="paper_b3_when_not" target="tool_gguf_llamacpp">
       <data key="relation">recommends_for</data>
       <data key="evidence">docs/18_DECISION_TREE_AND_COMPLETE_ROADMAP.md</data>
       <data key="weight">0.8</data>
     </edge>
-    <edge id="e74" source="algo_xnor_gemm" target="sys_packed_kernels">
+    <edge id="e73" source="algo_xnor_gemm" target="sys_packed_kernels">
       <data key="relation">implements</data>
       <data key="evidence">bnn/kernels/ | results/benchmark.json</data>
       <data key="weight">1.0</data>
     </edge>
-    <edge id="e75" source="algo_xnor_gemm" target="result_kernel_speedups">
+    <edge id="e74" source="algo_xnor_gemm" target="result_kernel_speedups">
       <data key="relation">measured_on</data>
       <data key="evidence">results/benchmark.json</data>
       <data key="weight">1.0</data>
     </edge>
-    <edge id="e76" source="algo_xnor_gemm" target="hw_cpu_x86_popcnt">
+    <edge id="e75" source="algo_xnor_gemm" target="hw_cpu_x86_popcnt">
       <data key="relation">requires</data>
       <data key="evidence">docs/41_PORTABLE_SIMD_KERNEL.md</data>
       <data key="weight">0.95</data>
     </edge>
-    <edge id="e77" source="algo_ternary_bitplane" target="sys_ultra_wrap">
+    <edge id="e76" source="algo_ternary_bitplane" target="sys_ultra_wrap">
       <data key="relation">part_of</data>
       <data key="evidence">results/ultra_wrap.json</data>
       <data key="weight">0.7</data>
     </edge>
-    <edge id="e78" source="algo_hybrid_ffn_wrap" target="result_hybrid_ffn">
+    <edge id="e77" source="algo_hybrid_ffn_wrap" target="result_hybrid_ffn">
       <data key="relation">measured_on</data>
       <data key="evidence">results/hybrid_ffn_wrap.json</data>
       <data key="weight">1.0</data>
     </edge>
-    <edge id="e79" source="algo_hybrid_ffn_wrap" target="sys_ultra_wrap">
+    <edge id="e78" source="algo_hybrid_ffn_wrap" target="sys_ultra_wrap">
       <data key="relation">part_of</data>
       <data key="evidence">docs/33_ULTRA_WRAP_LAYER.md</data>
       <data key="weight">0.8</data>
     </edge>
-    <edge id="e80" source="algo_ste_clip" target="concept_ste_vs_inference">
+    <edge id="e79" source="algo_ste_clip" target="concept_ste_vs_inference">
       <data key="relation">part_of</data>
       <data key="evidence">docs/13_TRAINING_QAT_DISTILL.md</data>
       <data key="weight">0.8</data>
     </edge>
-    <edge id="e81" source="algo_approx_sign" target="result_ste_compare">
+    <edge id="e80" source="algo_approx_sign" target="result_ste_compare">
       <data key="relation">measured_on</data>
       <data key="evidence">results/math_ste_compare.json</data>
       <data key="weight">1.0</data>
     </edge>
-    <edge id="e82" source="algo_irnet_ede" target="result_ste_compare">
+    <edge id="e81" source="algo_irnet_ede" target="result_ste_compare">
       <data key="relation">measured_on</data>
       <data key="evidence">results/math_ste_compare.json</data>
       <data key="weight">0.9</data>
     </edge>
-    <edge id="e83" source="algo_rsign_rprelu" target="gap_reactnet_in_repo">
+    <edge id="e82" source="algo_rsign_rprelu" target="gap_reactnet_in_repo">
       <data key="relation">blocked_by</data>
       <data key="evidence">docs/13_TRAINING_QAT_DISTILL.md</data>
       <data key="weight">0.85</data>
     </edge>
-    <edge id="e84" source="sys_optimise_api" target="sys_ultra_wrap">
+    <edge id="e83" source="sys_optimise_api" target="sys_ultra_wrap">
       <data key="relation">improves</data>
       <data key="evidence">docs/adr/0001_public_optimiser_api.md</data>
       <data key="weight">0.85</data>
     </edge>
-    <edge id="e85" source="sys_optimise_api" target="decision_prefer_optimise">
+    <edge id="e84" source="sys_optimise_api" target="decision_prefer_optimise">
       <data key="relation">implements</data>
       <data key="evidence">AGENTS.md</data>
       <data key="weight">1.0</data>
     </edge>
-    <edge id="e86" source="sys_optimise_api" target="sys_bnnpack">
+    <edge id="e85" source="sys_optimise_api" target="sys_bnnpack">
       <data key="relation">requires</data>
       <data key="evidence">docs/api/optimise.md</data>
       <data key="weight">0.7</data>
     </edge>
-    <edge id="e87" source="sys_bnnpack" target="gap_bnnpack_v2">
+    <edge id="e86" source="sys_bnnpack" target="gap_bnnpack_v2">
       <data key="relation">blocked_by</data>
       <data key="evidence">docs/MOONSHOT_DEFERRALS.md</data>
       <data key="weight">0.8</data>
     </edge>
-    <edge id="e88" source="sys_repro_gates" target="result_mnist">
+    <edge id="e87" source="sys_repro_gates" target="result_mnist">
       <data key="relation">measured_on</data>
       <data key="evidence">tests/golden_floors.json</data>
       <data key="weight">1.0</data>
     </edge>
-    <edge id="e89" source="sys_repro_gates" target="result_cifar">
+    <edge id="e88" source="sys_repro_gates" target="result_cifar">
       <data key="relation">measured_on</data>
       <data key="evidence">tests/golden_floors.json</data>
       <data key="weight">1.0</data>
     </edge>
-    <edge id="e90" source="sys_repro_gates" target="result_audio">
+    <edge id="e89" source="sys_repro_gates" target="result_audio">
       <data key="relation">measured_on</data>
       <data key="evidence">tests/golden_floors.json</data>
       <data key="weight">1.0</data>
     </edge>
-    <edge id="e91" source="sys_repro_gates" target="compression_32x">
+    <edge id="e90" source="sys_repro_gates" target="compression_32x">
       <data key="relation">requires</data>
       <data key="evidence">AGENTS.md</data>
       <data key="weight">1.0</data>
     </edge>
-    <edge id="e92" source="sys_vision_cifar" target="data_cifar10">
+    <edge id="e91" source="sys_vision_cifar" target="data_cifar10">
       <data key="relation">measured_on</data>
       <data key="evidence">results/image_cifar.json</data>
       <data key="weight">1.0</data>
     </edge>
-    <edge id="e93" source="sys_vision_cifar" target="paper_bireal">
+    <edge id="e92" source="sys_vision_cifar" target="paper_bireal">
       <data key="relation">derived_from</data>
       <data key="evidence">docs/tutorials/04_image_cifar.md</data>
       <data key="weight">0.9</data>
     </edge>
-    <edge id="e94" source="sys_audio_synth" target="data_audio_synth">
+    <edge id="e93" source="sys_audio_synth" target="data_audio_synth">
       <data key="relation">measured_on</data>
       <data key="evidence">results/audio_synth.json</data>
       <data key="weight">1.0</data>
     </edge>
-    <edge id="e95" source="sys_seq_encdec" target="bnn_lab_system">
+    <edge id="e94" source="sys_seq_encdec" target="bnn_lab_system">
       <data key="relation">part_of</data>
       <data key="evidence">docs/36_ENCODER_DECODER_AND_NEXT.md</data>
       <data key="weight">0.8</data>
     </edge>
-    <edge id="e96" source="sys_energy_module" target="energy_proxy_ept">
+    <edge id="e95" source="sys_energy_module" target="energy_proxy_ept">
       <data key="relation">implements</data>
       <data key="evidence">bnn/energy/ | results/energy_bound.json</data>
       <data key="weight">1.0</data>
     </edge>
-    <edge id="e97" source="sys_energy_module" target="result_energy_bound">
+    <edge id="e96" source="sys_energy_module" target="result_energy_bound">
       <data key="relation">measured_on</data>
       <data key="evidence">results/energy_bound.json</data>
       <data key="weight">1.0</data>
     </edge>
-    <edge id="e98" source="sys_energy_module" target="gap_rapl_windows">
+    <edge id="e97" source="sys_energy_module" target="gap_rapl_windows">
       <data key="relation">blocked_by</data>
       <data key="evidence">docs/spikes/RAPL_ENERGY_SPIKE.md</data>
       <data key="weight">0.7</data>
     </edge>
-    <edge id="e99" source="sys_packed_kernels" target="result_openmp_scaling">
+    <edge id="e98" source="sys_packed_kernels" target="result_openmp_scaling">
       <data key="relation">measured_on</data>
       <data key="evidence">results/benchmark.json</data>
       <data key="weight">0.9</data>
     </edge>
-    <edge id="e100" source="sys_packed_kernels" target="hw_arm_neon">
+    <edge id="e99" source="sys_packed_kernels" target="hw_arm_neon">
       <data key="relation">implements</data>
       <data key="evidence">docs/41_PORTABLE_SIMD_KERNEL.md</data>
       <data key="weight">0.85</data>
     </edge>
-    <edge id="e101" source="bnn_lab_system" target="sys_optimise_api">
+    <edge id="e100" source="bnn_lab_system" target="sys_optimise_api">
       <data key="relation">part_of</data>
       <data key="evidence">ROADMAP.md</data>
       <data key="weight">0.9</data>
     </edge>
-    <edge id="e102" source="bnn_lab_system" target="sys_packed_kernels">
+    <edge id="e101" source="bnn_lab_system" target="sys_packed_kernels">
       <data key="relation">part_of</data>
       <data key="evidence">ROADMAP.md</data>
       <data key="weight">1.0</data>
     </edge>
-    <edge id="e103" source="bnn_lab_system" target="sys_repro_gates">
+    <edge id="e102" source="bnn_lab_system" target="sys_repro_gates">
       <data key="relation">part_of</data>
       <data key="evidence">AGENTS.md</data>
       <data key="weight">1.0</data>
     </edge>
-    <edge id="e104" source="decision_wrap_tree" target="hw_nvidia_gpu">
+    <edge id="e103" source="decision_wrap_tree" target="hw_nvidia_gpu">
       <data key="relation">recommends_for</data>
       <data key="evidence">docs/18 — FP8/AWQ path</data>
       <data key="weight">0.9</data>
     </edge>
-    <edge id="e105" source="decision_wrap_tree" target="tool_bitnet_cpp">
+    <edge id="e104" source="decision_wrap_tree" target="tool_bitnet_cpp">
       <data key="relation">recommends_for</data>
       <data key="evidence">docs/18 — BitNet checkpoint</data>
       <data key="weight">0.9</data>
     </edge>
-    <edge id="e106" source="decision_wrap_tree" target="tool_gguf_llamacpp">
+    <edge id="e105" source="decision_wrap_tree" target="tool_gguf_llamacpp">
       <data key="relation">recommends_for</data>
       <data key="evidence">docs/18 — non-BitNet CPU LLM</data>
       <data key="weight">0.9</data>
     </edge>
-    <edge id="e107" source="decision_wrap_tree" target="tool_larq">
+    <edge id="e106" source="decision_wrap_tree" target="tool_larq">
       <data key="relation">recommends_for</data>
       <data key="evidence">docs/18 — edge vision retrainable</data>
       <data key="weight">0.8</data>
     </edge>
-    <edge id="e108" source="decision_wrap_tree" target="tool_brevitas_finn">
+    <edge id="e107" source="decision_wrap_tree" target="tool_brevitas_finn">
       <data key="relation">recommends_for</data>
       <data key="evidence">docs/18 — FPGA</data>
       <data key="weight">0.8</data>
     </edge>
-    <edge id="e109" source="decision_wrap_tree" target="bnn_lab_system">
+    <edge id="e108" source="decision_wrap_tree" target="bnn_lab_system">
       <data key="relation">recommends_for</data>
       <data key="evidence">docs/18 — research/teach XNOR</data>
       <data key="weight">1.0</data>
     </edge>
-    <edge id="e110" source="decision_wrap_tree" target="paper_bitdistill">
+    <edge id="e109" source="decision_wrap_tree" target="paper_bitdistill">
       <data key="relation">recommends_for</data>
       <data key="evidence">docs/18 — convert HF LLM to 1.58</data>
       <data key="weight">0.85</data>
     </edge>
-    <edge id="e111" source="decision_wrap_tree" target="tool_tflite_openvino_ort">
+    <edge id="e110" source="decision_wrap_tree" target="tool_tflite_openvino_ort">
       <data key="relation">recommends_for</data>
       <data key="evidence">docs/18 — cannot retrain</data>
       <data key="weight">0.85</data>
     </edge>
-    <edge id="e112" source="decision_no_gpu_32x" target="fake_binary_sign">
+    <edge id="e111" source="decision_no_gpu_32x" target="fake_binary_sign">
       <data key="relation">contradicts</data>
       <data key="evidence">ROADMAP.md</data>
       <data key="weight">1.0</data>
     </edge>
-    <edge id="e113" source="decision_onnx_defer" target="gap_bnnpack_v2">
+    <edge id="e112" source="decision_onnx_defer" target="gap_bnnpack_v2">
       <data key="relation">part_of</data>
       <data key="evidence">docs/MOONSHOT_DEFERRALS.md</data>
       <data key="weight">0.6</data>
     </edge>
-    <edge id="e114" source="roadmap_v030" target="world_class_v1">
+    <edge id="e113" source="roadmap_v030" target="world_class_v1">
       <data key="relation">part_of</data>
       <data key="evidence">ROADMAP.md</data>
       <data key="weight">0.8</data>
     </edge>
-    <edge id="e115" source="roadmap_v030" target="sys_packed_kernels">
+    <edge id="e114" source="roadmap_v030" target="sys_packed_kernels">
       <data key="relation">implements</data>
       <data key="evidence">docs/40_ROADMAP_E2E_SESSION.md</data>
       <data key="weight">0.9</data>
     </edge>
-    <edge id="e116" source="world_class_v1" target="gap_pypi_trusted">
+    <edge id="e115" source="world_class_v1" target="gap_pypi_trusted">
       <data key="relation">blocked_by</data>
       <data key="evidence">ROADMAP.md scorecard</data>
       <data key="weight">0.7</data>
     </edge>
-    <edge id="e117" source="world_class_v1" target="gap_distill_integration">
+    <edge id="e116" source="world_class_v1" target="gap_distill_integration">
       <data key="relation">blocked_by</data>
       <data key="evidence">docs/MOONSHOT_DEFERRALS.md</data>
       <data key="weight">0.7</data>
     </edge>
-    <edge id="e118" source="world_class_v1" target="gap_bnnpack_v2">
+    <edge id="e117" source="world_class_v1" target="gap_bnnpack_v2">
       <data key="relation">blocked_by</data>
       <data key="evidence">docs/MOONSHOT_DEFERRALS.md</data>
       <data key="weight">0.6</data>
     </edge>
-    <edge id="e119" source="gap_wasm" target="sys_packed_kernels">
+    <edge id="e118" source="gap_wasm" target="sys_packed_kernels">
       <data key="relation">alternative_to</data>
       <data key="evidence">docs/spikes/WASM_SIMD.md</data>
       <data key="weight">0.5</data>
     </edge>
-    <edge id="e120" source="gap_imagenet_sota" target="data_imagenet">
+    <edge id="e119" source="gap_imagenet_sota" target="data_imagenet">
       <data key="relation">blocked_by</data>
       <data key="evidence">ROADMAP.md non-goals</data>
       <data key="weight">0.9</data>
     </edge>
-    <edge id="e121" source="gap_venue_submit" target="paper_b1_honest_speedup">
+    <edge id="e120" source="gap_venue_submit" target="paper_b1_honest_speedup">
       <data key="relation">blocked_by</data>
       <data key="evidence">docs/PUBLICATION_PLAN.md</data>
       <data key="weight">0.8</data>
     </edge>
-    <edge id="e122" source="gap_venue_submit" target="paper_b2_packed_xnor">
+    <edge id="e121" source="gap_venue_submit" target="paper_b2_packed_xnor">
       <data key="relation">blocked_by</data>
       <data key="evidence">docs/PUBLICATION_PLAN.md</data>
       <data key="weight">0.8</data>
     </edge>
-    <edge id="e123" source="gap_venue_submit" target="paper_b3_when_not">
+    <edge id="e122" source="gap_venue_submit" target="paper_b3_when_not">
       <data key="relation">blocked_by</data>
       <data key="evidence">docs/PUBLICATION_PLAN.md</data>
       <data key="weight">0.8</data>
     </edge>
-    <edge id="e124" source="result_kernel_speedups" target="metric_s_compute">
+    <edge id="e123" source="result_kernel_speedups" target="metric_s_compute">
       <data key="relation">measured_on</data>
       <data key="evidence">results/benchmark.json</data>
       <data key="weight">1.0</data>
     </edge>
-    <edge id="e125" source="result_wrap_e2e" target="metric_s_e2e">
+    <edge id="e124" source="result_wrap_e2e" target="metric_s_e2e">
       <data key="relation">measured_on</data>
       <data key="evidence">results/wrap_demo.json</data>
       <data key="weight">1.0</data>
     </edge>
-    <edge id="e126" source="result_wrap_e2e" target="compression_32x">
+    <edge id="e125" source="result_wrap_e2e" target="compression_32x">
       <data key="relation">measured_on</data>
       <data key="evidence">results/wrap_demo.json</data>
       <data key="weight">1.0</data>
     </edge>
-    <edge id="e127" source="result_energy_bound" target="result_wrap_e2e">
+    <edge id="e126" source="result_energy_bound" target="result_wrap_e2e">
       <data key="relation">derived_from</data>
       <data key="evidence">results/energy_bound.json</data>
       <data key="weight">1.0</data>
     </edge>
-    <edge id="e128" source="result_mnist" target="data_mnist">
+    <edge id="e127" source="result_mnist" target="data_mnist">
       <data key="relation">measured_on</data>
       <data key="evidence">results/train_results.json</data>
       <data key="weight">1.0</data>
     </edge>
-    <edge id="e129" source="result_cifar" target="accuracy_collapse">
+    <edge id="e128" source="result_cifar" target="accuracy_collapse">
       <data key="relation">measured_on</data>
       <data key="evidence">results/image_cifar.json 10pp gap</data>
       <data key="weight">0.7</data>
     </edge>
-    <edge id="e130" source="result_openmp_scaling" target="sys_packed_kernels">
+    <edge id="e129" source="result_openmp_scaling" target="sys_packed_kernels">
       <data key="relation">measured_on</data>
       <data key="evidence">results/benchmark.json thread_scaling</data>
       <data key="weight">0.9</data>
     </edge>
-    <edge id="e131" source="org_microsoft_bitnet" target="paper_bitnet">
+    <edge id="e130" source="org_microsoft_bitnet" target="paper_bitnet">
       <data key="relation">part_of</data>
       <data key="evidence">arXiv:2310.11453</data>
       <data key="weight">1.0</data>
     </edge>
-    <edge id="e132" source="org_microsoft_bitnet" target="tool_bitnet_cpp">
+    <edge id="e131" source="org_microsoft_bitnet" target="tool_bitnet_cpp">
       <data key="relation">implements</data>
       <data key="evidence">https://github.com/microsoft/BitNet</data>
       <data key="weight">1.0</data>
     </edge>
-    <edge id="e133" source="org_plumerai_larq" target="tool_larq">
+    <edge id="e132" source="org_plumerai_larq" target="tool_larq">
       <data key="relation">implements</data>
       <data key="evidence">arXiv:2011.09398</data>
       <data key="weight">0.9</data>
     </edge>
-    <edge id="e134" source="hw_cpu_x86_popcnt" target="algo_xnor_gemm">
+    <edge id="e133" source="hw_cpu_x86_popcnt" target="algo_xnor_gemm">
       <data key="relation">recommends_for</data>
       <data key="evidence">docs/14_HARDWARE_AND_ENERGY.md</data>
       <data key="weight">1.0</data>
     </edge>
-    <edge id="e135" source="hw_nvidia_gpu" target="decision_no_gpu_32x">
+    <edge id="e134" source="hw_nvidia_gpu" target="decision_no_gpu_32x">
       <data key="relation">requires</data>
       <data key="evidence">ROADMAP.md</data>
       <data key="weight">1.0</data>
     </edge>
-    <edge id="e136" source="hw_phone_npu" target="npu_no_native_1bit">
+    <edge id="e135" source="hw_phone_npu" target="npu_no_native_1bit">
       <data key="relation">measured_on</data>
       <data key="evidence">docs/20_NPU_VENDOR_CLOSURE.md</data>
       <data key="weight">1.0</data>
     </edge>
-    <edge id="e137" source="hw_fpga_finn" target="paper_finn">
+    <edge id="e136" source="hw_fpga_finn" target="paper_finn">
       <data key="relation">recommends_for</data>
       <data key="evidence">docs/14_HARDWARE_AND_ENERGY.md</data>
       <data key="weight">0.9</data>
     </edge>
-    <edge id="e138" source="concept_ste_vs_inference" target="thesis_lock">
+    <edge id="e137" source="concept_ste_vs_inference" target="thesis_lock">
       <data key="relation">part_of</data>
       <data key="evidence">ROADMAP.md</data>
       <data key="weight">1.0</data>
     </edge>
-    <edge id="e139" source="concept_fp_shortcuts" target="sys_vision_cifar">
+    <edge id="e138" source="concept_fp_shortcuts" target="sys_vision_cifar">
       <data key="relation">implements</data>
       <data key="evidence">bnn/vision/</data>
       <data key="weight">0.85</data>
     </edge>
-    <edge id="e140" source="concept_prepack_once" target="result_kernel_speedups">
+    <edge id="e139" source="concept_prepack_once" target="result_kernel_speedups">
       <data key="relation">requires</data>
       <data key="evidence">results/benchmark.json</data>
       <data key="weight">1.0</data>
     </edge>
-    <edge id="e141" source="concept_ternary_zero_gate" target="paper_bitnet_b158">
+    <edge id="e140" source="concept_ternary_zero_gate" target="paper_bitnet_b158">
       <data key="relation">derived_from</data>
       <data key="evidence">arXiv:2402.17764</data>
       <data key="weight">1.0</data>
     </edge>
-    <edge id="e142" source="tool_bitnet_cpp" target="bnn_lab_system">
+    <edge id="e141" source="tool_bitnet_cpp" target="bnn_lab_system">
       <data key="relation">alternative_to</data>
       <data key="evidence">docs/23_BITNET_CPP_BRIDGE.md</data>
       <data key="weight">0.75</data>
     </edge>
-    <edge id="e143" source="tool_gguf_llamacpp" target="bnn_lab_system">
+    <edge id="e142" source="tool_gguf_llamacpp" target="bnn_lab_system">
       <data key="relation">alternative_to</data>
       <data key="evidence">docs/22_HF_TO_GGUF_GUIDE.md</data>
       <data key="weight">0.7</data>
     </edge>
-    <edge id="e144" source="tool_torchao" target="algo_xnor_gemm">
+    <edge id="e143" source="tool_torchao" target="algo_xnor_gemm">
       <data key="relation">alternative_to</data>
       <data key="evidence">docs/24_GPU_INT4_FP8_LANE.md</data>
       <data key="weight">0.8</data>
     </edge>
-    <edge id="e145" source="tool_vllm_trt" target="fake_binary_sign">
+    <edge id="e144" source="tool_vllm_trt" target="fake_binary_sign">
       <data key="relation">alternative_to</data>
       <data key="evidence">docs/18_DECISION_TREE_AND_COMPLETE_ROADMAP.md</data>
       <data key="weight">0.85</data>
     </edge>
-    <edge id="e146" source="paper_binaryconnect" target="paper_bnn_2016">
+    <edge id="e145" source="paper_binaryconnect" target="paper_bnn_2016">
       <data key="relation">part_of</data>
       <data key="evidence">docs/02_SOTA_SURVEY.md</data>
       <data key="weight">0.8</data>
     </edge>
-    <edge id="e147" source="paper_binaryconnect" target="compression_32x">
+    <edge id="e146" source="paper_binaryconnect" target="compression_32x">
       <data key="relation">improves</data>
       <data key="evidence">docs/02 — weight-only memory</data>
       <data key="weight">0.5</data>
     </edge>
-    <edge id="e148" source="paper_dorefa" target="paper_bnn_2016">
+    <edge id="e147" source="paper_dorefa" target="paper_bnn_2016">
       <data key="relation">improves</data>
       <data key="evidence">docs/02_SOTA_SURVEY.md</data>
       <data key="weight">0.6</data>
     </edge>
-    <edge id="e149" source="paper_fbi_llm" target="paper_bitnet">
+    <edge id="e148" source="paper_fbi_llm" target="paper_bitnet">
       <data key="relation">alternative_to</data>
       <data key="evidence">arXiv:2407.07093</data>
       <data key="weight">0.7</data>
     </edge>
-    <edge id="e150" source="paper_fbi_llm" target="gap_fbi_llm_repro">
+    <edge id="e149" source="paper_fbi_llm" target="gap_fbi_llm_repro">
       <data key="relation">blocked_by</data>
       <data key="evidence">ROADMAP non-goals</data>
       <data key="weight">0.8</data>
     </edge>
-    <edge id="e151" source="paper_bitnet_v2" target="paper_bitnet_a48">
+    <edge id="e150" source="paper_bitnet_v2" target="paper_bitnet_a48">
       <data key="relation">improves</data>
       <data key="evidence">arXiv:2504.18415</data>
       <data key="weight">0.85</data>
     </edge>
-    <edge id="e152" source="paper_bitnet_v2" target="org_microsoft_bitnet">
+    <edge id="e151" source="paper_bitnet_v2" target="org_microsoft_bitnet">
       <data key="relation">part_of</data>
       <data key="evidence">arXiv:2504.18415</data>
       <data key="weight">0.9</data>
     </edge>
-    <edge id="e153" source="method_tmac" target="tool_bitnet_cpp">
+    <edge id="e152" source="method_tmac" target="tool_bitnet_cpp">
       <data key="relation">alternative_to</data>
       <data key="evidence">docs/02_SOTA_SURVEY.md</data>
       <data key="weight">0.7</data>
     </edge>
-    <edge id="e154" source="method_tmac" target="algo_ternary_bitplane">
+    <edge id="e153" source="method_tmac" target="algo_ternary_bitplane">
       <data key="relation">part_of</data>
       <data key="evidence">docs/16_ECOSYSTEM_AND_TOOLING.md</data>
       <data key="weight">0.5</data>
     </edge>
-    <edge id="e155" source="method_surge" target="ste_mismatch">
+    <edge id="e154" source="method_surge" target="ste_mismatch">
       <data key="relation">improves</data>
       <data key="evidence">docs/03_FAILURE_ANALYSIS.md</data>
       <data key="weight">0.75</data>
     </edge>
-    <edge id="e156" source="method_surge" target="algo_ste_clip">
+    <edge id="e155" source="method_surge" target="algo_ste_clip">
       <data key="relation">alternative_to</data>
       <data key="evidence">docs/13_TRAINING_QAT_DISTILL.md</data>
       <data key="weight">0.7</data>
     </edge>
-    <edge id="e157" source="method_absmean_ptq" target="ptq_ternary_llm_wipe">
+    <edge id="e156" source="method_absmean_ptq" target="ptq_ternary_llm_wipe">
       <data key="relation">part_of</data>
       <data key="evidence">docs/18_DECISION_TREE_AND_COMPLETE_ROADMAP.md</data>
       <data key="weight">1.0</data>
     </edge>
-    <edge id="e158" source="method_absmean_ptq" target="paper_bitdistill">
+    <edge id="e157" source="method_absmean_ptq" target="paper_bitdistill">
       <data key="relation">contradicts</data>
       <data key="evidence">arXiv:2510.13998 — CPT+distill needed</data>
       <data key="weight">0.95</data>
     </edge>
-    <edge id="e159" source="sys_guide_e2e" target="sys_optimise_api">
+    <edge id="e158" source="sys_guide_e2e" target="sys_optimise_api">
       <data key="relation">recommends_for</data>
       <data key="evidence">docs/GUIDE_E2E.md</data>
       <data key="weight">1.0</data>
     </edge>
-    <edge id="e160" source="sys_guide_e2e" target="sys_repro_gates">
+    <edge id="e159" source="sys_guide_e2e" target="sys_repro_gates">
       <data key="relation">requires</data>
       <data key="evidence">AGENTS.md</data>
       <data key="weight">1.0</data>
     </edge>
-    <edge id="e161" source="sys_guide_e2e" target="bnn_lab_system">
+    <edge id="e160" source="sys_guide_e2e" target="bnn_lab_system">
       <data key="relation">part_of</data>
       <data key="evidence">docs/39_GUIDE_E2E_COMPLETION.md</data>
       <data key="weight">0.9</data>
     </edge>
-    <edge id="e162" source="sys_wrap_policy" target="sys_optimise_api">
+    <edge id="e161" source="sys_wrap_policy" target="sys_optimise_api">
       <data key="relation">part_of</data>
       <data key="evidence">docs/42_QAT_AND_LAYER_SEARCH.md</data>
       <data key="weight">0.9</data>
     </edge>
-    <edge id="e163" source="sys_wrap_policy" target="algo_hybrid_ffn_wrap">
+    <edge id="e162" source="sys_wrap_policy" target="algo_hybrid_ffn_wrap">
       <data key="relation">recommends_for</data>
       <data key="evidence">bnn/wrap/policy.py</data>
       <data key="weight">0.8</data>
     </edge>
-    <edge id="e164" source="sys_wrap_policy" target="gap_layer_search_full">
+    <edge id="e163" source="sys_wrap_policy" target="gap_layer_search_full">
       <data key="relation">blocked_by</data>
       <data key="evidence">docs/MOONSHOT_DEFERRALS.md</data>
       <data key="weight">0.7</data>
     </edge>
-    <edge id="e165" source="sys_calibrate_qat" target="metric_cosine_vs_fp">
+    <edge id="e164" source="sys_calibrate_qat" target="metric_cosine_vs_fp">
       <data key="relation">improves</data>
       <data key="evidence">docs/42_QAT_AND_LAYER_SEARCH.md</data>
       <data key="weight">0.9</data>
     </edge>
-    <edge id="e166" source="sys_calibrate_qat" target="algo_ste_clip">
+    <edge id="e165" source="sys_calibrate_qat" target="algo_ste_clip">
       <data key="relation">requires</data>
       <data key="evidence">bnn/wrap/qat.py</data>
       <data key="weight">0.8</data>
     </edge>
-    <edge id="e167" source="sys_calibrate_qat" target="result_ultra_wrap">
+    <edge id="e166" source="sys_calibrate_qat" target="result_ultra_wrap">
       <data key="relation">measured_on</data>
       <data key="evidence">results/ultra_wrap.json</data>
       <data key="weight">0.85</data>
     </edge>
-    <edge id="e168" source="sys_profile_pareto" target="dual_metric_culture">
+    <edge id="e167" source="sys_profile_pareto" target="dual_metric_culture">
       <data key="relation">implements</data>
       <data key="evidence">docs/FAIR_EVAL_PROTOCOL.md</data>
       <data key="weight">0.9</data>
     </edge>
-    <edge id="e169" source="sys_profile_pareto" target="metric_energy_proxy_ratio">
+    <edge id="e168" source="sys_profile_pareto" target="metric_energy_proxy_ratio">
       <data key="relation">measured_on</data>
       <data key="evidence">results/energy_bound.json</data>
       <data key="weight">0.8</data>
     </edge>
-    <edge id="e170" source="sys_hf_optimiser" target="sys_optimise_api">
+    <edge id="e169" source="sys_hf_optimiser" target="sys_optimise_api">
       <data key="relation">implements</data>
       <data key="evidence">docs/tutorials/08_HF_OPTIMISER.md</data>
       <data key="weight">0.9</data>
     </edge>
-    <edge id="e171" source="sys_hf_optimiser" target="sys_bnnpack">
+    <edge id="e170" source="sys_hf_optimiser" target="sys_bnnpack">
       <data key="relation">requires</data>
       <data key="evidence">docs/api/codec.md</data>
       <data key="weight">0.7</data>
     </edge>
-    <edge id="e172" source="sys_bridge_recipes" target="tool_torchao">
+    <edge id="e171" source="sys_bridge_recipes" target="tool_torchao">
       <data key="relation">implements</data>
       <data key="evidence">results/bridge_gpu_torchao.json</data>
       <data key="weight">0.9</data>
     </edge>
-    <edge id="e173" source="sys_bridge_recipes" target="tool_bitnet_cpp">
+    <edge id="e172" source="sys_bridge_recipes" target="tool_bitnet_cpp">
       <data key="relation">implements</data>
       <data key="evidence">results/bridge_cpu_llamacpp_bitnet.json</data>
       <data key="weight">0.9</data>
     </edge>
-    <edge id="e174" source="sys_bridge_recipes" target="decision_wrap_tree">
+    <edge id="e173" source="sys_bridge_recipes" target="decision_wrap_tree">
       <data key="relation">part_of</data>
       <data key="evidence">docs/18_DECISION_TREE_AND_COMPLETE_ROADMAP.md</data>
       <data key="weight">0.85</data>
     </edge>
-    <edge id="e175" source="result_ultra_wrap" target="sys_ultra_wrap">
+    <edge id="e174" source="result_ultra_wrap" target="sys_ultra_wrap">
       <data key="relation">measured_on</data>
       <data key="evidence">results/ultra_wrap.json</data>
       <data key="weight">1.0</data>
     </edge>
-    <edge id="e176" source="result_ultra_wrap" target="algo_ternary_bitplane">
+    <edge id="e175" source="result_ultra_wrap" target="algo_ternary_bitplane">
       <data key="relation">measured_on</data>
       <data key="evidence">tests/golden_floors.json ternary 16×</data>
       <data key="weight">0.9</data>
     </edge>
-    <edge id="e177" source="result_robustness_fgsm" target="result_mnist">
+    <edge id="e176" source="result_robustness_fgsm" target="result_mnist">
       <data key="relation">measured_on</data>
       <data key="evidence">results/robustness_fgsm.json</data>
       <data key="weight">0.7</data>
     </edge>
-    <edge id="e178" source="result_ternary_pack" target="algo_ternary_bitplane">
+    <edge id="e177" source="result_ternary_pack" target="algo_ternary_bitplane">
       <data key="relation">measured_on</data>
       <data key="evidence">results/ternary_pack.json</data>
       <data key="weight">1.0</data>
     </edge>
-    <edge id="e179" source="metric_cosine_vs_fp" target="result_wrap_e2e">
+    <edge id="e178" source="metric_cosine_vs_fp" target="result_wrap_e2e">
       <data key="relation">measured_on</data>
       <data key="evidence">results/wrap_demo.json cosine~0.31</data>
       <data key="weight">1.0</data>
     </edge>
-    <edge id="e180" source="metric_cosine_vs_fp" target="dual_metric_culture">
+    <edge id="e179" source="metric_cosine_vs_fp" target="dual_metric_culture">
       <data key="relation">part_of</data>
       <data key="evidence">docs/FAIR_EVAL_PROTOCOL.md</data>
       <data key="weight">0.8</data>
     </edge>
-    <edge id="e181" source="metric_energy_proxy_ratio" target="energy_proxy_ept">
+    <edge id="e180" source="metric_energy_proxy_ratio" target="energy_proxy_ept">
       <data key="relation">derived_from</data>
       <data key="evidence">results/energy_bound.json</data>
       <data key="weight">1.0</data>
     </edge>
-    <edge id="e182" source="concept_sim_vs_packed" target="fake_binary_sign">
+    <edge id="e181" source="concept_sim_vs_packed" target="fake_binary_sign">
       <data key="relation">contradicts</data>
       <data key="evidence">docs/03_FAILURE_ANALYSIS.md</data>
       <data key="weight">1.0</data>
     </edge>
-    <edge id="e183" source="concept_sim_vs_packed" target="algo_xnor_gemm">
+    <edge id="e182" source="concept_sim_vs_packed" target="algo_xnor_gemm">
       <data key="relation">requires</data>
       <data key="evidence">docs/05_PERFECTED_CONCEPT.md</data>
       <data key="weight">1.0</data>
     </edge>
-    <edge id="e184" source="concept_word_vs_wallclock" target="theoretical_word_reduction_64x">
+    <edge id="e183" source="concept_word_vs_wallclock" target="theoretical_word_reduction_64x">
       <data key="relation">contradicts</data>
       <data key="evidence">results/SUMMARY.md</data>
       <data key="weight">1.0</data>
     </edge>
-    <edge id="e185" source="concept_word_vs_wallclock" target="metric_s_compute">
+    <edge id="e184" source="concept_word_vs_wallclock" target="metric_s_compute">
       <data key="relation">requires</data>
       <data key="evidence">docs/06_CALCULATED_SPEEDUP_MODEL.md</data>
       <data key="weight">0.9</data>
     </edge>
-    <edge id="e186" source="concept_word_vs_wallclock" target="paper_b1_honest_speedup">
+    <edge id="e185" source="concept_word_vs_wallclock" target="paper_b1_honest_speedup">
       <data key="relation">part_of</data>
       <data key="evidence">docs/32_NOVEL_PAPER_CANDIDATES.md</data>
       <data key="weight">1.0</data>
     </edge>
-    <edge id="e187" source="hw_wasm" target="gap_wasm">
+    <edge id="e186" source="hw_wasm" target="gap_wasm">
       <data key="relation">part_of</data>
       <data key="evidence">docs/MOONSHOT_DEFERRALS.md</data>
       <data key="weight">1.0</data>
     </edge>
-    <edge id="e188" source="decision_int8_npu_first" target="hw_phone_npu">
+    <edge id="e187" source="decision_int8_npu_first" target="hw_phone_npu">
       <data key="relation">recommends_for</data>
       <data key="evidence">docs/20_NPU_VENDOR_CLOSURE.md</data>
       <data key="weight">1.0</data>
     </edge>
-    <edge id="e189" source="decision_int8_npu_first" target="npu_no_native_1bit">
+    <edge id="e188" source="decision_int8_npu_first" target="npu_no_native_1bit">
       <data key="relation">derived_from</data>
       <data key="evidence">docs/20_NPU_VENDOR_CLOSURE.md</data>
       <data key="weight">1.0</data>
     </edge>
-    <edge id="e190" source="decision_fair_eval" target="sys_repro_gates">
+    <edge id="e189" source="decision_fair_eval" target="sys_repro_gates">
       <data key="relation">requires</data>
       <data key="evidence">docs/FAIR_EVAL_PROTOCOL.md</data>
       <data key="weight">1.0</data>
     </edge>
-    <edge id="e191" source="decision_fair_eval" target="thesis_lock">
+    <edge id="e190" source="decision_fair_eval" target="thesis_lock">
       <data key="relation">part_of</data>
       <data key="evidence">AGENTS.md</data>
       <data key="weight">1.0</data>
     </edge>
-    <edge id="e192" source="gap_layer_search_full" target="sys_wrap_policy">
+    <edge id="e191" source="gap_layer_search_full" target="sys_wrap_policy">
       <data key="relation">blocked_by</data>
       <data key="evidence">docs/MOONSHOT_DEFERRALS.md</data>
       <data key="weight">0.75</data>
     </edge>
-    <edge id="e193" source="gap_bitnet_submodule" target="tool_bitnet_cpp">
+    <edge id="e192" source="gap_bitnet_submodule" target="tool_bitnet_cpp">
       <data key="relation">blocked_by</data>
       <data key="evidence">third_party/BITNET_PIN.md</data>
       <data key="weight">0.8</data>
     </edge>
-    <edge id="e194" source="gap_fbi_llm_repro" target="paper_fbi_llm">
+    <edge id="e193" source="gap_fbi_llm_repro" target="paper_fbi_llm">
       <data key="relation">blocked_by</data>
       <data key="evidence">ROADMAP.md</data>
       <data key="weight">0.8</data>
     </edge>
-    <edge id="e195" source="tool_executorch" target="tool_torchao">
+    <edge id="e194" source="tool_executorch" target="tool_torchao">
       <data key="relation">requires</data>
       <data key="evidence">docs/14_HARDWARE_AND_ENERGY.md</data>
       <data key="weight">0.7</data>
     </edge>
-    <edge id="e196" source="tool_executorch" target="hw_phone_npu">
+    <edge id="e195" source="tool_executorch" target="hw_phone_npu">
       <data key="relation">recommends_for</data>
       <data key="evidence">docs/16_ECOSYSTEM_AND_TOOLING.md</data>
       <data key="weight">0.6</data>
     </edge>
-    <edge id="e197" source="dataset_glue_downstream" target="paper_bitdistill">
+    <edge id="e196" source="dataset_glue_downstream" target="paper_bitdistill">
       <data key="relation">measured_on</data>
       <data key="evidence">arXiv:2510.13998</data>
       <data key="weight">0.85</data>
     </edge>
-    <edge id="e198" source="paper_awq" target="method_absmean_ptq">
+    <edge id="e197" source="paper_awq" target="method_absmean_ptq">
       <data key="relation">alternative_to</data>
       <data key="evidence">docs/24 — AWQ for GPU INT4</data>
       <data key="weight">0.75</data>
     </edge>
-    <edge id="e199" source="sys_energy_module" target="metric_energy_proxy_ratio">
+    <edge id="e198" source="sys_energy_module" target="metric_energy_proxy_ratio">
       <data key="relation">implements</data>
       <data key="evidence">docs/spikes/RAPL_ENERGY_SPIKE.md</data>
       <data key="weight">0.9</data>
     </edge>
-    <edge id="e200" source="bnn_lab_system" target="sys_guide_e2e">
+    <edge id="e199" source="bnn_lab_system" target="sys_guide_e2e">
       <data key="relation">part_of</data>
       <data key="evidence">docs/GUIDE_E2E.md</data>
       <data key="weight">0.9</data>
     </edge>
-    <edge id="e201" source="bnn_lab_system" target="sys_bridge_recipes">
+    <edge id="e200" source="bnn_lab_system" target="sys_bridge_recipes">
       <data key="relation">part_of</data>
       <data key="evidence">ROADMAP.md WC-P2</data>
       <data key="weight">0.85</data>
     </edge>
-    <edge id="e202" source="org_microsoft_bitnet" target="paper_bitdistill">
+    <edge id="e201" source="org_microsoft_bitnet" target="paper_bitdistill">
       <data key="relation">part_of</data>
       <data key="evidence">arXiv:2510.13998</data>
       <data key="weight">0.95</data>
     </edge>
-    <edge id="e203" source="org_microsoft_bitnet" target="paper_bitnet_2b4t">
+    <edge id="e202" source="org_microsoft_bitnet" target="paper_bitnet_2b4t">
       <data key="relation">part_of</data>
       <data key="evidence">arXiv:2504.12285</data>
       <data key="weight">0.95</data>
     </edge>
-    <edge id="e204" source="paper.bireal.eccv2018" target="metric.imagenet.bnn_ladder">
+    <edge id="e203" source="paper.bireal.eccv2018" target="metric.imagenet.bnn_ladder">
       <data key="relation">measured_on</data>
       <data key="evidence">Bi-Real-18 = 56.4% ImageNet top-1 (ECCV 2018 Table 2).</data>
       <data key="weight">1.0</data>
     </edge>
-    <edge id="e205" source="paper.real2bin.iclr2020" target="metric.imagenet.bnn_ladder">
+    <edge id="e204" source="paper.real2bin.iclr2020" target="metric.imagenet.bnn_ladder">
       <data key="relation">measured_on</data>
       <data key="evidence">Real-to-Bin ResNet-18 = 65.4% top-1 ImageNet (ICLR 2020).</data>
       <data key="weight">1.0</data>
     </edge>
-    <edge id="e206" source="paper.reactnet.eccv2020" target="metric.imagenet.bnn_ladder">
+    <edge id="e205" source="paper.reactnet.eccv2020" target="metric.imagenet.bnn_ladder">
       <data key="relation">measured_on</data>
       <data key="evidence">ReActNet-A 69.4%, ReActNet-C 71.4% ImageNet top-1.</data>
       <data key="weight">1.0</data>
     </edge>
-    <edge id="e207" source="paper.reactnet.eccv2020" target="paper.bireal.eccv2018">
+    <edge id="e206" source="paper.reactnet.eccv2020" target="paper.bireal.eccv2018">
       <data key="relation">improves</data>
       <data key="evidence">RSign/RPReLU on Bi-Real-18 lifts 56.4% → 65.5%; MobileNet redesign exceeds Real-to-Binary.</data>
       <data key="weight">1.0</data>
     </edge>
-    <edge id="e208" source="paper.reactnet.eccv2020" target="paper.real2bin.iclr2020">
+    <edge id="e207" source="paper.reactnet.eccv2020" target="paper.real2bin.iclr2020">
       <data key="relation">improves</data>
       <data key="evidence">ReActNet-A 69.4% vs Real-to-Binary 65.4% at lower OPs (0.87e8 vs ~1.65e8).</data>
       <data key="weight">1.0</data>
     </edge>
-    <edge id="e209" source="paper.bitnet.2023" target="paper.bitnet_b158.2024">
+    <edge id="e208" source="paper.bitnet.2023" target="paper.bitnet_b158.2024">
       <data key="relation">derived_from</data>
       <data key="evidence">BitNet ±1 → b1.58 adds 0 for feature filtering / quality parity.</data>
       <data key="weight">1.0</data>
     </edge>
-    <edge id="e210" source="paper.bitnet_b158.2024" target="paper.bitnet_a48.2024">
+    <edge id="e209" source="paper.bitnet_b158.2024" target="paper.bitnet_a48.2024">
       <data key="relation">improves</data>
       <data key="evidence">a4.8 continue-trains from W1.58A8 to 4-bit activations + sparsity.</data>
       <data key="weight">1.0</data>
     </edge>
-    <edge id="e211" source="paper.bitnet_b158.2024" target="paper.bitnet_cpp.2024">
+    <edge id="e210" source="paper.bitnet_b158.2024" target="paper.bitnet_cpp.2024">
       <data key="relation">requires</data>
       <data key="evidence">bitnet.cpp provides lossless CPU ternary kernels for b1.58 models.</data>
       <data key="weight">1.0</data>
     </edge>
-    <edge id="e212" source="paper.bitnet_cpp.2024" target="artifact.hf_bitnet_2b">
-      <data key="relation">implements</data>
-      <data key="evidence">Official BitNet-b1.58-2B-4T listed in microsoft/BitNet model table (I2_S/TL kernels).</data>
-      <data key="weight">1.0</data>
-    </edge>
-    <edge id="e213" source="paper.bitdistill.2025" target="recipe.qat_158bit">
+    <edge id="e211" source="paper.bitdistill.2025" target="recipe.qat_158bit">
       <data key="relation">implements</data>
       <data key="evidence">SubLN + CPT + logits/attention distill stages.</data>
       <data key="weight">1.0</data>
     </edge>
-    <edge id="e214" source="paper.bitdistill.2025" target="failure.ptq_to_ternary">
+    <edge id="e212" source="paper.bitdistill.2025" target="failure.ptq_to_ternary">
       <data key="relation">improves</data>
       <data key="evidence">Closes BitNet-SFT gap that widens with scale; recovers FP16-SFT task accuracy.</data>
       <data key="weight">1.0</data>
     </edge>
-    <edge id="e215" source="paper.bitdistill.2025" target="decision.awq_gptq_vs_binary">
+    <edge id="e213" source="paper.bitdistill.2025" target="decision.awq_gptq_vs_binary">
       <data key="relation">alternative_to</data>
       <data key="evidence">Paper Table 4: BitDistill works with GPTQ/AWQ/Block-Quant inits.</data>
       <data key="weight">1.0</data>
     </edge>
-    <edge id="e216" source="paper.bibert.2022" target="failure.attention_binarization">
+    <edge id="e214" source="paper.bibert.2022" target="failure.attention_binarization">
       <data key="relation">derived_from</data>
       <data key="evidence">Bi-Attention + DMD address attention entropy collapse and distill direction mismatch.</data>
       <data key="weight">1.0</data>
     </edge>
-    <edge id="e217" source="paper.bibert.2022" target="concept.binary_transformers">
+    <edge id="e215" source="paper.bibert.2022" target="concept.binary_transformers">
       <data key="relation">part_of</data>
       <data key="evidence">Full W1A1E1 encoder BERT line distinct from BitLinear LLMs.</data>
       <data key="weight">1.0</data>
     </edge>
-    <edge id="e218" source="paper.bitnet.2023" target="concept.binary_transformers">
+    <edge id="e216" source="paper.bitnet.2023" target="concept.binary_transformers">
       <data key="relation">part_of</data>
       <data key="evidence">BitLinear Transformer path (weights extreme, attention often higher bit).</data>
       <data key="weight">1.0</data>
     </edge>
-    <edge id="e219" source="paper.finn.fpga2017" target="tool.brevitas_finn">
+    <edge id="e217" source="paper.finn.fpga2017" target="tool.brevitas_finn">
       <data key="relation">implements</data>
       <data key="evidence">Modern flow trains in Brevitas then compiles with FINN.</data>
       <data key="weight">1.0</data>
     </edge>
-    <edge id="e220" source="tool.larq_lce" target="concept.mobile_npu_quant_reality">
+    <edge id="e218" source="tool.larq_lce" target="concept.mobile_npu_quant_reality">
       <data key="relation">alternative_to</data>
       <data key="evidence">When NPU lacks 1-bit, Larq CE on ARM CPU is the stock BNN path.</data>
       <data key="weight">1.0</data>
     </edge>
-    <edge id="e221" source="decision.awq_gptq_vs_binary" target="paper.bitnet_cpp.2024">
+    <edge id="e219" source="decision.awq_gptq_vs_binary" target="paper.bitnet_cpp.2024">
       <data key="relation">recommends_for</data>
       <data key="evidence">Decision tree: GPU→AWQ/GPTQ/torchao; CPU LLM→bitnet.cpp.</data>
       <data key="weight">1.0</data>
     </edge>
-    <edge id="e222" source="decision.awq_gptq_vs_binary" target="paper.finn.fpga2017">
+    <edge id="e220" source="decision.awq_gptq_vs_binary" target="paper.finn.fpga2017">
       <data key="relation">recommends_for</data>
       <data key="evidence">Fixed vision topologies on FPGA: FINN FPS/W dominates GPU BOM.</data>
       <data key="weight">1.0</data>
     </edge>
-    <edge id="e223" source="paper.sparse_bitnet.2026" target="paper.bitnet_b158.2024">
+    <edge id="e221" source="paper.sparse_bitnet.2026" target="paper.bitnet_b158.2024">
       <data key="relation">improves</data>
       <data key="evidence">Adds N:M masks + sparse TC kernels on ternary BitLinear.</data>
       <data key="weight">1.0</data>
     </edge>
-    <edge id="e224" source="failure.bn_sensitivity" target="paper.bireal.eccv2018">
+    <edge id="e222" source="failure.bn_sensitivity" target="paper.bireal.eccv2018">
       <data key="relation">improves</data>
       <data key="evidence">BN after binary conv is standard in Bi-Real / ReAct / Larq recipes.</data>
       <data key="weight">1.0</data>
     </edge>
-    <edge id="e225" source="failure.small_k_layers" target="decision.awq_gptq_vs_binary">
+    <edge id="e223" source="failure.small_k_layers" target="decision.awq_gptq_vs_binary">
       <data key="relation">requires</data>
       <data key="evidence">Thin layers should stay FP/INT8; binary only where K is wide enough for popcount win.</data>
       <data key="weight">1.0</data>
     </edge>
-    <edge id="e226" source="citation.strengthen.lab_weak" target="paper.real2bin.iclr2020">
+    <edge id="e224" source="citation.strengthen.lab_weak" target="paper.real2bin.iclr2020">
       <data key="relation">cites</data>
       <data key="evidence">Lab named Real-to-Bin without arXiv:2003.11535 / 65.4%.</data>
       <data key="weight">1.0</data>
     </edge>
-    <edge id="e227" source="citation.strengthen.lab_weak" target="paper.bitdistill.2025">
+    <edge id="e225" source="citation.strengthen.lab_weak" target="paper.bitdistill.2025">
       <data key="relation">cites</data>
       <data key="evidence">docs/13 mentions BitDistill without arXiv:2510.13998; avoid conflating BitDistiller.</data>
       <data key="weight">1.0</data>
     </edge>
-    <edge id="e228" source="citation.strengthen.lab_weak" target="paper.bitnet_cpp.2024">
+    <edge id="e226" source="citation.strengthen.lab_weak" target="paper.bitnet_cpp.2024">
       <data key="relation">cites</data>
       <data key="evidence">Energy −55–82% must be footnoted to M2/i7 tables in 2410.16144.</data>
       <data key="weight">1.0</data>
     </edge>
-    <edge id="e229" source="paper.bitnet_a48.2024" target="failure.attention_binarization">
+    <edge id="e227" source="paper.bitnet_a48.2024" target="failure.attention_binarization">
       <data key="relation">improves</data>
       <data key="evidence">Keeps intermediate attn/FFN states sparse-INT8 rather than full INT4.</data>
       <data key="weight">1.0</data>
     </edge>
-    <edge id="e230" source="concept.mobile_npu_quant_reality" target="decision.awq_gptq_vs_binary">
+    <edge id="e228" source="concept.mobile_npu_quant_reality" target="decision.awq_gptq_vs_binary">
       <data key="relation">part_of</data>
       <data key="evidence">Phone NPU → INT8/INT4 stock path in decision tree.</data>
       <data key="weight">1.0</data>
     </edge>
-    <edge id="e231" source="recipe.qat_158bit" target="paper.bitnet_b158.2024">
+    <edge id="e229" source="recipe.qat_158bit" target="paper.bitnet_b158.2024">
       <data key="relation">requires</data>
       <data key="evidence">From-scratch branch follows b1.58 absmean ternary + INT8 acts.</data>
       <data key="weight">1.0</data>
     </edge>
-    <edge id="e232" source="tool.brevitas_finn" target="paper.finn.fpga2017">
+    <edge id="e230" source="tool.brevitas_finn" target="paper.finn.fpga2017">
       <data key="relation">implements</data>
       <data key="evidence">Brevitas is the PyTorch QAT front-end for modern FINN.</data>
       <data key="weight">1.0</data>
     </edge>
-    <edge id="e233" source="paper.bireal.eccv2018" target="paper_bireal">
+    <edge id="e231" source="paper.bireal.eccv2018" target="paper_bireal">
       <data key="relation">same_as</data>
       <data key="evidence">enrichment↔lab ID alias (merge_kg_enrichment.py)</data>
       <data key="weight">1.0</data>
     </edge>
-    <edge id="e234" source="paper_bireal" target="paper.bireal.eccv2018">
+    <edge id="e232" source="paper_bireal" target="paper.bireal.eccv2018">
       <data key="relation">same_as</data>
       <data key="evidence">enrichment↔lab ID alias (merge_kg_enrichment.py)</data>
       <data key="weight">1.0</data>
     </edge>
-    <edge id="e235" source="paper.reactnet.eccv2020" target="paper_reactnet">
+    <edge id="e233" source="paper.reactnet.eccv2020" target="paper_reactnet">
       <data key="relation">same_as</data>
       <data key="evidence">enrichment↔lab ID alias (merge_kg_enrichment.py)</data>
       <data key="weight">1.0</data>
     </edge>
-    <edge id="e236" source="paper_reactnet" target="paper.reactnet.eccv2020">
+    <edge id="e234" source="paper_reactnet" target="paper.reactnet.eccv2020">
       <data key="relation">same_as</data>
       <data key="evidence">enrichment↔lab ID alias (merge_kg_enrichment.py)</data>
       <data key="weight">1.0</data>
     </edge>
-    <edge id="e237" source="paper.bitnet.2023" target="paper_bitnet">
+    <edge id="e235" source="paper.bitnet.2023" target="paper_bitnet">
       <data key="relation">same_as</data>
       <data key="evidence">enrichment↔lab ID alias (merge_kg_enrichment.py)</data>
       <data key="weight">1.0</data>
     </edge>
-    <edge id="e238" source="paper_bitnet" target="paper.bitnet.2023">
+    <edge id="e236" source="paper_bitnet" target="paper.bitnet.2023">
       <data key="relation">same_as</data>
       <data key="evidence">enrichment↔lab ID alias (merge_kg_enrichment.py)</data>
       <data key="weight">1.0</data>
     </edge>
-    <edge id="e239" source="paper.bitnet_b158.2024" target="paper_bitnet_b158">
+    <edge id="e237" source="paper.bitnet_b158.2024" target="paper_bitnet_b158">
       <data key="relation">same_as</data>
       <data key="evidence">enrichment↔lab ID alias (merge_kg_enrichment.py)</data>
       <data key="weight">1.0</data>
     </edge>
-    <edge id="e240" source="paper_bitnet_b158" target="paper.bitnet_b158.2024">
+    <edge id="e238" source="paper_bitnet_b158" target="paper.bitnet_b158.2024">
       <data key="relation">same_as</data>
       <data key="evidence">enrichment↔lab ID alias (merge_kg_enrichment.py)</data>
       <data key="weight">1.0</data>
     </edge>
-    <edge id="e241" source="paper.bitnet_a48.2024" target="paper_bitnet_a48">
+    <edge id="e239" source="paper.bitnet_a48.2024" target="paper_bitnet_a48">
       <data key="relation">same_as</data>
       <data key="evidence">enrichment↔lab ID alias (merge_kg_enrichment.py)</data>
       <data key="weight">1.0</data>
     </edge>
-    <edge id="e242" source="paper_bitnet_a48" target="paper.bitnet_a48.2024">
+    <edge id="e240" source="paper_bitnet_a48" target="paper.bitnet_a48.2024">
       <data key="relation">same_as</data>
       <data key="evidence">enrichment↔lab ID alias (merge_kg_enrichment.py)</data>
       <data key="weight">1.0</data>
     </edge>
-    <edge id="e243" source="paper.bitnet_cpp.2024" target="paper_bitnet_cpp">
+    <edge id="e241" source="paper.bitnet_cpp.2024" target="paper_bitnet_cpp">
       <data key="relation">same_as</data>
       <data key="evidence">enrichment↔lab ID alias (merge_kg_enrichment.py)</data>
       <data key="weight">1.0</data>
     </edge>
-    <edge id="e244" source="paper_bitnet_cpp" target="paper.bitnet_cpp.2024">
+    <edge id="e242" source="paper_bitnet_cpp" target="paper.bitnet_cpp.2024">
       <data key="relation">same_as</data>
       <data key="evidence">enrichment↔lab ID alias (merge_kg_enrichment.py)</data>
       <data key="weight">1.0</data>
     </edge>
-    <edge id="e245" source="paper.bitdistill.2025" target="paper_bitdistill">
+    <edge id="e243" source="paper.bitdistill.2025" target="paper_bitdistill">
       <data key="relation">same_as</data>
       <data key="evidence">enrichment↔lab ID alias (merge_kg_enrichment.py)</data>
       <data key="weight">1.0</data>
     </edge>
-    <edge id="e246" source="paper_bitdistill" target="paper.bitdistill.2025">
+    <edge id="e244" source="paper_bitdistill" target="paper.bitdistill.2025">
       <data key="relation">same_as</data>
       <data key="evidence">enrichment↔lab ID alias (merge_kg_enrichment.py)</data>
       <data key="weight">1.0</data>
     </edge>
-    <edge id="e247" source="paper.bibert.2022" target="paper_bibert">
+    <edge id="e245" source="paper.bibert.2022" target="paper_bibert">
       <data key="relation">same_as</data>
       <data key="evidence">enrichment↔lab ID alias (merge_kg_enrichment.py)</data>
       <data key="weight">1.0</data>
     </edge>
-    <edge id="e248" source="paper_bibert" target="paper.bibert.2022">
+    <edge id="e246" source="paper_bibert" target="paper.bibert.2022">
       <data key="relation">same_as</data>
       <data key="evidence">enrichment↔lab ID alias (merge_kg_enrichment.py)</data>
       <data key="weight">1.0</data>
     </edge>
-    <edge id="e249" source="paper.finn.fpga2017" target="paper_finn">
+    <edge id="e247" source="paper.finn.fpga2017" target="paper_finn">
       <data key="relation">same_as</data>
       <data key="evidence">enrichment↔lab ID alias (merge_kg_enrichment.py)</data>
       <data key="weight">1.0</data>
     </edge>
-    <edge id="e250" source="paper_finn" target="paper.finn.fpga2017">
+    <edge id="e248" source="paper_finn" target="paper.finn.fpga2017">
       <data key="relation">same_as</data>
       <data key="evidence">enrichment↔lab ID alias (merge_kg_enrichment.py)</data>
       <data key="weight">1.0</data>
     </edge>
-    <edge id="e251" source="paper.sparse_bitnet.2026" target="paper_sparse_bitnet">
+    <edge id="e249" source="paper.sparse_bitnet.2026" target="paper_sparse_bitnet">
       <data key="relation">same_as</data>
       <data key="evidence">enrichment↔lab ID alias (merge_kg_enrichment.py)</data>
       <data key="weight">1.0</data>
     </edge>
-    <edge id="e252" source="paper_sparse_bitnet" target="paper.sparse_bitnet.2026">
+    <edge id="e250" source="paper_sparse_bitnet" target="paper.sparse_bitnet.2026">
       <data key="relation">same_as</data>
       <data key="evidence">enrichment↔lab ID alias (merge_kg_enrichment.py)</data>
       <data key="weight">1.0</data>
     </edge>
-    <edge id="e253" source="tool.larq_lce" target="tool_larq">
+    <edge id="e251" source="tool.larq_lce" target="tool_larq">
       <data key="relation">same_as</data>
       <data key="evidence">enrichment↔lab ID alias (merge_kg_enrichment.py)</data>
       <data key="weight">1.0</data>
     </edge>
-    <edge id="e254" source="tool_larq" target="tool.larq_lce">
+    <edge id="e252" source="tool_larq" target="tool.larq_lce">
       <data key="relation">same_as</data>
       <data key="evidence">enrichment↔lab ID alias (merge_kg_enrichment.py)</data>
       <data key="weight">1.0</data>
     </edge>
-    <edge id="e255" source="tool.brevitas_finn" target="tool_brevitas_finn">
+    <edge id="e253" source="tool.brevitas_finn" target="tool_brevitas_finn">
       <data key="relation">same_as</data>
       <data key="evidence">enrichment↔lab ID alias (merge_kg_enrichment.py)</data>
       <data key="weight">1.0</data>
     </edge>
-    <edge id="e256" source="tool_brevitas_finn" target="tool.brevitas_finn">
+    <edge id="e254" source="tool_brevitas_finn" target="tool.brevitas_finn">
       <data key="relation">same_as</data>
       <data key="evidence">enrichment↔lab ID alias (merge_kg_enrichment.py)</data>
       <data key="weight">1.0</data>
     </edge>
-    <edge id="e257" source="failure.ptq_to_ternary" target="ptq_ternary_llm_wipe">
+    <edge id="e255" source="failure.ptq_to_ternary" target="ptq_ternary_llm_wipe">
       <data key="relation">same_as</data>
       <data key="evidence">enrichment↔lab ID alias (merge_kg_enrichment.py)</data>
       <data key="weight">1.0</data>
     </edge>
-    <edge id="e258" source="ptq_ternary_llm_wipe" target="failure.ptq_to_ternary">
+    <edge id="e256" source="ptq_ternary_llm_wipe" target="failure.ptq_to_ternary">
       <data key="relation">same_as</data>
       <data key="evidence">enrichment↔lab ID alias (merge_kg_enrichment.py)</data>
       <data key="weight">1.0</data>
     </edge>
-    <edge id="e259" source="concept.mobile_npu_quant_reality" target="npu_no_native_1bit">
-      <data key="relation">same_as</data>
-      <data key="evidence">enrichment↔lab ID alias (merge_kg_enrichment.py)</data>
+    <edge id="e257" source="world_class_v1" target="decision_wc_o_gates">
+      <data key="relation">requires</data>
+      <data key="evidence">ROADMAP.md §1.3 WC-O1–O4</data>
       <data key="weight">1.0</data>
     </edge>
-    <edge id="e260" source="npu_no_native_1bit" target="concept.mobile_npu_quant_reality">
-      <data key="relation">same_as</data>
-      <data key="evidence">enrichment↔lab ID alias (merge_kg_enrichment.py)</data>
+    <edge id="e258" source="decision_wc_o_gates" target="sys_calibrate_qat">
+      <data key="relation">implements</data>
+      <data key="evidence">bnn/wrap/calibrate.py | bnn/wrap/qat.py</data>
       <data key="weight">1.0</data>
     </edge>
-    <edge id="e261" source="decision.awq_gptq_vs_binary" target="decision_wrap_tree">
-      <data key="relation">same_as</data>
-      <data key="evidence">enrichment↔lab ID alias (merge_kg_enrichment.py)</data>
+    <edge id="e259" source="decision_wc_o_gates" target="sys_wrap_policy">
+      <data key="relation">implements</data>
+      <data key="evidence">bnn/wrap/policy.py | docs/42_QAT_AND_LAYER_SEARCH.md</data>
       <data key="weight">1.0</data>
     </edge>
-    <edge id="e262" source="decision_wrap_tree" target="decision.awq_gptq_vs_binary">
-      <data key="relation">same_as</data>
-      <data key="evidence">enrichment↔lab ID alias (merge_kg_enrichment.py)</data>
+    <edge id="e260" source="decision_wc_o_gates" target="gap_distill_integration">
+      <data key="relation">blocked_by</data>
+      <data key="evidence">docs/MOONSHOT_DEFERRALS.md W3.T08 | PR #19</data>
       <data key="weight">1.0</data>
     </edge>
-    <edge id="e263" source="artifact.hf_bitnet_2b" target="paper_bitnet_2b4t">
-      <data key="relation">same_as</data>
-      <data key="evidence">enrichment↔lab ID alias (merge_kg_enrichment.py)</data>
+    <edge id="e261" source="decision_wc_o_gates" target="gap_layer_search_full">
+      <data key="relation">blocked_by</data>
+      <data key="evidence">docs/42_QAT_AND_LAYER_SEARCH.md | PR #19</data>
       <data key="weight">1.0</data>
     </edge>
-    <edge id="e264" source="paper_bitnet_2b4t" target="artifact.hf_bitnet_2b">
-      <data key="relation">same_as</data>
-      <data key="evidence">enrichment↔lab ID alias (merge_kg_enrichment.py)</data>
+    <edge id="e262" source="sys_recommend_stack" target="decision_wrap_tree">
+      <data key="relation">implements</data>
+      <data key="evidence">scripts/recommend_stack.py</data>
+      <data key="weight">1.0</data>
+    </edge>
+    <edge id="e263" source="sys_recommend_stack" target="bnn_lab_system">
+      <data key="relation">part_of</data>
+      <data key="evidence">bnn/cli.py</data>
+      <data key="weight">1.0</data>
+    </edge>
+    <edge id="e264" source="sys_eval_suite" target="decision_fair_eval">
+      <data key="relation">implements</data>
+      <data key="evidence">scripts/run_eval_suite.py</data>
+      <data key="weight">1.0</data>
+    </edge>
+    <edge id="e265" source="sys_eval_suite" target="sys_repro_gates">
+      <data key="relation">part_of</data>
+      <data key="evidence">docs/FAIR_EVAL_PROTOCOL.md | results/SUMMARY.md</data>
+      <data key="weight">1.0</data>
+    </edge>
+    <edge id="e266" source="sys_kg" target="bnn_lab_system">
+      <data key="relation">part_of</data>
+      <data key="evidence">docs/44_KNOWLEDGE_GRAPH.md</data>
+      <data key="weight">1.0</data>
+    </edge>
+    <edge id="e267" source="sys_kg" target="thesis_lock">
+      <data key="relation">requires</data>
+      <data key="evidence">knowledge_graph/README.md</data>
+      <data key="weight">1.0</data>
+    </edge>
+    <edge id="e268" source="paper_bitdistiller" target="paper_bitdistill">
+      <data key="relation">alternative_to</data>
+      <data key="evidence">knowledge_graph/enrichment/NOTES.md — distinct papers</data>
+      <data key="weight">1.0</data>
+    </edge>
+    <edge id="e269" source="paper_bitdistill" target="paper_bitdistiller">
+      <data key="relation">alternative_to</data>
+      <data key="evidence">Do not conflate BitDistill vs BitDistiller</data>
+      <data key="weight">1.0</data>
+    </edge>
+    <edge id="e270" source="decision.awq_gptq_vs_binary" target="paper_gptq">
+      <data key="relation">recommends_for</data>
+      <data key="evidence">docs/24_GPU_INT4_FP8_LANE.md | arXiv:2210.17323</data>
+      <data key="weight">1.0</data>
+    </edge>
+    <edge id="e271" source="decision_wrap_tree" target="paper_gptq">
+      <data key="relation">recommends_for</data>
+      <data key="evidence">docs/18_DECISION_TREE_AND_COMPLETE_ROADMAP.md</data>
+      <data key="weight">1.0</data>
+    </edge>
+    <edge id="e272" source="paper_gptq" target="paper_awq">
+      <data key="relation">alternative_to</data>
+      <data key="evidence">Both INT4 GPU PTQ family; AWQ salience vs GPTQ Hessian</data>
+      <data key="weight">1.0</data>
+    </edge>
+    <edge id="e273" source="paper_qsparse" target="paper_sparse_bitnet">
+      <data key="relation">alternative_to</data>
+      <data key="evidence">Activation sparsity vs Sparse-BitNet 2:4 — literature only</data>
+      <data key="weight">1.0</data>
+    </edge>
+    <edge id="e274" source="paper_sparse_bitnet" target="paper_qsparse">
+      <data key="relation">cites</data>
+      <data key="evidence">docs/02_SOTA_SURVEY.md sparsity neighbors</data>
+      <data key="weight">1.0</data>
+    </edge>
+    <edge id="e275" source="sys_energy_module" target="result_energy_rapl_spike">
+      <data key="relation">measured_on</data>
+      <data key="evidence">PR #22 RAPL spike / CLOSED-BY-PROXY honesty</data>
+      <data key="weight">1.0</data>
+    </edge>
+    <edge id="e276" source="result_energy_rapl_spike" target="result_energy_bound">
+      <data key="relation">derived_from</data>
+      <data key="evidence">Latency energy_bound remains main-tip anchor</data>
+      <data key="weight">1.0</data>
+    </edge>
+    <edge id="e277" source="result_energy_rapl_spike" target="gap_rapl_windows">
+      <data key="relation">blocked_by</data>
+      <data key="evidence">Windows has no portable RAPL — proxy only</data>
+      <data key="weight">1.0</data>
+    </edge>
+    <edge id="e278" source="decision_nongoal_asr_whisper" target="thesis_lock">
+      <data key="relation">part_of</data>
+      <data key="evidence">ROADMAP non-goals / audio pedagogy</data>
+      <data key="weight">1.0</data>
+    </edge>
+    <edge id="e279" source="decision_nongoal_memory_arena" target="thesis_lock">
+      <data key="relation">part_of</data>
+      <data key="evidence">docs/43_MEMORY_FOOTPRINT.md</data>
+      <data key="weight">1.0</data>
+    </edge>
+    <edge id="e280" source="decision_imagenet_protocol_not_sota" target="data_imagenet">
+      <data key="relation">requires</data>
+      <data key="evidence">docs/imagenet_protocol.md</data>
+      <data key="weight">1.0</data>
+    </edge>
+    <edge id="e281" source="decision_imagenet_protocol_not_sota" target="gap_imagenet_sota">
+      <data key="relation">contradicts</data>
+      <data key="evidence">Protocol runner ≠ SOTA claim</data>
+      <data key="weight">1.0</data>
+    </edge>
+    <edge id="e282" source="artifact.hf_bitnet_2b" target="paper_bitnet_2b4t">
+      <data key="relation">implements</data>
+      <data key="evidence">HF checkpoint implements the 2B4T paper artifact</data>
+      <data key="weight">1.0</data>
+    </edge>
+    <edge id="e283" source="decision.awq_gptq_vs_binary" target="decision_wrap_tree">
+      <data key="relation">part_of</data>
+      <data key="evidence">AWQ/GPTQ branch is a subset of the wrap decision tree</data>
+      <data key="weight">1.0</data>
+    </edge>
+    <edge id="e284" source="concept.mobile_npu_quant_reality" target="npu_no_native_1bit">
+      <data key="relation">derived_from</data>
+      <data key="evidence">Concept documents the FailureMode</data>
+      <data key="weight">1.0</data>
+    </edge>
+    <edge id="e285" source="npu_no_native_1bit" target="concept.mobile_npu_quant_reality">
+      <data key="relation">part_of</data>
+      <data key="evidence">FailureMode is the operational takeaway of the concept</data>
+      <data key="weight">1.0</data>
+    </edge>
+    <edge id="e286" source="sys_vision_cifar" target="paper_bireal">
+      <data key="relation">implements</data>
+      <data key="evidence">results/image_cifar.json — System implements Bi-Real pattern</data>
+      <data key="weight">1.0</data>
+    </edge>
+    <edge id="e287" source="artifact.hf_bitnet_2b" target="paper.bitnet_cpp.2024">
+      <data key="relation">implements</data>
+      <data key="evidence">HF 2B4T checkpoint is the runtime artifact cited by bitnet.cpp</data>
       <data key="weight">1.0</data>
     </edge>
   </graph>

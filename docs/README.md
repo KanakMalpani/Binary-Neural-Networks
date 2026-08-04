@@ -120,8 +120,9 @@ thesis — previously unlinked from this index.
 
 | Doc | Topic |
 |-----|-------|
-| [`44_KNOWLEDGE_GRAPH.md`](44_KNOWLEDGE_GRAPH.md) | Pointer to `knowledge_graph/` (JSON + GraphML + VIEW) |
-| [`../knowledge_graph/README.md`](../knowledge_graph/README.md) | How to query / merge enrichment / thesis lock |
+| [`44_KNOWLEDGE_GRAPH.md`](44_KNOWLEDGE_GRAPH.md) | Pointer to `knowledge_graph/` (JSON + GraphML + VIEW); CLI `bnn kg` |
+| [`../knowledge_graph/README.md`](../knowledge_graph/README.md) | How to query / merge enrichment / integrity overlay / thesis lock |
+| [`lanes/kg.md`](lanes/kg.md) | KG integrity lane note (Wave 1 open-PR honesty) |
 
 ## Thesis lock (never reopen as a “win”)
 

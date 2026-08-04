@@ -26,6 +26,7 @@ def test_cli_help_lists_repro():
     help_txt = p.format_help()
     assert "repro" in help_txt
     assert "optimise" in help_txt
+    assert "kg" in help_txt
     assert "pareto" in help_txt
     assert "packed" in help_txt.lower() or "CPU" in help_txt or "edge" in help_txt
 

@@ -1,12 +1,12 @@
 {
   "meta": {
     "name": "Binary Neural Networks Lab Knowledge Graph",
-    "version": "1.1.0",
+    "version": "1.2.0",
     "repo": "https://github.com/KanakMalpani/Binary-Neural-Networks",
     "thesis_lock": "Packed CPU/edge XNOR-popcount + honest STE; never claim GPU 32× from sign(); 32× compression ≠ 32× latency.",
-    "generated_by": "scripts/build_bnn_kg.py + scripts/merge_kg_enrichment.py",
-    "node_count": 154,
-    "edge_count": 265,
+    "generated_by": "scripts/build_bnn_kg.py + scripts/merge_kg_enrichment.py + scripts/apply_kg_integrity.py",
+    "node_count": 165,
+    "edge_count": 288,
     "node_types": [
       "Algorithm",
       "Claim",
@@ -50,8 +50,44 @@
         "merged_updated_lab_nodes": 16,
         "merged_added_edges": 61,
         "same_as_aliases": 16
+      },
+      {
+        "generated": "2026-08-04T23:50:00+05:30",
+        "researcher": "lane-kg-enrich",
+        "schema_version": "1.0",
+        "purpose": "Lab/product integrity enrichment: WC-O gates, CLI systems, GPTQ/Q-Sparse/BitDistiller, RAPL Result, moonshot non-goals, Wave 1 open-PR status honesty, broken source fixes, same_as repairs.",
+        "lab_coverage_note": "Wave 1 lanes A–I remain open PRs #16–#24 — do not claim merged. Thesis lock unchanged.",
+        "integrity_added_nodes": 11,
+        "integrity_added_edges": 30,
+        "integrity_removed_same_as": 6
+      },
+      {
+        "generated": "2026-08-04T23:50:00+05:30",
+        "researcher": "lane-kg-enrich",
+        "schema_version": "1.0",
+        "purpose": "Lab/product integrity enrichment: WC-O gates, CLI systems, GPTQ/Q-Sparse/BitDistiller, RAPL Result, moonshot non-goals, Wave 1 open-PR status honesty, broken source fixes, same_as repairs.",
+        "lab_coverage_note": "Wave 1 lanes A–I remain open PRs #16–#24 — do not claim merged. Thesis lock unchanged.",
+        "integrity_added_nodes": 0,
+        "integrity_added_edges": 0,
+        "integrity_removed_same_as": 0,
+        "integrity_removed_edges": 1,
+        "integrity_cleared_lab_alias": 3
+      },
+      {
+        "generated": "2026-08-04T23:50:00+05:30",
+        "researcher": "lane-kg-enrich",
+        "schema_version": "1.0",
+        "purpose": "Lab/product integrity enrichment: WC-O gates, CLI systems, GPTQ/Q-Sparse/BitDistiller, RAPL Result, moonshot non-goals, Wave 1 open-PR status honesty, broken source fixes, same_as repairs.",
+        "lab_coverage_note": "Wave 1 lanes A–I remain open PRs #16–#24 — do not claim merged. Thesis lock unchanged.",
+        "integrity_added_nodes": 0,
+        "integrity_added_edges": 2,
+        "integrity_removed_same_as": 0,
+        "integrity_removed_edges": 2,
+        "integrity_cleared_lab_alias": 0,
+        "integrity_stripped_abs_sources": 0
       }
-    ]
+    ],
+    "integrity_patched_at": "2026-08-04T19:03:17.604225+00:00"
   },
   "nodes": [
     {
@@ -558,9 +594,7 @@
       "type": "Paper",
       "summary": "Novel claim: mandatory dual metrics + fake-binary negative control + Amdahl/energy proxies; compression/op-count ≠ wall-clock. Idea vault only.",
       "sources": [
-        "docs/32_NOVEL_PAPER_CANDIDATES.md",
-        "C:/00 Research Papers/BINARY_NEURAL_SERIES_README.md",
-        "C:/00 Research Papers/Stop Claiming 32x Honest Speedup Accounting for Binary Neural Networks/README.md"
+        "docs/32_NOVEL_PAPER_CANDIDATES.md"
       ],
       "confidence": 0.85,
       "status": "idea_vault"
@@ -571,8 +605,7 @@
       "type": "Paper",
       "summary": "Novel claim: MSVC/portable packed XNOR recipe + fair pre-pack benches + machine-checkable golden gates for humans/AI agents. Idea vault only.",
       "sources": [
-        "docs/32_NOVEL_PAPER_CANDIDATES.md",
-        "C:/00 Research Papers/Packed XNOR on Commodity CPUs Reproducible Productization and Golden Gates/README.md"
+        "docs/32_NOVEL_PAPER_CANDIDATES.md"
       ],
       "confidence": 0.85,
       "status": "idea_vault"
@@ -583,8 +616,7 @@
       "type": "Paper",
       "summary": "Novel claim: goal×hardware decision tree + hybrid FFN wrap evidence for honest wrapping vs INT4/FP8/GGUF / do-not-binarize. Idea vault only.",
       "sources": [
-        "docs/32_NOVEL_PAPER_CANDIDATES.md",
-        "C:/00 Research Papers/When Not to Binarize Decision Tree for Hybrid Low-Bit Wrapping/README.md"
+        "docs/32_NOVEL_PAPER_CANDIDATES.md"
       ],
       "confidence": 0.85,
       "status": "idea_vault"
@@ -659,7 +691,7 @@
       "type": "Algorithm",
       "summary": "2-bit / bitplane ternary path for {−1,0,+1}; ~16× compression vs FP32 when packed.",
       "sources": [
-        "bnn/ternary_pack.py",
+        "bnn/kernels/ternary_pack.py",
         "results/ternary_pack.json",
         "tests/golden_floors.json"
       ],
@@ -774,7 +806,7 @@
       "id": "sys_vision_cifar",
       "label": "Vision / CIFAR Bi-Real Lane",
       "type": "System",
-      "summary": "CIFAR-10 Bi-Real CNN: FP 71.14% vs binary 61.14% (10 pp gap); ImageNet protocol stub only.",
+      "summary": "CIFAR-10 Bi-Real CNN canary on main; Lane G PR #21 extends ResNet-BiReal + ImageNet protocol runner. No ImageNet SOTA golden.",
       "sources": [
         "results/image_cifar.json",
         "docs/tutorials/04_image_cifar.md",
@@ -800,12 +832,13 @@
       "id": "sys_energy_module",
       "label": "bnn.energy (Proxy + RAPL Spike)",
       "type": "System",
-      "summary": "Energy bound from wrap latency; Linux RAPL probe; Windows CLOSED-BY-PROXY.",
+      "summary": "Energy bound from wrap latency (E=P×t) on main; Lane H PR #22 adds RAPL probe + Windows CLOSED-BY-PROXY honesty. Not a golden floor.",
       "sources": [
-        "bnn/energy/",
+        "docs/14_HARDWARE_AND_ENERGY.md",
         "results/energy_bound.json",
-        "results/energy_rapl_spike.json",
-        "docs/spikes/RAPL_ENERGY_SPIKE.md"
+        "results/energy_bound_measured.json",
+        "docs/spikes/RAPL_ENERGY_SPIKE.md",
+        "https://github.com/KanakMalpani/Binary-Neural-Networks/pull/22"
       ],
       "confidence": 0.9,
       "status": "established"
@@ -818,7 +851,7 @@
       "sources": [
         "docs/23_BITNET_CPP_BRIDGE.md",
         "arXiv:2410.16144",
-        "third_party/BITNET_PIN.md"
+        "https://github.com/KanakMalpani/Binary-Neural-Networks/pull/17"
       ],
       "confidence": 0.95,
       "status": "established"
@@ -1134,7 +1167,7 @@
       "id": "data_imagenet",
       "label": "ImageNet (protocol stub only)",
       "type": "Dataset",
-      "summary": "Full ImageNet SOTA is explicit non-goal; protocol folder stub for future.",
+      "summary": "Full ImageNet SOTA is an explicit non-goal. Protocol stub/docs on main; Lane G PR #21 adds runner — protocol ≠ SOTA claim.",
       "sources": [
         "docs/imagenet_protocol.md",
         "docs/MOONSHOT_DEFERRALS.md",
@@ -1214,43 +1247,43 @@
       "id": "gap_wasm",
       "label": "OpenGap: WASM SIMD Demo",
       "type": "OpenGap",
-      "summary": "Optional browser pedagogy (W2.T06); not blocking v1.0 core.",
+      "summary": "Optional browser pedagogy (W2.T06); Lane F open PR #24 — spike/WASM tree not on main yet; not a v1.0 core gate.",
       "sources": [
         "docs/MOONSHOT_DEFERRALS.md",
-        "docs/spikes/WASM_SIMD.md"
+        "https://github.com/KanakMalpani/Binary-Neural-Networks/pull/24"
       ],
       "confidence": 0.8,
-      "status": "open"
+      "status": "open_pr"
     },
     {
       "id": "gap_bnnpack_v2",
       "label": "OpenGap: .bnnpack v2 + safetensors",
       "type": "OpenGap",
-      "summary": "Schema ADR + hashes + ternary meta + safetensors export still deferred.",
+      "summary": "Schema ADR + hashes + ternary meta + safetensors — Lane B open PR #18; not merged to main yet.",
       "sources": [
         "docs/MOONSHOT_DEFERRALS.md",
         "docs/BNNPACK_V2_DESIGN.md"
       ],
       "confidence": 0.85,
-      "status": "open"
+      "status": "open_pr"
     },
     {
       "id": "gap_distill_integration",
       "label": "OpenGap: Distill Integration (W3.T08)",
       "type": "OpenGap",
-      "summary": "distill_sketch.py exists; full BitDistill-scale integration not shipped.",
+      "summary": "distill_sketch.py on main; Lane A PR #19 extends distill/BN-fuse/WC-O — full BitDistill-scale still not a golden.",
       "sources": [
         "docs/MOONSHOT_DEFERRALS.md",
         "results/distill_sketch.json"
       ],
       "confidence": 0.85,
-      "status": "open"
+      "status": "open_pr"
     },
     {
       "id": "gap_pypi_trusted",
       "label": "OpenGap: First PyPI Trusted Publisher Upload",
       "type": "OpenGap",
-      "summary": "wheels.yml + docs ready; first bnn-lab upload via Trusted Publishing pending manual link.",
+      "summary": "wheels.yml + docs ready; Lane C PR #16 dry-run/attestations. First bnn-lab upload still needs human Trusted Publisher on pypi.org.",
       "sources": [
         "docs/PYPI_PUBLISH.md",
         "ROADMAP.md"
@@ -1287,13 +1320,15 @@
       "id": "gap_rapl_windows",
       "label": "OpenGap: Windows Board Joules (RAPL)",
       "type": "OpenGap",
-      "summary": "Linux RAPL spike delivered; Windows remains energy-proxy; no fake RAPL claims.",
+      "summary": "Windows has no portable RAPL — proxy only. Linux RAPL lands with Lane H PR #22; spike pointer doc is stub until that merge.",
       "sources": [
         "docs/spikes/RAPL_ENERGY_SPIKE.md",
-        "results/energy_rapl_spike.json"
+        "docs/14_HARDWARE_AND_ENERGY.md",
+        "results/energy_bound.json",
+        "https://github.com/KanakMalpani/Binary-Neural-Networks/pull/22"
       ],
       "confidence": 0.9,
-      "status": "closed_by_proxy_on_windows"
+      "status": "open_pr"
     },
     {
       "id": "gap_venue_submit",
@@ -1617,6 +1652,7 @@
       "summary": "Pareto field: fp=1.0, binary=E_bin/E_fp from proxy or RAPL spike.",
       "sources": [
         "results/energy_bound.json",
+        "docs/14_HARDWARE_AND_ENERGY.md",
         "docs/spikes/RAPL_ENERGY_SPIKE.md"
       ],
       "confidence": 0.9,
@@ -1651,13 +1687,13 @@
       "id": "hw_wasm",
       "label": "WebAssembly SIMD (deferred)",
       "type": "Hardware",
-      "summary": "Browser pedagogy target; spike notes exist; not shipped as gate.",
+      "summary": "Browser pedagogy target; Lane F PR #24 in progress. Not shipped as a golden gate.",
       "sources": [
-        "docs/spikes/WASM_SIMD.md",
-        "docs/MOONSHOT_DEFERRALS.md"
+        "docs/MOONSHOT_DEFERRALS.md",
+        "https://github.com/KanakMalpani/Binary-Neural-Networks/pull/24"
       ],
       "confidence": 0.7,
-      "status": "deferred"
+      "status": "open_pr"
     },
     {
       "id": "decision_int8_npu_first",
@@ -1688,25 +1724,26 @@
       "id": "gap_layer_search_full",
       "label": "OpenGap: Full Layer-wise Binary/Ternary Search",
       "type": "OpenGap",
-      "summary": "Sensitivity scores exist (W3.T05); full search W3.T06 still enrichable.",
+      "summary": "Sensitivity (W3.T05) on main; full binary/ternary/skip search W3.T06 in Lane A PR #19 — do not invent search goldens.",
       "sources": [
         "docs/MOONSHOT_DEFERRALS.md",
         "docs/42_QAT_AND_LAYER_SEARCH.md"
       ],
       "confidence": 0.8,
-      "status": "open"
+      "status": "open_pr"
     },
     {
       "id": "gap_bitnet_submodule",
       "label": "OpenGap: bitnet.cpp as Git Submodule",
       "type": "OpenGap",
-      "summary": "Vendor pin/size; keep bridge recipe scripts instead of vendoring full tree.",
+      "summary": "Prefer thin pin + bridge recipes over full BitNet submodule. Lane I PR #17 hardens pins; BITNET_PIN.md lands with that PR.",
       "sources": [
         "docs/MOONSHOT_DEFERRALS.md",
-        "third_party/BITNET_PIN.md"
+        "docs/23_BITNET_CPP_BRIDGE.md",
+        "https://github.com/KanakMalpani/Binary-Neural-Networks/pull/17"
       ],
       "confidence": 0.85,
-      "status": "open"
+      "status": "open_pr"
     },
     {
       "id": "gap_fbi_llm_repro",
@@ -1715,7 +1752,8 @@
       "summary": "Literature path for fully binary LLMs; not a lab gate; cite only.",
       "sources": [
         "arXiv:2407.07093",
-        "ROADMAP.md non-goals"
+        "ROADMAP.md",
+        "docs/MOONSHOT_DEFERRALS.md"
       ],
       "confidence": 0.75,
       "status": "open"
@@ -1966,8 +2004,7 @@
         "docs/18_DECISION_TREE_AND_COMPLETE_ROADMAP.md"
       ],
       "confidence": 0.91,
-      "status": "merged",
-      "lab_alias": "decision_wrap_tree"
+      "status": "merged"
     },
     {
       "id": "paper.sparse_bitnet.2026",
@@ -1993,8 +2030,7 @@
         "docs/14_HARDWARE_AND_ENERGY.md"
       ],
       "confidence": 0.9,
-      "status": "merged",
-      "lab_alias": "npu_no_native_1bit"
+      "status": "merged"
     },
     {
       "id": "failure.attention_binarization",
@@ -2061,8 +2097,7 @@
         "https://arxiv.org/abs/2504.12285"
       ],
       "confidence": 0.94,
-      "status": "merged",
-      "lab_alias": "paper_bitnet_2b4t"
+      "status": "merged"
     },
     {
       "id": "citation.strengthen.lab_weak",
@@ -2076,6 +2111,154 @@
       ],
       "confidence": 0.95,
       "status": "verified"
+    },
+    {
+      "id": "decision_wc_o_gates",
+      "label": "WC-O Optimiser Quality Gates (O1–O4)",
+      "type": "Decision",
+      "summary": "Calibration metrics, auto binary/ternary/skip policy, drop-in honesty thresholds, and short QAT vs cold PTQ — ROADMAP §1.3. Partial on main; Lane A PR #19 hardens — do not claim WC-O closed until integrator merges.",
+      "sources": [
+        "ROADMAP.md",
+        "docs/42_QAT_AND_LAYER_SEARCH.md",
+        "https://github.com/KanakMalpani/Binary-Neural-Networks/pull/19"
+      ],
+      "confidence": 0.9,
+      "status": "open_pr"
+    },
+    {
+      "id": "sys_recommend_stack",
+      "label": "bnn recommend (stack router)",
+      "type": "System",
+      "summary": "CLI over recommend_stack.py — goal→hardware routing aligned with the wrap decision tree; bridges when BNN is the wrong tool.",
+      "sources": [
+        "scripts/recommend_stack.py",
+        "bnn/cli.py",
+        "docs/18_DECISION_TREE_AND_COMPLETE_ROADMAP.md"
+      ],
+      "confidence": 0.95,
+      "status": "established"
+    },
+    {
+      "id": "sys_eval_suite",
+      "label": "bnn eval-suite",
+      "type": "System",
+      "summary": "Published-shape eval runner; dual-metric / fair-protocol companion to repro gates — no new golden shapes.",
+      "sources": [
+        "scripts/run_eval_suite.py",
+        "bnn/cli.py",
+        "docs/FAIR_EVAL_PROTOCOL.md",
+        "results/SUMMARY.md"
+      ],
+      "confidence": 0.95,
+      "status": "established"
+    },
+    {
+      "id": "sys_kg",
+      "label": "Knowledge Graph (bnn.kg + CI)",
+      "type": "System",
+      "summary": "Validated lab corpus map in knowledge_graph/; loader bnn.kg; kg_validate + tests/test_kg.py gated in CI so integrity cannot silently drift.",
+      "sources": [
+        "knowledge_graph/bnn_kg.json",
+        "bnn/kg/__init__.py",
+        "scripts/kg_validate.py",
+        "tests/test_kg.py",
+        "docs/44_KNOWLEDGE_GRAPH.md"
+      ],
+      "confidence": 0.95,
+      "status": "established"
+    },
+    {
+      "id": "paper_bitdistiller",
+      "label": "BitDistiller (Du et al., 2024)",
+      "type": "Paper",
+      "summary": "Sub-4-bit self-distillation arXiv:2402.10631 — distinct from BitNet Distillation (BitDistill, 2510.13998). Do not conflate names in lab docs.",
+      "sources": [
+        "https://arxiv.org/abs/2402.10631",
+        "knowledge_graph/enrichment/SOURCES.md",
+        "knowledge_graph/enrichment/NOTES.md"
+      ],
+      "confidence": 0.9,
+      "status": "literature",
+      "arxiv": "2402.10631"
+    },
+    {
+      "id": "paper_gptq",
+      "label": "GPTQ (Frantar et al., 2022)",
+      "type": "Paper",
+      "summary": "Second-order weight PTQ for LLM INT4; calib-domain sensitivity. Prefer with AWQ on GPU serve vs binary/ternary research paths.",
+      "sources": [
+        "https://arxiv.org/abs/2210.17323",
+        "docs/24_GPU_INT4_FP8_LANE.md"
+      ],
+      "confidence": 0.95,
+      "status": "literature",
+      "arxiv": "2210.17323"
+    },
+    {
+      "id": "paper_qsparse",
+      "label": "Q-Sparse (Wang et al., 2024)",
+      "type": "Paper",
+      "summary": "Activation sparsity for efficient LLMs (arXiv:2407.10969). Decision-tree neighbor to Sparse-BitNet / 2:4 sparsity — literature only; no local invented speedups.",
+      "sources": [
+        "https://arxiv.org/abs/2407.10969",
+        "docs/02_SOTA_SURVEY.md"
+      ],
+      "confidence": 0.85,
+      "status": "literature",
+      "arxiv": "2407.10969"
+    },
+    {
+      "id": "result_energy_rapl_spike",
+      "label": "RAPL Spike Result (Linux measure / Windows proxy)",
+      "type": "Result",
+      "summary": "Lane H PR #22: RAPL when powercap available; Windows CLOSED-BY-PROXY. Main tip still has latency energy_bound only — not a golden floor; do not invent board Joules.",
+      "sources": [
+        "results/energy_bound.json",
+        "docs/14_HARDWARE_AND_ENERGY.md",
+        "docs/spikes/RAPL_ENERGY_SPIKE.md",
+        "docs/MOONSHOT_DEFERRALS.md",
+        "https://github.com/KanakMalpani/Binary-Neural-Networks/pull/22"
+      ],
+      "confidence": 0.85,
+      "status": "open_pr"
+    },
+    {
+      "id": "decision_nongoal_asr_whisper",
+      "label": "Non-goal: Production ASR / Whisper replacement",
+      "type": "Decision",
+      "summary": "Audio lane is packing/QAT pedagogy on features — not a production Whisper/ASR product. Prefer INT8 Whisper/ORT when ASR is the goal.",
+      "sources": [
+        "docs/28_IMAGE_AUDIO_COMPLETION.md",
+        "ROADMAP.md",
+        "docs/MOONSHOT_DEFERRALS.md"
+      ],
+      "confidence": 0.95,
+      "status": "locked"
+    },
+    {
+      "id": "decision_nongoal_memory_arena",
+      "label": "Non-goal: Custom memory arena allocator",
+      "type": "Decision",
+      "summary": "Memory work stays footprint measurement + packed weight accounting (docs/43). Declined custom arena; do not reopen as a v1 gate.",
+      "sources": [
+        "docs/43_MEMORY_FOOTPRINT.md",
+        "docs/MOONSHOT_DEFERRALS.md"
+      ],
+      "confidence": 0.9,
+      "status": "locked"
+    },
+    {
+      "id": "decision_imagenet_protocol_not_sota",
+      "label": "ImageNet protocol ≠ SOTA gate",
+      "type": "Decision",
+      "summary": "Keep ImageNet protocol runner/stub for honesty; never promote full ImageNet SOTA training schedule as a golden or WC gate.",
+      "sources": [
+        "docs/imagenet_protocol.md",
+        "docs/MOONSHOT_DEFERRALS.md",
+        "ROADMAP.md"
+      ],
+      "confidence": 0.95,
+      "status": "locked"
     }
   ],
   "edges": [
@@ -2214,8 +2397,7 @@
       "evidence": [
         "results/SUMMARY.md"
       ],
-      "weight": 0.9,
-      "relation_original": "explains"
+      "weight": 0.9
     },
     {
       "source": "bandwidth_bound",
@@ -2368,8 +2550,7 @@
       "evidence": [
         "arXiv:1602.02830"
       ],
-      "weight": 1.0,
-      "relation_original": "introduces"
+      "weight": 1.0
     },
     {
       "source": "paper_xnornet",
@@ -2378,8 +2559,7 @@
       "evidence": [
         "arXiv:1603.05279"
       ],
-      "weight": 0.9,
-      "relation_original": "popularizes"
+      "weight": 0.9
     },
     {
       "source": "paper_xnornet",
@@ -2388,8 +2568,7 @@
       "evidence": [
         "arXiv:1909.13863"
       ],
-      "weight": 0.8,
-      "relation_original": "improved_by"
+      "weight": 0.8
     },
     {
       "source": "paper_bireal",
@@ -2398,8 +2577,7 @@
       "evidence": [
         "arXiv:1808.00278"
       ],
-      "weight": 1.0,
-      "relation_original": "introduces"
+      "weight": 1.0
     },
     {
       "source": "paper_bireal",
@@ -2408,17 +2586,7 @@
       "evidence": [
         "arXiv:1808.00278"
       ],
-      "weight": 1.0,
-      "relation_original": "introduces"
-    },
-    {
-      "source": "paper_bireal",
-      "target": "sys_vision_cifar",
-      "relation": "implements",
-      "evidence": [
-        "results/image_cifar.json"
-      ],
-      "weight": 0.85
+      "weight": 1.0
     },
     {
       "source": "paper_reactnet",
@@ -2427,8 +2595,7 @@
       "evidence": [
         "arXiv:2003.03488"
       ],
-      "weight": 1.0,
-      "relation_original": "introduces"
+      "weight": 1.0
     },
     {
       "source": "paper_reactnet",
@@ -2446,8 +2613,7 @@
       "evidence": [
         "docs/13_TRAINING_QAT_DISTILL.md"
       ],
-      "weight": 0.8,
-      "relation_original": "not_fully_implemented_in"
+      "weight": 0.8
     },
     {
       "source": "paper_irnet",
@@ -2456,8 +2622,7 @@
       "evidence": [
         "arXiv:1909.10788"
       ],
-      "weight": 1.0,
-      "relation_original": "introduces"
+      "weight": 1.0
     },
     {
       "source": "paper_bibert",
@@ -2475,8 +2640,7 @@
       "evidence": [
         "arXiv:2310.11453"
       ],
-      "weight": 1.0,
-      "relation_original": "authored_by"
+      "weight": 1.0
     },
     {
       "source": "paper_bitnet_b158",
@@ -2494,8 +2658,7 @@
       "evidence": [
         "arXiv:2402.17764"
       ],
-      "weight": 1.0,
-      "relation_original": "introduces"
+      "weight": 1.0
     },
     {
       "source": "paper_bitnet_b158",
@@ -2504,8 +2667,7 @@
       "evidence": [
         "docs/02_SOTA_SURVEY.md"
       ],
-      "weight": 0.7,
-      "relation_original": "motivates"
+      "weight": 0.7
     },
     {
       "source": "paper_bitnet_cpp",
@@ -2559,8 +2721,7 @@
       "evidence": [
         "arXiv:2510.13998"
       ],
-      "weight": 0.95,
-      "relation_original": "mitigates"
+      "weight": 0.95
     },
     {
       "source": "paper_sparse_bitnet",
@@ -3004,8 +3165,7 @@
       "evidence": [
         "docs/41_PORTABLE_SIMD_KERNEL.md"
       ],
-      "weight": 0.85,
-      "relation_original": "supports"
+      "weight": 0.85
     },
     {
       "source": "bnn_lab_system",
@@ -3113,8 +3273,7 @@
       "evidence": [
         "ROADMAP.md"
       ],
-      "weight": 1.0,
-      "relation_original": "forbids"
+      "weight": 1.0
     },
     {
       "source": "decision_onnx_defer",
@@ -3123,8 +3282,7 @@
       "evidence": [
         "docs/MOONSHOT_DEFERRALS.md"
       ],
-      "weight": 0.6,
-      "relation_original": "related_to"
+      "weight": 0.6
     },
     {
       "source": "roadmap_v030",
@@ -3268,8 +3426,7 @@
       "evidence": [
         "results/image_cifar.json 10pp gap"
       ],
-      "weight": 0.7,
-      "relation_original": "exemplifies"
+      "weight": 0.7
     },
     {
       "source": "result_openmp_scaling",
@@ -3287,8 +3444,7 @@
       "evidence": [
         "arXiv:2310.11453"
       ],
-      "weight": 1.0,
-      "relation_original": "authored"
+      "weight": 1.0
     },
     {
       "source": "org_microsoft_bitnet",
@@ -3297,8 +3453,7 @@
       "evidence": [
         "https://github.com/microsoft/BitNet"
       ],
-      "weight": 1.0,
-      "relation_original": "maintains"
+      "weight": 1.0
     },
     {
       "source": "org_plumerai_larq",
@@ -3307,8 +3462,7 @@
       "evidence": [
         "arXiv:2011.09398"
       ],
-      "weight": 0.9,
-      "relation_original": "maintains"
+      "weight": 0.9
     },
     {
       "source": "hw_cpu_x86_popcnt",
@@ -3335,8 +3489,7 @@
       "evidence": [
         "docs/20_NPU_VENDOR_CLOSURE.md"
       ],
-      "weight": 1.0,
-      "relation_original": "exhibits"
+      "weight": 1.0
     },
     {
       "source": "hw_fpga_finn",
@@ -3345,8 +3498,7 @@
       "evidence": [
         "docs/14_HARDWARE_AND_ENERGY.md"
       ],
-      "weight": 0.9,
-      "relation_original": "enables"
+      "weight": 0.9
     },
     {
       "source": "concept_ste_vs_inference",
@@ -3499,8 +3651,7 @@
       "evidence": [
         "docs/16_ECOSYSTEM_AND_TOOLING.md"
       ],
-      "weight": 0.5,
-      "relation_original": "related_to"
+      "weight": 0.5
     },
     {
       "source": "method_surge",
@@ -3932,8 +4083,7 @@
       "evidence": [
         "arXiv:2510.13998"
       ],
-      "weight": 0.95,
-      "relation_original": "authored"
+      "weight": 0.95
     },
     {
       "source": "org_microsoft_bitnet",
@@ -3942,8 +4092,7 @@
       "evidence": [
         "arXiv:2504.12285"
       ],
-      "weight": 0.95,
-      "relation_original": "authored"
+      "weight": 0.95
     },
     {
       "source": "paper.bireal.eccv2018",
@@ -3952,8 +4101,7 @@
       "evidence": [
         "Bi-Real-18 = 56.4% ImageNet top-1 (ECCV 2018 Table 2)."
       ],
-      "weight": 1.0,
-      "relation_original": "contributes_metric"
+      "weight": 1.0
     },
     {
       "source": "paper.real2bin.iclr2020",
@@ -3962,8 +4110,7 @@
       "evidence": [
         "Real-to-Bin ResNet-18 = 65.4% top-1 ImageNet (ICLR 2020)."
       ],
-      "weight": 1.0,
-      "relation_original": "contributes_metric"
+      "weight": 1.0
     },
     {
       "source": "paper.reactnet.eccv2020",
@@ -3972,8 +4119,7 @@
       "evidence": [
         "ReActNet-A 69.4%, ReActNet-C 71.4% ImageNet top-1."
       ],
-      "weight": 1.0,
-      "relation_original": "contributes_metric"
+      "weight": 1.0
     },
     {
       "source": "paper.reactnet.eccv2020",
@@ -3982,8 +4128,7 @@
       "evidence": [
         "RSign/RPReLU on Bi-Real-18 lifts 56.4% → 65.5%; MobileNet redesign exceeds Real-to-Binary."
       ],
-      "weight": 1.0,
-      "relation_original": "improves_upon"
+      "weight": 1.0
     },
     {
       "source": "paper.reactnet.eccv2020",
@@ -3992,8 +4137,7 @@
       "evidence": [
         "ReActNet-A 69.4% vs Real-to-Binary 65.4% at lower OPs (0.87e8 vs ~1.65e8)."
       ],
-      "weight": 1.0,
-      "relation_original": "outperforms_on_metric"
+      "weight": 1.0
     },
     {
       "source": "paper.bitnet.2023",
@@ -4002,8 +4146,7 @@
       "evidence": [
         "BitNet ±1 → b1.58 adds 0 for feature filtering / quality parity."
       ],
-      "weight": 1.0,
-      "relation_original": "precedes"
+      "weight": 1.0
     },
     {
       "source": "paper.bitnet_b158.2024",
@@ -4012,8 +4155,7 @@
       "evidence": [
         "a4.8 continue-trains from W1.58A8 to 4-bit activations + sparsity."
       ],
-      "weight": 1.0,
-      "relation_original": "extends"
+      "weight": 1.0
     },
     {
       "source": "paper.bitnet_b158.2024",
@@ -4022,18 +4164,7 @@
       "evidence": [
         "bitnet.cpp provides lossless CPU ternary kernels for b1.58 models."
       ],
-      "weight": 1.0,
-      "relation_original": "enabled_by_runtime"
-    },
-    {
-      "source": "paper.bitnet_cpp.2024",
-      "target": "artifact.hf_bitnet_2b",
-      "relation": "implements",
-      "evidence": [
-        "Official BitNet-b1.58-2B-4T listed in microsoft/BitNet model table (I2_S/TL kernels)."
-      ],
-      "weight": 1.0,
-      "relation_original": "runs_artifact"
+      "weight": 1.0
     },
     {
       "source": "paper.bitdistill.2025",
@@ -4042,8 +4173,7 @@
       "evidence": [
         "SubLN + CPT + logits/attention distill stages."
       ],
-      "weight": 1.0,
-      "relation_original": "defines_recipe"
+      "weight": 1.0
     },
     {
       "source": "paper.bitdistill.2025",
@@ -4052,8 +4182,7 @@
       "evidence": [
         "Closes BitNet-SFT gap that widens with scale; recovers FP16-SFT task accuracy."
       ],
-      "weight": 1.0,
-      "relation_original": "mitigates"
+      "weight": 1.0
     },
     {
       "source": "paper.bitdistill.2025",
@@ -4062,8 +4191,7 @@
       "evidence": [
         "Paper Table 4: BitDistill works with GPTQ/AWQ/Block-Quant inits."
       ],
-      "weight": 1.0,
-      "relation_original": "complements"
+      "weight": 1.0
     },
     {
       "source": "paper.bibert.2022",
@@ -4072,8 +4200,7 @@
       "evidence": [
         "Bi-Attention + DMD address attention entropy collapse and distill direction mismatch."
       ],
-      "weight": 1.0,
-      "relation_original": "diagnoses"
+      "weight": 1.0
     },
     {
       "source": "paper.bibert.2022",
@@ -4082,8 +4209,7 @@
       "evidence": [
         "Full W1A1E1 encoder BERT line distinct from BitLinear LLMs."
       ],
-      "weight": 1.0,
-      "relation_original": "instance_of"
+      "weight": 1.0
     },
     {
       "source": "paper.bitnet.2023",
@@ -4092,8 +4218,7 @@
       "evidence": [
         "BitLinear Transformer path (weights extreme, attention often higher bit)."
       ],
-      "weight": 1.0,
-      "relation_original": "instance_of"
+      "weight": 1.0
     },
     {
       "source": "paper.finn.fpga2017",
@@ -4102,8 +4227,7 @@
       "evidence": [
         "Modern flow trains in Brevitas then compiles with FINN."
       ],
-      "weight": 1.0,
-      "relation_original": "deployed_via"
+      "weight": 1.0
     },
     {
       "source": "tool.larq_lce",
@@ -4121,8 +4245,7 @@
       "evidence": [
         "Decision tree: GPU→AWQ/GPTQ/torchao; CPU LLM→bitnet.cpp."
       ],
-      "weight": 1.0,
-      "relation_original": "prefers_when_cpu_llm"
+      "weight": 1.0
     },
     {
       "source": "decision.awq_gptq_vs_binary",
@@ -4131,8 +4254,7 @@
       "evidence": [
         "Fixed vision topologies on FPGA: FINN FPS/W dominates GPU BOM."
       ],
-      "weight": 1.0,
-      "relation_original": "prefers_when_fpga_vision"
+      "weight": 1.0
     },
     {
       "source": "paper.sparse_bitnet.2026",
@@ -4141,8 +4263,7 @@
       "evidence": [
         "Adds N:M masks + sparse TC kernels on ternary BitLinear."
       ],
-      "weight": 1.0,
-      "relation_original": "hybridizes_with"
+      "weight": 1.0
     },
     {
       "source": "failure.bn_sensitivity",
@@ -4151,8 +4272,7 @@
       "evidence": [
         "BN after binary conv is standard in Bi-Real / ReAct / Larq recipes."
       ],
-      "weight": 1.0,
-      "relation_original": "mitigated_in_architecture"
+      "weight": 1.0
     },
     {
       "source": "failure.small_k_layers",
@@ -4161,8 +4281,7 @@
       "evidence": [
         "Thin layers should stay FP/INT8; binary only where K is wide enough for popcount win."
       ],
-      "weight": 1.0,
-      "relation_original": "constrains"
+      "weight": 1.0
     },
     {
       "source": "citation.strengthen.lab_weak",
@@ -4171,8 +4290,7 @@
       "evidence": [
         "Lab named Real-to-Bin without arXiv:2003.11535 / 65.4%."
       ],
-      "weight": 1.0,
-      "relation_original": "requires_cite"
+      "weight": 1.0
     },
     {
       "source": "citation.strengthen.lab_weak",
@@ -4181,8 +4299,7 @@
       "evidence": [
         "docs/13 mentions BitDistill without arXiv:2510.13998; avoid conflating BitDistiller."
       ],
-      "weight": 1.0,
-      "relation_original": "requires_cite"
+      "weight": 1.0
     },
     {
       "source": "citation.strengthen.lab_weak",
@@ -4191,8 +4308,7 @@
       "evidence": [
         "Energy −55–82% must be footnoted to M2/i7 tables in 2410.16144."
       ],
-      "weight": 1.0,
-      "relation_original": "requires_cite"
+      "weight": 1.0
     },
     {
       "source": "paper.bitnet_a48.2024",
@@ -4201,8 +4317,7 @@
       "evidence": [
         "Keeps intermediate attn/FFN states sparse-INT8 rather than full INT4."
       ],
-      "weight": 1.0,
-      "relation_original": "partially_avoids"
+      "weight": 1.0
     },
     {
       "source": "concept.mobile_npu_quant_reality",
@@ -4211,8 +4326,7 @@
       "evidence": [
         "Phone NPU → INT8/INT4 stock path in decision tree."
       ],
-      "weight": 1.0,
-      "relation_original": "informs"
+      "weight": 1.0
     },
     {
       "source": "recipe.qat_158bit",
@@ -4221,8 +4335,7 @@
       "evidence": [
         "From-scratch branch follows b1.58 absmean ternary + INT8 acts."
       ],
-      "weight": 1.0,
-      "relation_original": "uses"
+      "weight": 1.0
     },
     {
       "source": "tool.brevitas_finn",
@@ -4231,8 +4344,7 @@
       "evidence": [
         "Brevitas is the PyTorch QAT front-end for modern FINN."
       ],
-      "weight": 1.0,
-      "relation_original": "implements_flow_of"
+      "weight": 1.0
     },
     {
       "source": "paper.bireal.eccv2018",
@@ -4469,56 +4581,287 @@
       "weight": 1.0
     },
     {
-      "source": "concept.mobile_npu_quant_reality",
-      "target": "npu_no_native_1bit",
-      "relation": "same_as",
+      "source": "world_class_v1",
+      "target": "decision_wc_o_gates",
+      "relation": "requires",
       "evidence": [
-        "enrichment↔lab ID alias (merge_kg_enrichment.py)"
+        "ROADMAP.md §1.3 WC-O1–O4"
       ],
       "weight": 1.0
     },
     {
-      "source": "npu_no_native_1bit",
-      "target": "concept.mobile_npu_quant_reality",
-      "relation": "same_as",
+      "source": "decision_wc_o_gates",
+      "target": "sys_calibrate_qat",
+      "relation": "implements",
       "evidence": [
-        "enrichment↔lab ID alias (merge_kg_enrichment.py)"
+        "bnn/wrap/calibrate.py",
+        "bnn/wrap/qat.py"
+      ],
+      "weight": 1.0
+    },
+    {
+      "source": "decision_wc_o_gates",
+      "target": "sys_wrap_policy",
+      "relation": "implements",
+      "evidence": [
+        "bnn/wrap/policy.py",
+        "docs/42_QAT_AND_LAYER_SEARCH.md"
+      ],
+      "weight": 1.0
+    },
+    {
+      "source": "decision_wc_o_gates",
+      "target": "gap_distill_integration",
+      "relation": "blocked_by",
+      "evidence": [
+        "docs/MOONSHOT_DEFERRALS.md W3.T08",
+        "PR #19"
+      ],
+      "weight": 1.0
+    },
+    {
+      "source": "decision_wc_o_gates",
+      "target": "gap_layer_search_full",
+      "relation": "blocked_by",
+      "evidence": [
+        "docs/42_QAT_AND_LAYER_SEARCH.md",
+        "PR #19"
+      ],
+      "weight": 1.0
+    },
+    {
+      "source": "sys_recommend_stack",
+      "target": "decision_wrap_tree",
+      "relation": "implements",
+      "evidence": [
+        "scripts/recommend_stack.py"
+      ],
+      "weight": 1.0
+    },
+    {
+      "source": "sys_recommend_stack",
+      "target": "bnn_lab_system",
+      "relation": "part_of",
+      "evidence": [
+        "bnn/cli.py"
+      ],
+      "weight": 1.0
+    },
+    {
+      "source": "sys_eval_suite",
+      "target": "decision_fair_eval",
+      "relation": "implements",
+      "evidence": [
+        "scripts/run_eval_suite.py"
+      ],
+      "weight": 1.0
+    },
+    {
+      "source": "sys_eval_suite",
+      "target": "sys_repro_gates",
+      "relation": "part_of",
+      "evidence": [
+        "docs/FAIR_EVAL_PROTOCOL.md",
+        "results/SUMMARY.md"
+      ],
+      "weight": 1.0
+    },
+    {
+      "source": "sys_kg",
+      "target": "bnn_lab_system",
+      "relation": "part_of",
+      "evidence": [
+        "docs/44_KNOWLEDGE_GRAPH.md"
+      ],
+      "weight": 1.0
+    },
+    {
+      "source": "sys_kg",
+      "target": "thesis_lock",
+      "relation": "requires",
+      "evidence": [
+        "knowledge_graph/README.md"
+      ],
+      "weight": 1.0
+    },
+    {
+      "source": "paper_bitdistiller",
+      "target": "paper_bitdistill",
+      "relation": "alternative_to",
+      "evidence": [
+        "knowledge_graph/enrichment/NOTES.md — distinct papers"
+      ],
+      "weight": 1.0
+    },
+    {
+      "source": "paper_bitdistill",
+      "target": "paper_bitdistiller",
+      "relation": "alternative_to",
+      "evidence": [
+        "Do not conflate BitDistill vs BitDistiller"
       ],
       "weight": 1.0
     },
     {
       "source": "decision.awq_gptq_vs_binary",
-      "target": "decision_wrap_tree",
-      "relation": "same_as",
+      "target": "paper_gptq",
+      "relation": "recommends_for",
       "evidence": [
-        "enrichment↔lab ID alias (merge_kg_enrichment.py)"
+        "docs/24_GPU_INT4_FP8_LANE.md",
+        "arXiv:2210.17323"
       ],
       "weight": 1.0
     },
     {
       "source": "decision_wrap_tree",
-      "target": "decision.awq_gptq_vs_binary",
-      "relation": "same_as",
+      "target": "paper_gptq",
+      "relation": "recommends_for",
       "evidence": [
-        "enrichment↔lab ID alias (merge_kg_enrichment.py)"
+        "docs/18_DECISION_TREE_AND_COMPLETE_ROADMAP.md"
+      ],
+      "weight": 1.0
+    },
+    {
+      "source": "paper_gptq",
+      "target": "paper_awq",
+      "relation": "alternative_to",
+      "evidence": [
+        "Both INT4 GPU PTQ family; AWQ salience vs GPTQ Hessian"
+      ],
+      "weight": 1.0
+    },
+    {
+      "source": "paper_qsparse",
+      "target": "paper_sparse_bitnet",
+      "relation": "alternative_to",
+      "evidence": [
+        "Activation sparsity vs Sparse-BitNet 2:4 — literature only"
+      ],
+      "weight": 1.0
+    },
+    {
+      "source": "paper_sparse_bitnet",
+      "target": "paper_qsparse",
+      "relation": "cites",
+      "evidence": [
+        "docs/02_SOTA_SURVEY.md sparsity neighbors"
+      ],
+      "weight": 1.0
+    },
+    {
+      "source": "sys_energy_module",
+      "target": "result_energy_rapl_spike",
+      "relation": "measured_on",
+      "evidence": [
+        "PR #22 RAPL spike / CLOSED-BY-PROXY honesty"
+      ],
+      "weight": 1.0
+    },
+    {
+      "source": "result_energy_rapl_spike",
+      "target": "result_energy_bound",
+      "relation": "derived_from",
+      "evidence": [
+        "Latency energy_bound remains main-tip anchor"
+      ],
+      "weight": 1.0
+    },
+    {
+      "source": "result_energy_rapl_spike",
+      "target": "gap_rapl_windows",
+      "relation": "blocked_by",
+      "evidence": [
+        "Windows has no portable RAPL — proxy only"
+      ],
+      "weight": 1.0
+    },
+    {
+      "source": "decision_nongoal_asr_whisper",
+      "target": "thesis_lock",
+      "relation": "part_of",
+      "evidence": [
+        "ROADMAP non-goals / audio pedagogy"
+      ],
+      "weight": 1.0
+    },
+    {
+      "source": "decision_nongoal_memory_arena",
+      "target": "thesis_lock",
+      "relation": "part_of",
+      "evidence": [
+        "docs/43_MEMORY_FOOTPRINT.md"
+      ],
+      "weight": 1.0
+    },
+    {
+      "source": "decision_imagenet_protocol_not_sota",
+      "target": "data_imagenet",
+      "relation": "requires",
+      "evidence": [
+        "docs/imagenet_protocol.md"
+      ],
+      "weight": 1.0
+    },
+    {
+      "source": "decision_imagenet_protocol_not_sota",
+      "target": "gap_imagenet_sota",
+      "relation": "contradicts",
+      "evidence": [
+        "Protocol runner ≠ SOTA claim"
       ],
       "weight": 1.0
     },
     {
       "source": "artifact.hf_bitnet_2b",
       "target": "paper_bitnet_2b4t",
-      "relation": "same_as",
+      "relation": "implements",
       "evidence": [
-        "enrichment↔lab ID alias (merge_kg_enrichment.py)"
+        "HF checkpoint implements the 2B4T paper artifact"
       ],
       "weight": 1.0
     },
     {
-      "source": "paper_bitnet_2b4t",
-      "target": "artifact.hf_bitnet_2b",
-      "relation": "same_as",
+      "source": "decision.awq_gptq_vs_binary",
+      "target": "decision_wrap_tree",
+      "relation": "part_of",
       "evidence": [
-        "enrichment↔lab ID alias (merge_kg_enrichment.py)"
+        "AWQ/GPTQ branch is a subset of the wrap decision tree"
+      ],
+      "weight": 1.0
+    },
+    {
+      "source": "concept.mobile_npu_quant_reality",
+      "target": "npu_no_native_1bit",
+      "relation": "derived_from",
+      "evidence": [
+        "Concept documents the FailureMode"
+      ],
+      "weight": 1.0
+    },
+    {
+      "source": "npu_no_native_1bit",
+      "target": "concept.mobile_npu_quant_reality",
+      "relation": "part_of",
+      "evidence": [
+        "FailureMode is the operational takeaway of the concept"
+      ],
+      "weight": 1.0
+    },
+    {
+      "source": "sys_vision_cifar",
+      "target": "paper_bireal",
+      "relation": "implements",
+      "evidence": [
+        "results/image_cifar.json — System implements Bi-Real pattern"
+      ],
+      "weight": 1.0
+    },
+    {
+      "source": "artifact.hf_bitnet_2b",
+      "target": "paper.bitnet_cpp.2024",
+      "relation": "implements",
+      "evidence": [
+        "HF 2B4T checkpoint is the runtime artifact cited by bitnet.cpp"
       ],
       "weight": 1.0
     }

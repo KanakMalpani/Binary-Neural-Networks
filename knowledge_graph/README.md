@@ -11,8 +11,9 @@ candidates, and open gaps.
 | [`GAPS_FILLED.md`](GAPS_FILLED.md) | Gaps found → research → new nodes/edges |
 | Rebuild (lab corpus) | `python scripts/build_bnn_kg.py` |
 | Merge enrichment | `python scripts/merge_kg_enrichment.py` |
-| Validate | `python scripts/kg_validate.py` · `pytest tests/test_kg.py` |
-| Enrichment provenance | [`enrichment/`](enrichment/) (gap-parallel overlay; do not delete) |
+| Integrity overlay | `python scripts/apply_kg_integrity.py` |
+| Validate | `bnn kg validate` · `python scripts/kg_validate.py` · `pytest tests/test_kg.py` |
+| Enrichment provenance | [`enrichment/`](enrichment/) (gap-parallel + integrity_wave1; do not delete) |
 
 ## Thesis lock (immutable)
 
@@ -95,7 +96,7 @@ Import `bnn_kg.graphml` directly in Gephi (File → Open) or Neo4j (`apoc.import
 4. **Training** — STE / ApproxSign / IR-Net / ReActNet (partial)
 5. **Wrap decision tree** — BitNet / GGUF / torchao / AWQ / NPU INT8-first
 6. **Modalities** — MNIST / CIFAR Bi-Real / audio synth / seq enc-dec
-7. **Novel papers B1–B3** — local research vault under `C:\00 Research Papers\`
+7. **Novel papers B1–B3** — see `docs/32_NOVEL_PAPER_CANDIDATES.md` (maintainer-local idea vault is optional and not required to clone)
 8. **Roadmap gaps** — v0.3.0 vs v1.0 leftovers (`OpenGap` nodes)
 
 ## Gap fill policy
@@ -118,4 +119,4 @@ Missing literature was researched via arXiv (academia MCP), Exa, and Tavily
 - [`docs/44_KNOWLEDGE_GRAPH.md`](../docs/44_KNOWLEDGE_GRAPH.md) — docs-index pointer
 - [`docs/32_NOVEL_PAPER_CANDIDATES.md`](../docs/32_NOVEL_PAPER_CANDIDATES.md)
 - [`ROADMAP.md`](../ROADMAP.md) · [`AGENTS.md`](../AGENTS.md)
-- External index: `C:\00 Research Papers\BINARY_NEURAL_KG_INDEX.md`
+- External index (maintainer-local, optional): `C:\00 Research Papers\BINARY_NEURAL_KG_INDEX.md`

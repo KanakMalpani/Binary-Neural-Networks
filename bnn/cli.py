@@ -468,6 +468,47 @@ def cmd_version(_: argparse.Namespace) -> int:
     return 0
 
 
+def cmd_kg(args: argparse.Namespace) -> int:
+    """Validate or summarize the lab knowledge graph."""
+    from bnn.kg import clear_kg_cache, load_kg, nodes_by_type, validate_graph
+
+    clear_kg_cache()
+    g = load_kg()
+    if args.action == "validate":
+        errs = validate_graph(g)
+        meta = g.get("meta", {})
+        print(
+            f"KG: {meta.get('node_count', len(g['nodes']))} nodes, "
+            f"{meta.get('edge_count', len(g['edges']))} edges"
+        )
+        if errs:
+            print("FAIL:")
+            for e in errs:
+                print(f" - {e}")
+            return 1
+        print("KG: PASS")
+        return 0
+
+    # summary
+    meta = g.get("meta", {})
+    print(
+        f"BNN knowledge graph v{meta.get('version', '?')}: "
+        f"{meta.get('node_count', len(g['nodes']))} nodes / "
+        f"{meta.get('edge_count', len(g['edges']))} edges"
+    )
+    print("View: knowledge_graph/VIEW.md  ·  docs: docs/44_KNOWLEDGE_GRAPH.md")
+    print("Recommend: bnn recommend --goal <gpu-server|cpu-llm|edge-vision|…>")
+    print("Eval:      bnn eval-suite [--skip-pytest]")
+    gaps = nodes_by_type(g, "OpenGap")
+    openish = [n for n in gaps if str(n.get("status", "")).startswith(("open", "deferred"))]
+    print(f"OpenGaps: {len(gaps)} ({len(openish)} open/deferred/open_pr)")
+    for n in sorted(openish, key=lambda x: x["id"])[:8]:
+        print(f"  - {n['id']} [{n.get('status')}]")
+    if len(openish) > 8:
+        print(f"  … +{len(openish) - 8} more")
+    return 0
+
+
 def cmd_pareto(args: argparse.Namespace) -> int:
     """Emit dual-metric Pareto JSON (W7.T03)."""
     extra = ["--out", str(args.out)]
@@ -762,6 +803,19 @@ def build_parser() -> argparse.ArgumentParser:
 
     ver = sub.add_parser("version", help="Print package version")
     ver.set_defaults(func=cmd_version)
+
+    kg = sub.add_parser(
+        "kg",
+        help="Knowledge graph validate/summary (thesis + lab map)",
+    )
+    kg.add_argument(
+        "action",
+        nargs="?",
+        default="summary",
+        choices=("summary", "validate"),
+        help="summary (default) or validate",
+    )
+    kg.set_defaults(func=cmd_kg)
 
     return p
 

@@ -21,7 +21,7 @@ SUBCOMMANDS = sorted(
 
 def test_subcommand_inventory_is_non_trivial():
     assert len(SUBCOMMANDS) >= 15
-    for expected in ("repro", "optimise", "bench", "encode", "decode", "profile"):
+    for expected in ("repro", "optimise", "bench", "encode", "decode", "profile", "kg"):
         assert expected in SUBCOMMANDS
 
 
@@ -108,6 +108,14 @@ def test_profile_shape_flags():
 def test_recommend_goal_is_forwarded():
     args = build_parser().parse_args(["recommend", "--goal", "edge-vision"])
     assert args.goal == "edge-vision"
+
+
+def test_kg_validate_and_summary(capsys):
+    assert main(["kg", "validate"]) == 0
+    assert "PASS" in capsys.readouterr().out
+    assert main(["kg"]) == 0
+    out = capsys.readouterr().out
+    assert "knowledge graph" in out.lower() or "KG" in out or "nodes" in out
 
 
 def test_train_seed_and_epochs():

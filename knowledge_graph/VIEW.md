@@ -176,11 +176,14 @@ flowchart LR
   LAB --> B1[B1 Stop Claiming 32×<br/>dual metrics + fake binary]
   LAB --> B2[B2 Packed XNOR productization<br/>goldens + repro contract]
   LAB --> B3[B3 When Not to Binarize<br/>decision tree + hybrid FFN]
-  B1 --> VAULT["C:\\00 Research Papers\\"]
+  B1 --> VAULT["Maintainer-local idea vault"]
   B2 --> VAULT
   B3 --> VAULT
   B1 -.->|blocked_by| VENUE[Venue LaTeX OpenGap]
 ```
+
+Idea-vault folders under `C:\00 Research Papers\` are **maintainer-local** — cite
+[`docs/32_NOVEL_PAPER_CANDIDATES.md`](../docs/32_NOVEL_PAPER_CANDIDATES.md) in-repo.
 
 ---
 
@@ -222,6 +225,24 @@ flowchart TB
 | `algo_xnor_gemm` | Real speed path |
 | `fake_binary_sign` | Negative control |
 | `decision_wrap_tree` | Practitioner routing |
+| `sys_recommend_stack` | `bnn recommend` CLI |
+| `sys_eval_suite` | `bnn eval-suite` / fair shapes |
+| `decision_wc_o_gates` | WC-O1–O4 (Lane A open PR) |
+| `sys_kg` | Graph + CI integrity |
 | `paper_bitnet_b158` | Ternary LLM era pivot |
+| `paper_gptq` / `paper_bitdistiller` | INT4 distill disambiguation |
 | `sys_repro_gates` | `bnn repro` / goldens |
 | `paper_b1_honest_speedup` | Novel paper B1 |
+
+---
+
+## 11. CLI companions
+
+```bash
+bnn kg                  # counts + open gaps
+bnn kg validate         # structural PASS/FAIL
+bnn recommend --goal cpu-llm
+bnn eval-suite --skip-pytest
+```
+
+See [`docs/44_KNOWLEDGE_GRAPH.md`](../docs/44_KNOWLEDGE_GRAPH.md) and [`docs/lanes/kg.md`](../docs/lanes/kg.md).
