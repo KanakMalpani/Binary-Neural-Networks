@@ -1,4 +1,4 @@
-"""Vision models: CIFAR Bi-Real CNN + tiny binary ViT sketch."""
+"""Vision models: CIFAR Bi-Real CNN, ResNet-BiReal reference, tiny binary ViT."""
 
 from __future__ import annotations
 
@@ -70,6 +70,124 @@ class BinaryCIFARCNN(nn.Module):
         clip_weights_(self)
 
 
+class _BiRealConvBN(nn.Module):
+    """Binary 3×3 + BN (Bi-Real path before residual add)."""
+
+    def __init__(self, in_ch: int, out_ch: int, stride: int = 1):
+        super().__init__()
+        self.conv = BinaryConv2d(in_ch, out_ch, 3, stride, 1, bias=False)
+        self.bn = nn.BatchNorm2d(out_ch, momentum=0.9)
+
+    def forward(self, x):
+        return self.bn(self.conv(x))
+
+
+class BiRealBasicBlock(nn.Module):
+    """ResNet basic block with Bi-Real residuals around each binary conv.
+
+    Shortcut is full-precision (AvgPool + 1×1 when stride/channels change).
+    """
+
+    def __init__(self, in_ch: int, out_ch: int, stride: int = 1):
+        super().__init__()
+        self.unit1 = _BiRealConvBN(in_ch, out_ch, stride=stride)
+        self.unit2 = _BiRealConvBN(out_ch, out_ch, stride=1)
+        if stride != 1 or in_ch != out_ch:
+            parts: list[nn.Module] = []
+            if stride > 1:
+                parts.append(nn.AvgPool2d(kernel_size=stride, stride=stride))
+            parts.extend(
+                [
+                    nn.Conv2d(in_ch, out_ch, kernel_size=1, stride=1, bias=False),
+                    nn.BatchNorm2d(out_ch, momentum=0.9),
+                ]
+            )
+            self.proj: nn.Module | None = nn.Sequential(*parts)
+        else:
+            self.proj = None
+
+    def forward(self, x):
+        identity = x if self.proj is None else self.proj(x)
+        out = identity + self.unit1(x)
+        out = out + self.unit2(out)
+        return out
+
+
+class ResNetBiReal(nn.Module):
+    """ResNet-18-style Bi-Real reference (CIFAR or ImageNet stem).
+
+    Pedagogical recipe — not an ImageNet SOTA claim. FP stem/head; binary
+    residual path with ApproxSign-capable STE via ``BinaryConv2d``.
+    """
+
+    def __init__(
+        self,
+        num_classes: int = 10,
+        layers: tuple[int, int, int, int] = (2, 2, 2, 2),
+        width: int = 64,
+        cifar: bool = True,
+    ):
+        super().__init__()
+        self.in_ch = width
+        self.cifar = cifar
+        if cifar:
+            self.stem = nn.Sequential(
+                nn.Conv2d(3, width, kernel_size=3, stride=1, padding=1, bias=False),
+                nn.BatchNorm2d(width, momentum=0.9),
+            )
+        else:
+            self.stem = nn.Sequential(
+                nn.Conv2d(3, width, kernel_size=7, stride=2, padding=3, bias=False),
+                nn.BatchNorm2d(width, momentum=0.9),
+                nn.MaxPool2d(kernel_size=3, stride=2, padding=1),
+            )
+        self.layer1 = self._make_layer(width, layers[0], stride=1)
+        self.layer2 = self._make_layer(width * 2, layers[1], stride=2)
+        self.layer3 = self._make_layer(width * 4, layers[2], stride=2)
+        self.layer4 = self._make_layer(width * 8, layers[3], stride=2)
+        self.pool = nn.AdaptiveAvgPool2d(1)
+        self.head = nn.Linear(width * 8, num_classes)
+
+    def _make_layer(self, out_ch: int, blocks: int, stride: int) -> nn.Sequential:
+        layers = [BiRealBasicBlock(self.in_ch, out_ch, stride=stride)]
+        self.in_ch = out_ch
+        for _ in range(1, blocks):
+            layers.append(BiRealBasicBlock(out_ch, out_ch, stride=1))
+        return nn.Sequential(*layers)
+
+    def forward(self, x):
+        x = self.stem(x)
+        x = self.layer1(x)
+        x = self.layer2(x)
+        x = self.layer3(x)
+        x = self.layer4(x)
+        return self.head(self.pool(x).flatten(1))
+
+    def clip_weights(self):
+        clip_weights_(self)
+
+
+def ResNetBiRealCIFAR(
+    num_classes: int = 10,
+    width: int = 16,
+    layers: tuple[int, int, int, int] = (2, 2, 2, 2),
+) -> ResNetBiReal:
+    """CIFAR ResNet-18 Bi-Real reference (narrow width default for laptop demos)."""
+    return ResNetBiReal(
+        num_classes=num_classes, layers=layers, width=width, cifar=True
+    )
+
+
+def ResNetBiReal18(
+    num_classes: int = 1000,
+    width: int = 64,
+) -> ResNetBiReal:
+    """ImageNet-shaped ResNet-18 Bi-Real (protocol / smoke — not a SOTA gate)."""
+    return ResNetBiReal(
+        num_classes=num_classes, layers=(2, 2, 2, 2), width=width, cifar=False
+    )
+
+
 class TinyBinaryViT(nn.Module):
     """Tiny ViT-ish sketch: FP patch embed + binary MLP blocks (attn stays FP Linear).
 
@@ -118,7 +236,6 @@ class _ViTBlock(nn.Module):
         self.attn_qkv = nn.Linear(dim, dim * 3)
         self.attn_proj = nn.Linear(dim, dim)
         self.n2 = nn.LayerNorm(dim)
-        # Either binary or FP depending on binary_ffn; declare the union.
         self.ff1: BinaryLinear | nn.Linear
         self.ff2: BinaryLinear | nn.Linear
         if binary_ffn:
@@ -129,7 +246,6 @@ class _ViTBlock(nn.Module):
             self.ff2 = nn.Linear(dim * 2, dim)
 
     def forward(self, x):
-        # Single-head attention (FP)
         h = self.n1(x)
         qkv = self.attn_qkv(h).chunk(3, dim=-1)
         q, k, v = qkv
@@ -144,11 +260,39 @@ class _ViTBlock(nn.Module):
 def build_vision_model(name: str, channels: int = 64, **kwargs) -> nn.Module:
     name = name.lower()
     if name in ("fp32_cifar", "fp32_cnn"):
-        return FP32CIFARCNN(channels=channels, **{k: v for k, v in kwargs.items() if k == "num_classes"})
+        return FP32CIFARCNN(
+            channels=channels,
+            **{k: v for k, v in kwargs.items() if k == "num_classes"},
+        )
     if name in ("binary_cifar", "binary_bireal", "binary_cnn"):
-        return BinaryCIFARCNN(channels=channels, **{k: v for k, v in kwargs.items() if k == "num_classes"})
+        return BinaryCIFARCNN(
+            channels=channels,
+            **{k: v for k, v in kwargs.items() if k == "num_classes"},
+        )
+    if name in ("resnet_bireal_cifar", "resnet18_bireal_cifar", "resnet_bireal"):
+        width = int(kwargs.get("width", min(channels, 32) if channels else 16))
+        nc = int(kwargs.get("num_classes", 10))
+        return ResNetBiRealCIFAR(num_classes=nc, width=width)
+    if name in ("resnet_bireal18", "resnet18_bireal", "resnet_bireal_imagenet"):
+        width = int(kwargs.get("width", 64))
+        nc = int(kwargs.get("num_classes", 1000))
+        return ResNetBiReal18(num_classes=nc, width=width)
     if name in ("tiny_vit_binary", "binary_vit"):
-        return TinyBinaryViT(binary_ffn=True, **{k: kwargs[k] for k in kwargs if k in ("dim", "depth", "num_classes", "img_size", "patch")})
+        return TinyBinaryViT(
+            binary_ffn=True,
+            **{
+                k: kwargs[k]
+                for k in kwargs
+                if k in ("dim", "depth", "num_classes", "img_size", "patch")
+            },
+        )
     if name in ("tiny_vit_fp", "fp_vit"):
-        return TinyBinaryViT(binary_ffn=False, **{k: kwargs[k] for k in kwargs if k in ("dim", "depth", "num_classes", "img_size", "patch")})
+        return TinyBinaryViT(
+            binary_ffn=False,
+            **{
+                k: kwargs[k]
+                for k in kwargs
+                if k in ("dim", "depth", "num_classes", "img_size", "patch")
+            },
+        )
     raise ValueError(name)

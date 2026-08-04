@@ -17,17 +17,37 @@
       "build": "bnn.vision / train-image",
       "train_cli": "bnn train-image",
       "wrap": "wrap_conv_modules",
-      "docs": ["docs/tutorials/"],
-      "results": ["results/cifar_bireal.json"]
+      "docs": ["docs/tutorials/", "docs/imagenet_protocol.md"],
+      "results": ["results/image_cifar.json"]
+    },
+    {
+      "id": "resnet_bireal_cifar",
+      "name": "ResNet-18 Bi-Real CIFAR reference (W4.T05)",
+      "build": "bnn.vision.ResNetBiRealCIFAR",
+      "train_cli": "bnn train-image --include-resnet",
+      "wrap": "wrap_conv_modules (binary 3x3 path)",
+      "docs": ["docs/imagenet_protocol.md", "docs/lanes/g.md"],
+      "results": ["results/image_cifar.json"],
+      "note": "Optional --include-resnet; floors remain binary_cifar_bireal (no new golden keys)"
     },
     {
       "id": "tiny_binary_vit",
       "name": "Tiny Binary ViT",
       "build": "bnn.vision",
-      "train_cli": "bnn train-image --vit",
+      "train_cli": "bnn train-image --include-vit",
       "wrap": "hybrid_ffn on MLP blocks",
       "docs": ["docs/36_ENCODER_DECODER_AND_NEXT.md"],
       "results": []
+    },
+    {
+      "id": "imagenet_protocol_smoke",
+      "name": "ImageNet folder protocol runner (M6)",
+      "build": "bnn.vision.ResNetBiReal18 / scripts/imagenet_protocol.py",
+      "train_cli": "python scripts/imagenet_protocol.py --mode smoke",
+      "wrap": "n/a (STE smoke)",
+      "docs": ["docs/imagenet_protocol.md"],
+      "results": ["results/imagenet_protocol_smoke.json"],
+      "non_goal": "Full ImageNet SOTA train / CI gate"
     },
     {
       "id": "binary_transformer_seq2seq",

@@ -168,6 +168,9 @@ def cmd_train_image(args: argparse.Namespace) -> int:
         extra.append("--approx-sign")
     if args.include_vit:
         extra.append("--include-vit")
+    if getattr(args, "include_resnet", False):
+        extra.append("--include-resnet")
+        extra += ["--resnet-width", str(args.resnet_width)]
     if args.out:
         extra += ["--out", str(args.out)]
     return _run_script("train_image.py", extra)
@@ -541,7 +544,10 @@ def build_parser() -> argparse.ArgumentParser:
     c.add_argument("--batch-size", type=int, default=128)
     c.set_defaults(func=cmd_train_cifar)
 
-    img = sub.add_parser("train-image", help="Image lane: CIFAR-10 FP vs Bi-Real (+ optional ViT)")
+    img = sub.add_parser(
+        "train-image",
+        help="Image lane: CIFAR-10 FP vs Bi-Real (+ optional ViT / ResNet-BiReal)",
+    )
     img.add_argument("--epochs", type=int, default=8)
     img.add_argument("--subset", type=int, default=30000, help="0 = full 50k")
     img.add_argument("--batch-size", type=int, default=128)
@@ -549,6 +555,12 @@ def build_parser() -> argparse.ArgumentParser:
     img.add_argument("--seed", type=int, default=0)
     img.add_argument("--approx-sign", action="store_true")
     img.add_argument("--include-vit", action="store_true")
+    img.add_argument(
+        "--include-resnet",
+        action="store_true",
+        help="Also train ResNet-BiReal CIFAR reference (W4.T05)",
+    )
+    img.add_argument("--resnet-width", type=int, default=16)
     img.add_argument("--out", type=Path, default=None)
     img.set_defaults(func=cmd_train_image)
 
