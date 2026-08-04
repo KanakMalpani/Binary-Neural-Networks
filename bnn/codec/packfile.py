@@ -585,12 +585,18 @@ def load_bnnpack(
 ) -> dict[str, Any]:
     """Load ``.bnnpack`` with ``weights_only=True`` only (no unsafe pickle fallback).
 
+    Soft-warns when the path sits outside lab ``results/`` / ``checkpoints/`` /
+    ``data/`` (W10.T06). Never falls back to unsafe pickle.
+
     When ``verify_hashes`` is True (default) and the file is v2+, recompute
     per-layer ``content_sha256`` and raise if any mismatch.
     """
+    from ..paths import warn_untrusted_pack
+
     path = Path(path)
     if not path.is_file():
         raise FileNotFoundError(path)
+    warn_untrusted_pack(path, kind=".bnnpack")
     try:
         payload = torch.load(path, map_location="cpu", weights_only=True)
     except Exception as exc:

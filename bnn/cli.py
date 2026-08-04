@@ -293,6 +293,8 @@ def cmd_eval_suite(args: argparse.Namespace) -> int:
         extra.append("--full")
     if args.skip_pytest:
         extra.append("--skip-pytest")
+    if getattr(args, "strict_budgets", False):
+        extra.append("--strict-budgets")
     return _run_script("run_eval_suite.py", extra)
 
 
@@ -413,7 +415,7 @@ def cmd_decode(args: argparse.Namespace) -> int:
 def cmd_profile(args: argparse.Namespace) -> int:
     import json
 
-    from bnn.profile import profile_packed_linear
+    from bnn.profile import check_soft_budgets, profile_packed_linear
 
     br = profile_packed_linear(
         m=args.batch,
@@ -421,8 +423,14 @@ def cmd_profile(args: argparse.Namespace) -> int:
         k=args.out_features,
         reps=args.reps,
         warmup=args.warmup,
+        compare_baselines=not getattr(args, "no_baselines", False),
     )
     d = br.to_dict()
+    soft = check_soft_budgets(br)
+    d["soft_budget_ok"] = not soft
+    if soft:
+        d["soft_budget_violations"] = soft
+        print("WARN soft latency budget:", "; ".join(soft), file=sys.stderr)
     print(json.dumps(d, indent=2))
     if args.out:
         Path(args.out).parent.mkdir(parents=True, exist_ok=True)
@@ -761,6 +769,11 @@ def build_parser() -> argparse.ArgumentParser:
     e.add_argument("--out", type=Path, default=ROOT / "results" / "SUMMARY.md")
     e.add_argument("--full", action="store_true", help="Include short image/audio smokes")
     e.add_argument("--skip-pytest", action="store_true")
+    e.add_argument(
+        "--strict-budgets",
+        action="store_true",
+        help="Fail when soft latency budgets are exceeded (W13.T03; default warn-only)",
+    )
     e.set_defaults(func=cmd_eval_suite)
 
     pa = sub.add_parser(
@@ -806,10 +819,18 @@ def build_parser() -> argparse.ArgumentParser:
     dec.add_argument("--pack", type=Path, required=True)
     dec.set_defaults(func=cmd_decode)
 
-    pr = sub.add_parser("profile", help="Pack / GEMM / overhead breakdown vs torch FP32")
+    pr = sub.add_parser(
+        "profile",
+        help="Pack / GEMM / overhead breakdown vs torch FP32 + INT8-WO baselines",
+    )
     pr.add_argument("--batch", type=int, default=64)
     pr.add_argument("--in-features", type=int, default=4096)
     pr.add_argument("--out-features", type=int, default=4096)
+    pr.add_argument(
+        "--no-baselines",
+        action="store_true",
+        help="Skip FP32/INT8-WO baseline timings (W13.T06 compare is on by default)",
+    )
     pr.add_argument("--reps", type=int, default=20)
     pr.add_argument("--warmup", type=int, default=5)
     pr.add_argument("--out", type=Path, default=None)

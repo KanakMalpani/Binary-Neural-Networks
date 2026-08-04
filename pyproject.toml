@@ -83,6 +83,7 @@ markers = [
   "slow: longer trains / downloads (deselect with -m 'not slow')",
   "native: requires MSVC native DLL",
   "hf: optional Hugging Face / transformers (deselect with -m 'not hf')",
+  "optional_extras: transformers/torchao smoke (deselect with -m 'not optional_extras')",
 ]
 
 [tool.cibuildwheel]

@@ -52,12 +52,14 @@ Compile (Windows MSVC x64): `python -m bnn.kernels.compile_native`
 `get_audio_loaders`, `synthesize_tone`, `waveform_to_features`, `build_audio_model`.
 Synthetic tones only — not production ASR.
 
-## Paths / logging
+## Paths / logging / safety
 
 | Module | Role |
 |--------|------|
 | `bnn.paths.resolve_under` | Reject path traversal outside a root |
+| `bnn.paths.warn_untrusted_pack` | Soft-warn loads outside `results/`/`checkpoints/`/`data/` |
 | `bnn.logutil.info/warn/error` | Flushing stdout/stderr conventions |
+| `bnn.profile.check_soft_budgets` | Soft CI latency ceilings (W13.T03) |
 
 ## Seq + codec
 

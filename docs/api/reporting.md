@@ -1,5 +1,9 @@
 # Reporting & reproducibility
 ::: bnn.profile.profile_packed_linear
+::: bnn.profile.ProfileBreakdown
+::: bnn.profile.check_soft_budgets
+::: bnn.profile.check_committed_bench_soft_floors
+::: bnn.profile.SOFT_BUDGETS_MS
 ::: bnn.memory.memory_report
 ::: bnn.memory.MemoryReport
 ::: bnn.memory.LayerFootprint
@@ -9,8 +13,4 @@
 ::: bnn.eval_report.machine_card
 ::: bnn.eval.pareto
 ::: bnn.determinism.set_repro_seed
-::: bnn.paths.resolve_under
-::: bnn.paths.repo_relative
-::: bnn.export.save_checkpoint
-::: bnn.export.load_checkpoint
 ::: bnn.export.pack_linear_weight

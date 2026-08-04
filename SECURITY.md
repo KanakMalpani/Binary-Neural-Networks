@@ -23,7 +23,9 @@ We aim to acknowledge within **7 days** and ship a fix or mitigation advisory wh
 ## Safe loading policy (this repo)
 
 - Prefer `weights_only=True` (or equivalent) for `torch.load` of untrusted checkpoints.
-- `.bnnpack` loads go through `bnn.codec` with path guards (`bnn.paths`).
+- `.bnnpack` loads go through `bnn.codec.load_bnnpack` with **no** unsafe pickle
+  fallback; path soft-warnings via `bnn.paths.warn_untrusted_pack` when the file
+  sits outside lab `results/` / `checkpoints/` / `data/` (W10.T03 / W10.T06).
 - Do **not** commit secrets, API keys, or datasets under `data/`.
 - Native kernels are **local DLLs/SOs** built from this tree — treat third-party binaries as untrusted.
 

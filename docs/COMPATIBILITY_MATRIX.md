@@ -19,3 +19,7 @@
 
 **Policy:** floats need not be bit-identical across machines; same **conclusions**
 vs `tests/golden_floors.json`. Runtime ISA details: [`41_PORTABLE_SIMD_KERNEL.md`](41_PORTABLE_SIMD_KERNEL.md).
+
+**Torch upper bound:** [`TORCH_PIN_POLICY.md`](TORCH_PIN_POLICY.md) (W14.T03) —
+`torch>=2.1,<2.13`. Optional HF / torchao probes:
+[`OPTIONAL_EXTRAS_MATRIX.md`](OPTIONAL_EXTRAS_MATRIX.md) (W14.T06).
