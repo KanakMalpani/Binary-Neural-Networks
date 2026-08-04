@@ -8,9 +8,9 @@ from __future__ import annotations
 
 import platform
 import time
+from collections.abc import Callable
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Callable
 
 POWERCAP_ROOT = Path("/sys/class/powercap")
 
@@ -56,7 +56,7 @@ def detect_rapl(*, prefer_package: bool = True) -> list[RAPLDomain]:
     domains: list[RAPLDomain] = []
     for entry in sorted(POWERCAP_ROOT.iterdir()):
         name = entry.name
-        if not (name.startswith("intel-rapl:") or name.startswith("amd-rapl:")):
+        if not name.startswith(("intel-rapl:", "amd-rapl:")):
             continue
         energy = entry / "energy_uj"
         if not energy.is_file():
@@ -89,11 +89,19 @@ def detect_rapl(*, prefer_package: bool = True) -> list[RAPLDomain]:
 
 
 def _delta_uj(before: int, after: int, max_energy_uj: int | None) -> int:
+    """Non-negative microjoule delta; handles counter wrap when max is known.
+
+    Without ``max_energy_range_uj``, a wrap cannot be recovered honestly — raise
+    rather than return a negative Joules delta.
+    """
     if after >= before:
         return after - before
     if max_energy_uj and max_energy_uj > 0:
         return after + (max_energy_uj - before)
-    return after - before
+    raise RAPLUnavailable(
+        "RAPL energy_uj wrapped but max_energy_range_uj is missing; "
+        "refusing negative Joules"
+    )
 
 
 @dataclass
@@ -121,8 +129,11 @@ class RAPLMeter:
         *,
         sleep_s: float | None = None,
         domain: str | None = None,
-    ) -> dict[str, float | str | dict[str, float]]:
-        """Return Joules (and seconds) for ``domain`` (default: first / package)."""
+    ) -> dict[str, float | str | dict[str, float] | None]:
+        """Return Joules (and seconds) for ``domain`` (default: first / package).
+
+        ``avg_power_w`` is ``None`` when ``elapsed_s`` is zero (degenerate interval).
+        """
         if fn is None and sleep_s is None:
             raise ValueError("Provide fn= or sleep_s=")
         target = self._pick_domain(domain)
@@ -142,7 +153,7 @@ class RAPLMeter:
 
         elapsed = t1 - t0
         primary_j = joules_by_domain[target.name]
-        avg_w = primary_j / elapsed if elapsed > 0 else None
+        avg_w: float | None = (primary_j / elapsed) if elapsed > 0 else None
         return {
             "status": "MEASURED_RAPL",
             "domain": target.name,
@@ -169,6 +180,6 @@ def measure_rapl_joules(
     *,
     sleep_s: float | None = None,
     domain: str | None = None,
-) -> dict[str, float | str | dict[str, float]]:
+) -> dict[str, float | str | dict[str, float] | None]:
     """Convenience: open meter and measure once."""
     return RAPLMeter.open().measure(fn, sleep_s=sleep_s, domain=domain)

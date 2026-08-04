@@ -9,9 +9,8 @@ from typing import Any
 
 from bnn.paths import repo_relative
 
-from .proxy import estimate_energy, proxy_status_windows
+from .proxy import closed_by_proxy_status, estimate_energy
 from .rapl import detect_rapl
-
 
 LITERATURE_ANCHORS = {
     "bitnet_cpp_cpu_energy_reduction_pct": "55–82% (Microsoft bitnet.cpp reports)",
@@ -96,7 +95,7 @@ def build_energy_bound(
             "backend": "linux_powercap",
         }
     else:
-        status = proxy_status_windows()
+        status = closed_by_proxy_status()
         measurement_method = "proxy_E_eq_P_times_t"
         rapl_meta = {
             "available": False,

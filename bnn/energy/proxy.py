@@ -36,8 +36,12 @@ def estimate_energy(
     return row
 
 
-def proxy_status_windows() -> str:
-    """Honest status string for hosts without portable RAPL."""
+def closed_by_proxy_status() -> str:
+    """Honest CLOSED-BY-PROXY status when RAPL / board Joules are unavailable.
+
+    Covers Windows (no portable RAPL), Linux without readable powercap, and
+    other OS — not Windows-only despite the historical name.
+    """
     system = platform.system()
     if system == "Windows":
         return (
@@ -54,3 +58,7 @@ def proxy_status_windows() -> str:
         f"CLOSED-BY-PROXY: OS={system}; no RAPL path used; "
         "E=P*t with measured t + assumed P brackets + literature anchors."
     )
+
+
+# Back-compat alias (pre-review name was Windows-centric).
+proxy_status_windows = closed_by_proxy_status

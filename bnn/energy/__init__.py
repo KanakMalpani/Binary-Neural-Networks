@@ -18,7 +18,7 @@ from .bound import (
     energy_proxy_relative,
     write_energy_bound,
 )
-from .proxy import estimate_energy, proxy_status_windows
+from .proxy import closed_by_proxy_status, estimate_energy, proxy_status_windows
 from .rapl import (
     RAPLDomain,
     RAPLMeter,
@@ -33,6 +33,7 @@ __all__ = [
     "RAPLMeter",
     "RAPLUnavailable",
     "build_energy_bound",
+    "closed_by_proxy_status",
     "detect_rapl",
     "energy_proxy_relative",
     "estimate_energy",

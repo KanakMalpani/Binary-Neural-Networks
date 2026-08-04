@@ -13,13 +13,13 @@ import pytest
 from bnn.energy import (
     RAPLUnavailable,
     build_energy_bound,
+    closed_by_proxy_status,
     detect_rapl,
     energy_proxy_relative,
     estimate_energy,
-    proxy_status_windows,
     write_energy_bound,
 )
-from bnn.energy.rapl import RAPLMeter
+from bnn.energy.rapl import RAPLMeter, _delta_uj
 
 
 def test_estimate_energy_basic():
@@ -71,7 +71,14 @@ def test_detect_rapl_never_raises_on_windows():
     domains = detect_rapl()
     if platform.system() != "Linux":
         assert domains == []
-        assert "CLOSED-BY-PROXY" in proxy_status_windows()
+        assert "CLOSED-BY-PROXY" in closed_by_proxy_status()
+
+
+def test_delta_uj_wrap_without_max_raises():
+    assert _delta_uj(10, 20, None) == 10
+    assert _delta_uj(90, 10, 100) == 20
+    with pytest.raises(RAPLUnavailable, match="wrapped"):
+        _delta_uj(90, 10, None)
 
 
 def test_rapl_meter_open_raises_without_sysfs():
