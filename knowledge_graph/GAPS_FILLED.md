@@ -67,15 +67,28 @@ Provenance folder `knowledge_graph/enrichment/` is **kept** (not deleted).
 See `OpenGap` nodes in the JSON. Highest leverage leftovers:
 
 1. Venue drafting for B1–B3 (`gap_venue_submit`)
-2. Distill integration beyond sketch (`gap_distill_integration`)
-3. `.bnnpack` v2 + safetensors (`gap_bnnpack_v2`)
+2. Distill / WC-O hardening (`gap_distill_integration`, `decision_wc_o_gates`) — **Lane A PR #19**
+3. `.bnnpack` v2 + safetensors (`gap_bnnpack_v2`) — **Lane B PR #18**
 4. Local Litespark / Sparse-BitNet benches (`gap_litespark_local`) — **do not invent**
 5. Full ReActNet activations in `bnn.ste` (`gap_reactnet_in_repo`)
+6. Wave 1 moonshots still on open PRs: WASM (#24), energy/RAPL (#22), bitnet pin (#17), ImageNet protocol (#21)
+
+## Integrity enrichment (2026-08-04, `lane/kg-enrich`)
+
+| Step | Result |
+|------|--------|
+| Overlay | `knowledge_graph/enrichment/integrity_wave1.json` |
+| Tool | `python scripts/apply_kg_integrity.py` |
+| Adds | WC-O gates, `sys_recommend_stack`, `sys_eval_suite`, `sys_kg`, BitDistiller/GPTQ/Q-Sparse, RAPL Result, moonshot non-goals |
+| Fixes | Broken sources; over-aliased `same_as` → `implements`/`part_of`/`derived_from` |
+| Honesty | Wave 1 statuses `open_pr` — **not** claimed merged |
 
 ## Rebuild after edits
 
 ```bash
 python scripts/build_bnn_kg.py
+python scripts/merge_kg_enrichment.py
+python scripts/apply_kg_integrity.py
 python scripts/kg_validate.py
 pytest tests/test_kg.py -q
 ```

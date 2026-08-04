@@ -222,6 +222,24 @@ flowchart TB
 | `algo_xnor_gemm` | Real speed path |
 | `fake_binary_sign` | Negative control |
 | `decision_wrap_tree` | Practitioner routing |
+| `sys_recommend_stack` | `bnn recommend` CLI |
+| `sys_eval_suite` | `bnn eval-suite` / fair shapes |
+| `decision_wc_o_gates` | WC-O1–O4 (Lane A open PR) |
+| `sys_kg` | Graph + CI integrity |
 | `paper_bitnet_b158` | Ternary LLM era pivot |
+| `paper_gptq` / `paper_bitdistiller` | INT4 distill disambiguation |
 | `sys_repro_gates` | `bnn repro` / goldens |
 | `paper_b1_honest_speedup` | Novel paper B1 |
+
+---
+
+## 11. CLI companions
+
+```bash
+bnn kg                  # counts + open gaps
+bnn kg validate         # structural PASS/FAIL
+bnn recommend --goal cpu-llm
+bnn eval-suite --skip-pytest
+```
+
+See [`docs/44_KNOWLEDGE_GRAPH.md`](../docs/44_KNOWLEDGE_GRAPH.md) and [`docs/lanes/kg.md`](../docs/lanes/kg.md).

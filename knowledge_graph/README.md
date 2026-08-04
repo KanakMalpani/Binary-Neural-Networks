@@ -11,8 +11,9 @@ candidates, and open gaps.
 | [`GAPS_FILLED.md`](GAPS_FILLED.md) | Gaps found → research → new nodes/edges |
 | Rebuild (lab corpus) | `python scripts/build_bnn_kg.py` |
 | Merge enrichment | `python scripts/merge_kg_enrichment.py` |
-| Validate | `python scripts/kg_validate.py` · `pytest tests/test_kg.py` |
-| Enrichment provenance | [`enrichment/`](enrichment/) (gap-parallel overlay; do not delete) |
+| Integrity overlay | `python scripts/apply_kg_integrity.py` |
+| Validate | `bnn kg validate` · `python scripts/kg_validate.py` · `pytest tests/test_kg.py` |
+| Enrichment provenance | [`enrichment/`](enrichment/) (gap-parallel + integrity_wave1; do not delete) |
 
 ## Thesis lock (immutable)
 

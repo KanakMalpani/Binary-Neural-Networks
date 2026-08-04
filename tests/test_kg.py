@@ -74,3 +74,63 @@ def test_graphml_nonempty():
     assert "<graphml" in text
     assert 'edgedefault="directed"' in text
     assert text.count("<node ") >= 100
+
+
+def test_integrity_nodes_present(graph):
+    ids = {n["id"] for n in graph["nodes"]}
+    for nid in (
+        "decision_wc_o_gates",
+        "sys_recommend_stack",
+        "sys_eval_suite",
+        "sys_kg",
+        "paper_bitdistiller",
+        "paper_gptq",
+        "paper_qsparse",
+        "result_energy_rapl_spike",
+        "decision_nongoal_asr_whisper",
+        "decision_nongoal_memory_arena",
+        "decision_imagenet_protocol_not_sota",
+    ):
+        assert nid in ids, nid
+
+
+def test_ternary_source_path(graph):
+    idx = {n["id"]: n for n in graph["nodes"]}
+    srcs = idx["algo_ternary_bitplane"]["sources"]
+    assert "bnn/kernels/ternary_pack.py" in srcs
+    assert "bnn/ternary_pack.py" not in srcs
+
+
+def test_same_as_not_cross_type(graph):
+    """System↔Paper / Decision-subset / Concept↔FailureMode must not use same_as."""
+    forbidden = {
+        frozenset({"artifact.hf_bitnet_2b", "paper_bitnet_2b4t"}),
+        frozenset({"decision.awq_gptq_vs_binary", "decision_wrap_tree"}),
+        frozenset({"concept.mobile_npu_quant_reality", "npu_no_native_1bit"}),
+    }
+    for e in graph["edges"]:
+        if e["relation"] != "same_as":
+            continue
+        pair = frozenset({e["source"], e["target"]})
+        assert pair not in forbidden, e
+
+
+def test_repo_relative_sources_exist(graph):
+    """Local path-like sources should resolve on the checked-out tree."""
+    skip_prefixes = ("http://", "https://", "arXiv:", "arxiv:", "doi:", "hf:")
+    missing: list[str] = []
+    for n in graph["nodes"]:
+        for s in n.get("sources") or []:
+            if not isinstance(s, str) or s.startswith(skip_prefixes):
+                continue
+            # Allow bare filenames / section anchors only when they look like paths
+            if "/" not in s and "\\" not in s:
+                continue
+            # Strip markdown anchors
+            path_s = s.split("#", 1)[0].strip()
+            if not path_s:
+                continue
+            p = ROOT / path_s
+            if not p.exists():
+                missing.append(f"{n['id']}: {s}")
+    assert missing == [], missing

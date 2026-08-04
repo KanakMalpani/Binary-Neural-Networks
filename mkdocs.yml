@@ -31,6 +31,7 @@ nav:
   - Portable SIMD kernel: 41_PORTABLE_SIMD_KERNEL.md
   - QAT + layer search: 42_QAT_AND_LAYER_SEARCH.md
   - Memory footprint: 43_MEMORY_FOOTPRINT.md
+  - Knowledge graph: 44_KNOWLEDGE_GRAPH.md
   - World-class roadmap: 37_WORLD_CLASS_BNN_OPTIMISER_ROADMAP.md
 
 docs_dir: docs
