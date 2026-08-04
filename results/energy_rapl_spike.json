@@ -1,0 +1,23 @@
+{
+  "schema": "bnn_energy_rapl_spike_v1",
+  "os": "Windows",
+  "platform": "Windows-11-10.0.26200-SP0",
+  "machine": "AMD64",
+  "board_joules_status": "CLOSED-BY-PROXY: no readable RAPL powercap on this host; energy-bound proxy remains the default path.",
+  "rapl_domains": [],
+  "note": "Windows and locked-down Linux keep E=P*t. See docs/spikes/RAPL_ENERGY_SPIKE.md.",
+  "energy_proxy": {
+    "fp": 1.0,
+    "binary": 0.14833426047196713,
+    "unit": "relative_to_fp",
+    "note": "Pareto energy_proxy: FP=1.0 reference; binary is E_bin/E_fp. Not a GPU claim; wall-clock/proxy only."
+  },
+  "energy_bound_excerpt": {
+    "energy_j": {
+      "fp": 1.19472511667603,
+      "binary": 0.17721866664942354
+    },
+    "board_joules_status": "CLOSED-BY-PROXY: Windows has no portable RAPL in stdlib; E=P*t with measured t + assumed P brackets + literature anchors. Sufficient for decision thesis.",
+    "source_latency": "results/wrap_demo.json"
+  }
+}
