@@ -1,0 +1,43 @@
+{
+  "schema": "bnn.llamacpp_bitnet_pins.v1",
+  "pinned_at": "2026-08-04",
+  "policy": {
+    "vendor_submodule": false,
+    "reason": "microsoft/BitNet + nested llama.cpp fork are multi-GB with recursive history; this lab pins SHAs in-recipe and clones out-of-tree.",
+    "ci": "pytest validates pin schema + recipe JSON; optional full bitnet.cpp build is workflow_dispatch / local only (not a default CI gate)."
+  },
+  "bitnet_cpp": {
+    "repo": "https://github.com/microsoft/BitNet.git",
+    "ref": "0b341e582afbf9e1011f24744b554c96a3477eb5",
+    "ref_note": "main tip as of 2026-07-27 (Add VibeASR.cpp release to News #596). Re-pin intentionally; do not float HEAD in docs.",
+    "clone_flags": ["--recursive"],
+    "vendored_llama_cpp_fork": {
+      "repo": "https://github.com/isHuangXin/llama.cpp.git",
+      "ref": "390c307752ab78fd8189f359d6954c9ba1be74af",
+      "path_in_bitnet": "3rdparty/llama.cpp",
+      "note": "BitNet's recursive submodule tip at the pinned BitNet SHA — not stock ggerganov/llama.cpp."
+    }
+  },
+  "llama_cpp_gguf": {
+    "repo": "https://github.com/ggerganov/llama.cpp.git",
+    "ref": "b10262",
+    "ref_note": "Stock GGUF Q4_K_M path for non-BitNet HF chat models (2026-08-04 latest release tag)."
+  },
+  "models": {
+    "bitnet_b158_2b_4t_gguf": {
+      "hf_id": "microsoft/BitNet-b1.58-2B-4T-gguf",
+      "local_dir_hint": "models/BitNet-b1.58-2B-4T",
+      "quant_default": "i2_s"
+    },
+    "bitnet_b158_2b_4t_hf": {
+      "hf_id": "microsoft/bitnet-b1.58-2B-4T",
+      "note": "Transformers/safetensors reference; production CPU serve still goes through bitnet.cpp."
+    }
+  },
+  "requirements": {
+    "python": ">=3.9",
+    "cmake": ">=3.22",
+    "clang_recommended": "18+",
+    "windows": "Developer Command Prompt / PowerShell for VS2022; ClangCL toolchain per upstream FAQs"
+  }
+}
