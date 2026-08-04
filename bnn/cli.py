@@ -561,22 +561,22 @@ def cmd_bridge(args: argparse.Namespace) -> int:
         return 0
 
     if action == "figures":
-        extra = ["--out", str(args.out)] if args.out else []
+        fig_extra: list[str] = ["--out", str(args.out)] if args.out else []
         if args.plot_dir:
-            extra += ["--plot-dir", str(args.plot_dir)]
-        return _run_script("figure_from_results.py", extra)
+            fig_extra += ["--plot-dir", str(args.plot_dir)]
+        return _run_script("figure_from_results.py", fig_extra)
 
     name = BRIDGE_ALIASES.get(action or "", action or "")
-    meta = BRIDGE_RECIPES.get(name or "")
-    if meta is None:
+    recipe = BRIDGE_RECIPES.get(name or "")
+    if recipe is None:
         print(f"ERROR unknown bridge {action!r}; try: bnn bridge list", file=sys.stderr)
         return 2
-    extra: list[str] = []
+    bridge_extra: list[str] = []
     if getattr(args, "probe", False) and name == "gpu":
-        extra.append("--probe")
+        bridge_extra.append("--probe")
     if getattr(args, "out", None):
-        extra += ["--out", str(args.out)]
-    return _run_bridge(meta["script"], extra)
+        bridge_extra += ["--out", str(args.out)]
+    return _run_bridge(recipe["script"], bridge_extra)
 
 
 def build_parser() -> argparse.ArgumentParser:
