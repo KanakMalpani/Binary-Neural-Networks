@@ -1,8 +1,8 @@
 # Lane C — PyPI / attestations / badges
 
 **Branch:** `lane/c-release`  
-**Base:** `main` @ `5910978`  
-**Tip:** `7e7960f`  
+**Base:** `main` @ `f40f65e` (rebased)  
+**Tip:** _(filled after push)_  
 **Owned paths:** `.github/workflows/wheels.yml`, `docs/PYPI*`, `docs/SBOM*`,
 README packaging badge row, careful `pyproject.toml` packaging metadata,
 `docs/lanes/c.md`.

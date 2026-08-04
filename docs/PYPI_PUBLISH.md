@@ -74,8 +74,9 @@ cibuildwheel on **macOS/Windows** sets `BNN_NO_OPENMP=1` so wheels ship
 portable SIMD kernels without Homebrew `libomp` (delocate/macOS 26 bottle
 mismatch) or MSVC `vcomp*.dll` ctypes load failures. Linux still links
 `libgomp` when available. Thesis win remains packed XNOR–popcount, not thread
-scaling. Local OpenMP: omit the env var / use `BNN_FORCE_OPENMP` on macOS via
-`compile_native`.
+scaling. `BNN_NO_OPENMP` is the wheel-build kill switch in `setup.py`;
+`BNN_FORCE_OPENMP=1` (or `compile_native --openmp`) is the local macOS opt-in
+when you knowingly want OpenMP despite the default-off policy.
 
 **Skipped targets:** `*musllinux*` and `cp313-macosx_x86_64` — PyTorch has no
 wheels there, so a `bnn-lab` install (hard-deps `torch`) cannot succeed; we do
