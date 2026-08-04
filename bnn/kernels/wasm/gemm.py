@@ -25,9 +25,7 @@ _g_kernel: int = KERNEL_SCALAR
 def set_kernel(name: str | None) -> str:
     """Select pedagogy path label. ``simd128`` still uses scalar math in Python."""
     global _g_kernel
-    if name is None or name == "auto":
-        _g_kernel = KERNEL_SCALAR
-    elif name == "scalar":
+    if name is None or name in ("auto", "scalar"):
         _g_kernel = KERNEL_SCALAR
     elif name in ("simd128", "wasm_simd128", "simd"):
         # Label only — Python cannot execute WASM SIMD; math stays scalar.

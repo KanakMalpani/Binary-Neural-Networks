@@ -143,7 +143,7 @@ console.log('OK');
 
 
 def test_dist_wasm_optional_documented():
-    """Compiled artifact is optional; spike/README must say so."""
+    """Spike/README document optional compile; committed artifact preferred."""
     readme = (WASM_DIR / "README.md").read_text(encoding="utf-8")
     assert "optional" in readme.lower()
     spike = ROOT / "docs" / "spikes" / "WASM_SIMD.md"
@@ -153,3 +153,59 @@ def test_dist_wasm_optional_documented():
     assert "native" in body.lower()
     if DIST_WASM.is_file():
         assert DIST_WASM.stat().st_size > 100
+
+
+@pytest.mark.skipif(shutil.which("node") is None, reason="node not on PATH")
+@pytest.mark.skipif(not DIST_WASM.is_file(), reason="wasm/dist artifact not present")
+def test_node_instantiates_committed_wasm():
+    """Committed .wasm must load via fs path (not broken by Node global fetch)."""
+    script = r"""
+import { dirname, join } from 'node:path';
+import { fileURLToPath } from 'node:url';
+import { loadWasm, binaryGemm, packPm1, wasmKernelId } from './wasm/js/binary_gemm.mjs';
+
+const root = process.cwd();
+const wasmPath = join(root, 'wasm', 'dist', 'binary_gemm_wasm.wasm');
+const inst = await loadWasm(wasmPath);
+if (!inst) {
+  console.error('FAIL: loadWasm returned null for', wasmPath);
+  process.exit(1);
+}
+const kid = wasmKernelId();
+const B = 4, N = 64, M = 8;
+const x = new Float32Array(B * N);
+const w = new Float32Array(M * N);
+for (let i = 0; i < x.length; i++) x[i] = (i & 1) ? -1 : 1;
+for (let i = 0; i < w.length; i++) w[i] = (i % 3) ? -1 : 1;
+const { packed: xp, words } = packPm1(x, B, N);
+const { packed: wp } = packPm1(w, M, N);
+const { y, backend } = binaryGemm(xp, wp, B, M, words, N);
+if (backend !== 'wasm') {
+  console.error('FAIL: expected backend=wasm got', backend, 'kernel_id=', kid);
+  process.exit(1);
+}
+if (y.length !== B * M) {
+  console.error('FAIL: bad Y length', y.length);
+  process.exit(1);
+}
+console.log('OK kernel_id=' + kid + ' backend=' + backend);
+"""
+    proc = subprocess.run(
+        ["node", "--input-type=module", "-e", script],
+        cwd=str(ROOT),
+        capture_output=True,
+        text=True,
+        timeout=60,
+        check=False,
+    )
+    assert proc.returncode == 0, proc.stdout + proc.stderr
+    assert "OK" in proc.stdout
+    assert "backend=wasm" in proc.stdout
+
+
+def test_lane_note_has_no_absolute_windows_home_path():
+    """docs/lanes/f.md must not leak C:\\Users\\<name>\\ paths."""
+    text = (ROOT / "docs" / "lanes" / "f.md").read_text(encoding="utf-8")
+    assert not __import__("re").search(
+        r"[A-Za-z]:\\Users\\(?!<)[^\\\s<>]+\\", text
+    ), "lane note still contains an absolute local path"

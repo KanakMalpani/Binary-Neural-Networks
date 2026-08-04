@@ -89,23 +89,70 @@ export function packPm1(flat, rows, cols) {
 let _wasm = null;
 
 /**
+ * Load bytes from a path/URL.
+ *
+ * Node 18+ exposes a global `fetch` that rejects bare filesystem paths
+ * (`file://` or absolute/relative paths without a scheme). Prefer `fs.readFile`
+ * for local paths; try `pathToFileURL` + fetch; fall back to plain fetch for
+ * http(s) / browser.
+ */
+async function readWasmBytes(source) {
+  if (source instanceof Uint8Array) {
+    return source;
+  }
+  const isUrl = source instanceof URL;
+  const href = isUrl ? source.href : String(source);
+  const looksRemote = /^(https?:|data:)/i.test(href);
+  const isFileUrl = /^file:/i.test(href);
+
+  // Node local path / file URL → fs first (global fetch alone is not enough).
+  const canUseNodeFs =
+    typeof process !== "undefined" &&
+    process.versions &&
+    process.versions.node &&
+    !looksRemote;
+  if (canUseNodeFs) {
+    try {
+      const { readFile } = await import("node:fs/promises");
+      const { fileURLToPath } = await import("node:url");
+      const path = isFileUrl ? fileURLToPath(href) : href;
+      return new Uint8Array(await readFile(path));
+    } catch {
+      // fall through to fetch / pathToFileURL
+    }
+    if (!isFileUrl && !looksRemote) {
+      try {
+        const { pathToFileURL } = await import("node:url");
+        const res = await fetch(pathToFileURL(href));
+        if (res.ok) {
+          return new Uint8Array(await res.arrayBuffer());
+        }
+      } catch {
+        // continue
+      }
+    }
+  }
+
+  if (typeof fetch === "function") {
+    try {
+      const res = await fetch(isUrl ? source : href);
+      if (res.ok) {
+        return new Uint8Array(await res.arrayBuffer());
+      }
+    } catch {
+      return null;
+    }
+  }
+  return null;
+}
+
+/**
  * Try to instantiate a compiled module. Returns null if missing / unsupported.
  * @param {string|URL|Uint8Array} source path or bytes
  */
 export async function loadWasm(source) {
-  let bytes;
-  if (source instanceof Uint8Array) {
-    bytes = source;
-  } else if (typeof source === "string" || source instanceof URL) {
-    if (typeof fetch === "function") {
-      const res = await fetch(source);
-      if (!res.ok) return null;
-      bytes = new Uint8Array(await res.arrayBuffer());
-    } else {
-      const { readFile } = await import("node:fs/promises");
-      bytes = new Uint8Array(await readFile(source));
-    }
-  } else {
+  const bytes = await readWasmBytes(source);
+  if (!bytes) {
     return null;
   }
   try {

@@ -3,12 +3,12 @@
 | Field | Value |
 |-------|-------|
 | **Branch** | `lane/f-wasm` |
-| **Base** | `main` @ `5910978` |
-| **Worktree** | `C:\Users\mrkan\CRAZZY\Binary-Neural-Network-lane-f` |
+| **Base** | `main` (rebase includes KG ruff fix) |
+| **Worktree** | sibling worktree `Binary-Neural-Network-lane-f` (local only; not committed as an absolute path) |
 | **Owns** | `wasm/**`, `bnn/kernels/wasm/**`, WASM docs/spike, `docs/lanes/f.md`, `tests/test_wasm_parity.py` |
 | **May read** | `bnn/kernels/binary_gemm.c` (read-only) |
 | **Status** | **Delivered (pedagogy)** — 2026-08-04 |
-| **HEAD** | `ccae5fe90d6d955921c692dd2677794d86d4e6b1` |
+| **HEAD** | _(updated on push; see PR tip)_ |
 | **PR** | https://github.com/KanakMalpani/Binary-Neural-Networks/pull/24 |
 
 ## Tasks
@@ -39,10 +39,10 @@ When merging, flip in twin ROADMAP / `docs/37_…`:
 
 ## Residuals
 
-- Compiled `wasm/dist/binary_gemm_wasm.wasm` is **optional**; CI green without emcc/clang.
 - Python `simd128` kernel name is a **label only** (math remains scalar popcount).
 - No wall-clock benches vs native — by design.
-- Full Emscripten browser glue (glue JS, memory grow helpers beyond demo) left as follow-up if a product surface appears.
+- Full Emscripten browser glue (glue JS beyond the Node/HTML demos) left as follow-up if a product surface appears.
+- Root `.gitignore` un-ignores `wasm/dist/` so the pedagogy `.wasm` stays trackable despite global `dist/`.
 
 ## Thesis lock
 
