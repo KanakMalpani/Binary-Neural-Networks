@@ -56,10 +56,10 @@ gh workflow run wheels.yml --ref lane/c-release -f publish=false
 - First dry-run: https://github.com/KanakMalpani/Binary-Neural-Networks/actions/runs/30922180976
   - Exposed macOS `delocate`/libomp bottle mismatch + Windows OpenMP `vcomp` ctypes load failure
   - Fixed via `BNN_NO_OPENMP=1` on macOS/Windows cibuildwheel (SIMD still ships)
-- Re-dispatch after fix: https://github.com/KanakMalpani/Binary-Neural-Networks/actions/runs/30922905099
+- Re-dispatch after fix: https://github.com/KanakMalpani/Binary-Neural-Networks/actions/runs/30924842591 (prior 30922905099 failed on cp313-macosx_x86_64 torch)
 - Branch tip: `8c2cd04`
 - PR: https://github.com/KanakMalpani/Binary-Neural-Networks/pull/16
-- Conclusion: _(await re-run; publish must stay skipped)_
+- Conclusion: _(await 30924842591; publish must stay skipped)_
 
 - Also skip `cp313-macosx_x86_64` (no torch wheel → unloadable `bnn-lab`).
 
