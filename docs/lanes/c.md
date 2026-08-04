@@ -25,6 +25,8 @@ golden shapes; dual-metric honesty.
 | Trusted Publisher | **Human blocker** — pending publisher not registered |
 | `publish=true` | **Not dispatched** (would fail without publisher) |
 | API-token publish | **Forbidden / not invented** |
+| `hf` extra | Added soft dep `safetensors>=0.4,<1` (Lane B export) |
+| Stash `c-release-wip-not-lane-b` | Inspected — Lane C files already on branch; **did not** apply `bnn/wrap/metrics.py` (Lane A) |
 
 ## ROADMAP checkbox hints (for integrator)
 
@@ -54,8 +56,8 @@ gh workflow run wheels.yml --ref lane/c-release -f publish=false
 - First dry-run: https://github.com/KanakMalpani/Binary-Neural-Networks/actions/runs/30922180976
   - Exposed macOS `delocate`/libomp bottle mismatch + Windows OpenMP `vcomp` ctypes load failure
   - Fixed via `BNN_NO_OPENMP=1` on macOS/Windows cibuildwheel (SIMD still ships)
-- Re-dispatch after fix: _(filled after push)_
-- Branch tip: _(filled after push)_
+- Re-dispatch after fix: https://github.com/KanakMalpani/Binary-Neural-Networks/actions/runs/30922905099
+- Branch tip: `8c2cd04`
 - PR: https://github.com/KanakMalpani/Binary-Neural-Networks/pull/16
 - Conclusion: _(await re-run; publish must stay skipped)_
 
