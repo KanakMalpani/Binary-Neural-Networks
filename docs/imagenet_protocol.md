@@ -53,6 +53,10 @@ python scripts/imagenet_protocol.py --mode smoke \
   --out results/imagenet_protocol_smoke.json
 ```
 
+Default `--out` is mode-specific under `results/` (`imagenet_protocol_smoke.json`,
+`…_check.json`, `…_proxy.json`) so check/proxy do not clobber the committed smoke
+artifact. Paths written into JSON are repo-relative when under the repo root.
+
 Smoke pass criteria: layout proxy `ok`, logits finite after one Adam step.
 **Not** criteria: ImageNet top-1, multi-day schedules, bit-identical floats.
 

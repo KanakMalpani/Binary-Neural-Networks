@@ -22,6 +22,7 @@
 - [x] Protocol runner: `contract` / `check` / `proxy` / `smoke`.
 - [x] Tests under `tests/test_vision*.py` (no network; synthetic / proxy PNG).
 - [x] Thesis lock: no GPU 32× from `sign()`; ImageNet SOTA not a pass gate.
+- [x] Review fixes: Ruff I001/F401; mode-specific default `--out`; portable paths in smoke JSON.
 
 ## Residuals / integrator
 

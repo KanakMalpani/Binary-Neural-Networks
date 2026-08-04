@@ -11,9 +11,9 @@ from .imagenet_protocol import (
     write_dataset_contract,
 )
 from .models import (
-    BiRealBasicBlock,
-    BinaryCIFARCNN,
     FP32CIFARCNN,
+    BinaryCIFARCNN,
+    BiRealBasicBlock,
     ResNetBiReal,
     ResNetBiReal18,
     ResNetBiRealCIFAR,

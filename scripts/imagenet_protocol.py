@@ -37,6 +37,33 @@ from bnn.vision.imagenet_protocol import (  # noqa: E402
 )
 from bnn.vision.models import ResNetBiReal18, ResNetBiRealCIFAR  # noqa: E402
 
+_DEFAULT_OUT = {
+    "smoke": "imagenet_protocol_smoke.json",
+    "check": "imagenet_protocol_check.json",
+    "proxy": "imagenet_protocol_proxy.json",
+    "contract": "imagenet_dataset_contract.json",
+}
+
+
+def _portable_path(path: Path | str) -> str:
+    """Repo-relative posix path when under ROOT; else redact machine-local abs paths."""
+    p = Path(path).resolve()
+    try:
+        return p.relative_to(ROOT.resolve()).as_posix()
+    except ValueError:
+        return f"<external>/{p.name}"
+
+
+def _sanitize_folder_report(report: dict) -> dict:
+    out = dict(report)
+    if "root" in out:
+        out["root"] = _portable_path(out["root"])
+    if "hint" in out:
+        from bnn.vision.imagenet_protocol import describe_imagenet_folder_layout
+
+        out["hint"] = describe_imagenet_folder_layout(out.get("root", "<root>"))
+    return out
+
 
 def _smoke_train_step(
     *,
@@ -99,7 +126,9 @@ def main() -> int:
     p.add_argument(
         "--out",
         type=Path,
-        default=ROOT / "results" / "imagenet_protocol_smoke.json",
+        default=None,
+        help="Output JSON (default: results/imagenet_protocol_<mode>.json; "
+        "smoke alone writes imagenet_protocol_smoke.json)",
     )
     p.add_argument("--n-classes", type=int, default=4)
     p.add_argument("--images-per-class", type=int, default=2)
@@ -120,6 +149,8 @@ def main() -> int:
         help="Also write contract JSON to this path",
     )
     args = p.parse_args()
+    if args.out is None:
+        args.out = ROOT / "results" / _DEFAULT_OUT[args.mode]
 
     set_approx_sign(args.approx_sign)
     payload: dict = {
@@ -135,7 +166,7 @@ def main() -> int:
 
     if args.write_contract is not None:
         write_dataset_contract(args.write_contract)
-        payload["contract_written"] = str(args.write_contract)
+        payload["contract_written"] = _portable_path(args.write_contract)
 
     if args.mode == "contract":
         print(dataset_contract_summary())
@@ -155,15 +186,17 @@ def main() -> int:
             n_classes=args.n_classes,
             images_per_class=args.images_per_class,
         )
-        payload["folder"] = report
-        print(f"Proxy ImageNet at {report['root']} ok={report['ok']}", flush=True)
+        payload["folder"] = _sanitize_folder_report(report)
+        print(f"Proxy ImageNet at {payload['folder']['root']} ok={report['ok']}", flush=True)
     elif args.mode == "check":
         if root is None:
             print("ERROR: --root required for --mode check", file=sys.stderr)
             return 2
         report = check_imagenet_folder(root, require_images=True)
-        payload["folder"] = report
-        print(json.dumps(report, indent=2))
+        report = dict(report)
+        report["root"] = _portable_path(root)
+        payload["folder"] = _sanitize_folder_report(report)
+        print(json.dumps(payload["folder"], indent=2))
         if not report["ok"]:
             args.out.parent.mkdir(parents=True, exist_ok=True)
             args.out.write_text(json.dumps(payload, indent=2), encoding="utf-8")

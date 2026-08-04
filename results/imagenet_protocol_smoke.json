@@ -55,7 +55,7 @@
     "train_images": 8,
     "val_images": 8,
     "contract_schema": "bnn_imagenet_folder_contract_v1",
-    "hint": "ImageNet-style layout expected under C:\\Users\\mrkan\\AppData\\Local\\Temp\\bnn-lane-g-vision\\data\\_imagenet_proxy_smoke:\n  train/<classname>/*.jpg|png|jpeg\n  val/<classname>/*.jpg|png|jpeg\nFull ImageNet Bi-Real train is an ADR ACCEPTED-NON-GOAL.\nUse CIFAR-10 via `bnn train-image` / `bnn train-cifar` for in-repo evidence.\nProtocol runner: `python scripts/imagenet_protocol.py --mode smoke`.",
+    "hint": "ImageNet-style layout expected under data\\_imagenet_proxy_smoke:\n  train/<classname>/*.jpg|png|jpeg\n  val/<classname>/*.jpg|png|jpeg\nFull ImageNet Bi-Real train is an ADR ACCEPTED-NON-GOAL.\nUse CIFAR-10 via `bnn train-image` / `bnn train-cifar` for in-repo evidence.\nProtocol runner: `python scripts/imagenet_protocol.py --mode smoke`.",
     "proxy": true,
     "class_names": [
       "n0000",
@@ -63,7 +63,7 @@
       "n0002",
       "n0003"
     ],
-    "root": "C:\\Users\\mrkan\\AppData\\Local\\Temp\\bnn-lane-g-vision\\data\\_imagenet_proxy_smoke"
+    "root": "data/_imagenet_proxy_smoke"
   },
   "smoke": {
     "arch": "resnet_bireal_cifar",
@@ -77,7 +77,7 @@
       2,
       4
     ],
-    "train_step_seconds": 0.10637210000277264,
+    "train_step_seconds": 0.11682049999944866,
     "params": {
       "total_params": 176492,
       "binary_or_ternary_weight_params": 171648,
