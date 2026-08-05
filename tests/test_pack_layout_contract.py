@@ -175,16 +175,79 @@ def test_numpy_gemm_handles_negative_dot_products():
     assert out.dtype == np.float32
 
 
-def test_popcount_sum_promotes_to_unsigned():
-    """Documents *why* the cast above is load-bearing, so it is not re-litigated."""
+def test_popcount_sum_signedness_is_not_guaranteed():
+    """Documents *why* the int32 cast in the GEMM is load-bearing.
+
+    The signedness of the popcount sum depends on which implementation runs:
+
+    * NumPy >= 2.0 -> ``np.bitwise_count`` returns uint8, so ``.sum()``
+      accumulates into an **unsigned** type and ``n - 2*dist`` wraps.
+    * NumPy < 2.0  -> the LUT fallback in ``bnn/kernels/popcount.py`` ends with
+      ``.astype(np.intp)``, which is **signed**, and the subtraction behaves.
+
+    constraints.txt pins NumPy < 2 while local dev often has 2.x, so the cast
+    must stay regardless of which path is active. Asserting one environment's
+    signedness as universal is exactly the mistake this test used to make.
+    """
     counts = bitwise_count(np.array([[0xFFFFFFFFFFFFFFFF]], dtype=np.uint64))
     total = counts.sum(axis=1)
-    assert not np.issubdtype(total.dtype, np.signedinteger)
-    # The trap, made explicit: unsigned arithmetic wraps instead of going
-    # negative. The overflow warning here is the demonstration, not a defect.
-    with np.errstate(over="ignore"):
-        wrapped = int(0 - 2 * total[0])
-    assert wrapped != -128
-    assert wrapped > 0, "unsigned subtraction should wrap to a huge positive"
-    # Casting to a signed type first is what makes it behave.
+    assert int(total[0]) == 64
+
+    if np.issubdtype(total.dtype, np.signedinteger):
+        # Signed accumulator: no wrap, but the cast is still required for the
+        # other path, so this branch only records that we are on it.
+        assert int(0 - 2 * total[0]) == -128
+    else:
+        # Unsigned accumulator: the trap. The overflow warning is the
+        # demonstration, not a defect.
+        with np.errstate(over="ignore"):
+            wrapped = int(0 - 2 * total[0])
+        assert wrapped > 0, "unsigned subtraction should wrap to a huge positive"
+
+    # The invariant that holds on every NumPy: cast to signed first and the
+    # arithmetic is correct. This is what binary_gemm_numpy_prepacked does.
     assert int(0 - 2 * total.astype(np.int32)[0]) == -128
+
+
+@pytest.fixture
+def force_popcount_lut(monkeypatch):
+    """Run the NumPy < 2.0 LUT fallback even on NumPy >= 2.0.
+
+    constraints.txt pins NumPy < 2 for CI, so the LUT path is what actually
+    ships, while local dev usually has 2.x and takes `np.bitwise_count`. Without
+    this the two paths are never exercised on the same machine.
+    """
+    monkeypatch.delattr(np, "bitwise_count", raising=False)
+    return True
+
+
+def test_popcount_paths_agree(force_popcount_lut):
+    """The LUT fallback must return the same counts as np.bitwise_count."""
+    rng = np.random.default_rng(9)
+    a = rng.integers(0, 2**63, size=(64, 8), dtype=np.uint64)
+    lut = bitwise_count(a)
+    assert lut.sum() == sum(bin(int(v)).count("1") for v in a.ravel())
+
+
+def test_numpy_gemm_correct_under_lut_popcount(force_popcount_lut):
+    """The shipped (NumPy < 2) path must also survive negative dot products."""
+    n = 192
+    x = np.ones((4, n), dtype=np.float32)
+    w = -np.ones((8, n), dtype=np.float32)
+    xp, packed_n = pack_binary_pm1(x, 1)
+    wp, _ = pack_binary_pm1(w, 1)
+    assert np.all(binary_gemm_numpy_prepacked(xp, wp, packed_n) == -n)
+
+
+def test_gemm_matches_across_both_popcount_paths(monkeypatch):
+    """Same inputs, both popcount implementations, identical output."""
+    rng = np.random.default_rng(10)
+    x = rng.choice([-1.0, 1.0], size=(9, 320)).astype(np.float32)
+    w = rng.choice([-1.0, 1.0], size=(40, 320)).astype(np.float32)
+    xp, n = pack_binary_pm1(x, 1)
+    wp, _ = pack_binary_pm1(w, 1)
+
+    fast = binary_gemm_numpy_prepacked(xp, wp, n)
+    monkeypatch.delattr(np, "bitwise_count", raising=False)
+    lut = binary_gemm_numpy_prepacked(xp, wp, n)
+    assert np.array_equal(fast, lut)
