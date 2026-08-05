@@ -127,6 +127,12 @@ thesis — previously unlinked from this index.
 | [`../knowledge_graph/README.md`](../knowledge_graph/README.md) | How to query / merge enrichment / integrity overlay / thesis lock |
 | [`lanes/kg.md`](lanes/kg.md) | KG integrity lane note (Wave 1 open-PR honesty) |
 
+## Handoff
+
+| Doc | Topic |
+|-----|-------|
+| [`45_IMPROVEMENT_ROADMAP_HANDOFF.md`](45_IMPROVEMENT_ROADMAP_HANDOFF.md) | Prioritised improvements, invariants, and measured-and-declined ideas |
+
 ## Thesis lock (never reopen as a “win”)
 
 Packed CPU/edge kernels are the product story. Commodity GPU → INT4/FP8.
