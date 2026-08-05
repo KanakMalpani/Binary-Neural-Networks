@@ -249,6 +249,32 @@ def _try_load_native() -> ctypes.CDLL | None:
     return None
 
 
+def pack_bits_u64(bits: np.ndarray) -> np.ndarray:
+    """Pack a boolean mask along the last axis into little-endian uint64 words.
+
+    The single definition of the on-disk / on-wire bit layout: bit *j* of word
+    *w* is element ``64*w + j``. Both the binary packer (bit set where the value
+    is non-positive) and the ternary bitplane packers (bit set where the weight
+    is +1 / -1) go through here, so the two encodings cannot drift apart — a
+    mismatch would silently corrupt every ternary GEMM.
+
+    Input is padded with ``False`` to a multiple of 64.
+    """
+    bits = np.ascontiguousarray(bits, dtype=bool)
+    lead, n = bits.shape[:-1], bits.shape[-1]
+    pad = (-n) % 64
+    if pad:
+        bits = np.pad(bits, [(0, 0)] * (bits.ndim - 1) + [(0, pad)], constant_values=False)
+    # (..., words, 64) -> packbits -> (..., words, 8) uint8 -> view uint64.
+    # `.view(uint8)` is zero-copy on a contiguous bool array; `.astype` would
+    # duplicate the whole mask.
+    grouped = bits.reshape(*bits.shape[:-1], bits.shape[-1] // 64, 64)
+    u8 = np.packbits(grouped.view(np.uint8), axis=-1, bitorder="little")
+    # Force little-endian uint64 so bit j of the word matches bits[..., j].
+    packed = np.ascontiguousarray(u8).view("<u8").reshape(*lead, -1)
+    return np.ascontiguousarray(packed, dtype=np.uint64)
+
+
 def pack_binary_pm1(x: np.ndarray, axis: int = -1) -> tuple[np.ndarray, int]:
     """Pack ±1 values along `axis` into uint64 words. bit1 => -1/non-positive.
 
@@ -260,20 +286,8 @@ def pack_binary_pm1(x: np.ndarray, axis: int = -1) -> tuple[np.ndarray, int]:
     if not np.issubdtype(x.dtype, np.floating) and not np.issubdtype(x.dtype, np.integer):
         raise TypeError(f"pack_binary_pm1: expected numeric dtype, got {x.dtype}")
     x = np.moveaxis(x, axis, -1)
-    shape = x.shape
-    n = int(shape[-1])
-    bits = np.less_equal(x, 0)
-    pad = (-n) % 64
-    if pad:
-        bits = np.pad(bits, [(0, 0)] * (bits.ndim - 1) + [(0, pad)], constant_values=False)
-    # (..., words, 64) → packbits → (..., words, 8) uint8 → view uint64
-    packed_shape = bits.shape[:-1] + (bits.shape[-1] // 64, 64)
-    bits64 = bits.reshape(packed_shape)
-    u8 = np.packbits(bits64.astype(np.uint8, copy=False), axis=-1, bitorder="little")
-    # Force little-endian uint64 so bit j of the word matches bits[..., j]
-    u8 = np.ascontiguousarray(u8)
-    packed = u8.view("<u8").reshape(*shape[:-1], -1).astype(np.uint64, copy=False)
-    return np.ascontiguousarray(packed, dtype=np.uint64), n
+    n = int(x.shape[-1])
+    return pack_bits_u64(np.less_equal(x, 0)), n
 
 
 def _validate_prepacked(xp: np.ndarray, wp: np.ndarray, n: int) -> tuple[int, int, int]:
