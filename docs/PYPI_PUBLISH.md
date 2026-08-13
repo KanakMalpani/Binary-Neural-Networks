@@ -51,12 +51,14 @@ Trusted Publishing is **not** configured for this project yet:
 3. OIDC `publish=true` on tag `v1.0.0` failed with `invalid-publisher`
    ([run 31031733046](https://github.com/KanakMalpani/Binary-Neural-Networks/actions/runs/31031733046),
    2026-08-05): valid GitHub OIDC token, **no matching pending publisher**.
-4. Retry on 2026-08-13
-   ([run 31698000321](https://github.com/KanakMalpani/Binary-Neural-Networks/actions/runs/31698000321))
-   never reached the publish job: `windows-amd64` `cp313` wheel test crashed
-   (`check_wheel_kernel.py` exit **3221225477** / `0xC0000005`). Linux/macOS
-   wheels + sdist succeeded. That Win+3.13 target is now skipped (see
-   [Wheel matrix notes](#wheel-matrix-notes-lane-c-dry-run)).
+4. Retry on 2026-08-13:
+   - [31698000321](https://github.com/KanakMalpani/Binary-Neural-Networks/actions/runs/31698000321)
+     (`v1.0.0`): never reached publish — `windows-amd64` `cp313` wheel test
+     crashed (`check_wheel_kernel.py` exit **3221225477** / `0xC0000005`).
+   - [31700631120](https://github.com/KanakMalpani/Binary-Neural-Networks/actions/runs/31700631120)
+     (`lane/c-pypi-honesty`, `cp313-win_amd64` skipped): matrix + `package-check`
+     **success**; publish **`invalid-publisher`** again. Win+3.13 is skipped
+     (see [Wheel matrix notes](#wheel-matrix-notes-lane-c-dry-run)).
 5. **Do not** add a PyPI API token secret or invent a token-based publish path.
    `wheels.yml` is OIDC-only (`id-token: write`, `pypa/gh-action-pypi-publish`).
 

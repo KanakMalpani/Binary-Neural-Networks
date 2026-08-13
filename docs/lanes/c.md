@@ -24,6 +24,7 @@ golden shapes; dual-metric honesty.
 | Trusted Publisher | **Human blocker** — pending publisher not registered |
 | `publish=true` @ `v1.0.0` | [31031733046](https://github.com/KanakMalpani/Binary-Neural-Networks/actions/runs/31031733046) — **`invalid-publisher`** |
 | Retry `publish=true` @ `v1.0.0` | [31698000321](https://github.com/KanakMalpani/Binary-Neural-Networks/actions/runs/31698000321) — **Windows `cp313` AV**; publish skipped |
+| Probe `publish=true` @ this branch | [31700631120](https://github.com/KanakMalpani/Binary-Neural-Networks/actions/runs/31700631120) — wheels+check **PASS**; publish **`invalid-publisher`** |
 | cibuildwheel skips | `*musllinux*`, `cp313-macosx_x86_64`, **`cp313-win_amd64`** (untested; numpy&lt;2 + py3.13 AV) |
 | API-token publish | **Forbidden / not invented** |
 
@@ -55,5 +56,6 @@ golden shapes; dual-metric honesty.
 | [30946319438](https://github.com/KanakMalpani/Binary-Neural-Networks/actions/runs/30946319438) | Tag-push wheels **PASS** (no publish job) |
 | [31031733046](https://github.com/KanakMalpani/Binary-Neural-Networks/actions/runs/31031733046) | `publish=true` @ `v1.0.0` → **`invalid-publisher`** |
 | [31698000321](https://github.com/KanakMalpani/Binary-Neural-Networks/actions/runs/31698000321) | `publish=true` @ `v1.0.0` → Windows `cp313` crash; publish skipped |
+| [31700631120](https://github.com/KanakMalpani/Binary-Neural-Networks/actions/runs/31700631120) | `publish=true` @ this branch → wheels+check **PASS**; **`invalid-publisher`** |
 
 **Still blocked for upload:** PyPI Trusted Publisher for `bnn-lab` (project 404). Do not invent an API-token path.
