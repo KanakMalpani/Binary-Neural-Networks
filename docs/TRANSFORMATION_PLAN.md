@@ -21,11 +21,11 @@ Audit: **2026-08-13**. Score is honesty vs a *public category-leading repo*, not
 
 | Area | Score | State | Residual |
 |------|------:|-------|----------|
-| **Kernels** | **9/10** | Portable SIMD (AVX-512 → AVX2 → NEON → scalar), OpenMP, `err = 0` bit-identity, 4-row blocking. Aggregate **5.1×** vs prior kernel; **~24×** vs NumPy FP32 at 64×4096×4096. | NumPy fallback is **5–11× slower than BLAS** for B≳8 ([docs/45](45_IMPROVEMENT_ROADMAP_HANDOFF.md) P1). Wheels often `BNN_NO_OPENMP=1`. |
-| **Wrap / WC-O** | **7/10** | `bnn optimise` + schema v1, auto policy, BN fuse, distill sketch, drop-in **REFUSE**. Binary wrap cosine **0.31** (demo) / **0.70** (hybrid) — not drop-in. Ternary+QAT cosine **0.99**, drop-in OK — but e2e **0.73×** (slower than FP). | Product paradox: fast path destroys quality; accurate path loses wall-clock. |
+| **Kernels** | **9/10** | Portable SIMD (AVX-512 → AVX2 → NEON → scalar), OpenMP, `err = 0` bit-identity, 4-row blocking. Aggregate **5.1×** vs prior kernel; **~24×** vs NumPy FP32 at 64×4096×4096. | NumPy packed path is **5–11× slower than BLAS** for B≳8 when **native does not load** ([docs/45](45_IMPROVEMENT_ROADMAP_HANDOFF.md) P1) — not the typical pip wheel (Win/mac wheels already ship native SIMD; `BNN_NO_OPENMP=1` is thread scaling, not missing kernels). |
+| **Wrap / WC-O** | **7/10** | `bnn optimise` + schema v1, auto policy, BN fuse, distill, drop-in **REFUSE**. Default `--policy auto` lands **hybrid cosine ~0.70** + `REFUSE_DROP_IN`. Legacy `wrap_demo.json` binary_xnor cosine **0.31** (no QAT). Ternary+QAT cosine **0.991**, drop-in OK — but e2e **0.73×** (slower than FP). WC-O4 is **[x]** in ROADMAP (short QAT vs cold PTQ on the documented demo). | Gap is **binary/hybrid still below 0.85 drop-in** while staying fast — not “QAT is a sketch.” |
 | **Codec** | **8/10** | `.bnnpack` v2 + hashes + safetensors. | ONNX = bridge-only (policy). No Hub collection of packs. |
 | **CLI** | **8/10** | Rich (`optimise`, `repro`, `bridge`, `kg`, `energy-bound`, …). | Clone-first; `bnn/cli.py` ~1k lines (split is 1.1×). |
-| **Docs** | **8/10** | `GUIDE_E2E`, tutorials 01–08, MkDocs autodoc `--strict`, dual-metric README. | **GitHub Pages 404**. README conversion is clone+MSVC. Issue #1 still open though README already has “When not to use”. |
+| **Docs** | **8/10** | `GUIDE_E2E`, tutorials 01–08, MkDocs autodoc `--strict`, dual-metric README. | **GitHub Pages 404**. README conversion is clone+MSVC. Issue **#1 is still open for a reason**: it wants an **above-the-fold** “When NOT to use BNN” callout under the thesis; the README only has an Is/is not table **at the bottom**. |
 | **CI / OSS** | **7/10** | Win+Linux native, py3.11–3.13, portability, CodeQL, OpenSSF Scorecard, LICENSE, templates, Discussions, branch protection. | **0 stars / 0 forks**. 2 stale good-first issues. 7+ Dependabot PRs. No Pages. |
 | **Research / KG** | **7/10** | 165 nodes / 288 edges, `validate PASS`, claims whitelist, B1–B3 vault. | KG still marks Wave 1 lanes as `open_pr` after merge #26. No venue submit. Survey last reviewed 2026-08-04 (misses ScaleQ-1.58, BitEmbed, VibeASR-BitNet). |
 | **Moonshots** | **8/10** | WASM pedagogy, RAPL proxy, ImageNet *protocol* (no SOTA gate), bitnet.cpp pin (no submodule). | Privileged RAPL, ORT custom op, BitDistill-scale KD — correctly deferred. |
@@ -69,10 +69,10 @@ It is **not** a fake-binary GPU story, not llama.cpp, not bitnet.cpp, not ImageN
 | # | Constraint | Why it dominates |
 |---|------------|------------------|
 | **1. Discoverability / install physics** | A stranger cannot `pip install bnn-lab`. Search for “binary neural networks pytorch” hits archived Larq, Adrian Bulat’s `bnn` 0.1.2, and student MNIST repos — **not this lab**. 0 stars after a complete v1.0. | OSS “best in category” is a **funnel**. Uninstallable + unfindable = zero compounding, regardless of kernel quality. |
-| **2. Wrap quality vs speed (Amdahl + STE)** | Binary wrap: **~5× e2e** at cosine **0.31**. Ternary+QAT: cosine **0.99**, e2e **0.73×**. Auto policy `REFUSE_DROP_IN_CLAIM`. | Users who try the product verb (`bnn optimise`) on a real net either get a refused claim or a slower model. That is a **bounce**, not a 1.1× docs issue. |
-| **3. Memory bandwidth vs popcount throughput** | Large GEMMs are DRAM-bound; packing wins by shrinking the stream. Small GEMMs / Python loops / act-pack overhead eat Amdahl. NumPy packed path **loses to BLAS** for batched shapes. | Physics: 32× fewer bytes only helps if the runtime **streams packed bits**. Fake-binary and slow fallback invert the thesis for the users without a compiler. |
+| **2. Wrap quality vs speed (Amdahl + STE)** | Default `bnn optimise --policy auto`: **hybrid cosine ~0.70**, e2e modest, `REFUSE_DROP_IN`. Legacy `wrap_demo.json` binary_xnor: cosine **0.31** / **~4.8×** e2e (no QAT). Ternary+QAT: cosine **0.991**, e2e **0.73×**. | The 10× product gap is **hybrid/binary ≥0.85 cosine and still ≥1.5× e2e**. Auto already refuses honestly — that is not the missing 10×. Ternary already meets cosine and **loses** wall-clock. |
+| **3. Memory bandwidth vs popcount throughput** | Large GEMMs are DRAM-bound; packing wins by shrinking the stream. Small GEMMs / Python loops / act-pack overhead eat Amdahl. NumPy packed path **loses to BLAS** for batched shapes **when native is absent**. | Physics: 32× fewer bytes only helps if the runtime **streams packed bits**. Typical pip (Win/mac wheels) already loads native SIMD. The 5–11× inversion is the **no-native-load** audience (failed/`BNN_FORCE_NUMPY`/exotic platform), not “most `pip install` users.” |
 | **4. STE / architecture gap vs literature** | Lab CIFAR Bi-Real **61% vs FP 71%** (10 pp). Literature ImageNet ladder: BinaryNet 42% → ReActNet-A **69.4%**. RSign/RPReLU is documented, not default (`gap_reactnet_in_repo`). | Training recipe, not kernel, sets whether wrap/train is a toy. Closing 10 pp on the **canary** is allowed; ImageNet SOTA as a **gate** is not. |
-| **5. OSS trust / conversion** | README’s first action is `git clone` + `compile_native`. MkDocs builds in CI; **Pages not deployed**. HF Space: none. Issues #1–#2 stale. KG `open_pr` after merge. | llama.cpp / bitnet.cpp / transformers win on **60-second success**. This lab currently onboards like a research archive. |
+| **5. OSS trust / conversion** | README’s first action is `git clone` + `compile_native`. MkDocs builds in CI; **Pages not deployed**. HF Space: none. Issue #1 still needs the above-the-fold callout (not a paperwork close). KG `open_pr` after merge. | llama.cpp / bitnet.cpp / transformers win on **60-second success**. This lab currently onboards like a research archive. |
 | **6. Category confusion (BitNet era)** | 2026 mindshare is **1.58-bit LLMs** (bitnet.cpp **~40k★**, 2B4T, BitEmbed, ScaleQ-1.58 PTQ, Litespark SIMD). Classic CNN BNN tooling (**Larq archived**) is vacant. | Competing with bitnet.cpp on LLM tok/s is suicide. Occupying **PyTorch packed BNN optimiser + honest routing** is the wedge. |
 
 ### Invert: what world-class looks like in 2026
@@ -93,7 +93,9 @@ It is **not** a fake-binary GPU story, not llama.cpp, not bitnet.cpp, not ImageN
 
 Each item: **what / why 10× not 1.1× / first principles / evidence / effort / thesis risk / next PR**.
 
-### 1. Ship `bnn-lab` on PyPI (Trusted Publisher)
+**Kind (rank order unchanged):** **funnel 10×** = adoption/discoverability (levers **1–3, 6–8**) — not a measured kernel/wrap ratio. **Measured 10×** = wall-clock or cosine on committed shapes (levers **4, 5**). Lever 9 is agent-memory; lever 10 is bounded/bridge.
+
+### 1. Ship `bnn-lab` on PyPI (Trusted Publisher) — *funnel 10×*
 
 - **What:** Human registers pending publisher for `bnn-lab` / `wheels.yml` / env `pypi`; dispatch `publish=true`; clean-venv `pip install bnn-lab && bnn repro`.
 - **Why 10×:** Converts the lab from “clone a 3-week-old repo” to **the installable PyTorch BNN toolkit** the week Larq is archived. Zero → indexable on PyPI, Cursor, pip, HF snippets.
@@ -103,47 +105,49 @@ Each item: **what / why 10× not 1.1× / first principles / evidence / effort / 
 - **Thesis risk:** **None** if dual-metric README stays.
 - **Next PR:** After upload: README/GUIDE lead with pip; pin release assets; close W8.T08 in ROADMAP twins.
 
-### 2. Landing conversion: 60-second dual-metric demo, not clone+MSVC
+### 2. Landing conversion: 60-second dual-metric demo, not clone+MSVC — *funnel 10×*
 
-- **What:** README above-the-fold = one-liner install + one command that prints **compression 32×, cosine, wall-clock, REFUSE/OK**. Move thesis mermaid down. Close or rewrite stale issues #1–#2. Deploy **GitHub Pages** from existing MkDocs CI artifact.
+- **What:** README above-the-fold = one-liner install + one command that prints **compression 32×, cosine, wall-clock, REFUSE/OK**. Move thesis mermaid down. **Implement issue #1** as a short **above-the-fold** “When NOT to use BNN” callout **under the thesis** (GPU/INT4/bitnet.cpp/NPU INT8) — the bottom Is/is not table does **not** satisfy #1; do **not** paperwork-close it. Then close #1, or rewrite the issue if the callout is rejected. Deploy **GitHub Pages** from existing MkDocs CI artifact.
 - **Why 10×:** llama.cpp/HF conversion is “first screen success.” Current first screen is a research manifesto. Pages 404 wastes a `--strict` docs job.
 - **First principles:** Attention is bandwidth-limited; the README is the only kernel most visitors run.
-- **Evidence:** Exa fetch of GitHub README; `gh api .../pages` 404; issue #1 open while README already has “When not to use”.
+- **Evidence:** Exa fetch of GitHub README; `gh api .../pages` 404; issue #1 still open because the callout is missing above the fold, not because nobody wrote “when not to use” anywhere.
 - **Effort:** **M**.
 - **Thesis risk:** **Low** — do not drop dual-metric warnings to look punchier.
-- **Next PR:** `docs(W9): pip-first README + Pages workflow`; close #1 as completed.
+- **Next PR:** `docs(W9): pip-first README + above-the-fold When-NOT callout (#1) + Pages workflow`.
 
-### 3. One killer demo (HF Space): the wrap paradox, visualized
+### 3. One killer demo (HF Space): the wrap paradox, visualized — *funnel 10×*
 
-- **What:** A Space (KanakMalpani) that runs `bnn optimise` on a **tiny public** MLP/CNN: three columns — FP32, binary packed, ternary+QAT — showing **size / cosine / latency** and the REFUSE badge. Not ImageNet. Not ASR.
-- **Why 10×:** bitnet.cpp has an Azure demo; transformers has Spaces. A 0-star repo with no try-before-clone cannot enter the category. The *unique* demo is honesty (binary fast+ugly vs ternary accurate+slower), which no fake-32× repo will ship.
+- **What:** A Space (KanakMalpani) that runs `bnn optimise` on a **tiny public** MLP/CNN: three columns — FP32, binary packed, ternary+QAT — showing **size / cosine / latency** and the REFUSE badge. Not ImageNet. Not ASR. Label default auto (~0.70 hybrid, REFUSE) separately from legacy `wrap_demo.json` 0.31.
+- **Why 10×:** bitnet.cpp has an Azure demo; transformers has Spaces. A 0-star repo with no try-before-clone cannot enter the category. The *unique* demo is honesty (binary/hybrid fast-ish + below drop-in vs ternary accurate + slower), which no fake-32× repo will ship.
 - **First principles:** Product = decision under constraints. Show the Pareto, don’t hide it.
-- **Evidence:** `results/wrap_demo.json` cosine 0.31 / 4.82× e2e; `results/ultra_wrap.json` ternary 0.99 cosine / 0.73× e2e; HF Spaces search for `bnn-lab` empty.
+- **Evidence:** `results/ultra_wrap.json` hybrid cosine ~0.70 / `drop_in_ok: false`; ternary 0.991 cosine / 0.73× e2e; `results/wrap_demo.json` 0.31 / 4.82× is the **legacy binary_xnor, no-QAT** snapshot; HF Spaces search for `bnn-lab` empty.
 - **Effort:** **L** (CPU Space, no GPU claim).
 - **Thesis risk:** **Medium** if the Space implies drop-in; mitigate with the same schema flags.
-- **Next PR:** `feat(demo): Gradio Space from wrap_demo shapes only`.
+- **Next PR:** `feat(demo): Gradio Space from committed wrap/ultra_wrap shapes only`.
 
-### 4. Wrap accuracy leap on a *documented* tiny model (cross 0.85 without `--force`)
+### 4. Wrap accuracy leap: hybrid/binary ≥0.85 **and** e2e ≥1.5× — *measured 10×*
 
-- **What:** One public recipe (not a new golden shape) where **binary or hybrid** wrap + short QAT/distill meets `drop_in_threshold` **and** stays ≥1.5× on the wide GEMM. If physics forbids it, make **`policy=auto` default to ternary/skip** so first-run is not `REFUSE` + cosine 0.3.
-- **Why 10×:** This is the product. A kernel that is 24× on a microbench is irrelevant if `optimise` produces garbage logits. Crossing drop-in on *one* honest demo changes “lab” → “tool.”
+- **What:** One public recipe on **committed** `wrap_demo` / `ultra_wrap` shapes (not a new golden): **binary or hybrid** wrap + short QAT/distill reaches cosine **≥0.85 and** e2e **≥1.5×** vs FP, **without `--force`**. Ternary already has cosine **0.991** and e2e **0.73×** — that does **not** satisfy this lever.
+- **1.1× fallback (not this lever, not Wave 3 exit):** make `policy=auto` never first-run a `REFUSE_DROP_IN` path (skip/ternary when hybrid would refuse). Default auto **already** lands hybrid cosine **~0.70** + REFUSE — so “auto never first-runs 0.3 cosine binary wrap” is **already true** (the 0.31 figure is legacy `wrap_demo.json`). Counting that OR as Wave 3 would ship a no-op.
+- **If targeting `wrap_demo`:** `tests/golden_floors.json` has `wrap_demo.cosine_max_without_qat: 0.5` (low cosine without QAT is **expected**). A real win **updates that floor on the same shape** — do not invent a new bench.
+- **Why 10×:** This is the product. A kernel that is 24× on a microbench is irrelevant if hybrid wrap cannot be both drop-in **and** faster. Crossing **both** gates on one honest demo changes “lab” → “tool.”
 - **First principles:** STE mismatch + absmean PTQ wipe (`paper_bitdistill` vs `method_absmean_ptq`). BitDistill-scale KD is a moonshot; a **short, reproducible QAT** on the existing demo is the lever. Literature: ReActNet/Bi-Real recover accuracy via **architecture + distill**, not magically via `sign()`.
-- **Evidence:** WC-O4 exists as a sketch; ultra wrap `drop_in_ok: false` on binary hybrid; BitNet Distillation arXiv:2510.13998; ScaleQ-1.58 arXiv:2608.01078 (PTQ of reasoning LLMs — **do not claim** we reproduce it).
+- **Evidence:** WC-O4 is **[x]** in ROADMAP (short QAT improves cosine vs cold PTQ on the documented demo) — not a sketch. The residual is **binary/hybrid still below 0.85** (`ultra_wrap` primary hybrid cosine ~0.70, `drop_in_ok: false`, e2e already **~1.61×** on that snapshot — so the missing AND is **cosine**, not speed, unless QAT eats the 1.5×). BitNet Distillation arXiv:2510.13998; ScaleQ-1.58 arXiv:2608.01078 — **do not claim** we reproduce them.
 - **Effort:** **L**.
-- **Thesis risk:** **High** if someone “fixes” cosine by changing golden shapes or claiming LLM chat quality. Stay on committed wrap demo / CIFAR canary.
-- **Next PR:** `feat(W3): QAT recipe that meets drop-in on wrap_demo without --force` + docs/42 update. No new benches.
+- **Thesis risk:** **High** if someone “fixes” cosine by changing golden **shapes** or claiming LLM chat quality. Stay on committed wrap_demo / ultra_wrap / CIFAR canary. Updating `cosine_max_without_qat` after a measured QAT win on the **same** shape is allowed.
+- **Next PR:** `feat(W3): hybrid/binary QAT on wrap_demo/ultra_wrap that meets 0.85 cosine and 1.5× e2e without --force` + docs/42. No new benches.
 
-### 5. Honest NumPy fallback: never slower than “doing nothing”
+### 5. Honest NumPy fallback: never slower than “doing nothing” — *measured 10×*
 
-- **What:** When native is absent, dispatch packed NumPy vs dequant+BLAS by shape (docs/45 P1). Keep `binary_gemm_numpy_prepacked` as the **correctness reference**. README: *correct* ≠ *fast*.
-- **Why 10×:** Compiler-less users (pip wheel without native, or failed `cl`) currently run a path **5–11× slower than FP32 BLAS**. That inverts the thesis for the majority install. Fixing it is not 1.1× polish; it stops the product from lying by omission.
+- **What:** When **native does not load**, dispatch packed NumPy vs dequant+BLAS by shape (docs/45 P1). Keep `binary_gemm_numpy_prepacked` as the **correctness reference**. README: *correct* ≠ *fast*.
+- **Why 10× (for that audience):** Without a native library, batched packed NumPy is **5–11× slower than FP32 BLAS**. That inverts the thesis for the no-native-load path. It is **not** the typical `pip install` on Win/mac — those wheels already ship native SIMD (`BNN_NO_OPENMP=1` does not drop you onto NumPy).
 - **First principles:** Bandwidth win requires a packed *or* BLAS-fast path; a Python loop over B is neither.
-- **Evidence:** Measured table in docs/45; crossover B≈8–16 at 4096.
+- **Evidence:** Measured table in docs/45; crossover B≈8–16 at 4096; wheel matrix in `docs/PYPI_PUBLISH.md`.
 - **Effort:** **M**.
 - **Thesis risk:** **Low** if `err = 0` both ways and compression of stored weights is unchanged.
 - **Next PR:** `perf(kernels): BLAS fallback when NumPy packed loses` + test at B=64.
 
-### 6. Occupy the Larq vacuum, explicitly
+### 6. Occupy the Larq vacuum, explicitly — *funnel 10×*
 
 - **What:** Positioning sentence: *PyTorch packed BNN optimiser now that Larq (TF/Keras) is archived (2026-06-15).* Comparison table: Larq / Brevitas / bitnet.cpp / torchao / this lab. Do **not** claim LCE FPS.
 - **Why 10×:** Category leadership is **who inherits the search query**. 732★ Larq is read-only; LCE last release 2024. PyTorch users have no default BNN toolkit with packed kernels + honesty.
@@ -153,7 +157,7 @@ Each item: **what / why 10× not 1.1× / first principles / evidence / effort / 
 - **Thesis risk:** **Low** if we don’t claim Larq Zoo ImageNet numbers as ours.
 - **Next PR:** `docs: Larq-archive positioning + competitor table`.
 
-### 7. B1 tech report from goldens + Papers with Code
+### 7. B1 tech report from goldens + Papers with Code — *funnel 10×*
 
 - **What:** Ship **B1 — Stop claiming 32×** as an arXiv tech report **only** from `results/*.json` + claims whitelist (`docs/PUBLICATION_PLAN.md`). Register the repo on Papers with Code / CITATION.cff already exists. B2/B3 as companions later.
 - **Why 10×:** Academic and HN funnels are paper-shaped. A citable “honest speedup accounting” paper is the unique research wedge (not another XNOR-Net survey). Citations compound; more CIFAR epochs do not.
@@ -163,7 +167,7 @@ Each item: **what / why 10× not 1.1× / first principles / evidence / effort / 
 - **Thesis risk:** **High** if the paper advertises 32× latency. Whitelist C1–C7 only.
 - **Next PR:** `docs(W12): B1 preprint skeleton + PwC code link` (no invented figures).
 
-### 8. Hub artifacts: `.bnnpack` + tiny zoo on Hugging Face
+### 8. Hub artifacts: `.bnnpack` + tiny zoo on Hugging Face — *funnel 10×*
 
 - **What:** Upload 1–3 **tiny** packed artifacts (MNIST MLP, CIFAR Bi-Real canary weights if license-clean, wrap-demo pack) with model cards that quote floors, not SOTA. `from_pretrained`-style load in tutorial 08.
 - **Why 10×:** llama.cpp won because GGUF is a **noun** on the Hub. `.bnnpack` is a format without a public object. Formats without objects don’t get copied.
@@ -212,6 +216,8 @@ Impressive-looking work that **violates the thesis** or **does not compound**:
 | `ruff format` whole-repo / CLI split / more tutorials 09–20 | 1.1× maintainability, merge pain. |
 | Competing with bitnet.cpp on tok/s using this GEMM | Wrong product; route. |
 | Dependabot firehose as the roadmap | Hygiene, not 10×. |
+| Paperwork-close of issue #1 | Bottom “When not to use” table ≠ above-the-fold callout under the thesis. Implement or rewrite; don’t close as completed. |
+| Counting ternary 0.991 / 0.73× e2e, or auto-REFUSE, as Wave 3 | Ternary already meets cosine and loses speed; auto already refuses. The 10× is hybrid/binary **0.85 and 1.5×**. |
 | WASM as a native-kernel substitute | Pedagogy only. |
 
 **Moonshots allowed as labeled moonshots (not gates):** LUT ternary ASIC/T-MAC research, privileged RAPL Joules, community leaderboard submissions, ReActNet-A ImageNet *reproduction* if someone brings the schedule and hardware.
@@ -227,7 +233,7 @@ flowchart LR
   W0[Wave 0 PyPI human]
   W1[Wave 1 landing + Pages + issues + KG status]
   W2[Wave 2 HF Space demo]
-  W3[Wave 3 wrap drop-in recipe]
+  W3[Wave 3 hybrid 0.85 AND 1.5x]
   W4[Wave 4 NumPy BLAS fallback]
   W5[Wave 5 B1 preprint]
   W6[Wave 6 Hub packs + Show HN]
@@ -241,10 +247,10 @@ flowchart LR
 | Wave | Days | Owner | Exit | Depends |
 |------|------|-------|------|---------|
 | **0** | 0–3 | **Human** | `pip install bnn-lab` + `bnn repro` on clean venv; PyPI JSON 200 | Publisher on pypi.org |
-| **1** | 1–14 | Agent | Pip-first README; Pages live; #1 closed; KG `open_pr` drift fixed | Wave 0 preferred, can draft README anyway |
-| **2** | 7–28 | Agent | HF Space shows wrap paradox on **existing** shapes | Wave 0 (install story) |
-| **3** | 14–45 | Agent | One recipe cosine ≥0.85 without `--force` **or** auto policy never first-runs a 0.3 cosine binary wrap | Wave 2 (demo must match recipe) |
-| **4** | 21–45 | Agent | NumPy fallback never 5× slower than BLAS at B=64 (docs/45 P1) | Independent of 3 |
+| **1** | 1–14 | Agent | Pip-first README; Pages live; **issue #1 implemented** as an above-the-fold “When NOT to use BNN” callout under the thesis (then close), **or** rewrite #1 — not a paperwork close of the bottom table; KG `open_pr` drift fixed | Wave 0 preferred, can draft README anyway |
+| **2** | 7–28 | Agent | HF Space shows wrap paradox on **existing** shapes (label auto ~0.70 REFUSE vs legacy wrap_demo 0.31) | Wave 0 (install story) |
+| **3** | 14–45 | Agent | **Same as lever 4 (AND, not OR):** hybrid/binary cosine **≥0.85 and** e2e **≥1.5×** on committed `wrap_demo` / `ultra_wrap` shapes, without `--force`. Ternary 0.991 / 0.73× does **not** count. Auto-never-first-run-REFUSE is a **1.1×** side quest (already nearly true today) — **not** this exit. If `wrap_demo` is the target, update `golden_floors.json` `cosine_max_without_qat: 0.5` on **that same shape**. | Wave 2 (demo must match recipe) |
+| **4** | 21–45 | Agent | When native is **absent**, NumPy fallback never 5× slower than BLAS at B=64 (docs/45 P1). Typical Win/mac pip wheels already have native SIMD. | Independent of 3 |
 | **5** | 30–75 | Author | B1 arXiv from goldens; PwC code link | Waves 1–2 (public artifact) |
 | **6** | 45–90 | Mixed | HF `.bnnpack` collection; Show HN / r/MachineLearning with **honest** title; Larq-vacuum positioning | Waves 0–2 |
 
@@ -255,7 +261,7 @@ flowchart LR
 1. `pip install bnn-lab` works.
 2. A stranger gets a dual-metric report in <5 minutes without MSVC.
 3. One Hub or Space artifact exists.
-4. Wrap story does not bounce (drop-in or honest skip).
+4. Hybrid/binary wrap on a committed shape is **drop-in (≥0.85) and faster (≥1.5× e2e)** — honest skip/REFUSE is already shipped and is **not** this bar.
 5. Paper or tech report cites committed goldens only.
 6. Search “pytorch binary neural network packed” can find this repo.
 
