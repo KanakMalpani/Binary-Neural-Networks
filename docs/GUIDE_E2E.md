@@ -109,11 +109,13 @@ class Tiny(nn.Module):
         return self.ffn_fc2(torch.relu(self.ffn_fc1(x)))
 
 x = torch.randn(8, 64)
-result = optimise_model(Tiny(), x, OptimiseConfig(policy="auto"))
+result = optimise_model(
+    Tiny(), x, OptimiseConfig(policy="hybrid_ffn", min_in_features=64)
+)
 print(result.payload["compression_replaced_weights"], result.payload["status"])
 ```
 
-### 3.1 Clone and install (CLI: `bnn repro` / `bnn optimise`)
+### 3.1 Clone and install (CLI: `bnn repro` / `bnn optimise` / `bnn recommend`)
 
 **Windows:**
 

@@ -176,6 +176,44 @@ def test_git_pip_fences_do_not_run_script_clis():
                 assert cmd not in block, f"{path.name} runs {cmd!r} after git-pip:\n{block}"
 
 
+def _first_python_fence_after_git_pip(text: str) -> str:
+    needle = "git+https://github.com/KanakMalpani/Binary-Neural-Networks.git@v1.0.0"
+    idx = text.find(needle)
+    assert idx != -1, "missing git-pip install URL"
+    match = re.search(r"```python\n(.*?)```", text[idx:], re.S)
+    assert match, "missing Python snippet after git-pip install"
+    return match.group(1)
+
+
+def test_git_pip_python_snippet_replaces_ffn_at_32x():
+    """Documented git-pip config must wrap FFN layers at 32×, not auto's 0×/16×."""
+    for path in (ROOT / "README.md", ROOT / "docs" / "GUIDE_E2E.md"):
+        snippet = _first_python_fence_after_git_pip(path.read_text(encoding="utf-8"))
+        assert 'policy="hybrid_ffn"' in snippet, path.name
+        assert "min_in_features=64" in snippet, path.name
+        assert 'policy="auto"' not in snippet, path.name
+        ns: dict = {}
+        exec(compile(snippet, str(path), "exec"), ns)
+        result = ns["result"]
+        assert result.report.replaced, (path.name, result.report.skipped)
+        assert float(result.payload["compression_replaced_weights"]) == 32.0, (
+            path.name,
+            result.payload.get("compression_replaced_weights"),
+            result.payload.get("status"),
+        )
+
+
+def test_readme_simd_ladder_uses_entry_node():
+    text = (ROOT / "README.md").read_text(encoding="utf-8")
+    assert 'Entry["binary_gemm"]' in text
+
+
+def test_guide_clone_heading_lists_recommend():
+    text = (ROOT / "docs" / "GUIDE_E2E.md").read_text(encoding="utf-8")
+    heading = next(line for line in text.splitlines() if line.startswith("### 3.1"))
+    assert "bnn recommend" in heading
+
+
 def test_readme_does_not_claim_windows_arm64_wheel():
     text = (ROOT / "README.md").read_text(encoding="utf-8")
     assert "windows-amd64" in text

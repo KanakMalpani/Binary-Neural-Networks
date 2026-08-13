@@ -101,7 +101,9 @@ class Tiny(nn.Module):
         return self.ffn_fc2(torch.relu(self.ffn_fc1(x)))
 
 x = torch.randn(8, 64)
-result = optimise_model(Tiny(), x, OptimiseConfig(policy="auto"))
+result = optimise_model(
+    Tiny(), x, OptimiseConfig(policy="hybrid_ffn", min_in_features=64)
+)
 print(result.payload["compression_replaced_weights"])  # 32× pack — size, not latency
 print(result.payload["status"])                        # OK or REFUSE_DROP_IN_CLAIM
 ```
