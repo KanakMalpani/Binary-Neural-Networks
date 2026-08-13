@@ -7,7 +7,7 @@ python scripts/generate_sbom.py --out sbom.json
 ```
 
 Emits a CycloneDX-shaped JSON from `pip freeze` + `bnn` version. Attached to
-GitHub Releases for `v0.3.0+`.
+GitHub Releases for `v0.3.0+` (current tag `v1.0.0`).
 
 ## Full CycloneDX (optional)
 
@@ -33,8 +33,8 @@ matrix until findings are triaged).
 `KanakMalpani/Binary-Neural-Networks` (skipped on forks — no OIDC).
 
 ```bat
-gh attestation verify bnn_lab-0.3.0-*.whl --repo KanakMalpani/Binary-Neural-Networks
-gh attestation verify bnn_lab-0.3.0.tar.gz --repo KanakMalpani/Binary-Neural-Networks
+gh attestation verify bnn_lab-1.0.0-*.whl --repo KanakMalpani/Binary-Neural-Networks
+gh attestation verify bnn_lab-1.0.0.tar.gz --repo KanakMalpani/Binary-Neural-Networks
 ```
 
 Filenames use the normalised dist name `bnn_lab` (PyPI project `bnn-lab`).
