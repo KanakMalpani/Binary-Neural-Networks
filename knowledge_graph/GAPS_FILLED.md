@@ -67,11 +67,12 @@ Provenance folder `knowledge_graph/enrichment/` is **kept** (not deleted).
 See `OpenGap` nodes in the JSON. Highest leverage leftovers:
 
 1. Venue drafting for B1–B3 (`gap_venue_submit`)
-2. Distill / WC-O hardening (`gap_distill_integration`, `decision_wc_o_gates`) — **Lane A PR #19**
-3. `.bnnpack` v2 + safetensors (`gap_bnnpack_v2`) — **Lane B PR #18**
-4. Local Litespark / Sparse-BitNet benches (`gap_litespark_local`) — **do not invent**
-5. Full ReActNet activations in `bnn.ste` (`gap_reactnet_in_repo`)
-6. Wave 1 moonshots still on open PRs: WASM (#24), energy/RAPL (#22), bitnet pin (#17), ImageNet protocol (#21)
+2. First PyPI Trusted Publisher upload (`gap_pypi_trusted`) — **human**, not live
+3. Local Litespark / Sparse-BitNet benches (`gap_litespark_local`) — **do not invent**
+4. Full ReActNet activations in `bnn.ste` (`gap_reactnet_in_repo`)
+5. FBI-LLM repro (`gap_fbi_llm_repro`) — literature / non-goal
+
+Shipped or closed-by-policy (do **not** leave as `open_pr`): WASM pedagogy (#24), `.bnnpack` v2 (#18), distill/search (#19), RAPL/proxy (#22), bitnet.cpp pin (#17), ImageNet protocol (#21).
 
 ## Integrity enrichment (2026-08-04, `lane/kg-enrich`)
 
@@ -81,7 +82,7 @@ See `OpenGap` nodes in the JSON. Highest leverage leftovers:
 | Tool | `python scripts/apply_kg_integrity.py` |
 | Adds | WC-O gates, `sys_recommend_stack`, `sys_eval_suite`, `sys_kg`, BitDistiller/GPTQ/Q-Sparse, RAPL Result, moonshot non-goals |
 | Fixes | Broken sources; over-aliased `same_as` → `implements`/`part_of`/`derived_from` |
-| Honesty | Wave 1 statuses `open_pr` — **not** claimed merged |
+| Honesty | Wave 1 statuses `open_pr` at write time — **flipped 2026-08-13** after v1.0.0 / PR #26; PyPI still not claimed live |
 
 ## Rebuild after edits
 

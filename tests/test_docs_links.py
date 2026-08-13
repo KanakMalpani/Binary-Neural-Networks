@@ -127,6 +127,115 @@ def test_every_autodoc_reference_is_importable():
     assert not unresolved, "autodoc references that do not resolve:\n  " + "\n  ".join(unresolved)
 
 
+def test_readme_when_not_callout_is_above_the_fold():
+    """Issue #1: When-NOT must sit under the thesis, not only the bottom Is/is not table."""
+    text = (ROOT / "README.md").read_text(encoding="utf-8")
+    lower = text.lower()
+    thesis = lower.find("## the thesis")
+    when_not = lower.find("when **not**")
+    if when_not < 0:
+        when_not = lower.find("when not")
+    is_is_not = lower.find("## is / is not")
+    assert thesis != -1, "README is missing the thesis heading"
+    assert when_not != -1, "README is missing a When-NOT callout"
+    assert is_is_not != -1, "README is missing the Is/is not table"
+    assert thesis < when_not < is_is_not, "When-NOT callout must sit under the thesis, above Is/is not"
+    window = text[thesis:when_not + 2500]
+    assert "docs/GUIDE_E2E.md" in window, "When-NOT callout must link GUIDE_E2E"
+    assert "docs/18_DECISION_TREE_AND_COMPLETE_ROADMAP.md" in window, "When-NOT callout must link docs/18"
+    assert "bnn recommend" in window, "When-NOT callout must point at bnn recommend"
+    callout = text[when_not : when_not + 3000]
+    assert "bitnet.cpp" in callout.lower()
+    assert "gpu" in callout.lower()
+    assert "int4" in callout.lower() or "fp8" in callout.lower()
+
+
+def test_readme_does_not_claim_live_pypi_install():
+    """Wave 0 residual: do not advertise `pip install bnn-lab` as a working PyPI command."""
+    text = (ROOT / "README.md").read_text(encoding="utf-8")
+    assert "pypi.org/project/bnn-lab" not in text.lower()
+    for line in text.splitlines():
+        stripped = line.strip()
+        if stripped.startswith("pip install bnn-lab") and "@ git+" not in stripped:
+            raise AssertionError(f"README claims live PyPI install: {stripped}")
+
+
+def _git_pip_fences(text: str) -> list[str]:
+    fences = re.findall(r"```(?:bat|bash|sh)?\n(.*?)```", text, re.S)
+    return [b for b in fences if "git+" in b and "bnn-lab @" in b]
+
+
+def test_git_pip_fences_do_not_run_script_clis():
+    """Non-editable git-pip wheels do not ship scripts/; do not run bnn repro after them."""
+    banned = ("bnn repro", "bnn optimise", "bnn recommend")
+    for path in (ROOT / "README.md", ROOT / "docs" / "GUIDE_E2E.md"):
+        fences = _git_pip_fences(path.read_text(encoding="utf-8"))
+        assert fences, f"{path.name} should still document git-pip install"
+        for block in fences:
+            for cmd in banned:
+                assert cmd not in block, f"{path.name} runs {cmd!r} after git-pip:\n{block}"
+
+
+def _first_python_fence_after_git_pip(text: str) -> str:
+    needle = "git+https://github.com/KanakMalpani/Binary-Neural-Networks.git@v1.0.0"
+    idx = text.find(needle)
+    assert idx != -1, "missing git-pip install URL"
+    match = re.search(r"```python\n(.*?)```", text[idx:], re.S)
+    assert match, "missing Python snippet after git-pip install"
+    return match.group(1)
+
+
+def test_git_pip_python_snippet_replaces_ffn_at_32x():
+    """Documented git-pip config must wrap FFN layers at 32×, not auto's 0×/16×."""
+    for path in (ROOT / "README.md", ROOT / "docs" / "GUIDE_E2E.md"):
+        snippet = _first_python_fence_after_git_pip(path.read_text(encoding="utf-8"))
+        assert 'policy="hybrid_ffn"' in snippet, path.name
+        assert "min_in_features=64" in snippet, path.name
+        assert 'policy="auto"' not in snippet, path.name
+        ns: dict = {}
+        exec(compile(snippet, str(path), "exec"), ns)
+        result = ns["result"]
+        assert result.report.replaced, (path.name, result.report.skipped)
+        assert float(result.payload["compression_replaced_weights"]) == 32.0, (
+            path.name,
+            result.payload.get("compression_replaced_weights"),
+            result.payload.get("status"),
+        )
+
+
+def test_readme_simd_ladder_uses_entry_node():
+    text = (ROOT / "README.md").read_text(encoding="utf-8")
+    assert 'Entry["binary_gemm"]' in text
+
+
+def test_guide_clone_heading_lists_recommend():
+    text = (ROOT / "docs" / "GUIDE_E2E.md").read_text(encoding="utf-8")
+    heading = next(line for line in text.splitlines() if line.startswith("### 3.1"))
+    assert "bnn recommend" in heading
+
+
+def test_readme_does_not_claim_windows_arm64_wheel():
+    text = (ROOT / "README.md").read_text(encoding="utf-8")
+    assert "windows-amd64" in text
+    assert "no Windows ARM64" in text or "no Windows arm64" in text.lower()
+    assert "Windows × x86-64 / arm64" not in text
+
+
+def test_readme_kernel_wrap_simd_bridge_diagrams():
+    """Landing page must ship the four concept diagrams (GitHub-renderable mermaid)."""
+    text = (ROOT / "README.md").read_text(encoding="utf-8")
+    assert text.count("```mermaid") >= 6
+    for needle in (
+        "Bit-pack",
+        "Layer policy",
+        "AVX-512",
+        "WASM SIMD128",
+        "bitnet.cpp",
+        "torchao",
+    ):
+        assert needle in text, needle
+
+
 def test_api_pages_cover_the_public_api():
     """Everything exported from `bnn` should appear somewhere in the API docs."""
     import bnn

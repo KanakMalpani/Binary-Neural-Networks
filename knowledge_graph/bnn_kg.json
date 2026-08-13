@@ -6,7 +6,7 @@
     "thesis_lock": "Packed CPU/edge XNOR-popcount + honest STE; never claim GPU 32× from sign(); 32× compression ≠ 32× latency.",
     "generated_by": "scripts/build_bnn_kg.py + scripts/merge_kg_enrichment.py + scripts/apply_kg_integrity.py",
     "node_count": 165,
-    "edge_count": 288,
+    "edge_count": 286,
     "node_types": [
       "Algorithm",
       "Claim",
@@ -85,9 +85,22 @@
         "integrity_removed_edges": 2,
         "integrity_cleared_lab_alias": 0,
         "integrity_stripped_abs_sources": 0
+      },
+      {
+        "generated": "2026-08-04T23:50:00+05:30",
+        "researcher": "lane-kg-enrich",
+        "schema_version": "1.0",
+        "purpose": "Lab/product integrity enrichment: WC-O gates, CLI systems, GPTQ/Q-Sparse/BitDistiller, RAPL Result, moonshot non-goals, Wave 1 status honesty, broken source fixes, same_as repairs. 2026-08-13: flip stale open_pr after v1.0.0 / PR #26; PyPI still not live.",
+        "lab_coverage_note": "Lanes A–I merged via Wave 2 integrator (PRs #16–#24, #26). Stale open_pr statuses flipped to merged/closed_by_policy/established. gap_pypi_trusted remains open — bnn-lab is not on PyPI. Thesis lock unchanged.",
+        "integrity_added_nodes": 0,
+        "integrity_added_edges": 2,
+        "integrity_removed_same_as": 0,
+        "integrity_removed_edges": 4,
+        "integrity_cleared_lab_alias": 0,
+        "integrity_stripped_abs_sources": 0
       }
     ],
-    "integrity_patched_at": "2026-08-04T19:03:17.604225+00:00"
+    "integrity_patched_at": "2026-08-13T18:13:07.563987+00:00"
   },
   "nodes": [
     {
@@ -806,7 +819,7 @@
       "id": "sys_vision_cifar",
       "label": "Vision / CIFAR Bi-Real Lane",
       "type": "System",
-      "summary": "CIFAR-10 Bi-Real CNN canary on main; Lane G PR #21 extends ResNet-BiReal + ImageNet protocol runner. No ImageNet SOTA golden.",
+      "summary": "CIFAR-10 Bi-Real CNN canary on main; ResNet-BiReal + ImageNet protocol runner shipped (PR #21). Protocol ≠ SOTA golden.",
       "sources": [
         "results/image_cifar.json",
         "docs/tutorials/04_image_cifar.md",
@@ -832,7 +845,7 @@
       "id": "sys_energy_module",
       "label": "bnn.energy (Proxy + RAPL Spike)",
       "type": "System",
-      "summary": "Energy bound from wrap latency (E=P×t) on main; Lane H PR #22 adds RAPL probe + Windows CLOSED-BY-PROXY honesty. Not a golden floor.",
+      "summary": "Energy bound from wrap latency (E=P×t) plus RAPL probe on Linux; Windows CLOSED-BY-PROXY (PR #22). Not a golden floor.",
       "sources": [
         "docs/14_HARDWARE_AND_ENERGY.md",
         "results/energy_bound.json",
@@ -1247,43 +1260,43 @@
       "id": "gap_wasm",
       "label": "OpenGap: WASM SIMD Demo",
       "type": "OpenGap",
-      "summary": "Optional browser pedagogy (W2.T06); Lane F open PR #24 — spike/WASM tree not on main yet; not a v1.0 core gate.",
+      "summary": "WASM SIMD pedagogy shipped (wasm/, tests/test_wasm_parity.py, PR #24). Not a native-kernel substitute and not a golden gate.",
       "sources": [
         "docs/MOONSHOT_DEFERRALS.md",
         "https://github.com/KanakMalpani/Binary-Neural-Networks/pull/24"
       ],
       "confidence": 0.8,
-      "status": "open_pr"
+      "status": "merged"
     },
     {
       "id": "gap_bnnpack_v2",
       "label": "OpenGap: .bnnpack v2 + safetensors",
       "type": "OpenGap",
-      "summary": "Schema ADR + hashes + ternary meta + safetensors — Lane B open PR #18; not merged to main yet.",
+      "summary": "Schema ADR + hashes + ternary meta + safetensors on main (Lane B / PR #18).",
       "sources": [
         "docs/MOONSHOT_DEFERRALS.md",
         "docs/BNNPACK_V2_DESIGN.md"
       ],
       "confidence": 0.85,
-      "status": "open_pr"
+      "status": "merged"
     },
     {
       "id": "gap_distill_integration",
       "label": "OpenGap: Distill Integration (W3.T08)",
       "type": "OpenGap",
-      "summary": "distill_sketch.py on main; Lane A PR #19 extends distill/BN-fuse/WC-O — full BitDistill-scale still not a golden.",
+      "summary": "bnn.wrap.distill + OptimiseConfig.distill_steps on main (Lane A / PR #19). Full BitDistill-scale KD is still not a golden.",
       "sources": [
         "docs/MOONSHOT_DEFERRALS.md",
         "results/distill_sketch.json"
       ],
       "confidence": 0.85,
-      "status": "open_pr"
+      "status": "merged"
     },
     {
       "id": "gap_pypi_trusted",
       "label": "OpenGap: First PyPI Trusted Publisher Upload",
       "type": "OpenGap",
-      "summary": "wheels.yml + docs ready; Lane C PR #16 dry-run/attestations. First bnn-lab upload still needs human Trusted Publisher on pypi.org.",
+      "summary": "wheels.yml + docs ready; OIDC dry-run/attestations shipped. First bnn-lab upload still needs human Trusted Publisher on pypi.org — not live (JSON 404).",
       "sources": [
         "docs/PYPI_PUBLISH.md",
         "ROADMAP.md"
@@ -1320,7 +1333,7 @@
       "id": "gap_rapl_windows",
       "label": "OpenGap: Windows Board Joules (RAPL)",
       "type": "OpenGap",
-      "summary": "Windows has no portable RAPL — proxy only. Linux RAPL lands with Lane H PR #22; spike pointer doc is stub until that merge.",
+      "summary": "Windows has no portable RAPL — proxy only (CLOSED-BY-PROXY). Linux RAPL probe shipped with PR #22. Privileged wrap-workload RAPL remains a moonshot.",
       "sources": [
         "docs/spikes/RAPL_ENERGY_SPIKE.md",
         "docs/14_HARDWARE_AND_ENERGY.md",
@@ -1328,7 +1341,7 @@
         "https://github.com/KanakMalpani/Binary-Neural-Networks/pull/22"
       ],
       "confidence": 0.9,
-      "status": "open_pr"
+      "status": "closed_by_policy"
     },
     {
       "id": "gap_venue_submit",
@@ -1685,15 +1698,15 @@
     },
     {
       "id": "hw_wasm",
-      "label": "WebAssembly SIMD (deferred)",
+      "label": "WebAssembly SIMD (pedagogy)",
       "type": "Hardware",
-      "summary": "Browser pedagogy target; Lane F PR #24 in progress. Not shipped as a golden gate.",
+      "summary": "Browser pedagogy target shipped with Lane F / PR #24. Not a production GEMM path.",
       "sources": [
         "docs/MOONSHOT_DEFERRALS.md",
         "https://github.com/KanakMalpani/Binary-Neural-Networks/pull/24"
       ],
       "confidence": 0.7,
-      "status": "open_pr"
+      "status": "merged"
     },
     {
       "id": "decision_int8_npu_first",
@@ -1724,26 +1737,26 @@
       "id": "gap_layer_search_full",
       "label": "OpenGap: Full Layer-wise Binary/Ternary Search",
       "type": "OpenGap",
-      "summary": "Sensitivity (W3.T05) on main; full binary/ternary/skip search W3.T06 in Lane A PR #19 — do not invent search goldens.",
+      "summary": "search_layer_modes (binary/ternary/skip) + docs/42 on main (W3.T06 / PR #19). Do not invent search goldens.",
       "sources": [
         "docs/MOONSHOT_DEFERRALS.md",
         "docs/42_QAT_AND_LAYER_SEARCH.md"
       ],
       "confidence": 0.8,
-      "status": "open_pr"
+      "status": "merged"
     },
     {
       "id": "gap_bitnet_submodule",
       "label": "OpenGap: bitnet.cpp as Git Submodule",
       "type": "OpenGap",
-      "summary": "Prefer thin pin + bridge recipes over full BitNet submodule. Lane I PR #17 hardens pins; BITNET_PIN.md lands with that PR.",
+      "summary": "Thin pin + bridge recipes instead of a giant submodule. third_party/BITNET_PIN.md + docs/23; PR #17 merged.",
       "sources": [
         "docs/MOONSHOT_DEFERRALS.md",
         "docs/23_BITNET_CPP_BRIDGE.md",
         "https://github.com/KanakMalpani/Binary-Neural-Networks/pull/17"
       ],
       "confidence": 0.85,
-      "status": "open_pr"
+      "status": "closed_by_policy"
     },
     {
       "id": "gap_fbi_llm_repro",
@@ -2116,14 +2129,14 @@
       "id": "decision_wc_o_gates",
       "label": "WC-O Optimiser Quality Gates (O1–O4)",
       "type": "Decision",
-      "summary": "Calibration metrics, auto binary/ternary/skip policy, drop-in honesty thresholds, and short QAT vs cold PTQ — ROADMAP §1.3. Partial on main; Lane A PR #19 hardens — do not claim WC-O closed until integrator merges.",
+      "summary": "WC-O1–O4 on main: calib, auto policy, drop-in honesty, short QAT vs cold PTQ (ROADMAP [x]; PR #19 / Wave 2 integrator). Hybrid/binary 0.85 AND 1.5× e2e is a later lever, not a missing O-gate.",
       "sources": [
         "ROADMAP.md",
         "docs/42_QAT_AND_LAYER_SEARCH.md",
         "https://github.com/KanakMalpani/Binary-Neural-Networks/pull/19"
       ],
       "confidence": 0.9,
-      "status": "open_pr"
+      "status": "established"
     },
     {
       "id": "sys_recommend_stack",
@@ -2211,7 +2224,7 @@
       "id": "result_energy_rapl_spike",
       "label": "RAPL Spike Result (Linux measure / Windows proxy)",
       "type": "Result",
-      "summary": "Lane H PR #22: RAPL when powercap available; Windows CLOSED-BY-PROXY. Main tip still has latency energy_bound only — not a golden floor; do not invent board Joules.",
+      "summary": "RAPL when powercap is available; Windows CLOSED-BY-PROXY (PR #22). Latency energy_bound remains the default; do not invent board Joules.",
       "sources": [
         "results/energy_bound.json",
         "docs/14_HARDWARE_AND_ENERGY.md",
@@ -2220,7 +2233,7 @@
         "https://github.com/KanakMalpani/Binary-Neural-Networks/pull/22"
       ],
       "confidence": 0.85,
-      "status": "open_pr"
+      "status": "merged"
     },
     {
       "id": "decision_nongoal_asr_whisper",
@@ -3310,24 +3323,6 @@
         "ROADMAP.md scorecard"
       ],
       "weight": 0.7
-    },
-    {
-      "source": "world_class_v1",
-      "target": "gap_distill_integration",
-      "relation": "blocked_by",
-      "evidence": [
-        "docs/MOONSHOT_DEFERRALS.md"
-      ],
-      "weight": 0.7
-    },
-    {
-      "source": "world_class_v1",
-      "target": "gap_bnnpack_v2",
-      "relation": "blocked_by",
-      "evidence": [
-        "docs/MOONSHOT_DEFERRALS.md"
-      ],
-      "weight": 0.6
     },
     {
       "source": "gap_wasm",
@@ -4610,26 +4605,6 @@
       "weight": 1.0
     },
     {
-      "source": "decision_wc_o_gates",
-      "target": "gap_distill_integration",
-      "relation": "blocked_by",
-      "evidence": [
-        "docs/MOONSHOT_DEFERRALS.md W3.T08",
-        "PR #19"
-      ],
-      "weight": 1.0
-    },
-    {
-      "source": "decision_wc_o_gates",
-      "target": "gap_layer_search_full",
-      "relation": "blocked_by",
-      "evidence": [
-        "docs/42_QAT_AND_LAYER_SEARCH.md",
-        "PR #19"
-      ],
-      "weight": 1.0
-    },
-    {
       "source": "sys_recommend_stack",
       "target": "decision_wrap_tree",
       "relation": "implements",
@@ -4862,6 +4837,27 @@
       "relation": "implements",
       "evidence": [
         "HF 2B4T checkpoint is the runtime artifact cited by bitnet.cpp"
+      ],
+      "weight": 1.0
+    },
+    {
+      "source": "decision_wc_o_gates",
+      "target": "gap_distill_integration",
+      "relation": "implements",
+      "evidence": [
+        "bnn/wrap/distill.py",
+        "PR #19 merged"
+      ],
+      "weight": 1.0
+    },
+    {
+      "source": "decision_wc_o_gates",
+      "target": "gap_layer_search_full",
+      "relation": "implements",
+      "evidence": [
+        "bnn/wrap/sensitivity.py",
+        "docs/42_QAT_AND_LAYER_SEARCH.md",
+        "PR #19 merged"
       ],
       "weight": 1.0
     }

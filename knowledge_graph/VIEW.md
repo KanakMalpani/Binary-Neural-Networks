@@ -195,12 +195,14 @@ flowchart TB
   V10[World-class v1.0 bar<br/>ROADMAP WC-* gates]
   V03 --> V10
   V10 -.->|blocked_by| G1[PyPI Trusted Publisher first upload]
-  V10 -.->|blocked_by| G2[Distill integration W3.T08]
-  V10 -.->|blocked_by| G3[.bnnpack v2 + safetensors]
-  V10 -.->|optional| G4[WASM SIMD]
+  V10 -.->|shipped| G2[Distill integration W3.T08]
+  V10 -.->|shipped| G3[.bnnpack v2 + safetensors]
+  V10 -.->|pedagogy shipped| G4[WASM SIMD]
   V10 -.->|proxy OK| G5[Windows RAPL / board Joules]
   V10 -.->|accepted non-goal| G6[Full ImageNet SOTA schedule]
 ```
+
+`gap_pypi_trusted` is the remaining human blocker. Distill, `.bnnpack` v2, WASM pedagogy, layer search, and bitnet.cpp pin are **merged / closed-by-policy** — do not re-open them from stale `open_pr` fields.
 
 ---
 
@@ -227,7 +229,7 @@ flowchart TB
 | `decision_wrap_tree` | Practitioner routing |
 | `sys_recommend_stack` | `bnn recommend` CLI |
 | `sys_eval_suite` | `bnn eval-suite` / fair shapes |
-| `decision_wc_o_gates` | WC-O1–O4 (Lane A open PR) |
+| `decision_wc_o_gates` | WC-O1–O4 (established on main) |
 | `sys_kg` | Graph + CI integrity |
 | `paper_bitnet_b158` | Ternary LLM era pivot |
 | `paper_gptq` / `paper_bitdistiller` | INT4 distill disambiguation |
