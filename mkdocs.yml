@@ -37,6 +37,7 @@ nav:
   - Memory footprint: 43_MEMORY_FOOTPRINT.md
   - Knowledge graph: 44_KNOWLEDGE_GRAPH.md
   - Improvement handoff: 45_IMPROVEMENT_ROADMAP_HANDOFF.md
+  - Transformation plan: TRANSFORMATION_PLAN.md
   - World-class roadmap: 37_WORLD_CLASS_BNN_OPTIMISER_ROADMAP.md
 
 docs_dir: docs

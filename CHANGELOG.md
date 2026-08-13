@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Docs: first-principles 90-day transformation plan (`docs/TRANSFORMATION_PLAN.md`) — proposal only; does not flip ROADMAP WC checkboxes or invent goldens. Review patch: Wave 3 = lever 4 AND (hybrid/binary 0.85 cosine **and** 1.5× e2e); issue #1 is implement-then-close, not paperwork.
+
 ## [1.0.0] — 2026-08-05
 
 ### Wave 2 integrator + Wave 3 v1.0
