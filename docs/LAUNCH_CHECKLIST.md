@@ -31,7 +31,7 @@ bnn-lab`.
   - [ ] Register pending Trusted Publisher on pypi.org (`bnn-lab` / `wheels.yml` / env `pypi`)
   - [ ] Then Actions → wheels → **publish=true** on **`main`** (not frozen tag `v1.0.0`; see `PYPI_PUBLISH.md`)
 - [x] Repository is **public** — free Code Scanning + Scorecard public badge API work
-- [x] README shields for CI / CodeQL / Scorecard / wheels (PyPI `bnn-lab` badge stays 404 until first upload)
+- [x] README shields for CI / CodeQL / Scorecard / wheels / Pages; PyPI badge is **pending Trusted Publisher** (not a live `pypi/v/bnn-lab` 404)
 
 ## Not required to claim the v1.0.0 GitHub tag
 

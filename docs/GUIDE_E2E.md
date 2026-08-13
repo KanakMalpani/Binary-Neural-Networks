@@ -82,6 +82,15 @@ Needed only for [tutorial 08](tutorials/08_HF_OPTIMISER.md) (Hugging Face).
 
 ## 3. Install & verify
 
+PyPI **`bnn-lab` is not live yet** (human Trusted Publisher — [`PYPI_PUBLISH.md`](PYPI_PUBLISH.md)).
+Until then, install from Git or an editable clone. Do **not** treat `pip install bnn-lab`
+as a working PyPI command.
+
+```bat
+pip install "bnn-lab @ git+https://github.com/KanakMalpani/Binary-Neural-Networks.git@v1.0.0"
+bnn repro
+```
+
 ### 3.1 Clone and install
 
 **Windows:**
@@ -102,7 +111,7 @@ python -m pip install -U pip
 pip install -e ".[dev]" -c constraints.txt
 ```
 
-**Expect:** install finishes without error; `bnn --version` prints something like `bnn 0.2.0`.
+**Expect:** install finishes without error; `bnn --version` prints something like `bnn 1.0.0`.
 
 **Failure modes:** wrong Python on PATH; torch wheel missing for your version → use 3.12; corporate proxy → configure pip.
 

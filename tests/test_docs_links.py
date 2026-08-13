@@ -127,6 +127,54 @@ def test_every_autodoc_reference_is_importable():
     assert not unresolved, "autodoc references that do not resolve:\n  " + "\n  ".join(unresolved)
 
 
+def test_readme_when_not_callout_is_above_the_fold():
+    """Issue #1: When-NOT must sit under the thesis, not only the bottom Is/is not table."""
+    text = (ROOT / "README.md").read_text(encoding="utf-8")
+    lower = text.lower()
+    thesis = lower.find("## the thesis")
+    when_not = lower.find("when **not**")
+    if when_not < 0:
+        when_not = lower.find("when not")
+    is_is_not = lower.find("## is / is not")
+    assert thesis != -1, "README is missing the thesis heading"
+    assert when_not != -1, "README is missing a When-NOT callout"
+    assert is_is_not != -1, "README is missing the Is/is not table"
+    assert thesis < when_not < is_is_not, "When-NOT callout must sit under the thesis, above Is/is not"
+    window = text[thesis:when_not + 2500]
+    assert "docs/GUIDE_E2E.md" in window, "When-NOT callout must link GUIDE_E2E"
+    assert "docs/18_DECISION_TREE_AND_COMPLETE_ROADMAP.md" in window, "When-NOT callout must link docs/18"
+    assert "bnn recommend" in window, "When-NOT callout must point at bnn recommend"
+    callout = text[when_not : when_not + 3000]
+    assert "bitnet.cpp" in callout.lower()
+    assert "gpu" in callout.lower()
+    assert "int4" in callout.lower() or "fp8" in callout.lower()
+
+
+def test_readme_does_not_claim_live_pypi_install():
+    """Wave 0 residual: do not advertise `pip install bnn-lab` as a working PyPI command."""
+    text = (ROOT / "README.md").read_text(encoding="utf-8")
+    assert "pypi.org/project/bnn-lab" not in text.lower()
+    for line in text.splitlines():
+        stripped = line.strip()
+        if stripped.startswith("pip install bnn-lab") and "@ git+" not in stripped:
+            raise AssertionError(f"README claims live PyPI install: {stripped}")
+
+
+def test_readme_kernel_wrap_simd_bridge_diagrams():
+    """Landing page must ship the four concept diagrams (GitHub-renderable mermaid)."""
+    text = (ROOT / "README.md").read_text(encoding="utf-8")
+    assert text.count("```mermaid") >= 6
+    for needle in (
+        "Bit-pack",
+        "Layer policy",
+        "AVX-512",
+        "WASM SIMD128",
+        "bitnet.cpp",
+        "torchao",
+    ):
+        assert needle in text, needle
+
+
 def test_api_pages_cover_the_public_api():
     """Everything exported from `bnn` should appear somewhere in the API docs."""
     import bnn

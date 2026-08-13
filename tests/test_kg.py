@@ -77,6 +77,25 @@ def test_graphml_nonempty():
     assert text.count("<node ") >= 100
 
 
+def test_shipped_wave1_lanes_are_not_open_pr(graph):
+    """v1.0.0 / Wave 2 integrator merged lanes A–I — do not leave open_pr drift."""
+    idx = {n["id"]: n for n in graph["nodes"]}
+    shipped = {
+        "gap_wasm": ("merged",),
+        "hw_wasm": ("merged",),
+        "gap_bnnpack_v2": ("merged",),
+        "gap_distill_integration": ("merged",),
+        "gap_layer_search_full": ("merged",),
+        "gap_bitnet_submodule": ("closed_by_policy",),
+        "gap_rapl_windows": ("closed_by_policy",),
+        "decision_wc_o_gates": ("established",),
+        "result_energy_rapl_spike": ("merged",),
+    }
+    for nid, allowed in shipped.items():
+        assert idx[nid]["status"] in allowed, (nid, idx[nid]["status"])
+    assert idx["gap_pypi_trusted"]["status"] == "open"
+
+
 def test_integrity_nodes_present(graph):
     ids = {n["id"] for n in graph["nodes"]}
     for nid in (

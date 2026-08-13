@@ -4,7 +4,7 @@
 |-------|-------|
 | **Branch** | `lane/kg-enrich` |
 | **Base** | `main` @ `f40f65e` |
-| **Status** | Integrity enrichment PR (Wave 1 lanes A–I remain open) |
+| **Status** | Integrity enrichment landed; 2026-08-13 status refresh (stale `open_pr` → merged/closed-by-policy) |
 | **Date** | 2026-08-04 |
 
 ## Owned paths
@@ -34,7 +34,6 @@
 
 ## Residuals (deliberately not done)
 
-- Do **not** merge Wave 1 PRs #16–#24 in this PR.
 - Do **not** invent golden floors / ImageNet SOTA / GPU 32× from `sign()`.
-- Do **not** land Lane H energy tree on main here — Result node cites PR #22 + main `energy_bound`.
-- WASM_SIMD.md / BITNET_PIN.md stay branch-local until F/I merge; KG points at PRs + docs that exist on main.
+- Do **not** claim PyPI `bnn-lab` is live (`gap_pypi_trusted` stays `open`).
+- BitDistill-scale KD and privileged RAPL Joules remain moonshots, not goldens.

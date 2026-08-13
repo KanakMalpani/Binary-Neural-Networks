@@ -1,128 +1,100 @@
 # Binary Neural Networks
 
-### The honest optimiser for packed 1-bit inference on CPU and edge
+### Packed 1-bit inference for CPU and edge — with metrics that refuse to lie
 
 [![CI](https://github.com/KanakMalpani/Binary-Neural-Networks/actions/workflows/ci.yml/badge.svg)](https://github.com/KanakMalpani/Binary-Neural-Networks/actions/workflows/ci.yml)
 [![CodeQL](https://github.com/KanakMalpani/Binary-Neural-Networks/actions/workflows/codeql.yml/badge.svg)](https://github.com/KanakMalpani/Binary-Neural-Networks/actions/workflows/codeql.yml)
 [![OpenSSF Scorecard](https://api.securityscorecards.dev/projects/github.com/KanakMalpani/Binary-Neural-Networks/badge)](https://scorecard.dev/viewer/?uri=github.com/KanakMalpani/Binary-Neural-Networks)
-[![PyPI](https://img.shields.io/pypi/v/bnn-lab.svg)](https://pypi.org/project/bnn-lab/)
-[![Wheels](https://img.shields.io/badge/wheels-manual%20%2F%20v*%20tag-lightgrey)](https://github.com/KanakMalpani/Binary-Neural-Networks/actions/workflows/wheels.yml)
-[![Python 3.11+](https://img.shields.io/badge/python-3.11%2B-blue.svg)](https://www.python.org/downloads/)
-[![License: MIT](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
-[![Ruff](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/ruff/main/assets/badge/v2.json)](https://github.com/astral-sh/ruff)
-[![Checked with mypy](https://www.mypy-lang.org/static/mypy_badge.svg)](https://mypy-lang.org/)
+[![Docs](https://img.shields.io/badge/docs-GitHub_Pages-2563eb)](https://kanakmalpani.github.io/Binary-Neural-Networks/)
+[![Python 3.11–3.13](https://img.shields.io/badge/python-3.11%20%7C%203.12%20%7C%203.13-3776ab)](docs/COMPATIBILITY_MATRIX.md)
+[![License: MIT](https://img.shields.io/badge/license-MIT-22c55e)](LICENSE)
+[![Repro](https://img.shields.io/badge/repro-PASS-22c55e)](REPRODUCIBILITY.md)
+[![Pack](https://img.shields.io/badge/pack-32x_uint64-0284c7)](#dual-metric-benchmarks)
+[![SIMD](https://img.shields.io/badge/SIMD-~24x_vs_NumPy_FP32-7c3aed)](#dual-metric-benchmarks)
+[![PyPI](https://img.shields.io/badge/PyPI-pending_Trusted_Publisher-9ca3af)](https://github.com/KanakMalpani/Binary-Neural-Networks/blob/main/docs/PYPI_PUBLISH.md)
 
-**Binary Neural Networks** packs weights (and optionally activations) to **1–1.58 bits** and runs **real** XNOR–popcount kernels on **CPU / edge** — with dual-metric reports that never confuse pack math with wall-clock.
+**Binary Neural Networks** (`bnn` 1.0.0) is the honest optimiser toolkit for **packed binary / ternary** inference on **CPU and edge**. It bit-packs weights into `uint64`, runs **real** XNOR–popcount SIMD kernels, and prints **dual metrics** — pack math and wall-clock — as separate numbers.
 
-It is a lab **optimiser toolkit** (`bnn 1.0.0`), not a claim that `sign()` is 32× faster on GPU.
+It is **not** a claim that `sign()` is 32× faster on GPU. Compression **32×** is exact uint64 pack **size**. Kernel speed is XNOR–popcount. Those are different physics.
 
 <table>
 <tr>
-<td width="25%" align="center">
+<td width="16%" align="center">
 
 ### 32.00×
 **weight pack**<br/>
 <sub>exact, uint64-aligned</sub>
 
 </td>
-<td width="25%" align="center">
+<td width="16%" align="center">
+
+### ~23.9×
+**SIMD vs NumPy FP32**<br/>
+<sub>64×4096×4096, one CPU</sub>
+
+</td>
+<td width="16%" align="center">
 
 ### err = 0
-**every SIMD path**<br/>
+**every ISA path**<br/>
 <sub>AVX-512 · AVX2 · NEON · scalar</sub>
 
 </td>
-<td width="25%" align="center">
+<td width="16%" align="center">
 
 ### 5.1×
 **faster kernel**<br/>
-<sub>aggregate over 12 shapes</sub>
+<sub>aggregate, 12 shapes</sub>
 
 </td>
-<td width="25%" align="center">
+<td width="16%" align="center">
 
 ### 29.68×
-**measured** RAM<br/>
-<sub>not the 32× brochure number</sub>
+**measured RAM**<br/>
+<sub>not the 32× brochure</sub>
+
+</td>
+<td width="16%" align="center">
+
+### REFUSE
+**when cosine is junk**<br/>
+<sub>drop-in is a gate, not a vibe</sub>
 
 </td>
 </tr>
 </table>
 
-> Four numbers, four different kinds of claim — that distinction *is* the product.
-> Pack ratio is exact math. `err = 0` is exact integer arithmetic. The kernel
-> speedup is wall-clock on one machine. The memory figure is measured from real
-> buffers, which is why it is **below** the theoretical 32×.
+> Six numbers, six kinds of claim — that distinction *is* the product.
+> Pack ratio is exact math. `err = 0` is exact integer arithmetic. SIMD and kernel
+> speedups are wall-clock on one machine. Resident RAM is measured from real
+> buffers, which is why it sits **below** theoretical 32×. `REFUSE` is the report
+> telling you not to ship a wrap whose cosine collapsed.
 
-```mermaid
-flowchart LR
-  subgraph Desire["What you want"]
-    A["Smaller weights<br/>on CPU / edge"]
-    B["Real kernel speed<br/>where GEMMs are wide"]
-    C["Honest metrics<br/>size ≠ latency"]
-  end
-  subgraph Product["This repo"]
-    D["bnn optimise"]
-    E[".bnnpack + native GEMM"]
-    F["bnn repro gates"]
-  end
-  A --> D
-  B --> E
-  C --> F
-  D --> E
-  E --> F
-```
-
-| Start here | |
-|--|--|
-| **Human path** | [`docs/GUIDE_E2E.md`](docs/GUIDE_E2E.md) — install → repro → optimise |
-| **Reproduce** | [`REPRODUCIBILITY.md`](REPRODUCIBILITY.md) · `bnn repro` |
-| **AI agents** | [`AGENTS.md`](AGENTS.md) |
-| **Knowledge graph** | [`knowledge_graph/`](knowledge_graph/) · [`docs/44_KNOWLEDGE_GRAPH.md`](docs/44_KNOWLEDGE_GRAPH.md) |
-| **Roadmap** | [`ROADMAP.md`](ROADMAP.md) |
-| **Compatibility** | [`docs/COMPATIBILITY_MATRIX.md`](docs/COMPATIBILITY_MATRIX.md) — Win/Linux/macOS × x86-64/arm64 |
-| **Limits** | [`MODEL_CARD.md`](MODEL_CARD.md) |
-| **Kernel internals** | [`docs/41`](docs/41_PORTABLE_SIMD_KERNEL.md) SIMD · [`docs/42`](docs/42_QAT_AND_LAYER_SEARCH.md) QAT+search · [`docs/43`](docs/43_MEMORY_FOOTPRINT.md) memory |
-| **Docs index** | [`docs/README.md`](docs/README.md) |
+**Jump:** [60 seconds](#60-seconds-to-a-dual-metric-report) · [When to use / when not](#when-to-use--when-not) · [Kernel](#core-kernel-pipeline) · [Wrap](#wrap--optimisation-flow) · [SIMD](#simd-execution-ladder) · [Benchmarks](#dual-metric-benchmarks) · [Bridges](#ecosystem--bridges) · [Docs](https://kanakmalpani.github.io/Binary-Neural-Networks/)
 
 ---
 
-## The thesis (locked)
+## 60 seconds to a dual-metric report
 
-Most “binary” demos train with STE, then infer with `sign()` + `nn.Linear`. That is a **simulation**. On commodity GPUs it is often *slower* than FP32. The 32× you see in papers is usually **bit-pack compression**, not end-to-end latency.
+PyPI **`bnn-lab` is not live yet** (human [Trusted Publisher](docs/PYPI_PUBLISH.md) residual). Until that upload, install from Git. The short name `bnn` on PyPI is an unrelated package — import and CLI here stay `bnn`.
 
-This lab separates the two:
-
-| Locked claim | Meaning |
-|--------------|---------|
-| Speedups come from **packed kernels** | XNOR + popcount on CPU/edge — not `sign()` theatre |
-| Training STE ≠ inference throughput | STE trains latents; inference uses pack + GEMM |
-| Compression **32×** | Exact for aligned uint64 binary pack — **size**, not e2e latency |
-| Commodity GPU quality | INT4 / FP8 / AWQ / vLLM — documented bridges, not fake BNN wins |
-| Repro culture | `bnn repro` + [`tests/golden_floors.json`](tests/golden_floors.json) + committed [`results/*.json`](results/) |
-
-```mermaid
-flowchart TB
-  subgraph Train["Training — STE"]
-    W["Full-precision latents"]
-    STE["Straight-through estimator"]
-    W --> STE
-    STE --> W
-  end
-  subgraph Infer["Inference — packed path"]
-    Pack["uint64 pack<br/>weights ± activations"]
-    GEMM["XNOR–popcount GEMM<br/>native SIMD or NumPy"]
-    Out["Scaled output<br/>α · y + bias"]
-    Pack --> GEMM --> Out
-  end
-  STE -.->|"checkpoint / policy"| Pack
-  style Train fill:#f6f8fa,stroke:#57606a
-  style Infer fill:#ddf4ff,stroke:#0969da
+```bat
+pip install "bnn-lab @ git+https://github.com/KanakMalpani/Binary-Neural-Networks.git@v1.0.0"
+bnn repro
+bnn optimise --policy auto --report results\optimise_report.json
 ```
 
----
+```python
+from bnn.optimise import OptimiseConfig, optimise_model
 
-## Prove it in five commands
+result = optimise_model(model, calib_inputs, OptimiseConfig(policy="auto"))
+print(result.payload["compression_replaced_weights"])  # 32× pack — size, not latency
+print(result.payload["status"])                        # OK or REFUSE_DROP_IN_CLAIM
+```
+
+Expect **`REPRO: PASS`** (exit 0). The report prints **compression**, **cosine**, **wall-clock**, and **REFUSE/OK**. Prefer **`bnn optimise`** over legacy `bnn wrap --ultra`.
+
+Dev clone (extras + constraints; optional native compile):
 
 ```bat
 git clone https://github.com/KanakMalpani/Binary-Neural-Networks.git
@@ -132,73 +104,207 @@ python -m bnn.kernels.compile_native
 bnn repro
 ```
 
-Expect **`REPRO: PASS`** (exit 0). Fast verify uses committed goldens — same **conclusions**, not bit-identical floats across machines.
+No compiler? Install still succeeds — the NumPy packed path stays **correct**. Windows native needs **MSVC x64** (MinGW 32-bit → WinError 193). Full path: [`docs/GUIDE_E2E.md`](docs/GUIDE_E2E.md).
 
-Optional: `bnn repro --mode full` for short smoke trains. Prefer `compile_native` on **every** OS (Win/Linux/macOS, x64/arm64) for real XNOR–popcount; Windows needs **MSVC x64** (MinGW 32-bit DLLs fail with WinError 193). No compiler? Install still succeeds — NumPy path keeps correctness. Runtime SIMD ladder: [`docs/41_PORTABLE_SIMD_KERNEL.md`](docs/41_PORTABLE_SIMD_KERNEL.md) (W2.T04/T05).
+---
+
+## The thesis (locked)
+
+Most “binary” demos train with STE, then infer with `sign()` + `nn.Linear`. That is a **simulation**. On commodity GPUs it is often *slower* than FP32. The 32× in papers is usually **bit-pack compression**, not end-to-end latency.
+
+| Locked claim | Meaning |
+|--------------|---------|
+| Speedups come from **packed kernels** | XNOR + popcount on CPU/edge — not `sign()` theatre |
+| Training STE ≠ inference throughput | STE trains latents; inference uses pack + GEMM |
+| Compression **32×** | Exact for aligned uint64 binary pack — **size**, not e2e latency |
+| Commodity GPU quality | INT4 / FP8 / AWQ / vLLM — documented bridges, not fake BNN wins |
+| Repro culture | `bnn repro` + [`tests/golden_floors.json`](tests/golden_floors.json) + committed [`results/*.json`](results/) |
+
+---
+
+## When to use / when **not**
+
+Honesty is the product. If another stack wins, this lab **says so** and routes you there (`bnn recommend`). Compact callout under the thesis — not a table buried at the bottom.
+
+<table>
+<tr>
+<td width="50%" valign="top">
+
+**Use this lab when**
+
+- You want **smaller weights on CPU / edge** and will retrain or wrap wide GEMMs
+- You need **real XNOR–popcount**, not `sign()` + `nn.Linear`
+- You want a report that **refuses drop-in** when cosine is junk
+- You are researching packed binary / ternary kernels, Bi-Real-style vision, or `.bnnpack`
+- You want **dual metrics**: 32× pack **and** measured wall-clock, separately
+
+</td>
+<td width="50%" valign="top">
+
+**Do not use this lab when**
+
+- **GPU server quality** → FP8 / AWQ-INT4 + vLLM — **not** `sign()`, **not** “GPU 32×”
+- **Local CPU LLM chat** → [bitnet.cpp](https://github.com/microsoft/BitNet) (BitNet) or GGUF Q4_K_M
+- **Phone / NPU stock SDK** → INT8 / INT4 — vendors do **not** ship native 1-bit
+- **Production ASR / diffusion fidelity** → INT8 Whisper / ORT / FP8 PTQ (audio here is synthetic)
+- You need to claim **32× e2e latency** from pack math alone — forbidden forever
+
+</td>
+</tr>
+</table>
+
+```mermaid
+flowchart TD
+  Q{"Primary goal?"}
+  Q -->|"GPU server quality"| GPU["FP8 / AWQ-INT4 + vLLM<br/>NOT classic BNN"]
+  Q -->|"CPU local LLM"| LLM{"BitNet checkpoint?"}
+  LLM -->|yes| BN["bitnet.cpp"]
+  LLM -->|no| GGUF["GGUF Q4_K_M"]
+  Q -->|"Edge vision, retrain OK"| EV["this repo — Bi-Real + packed GEMM"]
+  Q -->|"Phone NPU stock SDK"| NPU["INT8 / INT4<br/>no stock 1-bit"]
+  Q -->|"Packed XNOR research"| LAB["this repo — bnn optimise"]
+  Q -->|"Diffusion / production ASR"| AVOID["INT8 / FP8 PTQ<br/>not this audio lane"]
+  style LAB fill:#ddf4ff,stroke:#0969da
+  style GPU fill:#fff8c5,stroke:#9a6700
+  style BN fill:#fff8c5,stroke:#9a6700
+  style NPU fill:#fff8c5,stroke:#9a6700
+  style AVOID fill:#fff8c5,stroke:#9a6700
+```
+
+```bat
+bnn recommend --goal edge-vision
+```
+
+Also skip (or hybrid-skip) **small GEMMs / attention projections** (packing overhead wins; auto leaves them FP) and **drop-in HF LLMs without QAT** (cold binary PTQ cosine often collapses — the report REFUSEs unless `--force`).
+
+Full tree: [`docs/GUIDE_E2E.md`](docs/GUIDE_E2E.md) · [`docs/18_DECISION_TREE_AND_COMPLETE_ROADMAP.md`](docs/18_DECISION_TREE_AND_COMPLETE_ROADMAP.md) · limits: [`MODEL_CARD.md`](MODEL_CARD.md).
+
+---
+
+## Core kernel pipeline
+
+FP32 tensors are not “made binary” by `sign()` in `nn.Linear`. Inference **quantizes to ±1**, **packs 32 or 64 values into a `uint32`/`uint64` word**, then a SIMD kernel does **XNOR + popcount** and **scales** back. That pack is the **32×**. The popcount is the **speed**.
 
 ```mermaid
 flowchart LR
-  I["pip install -e .[dev]"] --> C["compile_native<br/>all platforms"]
-  C --> R["bnn repro"]
-  R --> P{"REPRO: PASS?"}
-  P -->|yes| O["bnn optimise"]
-  P -->|no| T["REPRODUCIBILITY.md<br/>+ issue templates"]
-  O --> G["GUIDE_E2E.md"]
+  FP["FP32 weights<br/>and activations"] --> Q["Quantize to ±1"]
+  Q --> P["Bit-pack<br/>32/64 values into<br/>uint32 / uint64"]
+  P --> X["SIMD XNOR + popcount<br/>AVX-512 / AVX2 / NEON"]
+  X --> S["Scale / dequant<br/>alpha · y + bias"]
+  S --> Y["Output activations"]
+  style P fill:#ddf4ff,stroke:#0969da
+  style X fill:#ddf4ff,stroke:#0969da
 ```
-
-### Then optimise
-
-```bat
-bnn optimise --policy auto --report results\optimise_report.json
-```
-
-```python
-from bnn.optimise import optimise_model, OptimiseConfig
-# docs/tutorials/07_OPTIMISER_QUICKSTART.md
-```
-
-Prefer **`bnn optimise`** over legacy `bnn wrap --ultra`. Same hybrid path; clearer product verb and report schema (`bnn_optimise_report_v1`).
-
----
-
-## How the stack fits together
 
 ```mermaid
 flowchart TB
-  CLI["bnn CLI"]
-  OPT["bnn.optimise<br/>policy · calib · QAT"]
-  WRAP["bnn.wrap<br/>PackedLinear / hybrid FFN"]
-  CODEC["bnn.codec<br/>.bnnpack encode / decode"]
-  KER["bnn.kernels<br/>binary_gemm.c"]
-  STEZ["bnn layers / models<br/>STE zoo"]
-  VIS["vision · audio · seq"]
-
-  CLI --> OPT
-  CLI --> CODEC
-  CLI --> STEZ
-  OPT --> WRAP
-  WRAP --> KER
-  CODEC --> KER
-  STEZ --> VIS
-  WRAP --> CODEC
-```
-
-**Installing does not require a compiler.** `setup.py` builds the kernel when a toolchain is present and falls back to NumPy otherwise. Prebuilt wheels (Linux / macOS / Windows × x86-64 / arm64) ship via the [`wheels`](.github/workflows/wheels.yml) workflow. On PyPI the distribution name is **`bnn-lab`** (`pip install bnn-lab`) — the short name `bnn` is already taken by an unrelated project; the import and CLI stay `bnn`. Live upload needs [Trusted Publishing](docs/PYPI_PUBLISH.md).
-
-```bat
-bnn validate-native          # selected ISA path, err = 0
-BNN_KERNEL=scalar bnn bench  # force scalar|avx2|avx512|neon
+  subgraph Train["Training — STE simulation"]
+    W["Full-precision latents"]
+    STE["Straight-through estimator"]
+    W --> STE
+    STE --> W
+  end
+  subgraph Infer["Inference — packed path"]
+    Pack["uint64 pack"]
+    GEMM["XNOR-popcount GEMM"]
+    Out["alpha · y + bias"]
+    Pack --> GEMM --> Out
+  end
+  STE -.->|"checkpoint / policy"| Pack
+  style Train fill:#f6f8fa,stroke:#57606a
+  style Infer fill:#ddf4ff,stroke:#0969da
 ```
 
 ---
 
-## Dual metrics — never conflate them
+## Wrap & optimisation flow
+
+`bnn optimise` does not blindly binarize every `Linear`. It **measures**, **assigns a per-layer policy**, optionally **QAT/distills**, then **refuses drop-in** when cosine is below the gate.
+
+```mermaid
+flowchart LR
+  M["FP / HF model"] --> Sens["Sensitivity<br/>per-layer"]
+  Sens --> Pol{"Layer policy"}
+  Pol -->|"binary"| Bin["Packed XNOR<br/>32× size"]
+  Pol -->|"ternary"| Ter["Bitplane 1.58-bit"]
+  Pol -->|"skip"| Skip["Keep FP32"]
+  Bin --> Rec["QAT / distill<br/>optional"]
+  Ter --> Rec
+  Skip --> Rec
+  Rec --> Gate{"Drop-in honesty<br/>cosine vs threshold"}
+  Gate -->|"pass"| OK["status: OK<br/>drop_in_ok true"]
+  Gate -->|"fail"| RF["status: REFUSE<br/>unless --force"]
+  style OK fill:#dafbe1,stroke:#1a7f37
+  style RF fill:#ffebe9,stroke:#cf222e
+```
+
+Default `--policy auto` on the documented hybrid demo lands **cosine ~0.70** and **REFUSE_DROP_IN** — that is working as designed, not a silent 32× quality claim. Ternary+QAT can reach cosine **0.991** and still **lose** wall-clock (e2e **0.73×**). The product gap is hybrid/binary that is **both** drop-in **and** faster — not paperwork.
+
+Layer search is monotonic and tested: **32× is available at cosine 0.27.** That is why the search exists.
+
+| `quality_floor` | final cosine | theoretical compression | assignment |
+|---|---|---|---|
+| 0.00 | 0.271 | **32.0×** | 3 binary |
+| 0.90 | 0.950 | 1.71× | 1 ternary, 2 skip |
+| 0.999 | 1.000 | 1.00× | 3 skip |
+
+Details: [`docs/42_QAT_AND_LAYER_SEARCH.md`](docs/42_QAT_AND_LAYER_SEARCH.md) · tutorial [`07`](docs/tutorials/07_OPTIMISER_QUICKSTART.md).
+
+---
+
+## SIMD execution ladder
+
+One C source. ISA is chosen at **run** time — never `-march=native` baking the builder’s CPU into a wheel. AVX-512 is used when present, **never required**. **WASM SIMD128** is a **pedagogy** path (`wasm/`), not a substitute for the native kernel.
+
+```mermaid
+flowchart TB
+  Call["binary_gemm"] --> Det{"cpuid / xgetbv<br/>or ARM features"}
+  Det -->|"x86_64 + VPOPCNTDQ"| AVX512["AVX-512"]
+  Det -->|"x86_64 else"| AVX2["AVX2 nibble LUT"]
+  Det -->|"ARM64 / Apple Silicon"| NEON["NEON vcnt"]
+  Det -->|"none of the above"| Scalar["Scalar popcount"]
+  AVX512 --> Done["OpenMP + 4-row blocking<br/>optional alpha/bias epilogue"]
+  AVX2 --> Done
+  NEON --> Done
+  Scalar --> Done
+  Done --> Native{"native library loaded?"}
+  Native -->|yes| Fast["Packed SIMD GEMM"]
+  Native -->|no| NP["Portable NumPy fallback<br/>correct, not always fast"]
+  WASM["WASM SIMD128<br/>pedagogy only"] -.->|"not the production dispatch"| Call
+  style AVX512 fill:#ddf4ff,stroke:#0969da
+  style AVX2 fill:#ddf4ff,stroke:#0969da
+  style NEON fill:#ddf4ff,stroke:#0969da
+  style WASM fill:#f6f8fa,stroke:#57606a
+  style NP fill:#fff8c5,stroke:#9a6700
+```
+
+| Platform | Native | Production ladder |
+|----------|--------|-------------------|
+| Linux x86-64 (GCC/Clang) | yes | AVX-512 → AVX2 → scalar |
+| Windows x64 (MSVC) | yes | AVX-512 → AVX2 → scalar |
+| macOS / Linux arm64 | yes | NEON |
+| macOS x86-64 | yes | AVX2 → scalar |
+| Browser / teaching | WASM SIMD128 | pedagogy — [`wasm/`](wasm/) |
+| Anything else | NumPy packed GEMM | correctness first |
+
+Deep dive: [`docs/41_PORTABLE_SIMD_KERNEL.md`](docs/41_PORTABLE_SIMD_KERNEL.md).
+
+```bat
+bnn validate-native          # selected ISA path, err = 0
+BNN_KERNEL=scalar bnn bench  # force scalar / avx2 / avx512 / neon
+```
+
+---
+
+## Dual-metric benchmarks
+
+Never equate pack math with latency.
 
 ```mermaid
 flowchart LR
   subgraph Theory["Theory / size"]
     T1["32× weight pack<br/>uint64 aligned"]
-    T2["~64× word ops<br/>XNOR–popcount"]
+    T2["~64× word ops<br/>XNOR-popcount"]
   end
   subgraph Wall["Wall-clock / energy-proxy"]
     W1["Kernel microbench<br/>prepacked GEMM"]
@@ -212,10 +318,10 @@ flowchart LR
 | Weight pack **32.00×** | Exact | End-to-end latency |
 | Native GEMM **err = 0** | Exact (when native loaded) | Accuracy of a wrapped LLM |
 | ISA paths agree | Exact | Cross-machine float identity |
-| Kernel vs NumPy / Torch | Wall-clock (machine-dependent) | Full-model FPS |
+| **~23.9×** vs NumPy FP32 at 64×4096×4096 | Wall-clock (machine-dependent) | Full-model FPS / GPU 32× |
 | Wrap e2e speedup | Wall-clock (machine-dependent) | Drop-in quality |
 
-Committed snapshot (CPU; see [`results/SUMMARY.md`](results/SUMMARY.md)):
+Committed snapshot (CPU; [`results/SUMMARY.md`](results/SUMMARY.md)):
 
 | Check | Result |
 |-------|--------|
@@ -249,70 +355,53 @@ Details: [`docs/41_PORTABLE_SIMD_KERNEL.md`](docs/41_PORTABLE_SIMD_KERNEL.md).
 
 </details>
 
-> Floors live in [`tests/golden_floors.json`](tests/golden_floors.json). Wall-clock ratios move with CPU, threads, and OpenMP — gates check conclusions, not bit-identical floats.
+> Floors live in [`tests/golden_floors.json`](tests/golden_floors.json). Wall-clock ratios move with CPU, threads, and OpenMP — gates check **conclusions**, not bit-identical floats.
 
 ---
 
-## Runtime: one build, fastest legal SIMD
+## Ecosystem & bridges
 
-One C source. ISA chosen at **run** time — never `-march=native` tying a wheel to the builder’s CPU. AVX-512 is used when present, never required.
+This lab occupies **packed PyTorch BNN optimisation** now that **Larq (TF/Keras) is archived**. It does **not** compete with bitnet.cpp on LLM tok/s, or with torchao/vLLM on GPU INT4/FP8. When those win, `bnn bridge` / `bnn recommend` say so.
 
 ```mermaid
 flowchart TB
-  Start["binary_gemm call"] --> Detect{"cpuid + xgetbv<br/>/ ARM features"}
-  Detect -->|x86 VPOPCNTDQ| AVX512["AVX-512 path"]
-  Detect -->|x86 else| AVX2["AVX2 nibble LUT"]
-  Detect -->|arm64| NEON["NEON vcnt"]
-  Detect -->|none| Scalar["Scalar popcount"]
-  AVX512 --> Done["OpenMP + 4-row blocking<br/>optional α/bias epilogue"]
-  AVX2 --> Done
-  NEON --> Done
-  Scalar --> Done
-  Done --> Fallback{"native loaded?"}
-  Fallback -->|no| NumPy["NumPy packed GEMM<br/>correctness preserved"]
+  subgraph Lab["This lab — bnn-lab"]
+    OPT["bnn.optimise"]
+    KER["Packed XNOR / ternary GEMM"]
+    COD[".bnnpack codec"]
+    OPT --> KER
+    OPT --> COD
+    COD --> KER
+  end
+  PT["PyTorch STE train"] --> OPT
+  HF["Hugging Face models"] --> OPT
+  KER -.->|"ONNX = bridge only"| ONNX["ONNX Runtime"]
+  OPT -.->|"GPU quality"| TAO["torchao / AWQ / FP8<br/>vLLM"]
+  OPT -.->|"BitNet-style CPU LLM"| BCPP["bitnet.cpp"]
+  OPT -.->|"generic local LLM"| GGUF2["llama.cpp GGUF"]
+  style Lab fill:#ddf4ff,stroke:#0969da
+  style TAO fill:#fff8c5,stroke:#9a6700
+  style BCPP fill:#fff8c5,stroke:#9a6700
 ```
-
-| Platform | Native | SIMD ladder |
-|----------|--------|-------------|
-| Linux x86-64 (GCC/Clang) | yes | AVX-512 → AVX2 → scalar |
-| Windows x64 (MSVC) | yes | AVX-512 → AVX2 → scalar |
-| macOS / Linux arm64 | yes | NEON |
-| macOS x86-64 | yes | AVX2 → scalar |
-| Anything else | NumPy fallback | correctness first |
-
-Deep dive: [`docs/41_PORTABLE_SIMD_KERNEL.md`](docs/41_PORTABLE_SIMD_KERNEL.md).
-
----
-
-## When **not** to use this
-
-Honesty is the product. If another stack wins, we say so.
 
 ```mermaid
-flowchart TD
-  Q{"Deployment goal?"}
-  Q -->|"GPU server quality"| GPU["FP8 / AWQ-INT4 + vLLM<br/>NOT classic BNN"]
-  Q -->|"CPU local LLM"| LLM{"BitNet-style?"}
-  LLM -->|yes| BN["bitnet.cpp"]
-  LLM -->|no| GGUF["GGUF Q4_K_M"]
-  Q -->|"Edge vision, retrain OK"| EV["Bi-Real + this repo<br/>or LCE / FINN"]
-  Q -->|"Phone NPU stock SDK"| NPU["INT8 / INT4<br/>no stock 1-bit"]
-  Q -->|"Research XNOR kernels"| BNN["this repo — bnn"]
-  Q -->|"Diffusion fidelity"| DIFF["INT8 / FP8 PTQ<br/>avoid full BNN"]
-  Q -->|"Production ASR"| ASR["INT8 Whisper / ORT<br/>audio lane here is synthetic"]
+flowchart TB
+  CLI["bnn CLI"]
+  OPT2["bnn.optimise<br/>policy · calib · QAT"]
+  WRAP["bnn.wrap<br/>PackedLinear / hybrid FFN"]
+  CODEC["bnn.codec"]
+  KER2["bnn.kernels"]
+  STEZ["STE zoo · vision · audio · seq"]
+  CLI --> OPT2
+  CLI --> CODEC
+  CLI --> STEZ
+  OPT2 --> WRAP
+  WRAP --> KER2
+  CODEC --> KER2
+  WRAP --> CODEC
 ```
 
-```bat
-bnn recommend --goal edge-vision
-```
-
-Also skip (or hybrid-skip) when:
-
-- **Small GEMMs / attention projections** — packing overhead dominates; auto policy leaves them FP
-- **Drop-in HF LLM without QAT** — cold binary PTQ cosine often collapses; reports refuse drop-in unless `--force`
-- **Claiming GPU 32× from `sign()`** — forbidden forever ([good first issue theme](https://github.com/KanakMalpani/Binary-Neural-Networks/issues/1))
-
-Full tree: [`docs/18_DECISION_TREE_AND_COMPLETE_ROADMAP.md`](docs/18_DECISION_TREE_AND_COMPLETE_ROADMAP.md) · limits: [`MODEL_CARD.md`](MODEL_CARD.md).
+**Installing does not require a compiler.** `setup.py` builds the kernel when a toolchain is present and falls back to NumPy otherwise. Prebuilt wheels (Linux / macOS / Windows × x86-64 / arm64) ship via [`wheels.yml`](.github/workflows/wheels.yml). Live `pip install bnn-lab` from PyPI still needs [Trusted Publishing](docs/PYPI_PUBLISH.md).
 
 ---
 
@@ -321,30 +410,25 @@ Full tree: [`docs/18_DECISION_TREE_AND_COMPLETE_ROADMAP.md`](docs/18_DECISION_TR
 | Path | Command / entry | Docs |
 |------|-----------------|------|
 | Optimiser | `bnn optimise --policy auto` | [GUIDE §4](docs/GUIDE_E2E.md) · [tutorial 07](docs/tutorials/07_OPTIMISER_QUICKSTART.md) · [HF 08](docs/tutorials/08_HF_OPTIMISER.md) |
-| **Per-layer search** | `bnn.wrap.search_layer_modes(...)` | [docs/42](docs/42_QAT_AND_LAYER_SEARCH.md) — binary vs ternary vs skip, per layer |
+| **Per-layer search** | `bnn.wrap.search_layer_modes(...)` | [docs/42](docs/42_QAT_AND_LAYER_SEARCH.md) |
 | **QAT recovery** | `bnn optimise --qat-steps 200` | [docs/42](docs/42_QAT_AND_LAYER_SEARCH.md) — search *before* QAT |
-| **Memory footprint** | `bnn memory --dim 1024 --ff 4096` | [docs/43](docs/43_MEMORY_FOOTPRINT.md) — resident vs theoretical |
+| **Memory footprint** | `bnn memory --dim 1024 --ff 4096` | [docs/43](docs/43_MEMORY_FOOTPRINT.md) |
 | Codec | `bnn encode` / `bnn decode` | [GUIDE §5](docs/GUIDE_E2E.md) |
 | MNIST STE | `bnn train --epochs 3 --seed 42` | pedagogy — not a throughput win |
 | Vision | `bnn train-image --epochs 8 --subset 30000` | [tutorial 04](docs/tutorials/04_image_cifar.md) |
 | Audio | `bnn train-audio --epochs 5` | [tutorial 05](docs/tutorials/05_audio.md) — synthetic only |
 | Seq2seq / profile | `bnn train-seq2seq` · `bnn profile` | [tutorial 06](docs/tutorials/06_encoder_decoder.md) |
 
-### The layer search, in one table
-
-`search_layer_modes` starts every layer binary and relaxes whatever costs the
-most quality, re-measuring the **whole** model each step. The trade-off is
-monotonic — and tested as such, because a search that ever reported *more*
-compression at *higher* quality would be lying:
-
-| `quality_floor` | final cosine | theoretical compression | assignment |
-|---|---|---|---|
-| 0.00 | 0.271 | **32.0×** | 3 binary |
-| 0.90 | 0.950 | 1.71× | 1 ternary, 2 skip |
-| 0.999 | 1.000 | 1.00× | 3 skip |
-
-That first row is the honest headline: **32× is available, at cosine 0.27.**
-Which is exactly why the search exists.
+| Start here | |
+|--|--|
+| **Human path** | [`docs/GUIDE_E2E.md`](docs/GUIDE_E2E.md) — install → repro → optimise |
+| **Browsable docs** | [GitHub Pages](https://kanakmalpani.github.io/Binary-Neural-Networks/) |
+| **Reproduce** | [`REPRODUCIBILITY.md`](REPRODUCIBILITY.md) · `bnn repro` |
+| **AI agents** | [`AGENTS.md`](AGENTS.md) |
+| **Knowledge graph** | [`knowledge_graph/`](knowledge_graph/) · [`docs/44_KNOWLEDGE_GRAPH.md`](docs/44_KNOWLEDGE_GRAPH.md) |
+| **Roadmap** | [`ROADMAP.md`](ROADMAP.md) |
+| **Compatibility** | [`docs/COMPATIBILITY_MATRIX.md`](docs/COMPATIBILITY_MATRIX.md) |
+| **Limits** | [`MODEL_CARD.md`](MODEL_CARD.md) |
 
 ```
 bnn/           STE, layers, models, optimise, export, determinism
@@ -370,7 +454,7 @@ Public API: `import bnn` — [`docs/api/README.md`](docs/api/README.md). CLI: `b
 | Trainable BNN + BitLinear pedagogy + optimiser | Full BitNet LLM pretrain |
 | Dual-metric culture and repro gates | Bit-identical floats across OS/CPU |
 | Bridges toward INT4 / FP8 / bitnet.cpp | A cuDNN / TensorRT replacement |
-| Lab / beta on the road to v1.0 | “World-class optimiser” until [`ROADMAP.md`](ROADMAP.md) WC gates pass |
+| Tagged **v1.0.0** lab (PyPI upload still human) | A fake-binary GPU 32× story |
 
 ---
 
@@ -379,6 +463,7 @@ Public API: `import bnn` — [`docs/api/README.md`](docs/api/README.md). CLI: `b
 - [`CONTRIBUTING.md`](CONTRIBUTING.md) · [`CHANGELOG.md`](CHANGELOG.md) · [`SECURITY.md`](SECURITY.md) · [`docs/LAUNCH_CHECKLIST.md`](docs/LAUNCH_CHECKLIST.md)
 - Product direction: [`ROADMAP.md`](ROADMAP.md) (Phases A→F; workstreams W1–W14)
 - API reference is **generated** from docstrings (`mkdocs build --strict` in CI) — see [`docs/api/`](docs/api/); a renamed symbol breaks the build rather than silently emptying a page
+- Site: [kanakmalpani.github.io/Binary-Neural-Networks](https://kanakmalpani.github.io/Binary-Neural-Networks/)
 - Supply chain: wheels + sdist carry signed [build provenance](https://docs.github.com/actions/security-guides/using-artifact-attestations) (`gh attestation verify`), and `pip-audit` is a **hard gate** on the shipped dependency set with every ignore triaged in [`ci.yml`](.github/workflows/ci.yml)
 - Agents: [`AGENTS.md`](AGENTS.md) — do not invent alternate golden shapes
 - CI: [`ci.yml`](.github/workflows/ci.yml) — quality (ruff/mypy/coverage ≥80%), Windows + Linux native (export-check, repro), **portability** (linux-arm64 NEON, macos-arm64 NEON, macos-x86_64) per [`COMPATIBILITY_MATRIX.md`](docs/COMPATIBILITY_MATRIX.md), Python 3.11–3.13; plus [CodeQL](.github/workflows/codeql.yml), [Scorecard](.github/workflows/scorecard.yml), [wheels](.github/workflows/wheels.yml)

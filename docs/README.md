@@ -7,6 +7,7 @@ Start here if you are new to the repo.
 | Doc | Why |
 |-----|-----|
 | [`GUIDE_E2E.md`](GUIDE_E2E.md) | **Primary User Guide** — zero → optimiser results (follow this) |
+| [GitHub Pages](https://kanakmalpani.github.io/Binary-Neural-Networks/) | Browsable MkDocs site (API autodoc) |
 | [`../REPRODUCIBILITY.md`](../REPRODUCIBILITY.md) | Exact repro commands, goldens, troubleshooting |
 | [`../AGENTS.md`](../AGENTS.md) | Ordered steps for coding agents |
 | [`25_ONEPAGER.md`](25_ONEPAGER.md) | Executive decision tree (honest) |
