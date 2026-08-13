@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Docs: first-principles 90-day transformation plan (`docs/TRANSFORMATION_PLAN.md`) — proposal only; does not flip ROADMAP WC checkboxes or invent goldens.
+
 ## [1.0.0] — 2026-08-05
 
 ### Wave 2 integrator + Wave 3 v1.0

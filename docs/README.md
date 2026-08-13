@@ -42,6 +42,7 @@ Ordered path (also nested inside [`GUIDE_E2E.md`](GUIDE_E2E.md)):
 | [`LAUNCH_CHECKLIST.md`](LAUNCH_CHECKLIST.md) | Public launch checklist |
 | [`FAIR_EVAL_PROTOCOL.md`](FAIR_EVAL_PROTOCOL.md) | Dual-metric fair eval |
 | [`MOONSHOT_DEFERRALS.md`](MOONSHOT_DEFERRALS.md) | Explicit v1.0 leftovers (W2.T04/T05 removed — delivered) |
+| [`TRANSFORMATION_PLAN.md`](TRANSFORMATION_PLAN.md) | First-principles 90-day exponential plan (proposal; does not flip ROADMAP boxes) |
 | [`37_WORLD_CLASS_BNN_OPTIMISER_ROADMAP.md`](37_WORLD_CLASS_BNN_OPTIMISER_ROADMAP.md) | Canonical world-class plan (twin of root `ROADMAP.md`) |
 | [`38_ROADMAP_EXECUTION_LOG.md`](38_ROADMAP_EXECUTION_LOG.md) | Session execution log |
 | [`SEMVER_AND_DEPRECATION.md`](SEMVER_AND_DEPRECATION.md) | Public API semver policy |
