@@ -160,6 +160,29 @@ def test_readme_does_not_claim_live_pypi_install():
             raise AssertionError(f"README claims live PyPI install: {stripped}")
 
 
+def _git_pip_fences(text: str) -> list[str]:
+    fences = re.findall(r"```(?:bat|bash|sh)?\n(.*?)```", text, re.S)
+    return [b for b in fences if "git+" in b and "bnn-lab @" in b]
+
+
+def test_git_pip_fences_do_not_run_script_clis():
+    """Non-editable git-pip wheels do not ship scripts/; do not run bnn repro after them."""
+    banned = ("bnn repro", "bnn optimise", "bnn recommend")
+    for path in (ROOT / "README.md", ROOT / "docs" / "GUIDE_E2E.md"):
+        fences = _git_pip_fences(path.read_text(encoding="utf-8"))
+        assert fences, f"{path.name} should still document git-pip install"
+        for block in fences:
+            for cmd in banned:
+                assert cmd not in block, f"{path.name} runs {cmd!r} after git-pip:\n{block}"
+
+
+def test_readme_does_not_claim_windows_arm64_wheel():
+    text = (ROOT / "README.md").read_text(encoding="utf-8")
+    assert "windows-amd64" in text
+    assert "no Windows ARM64" in text or "no Windows arm64" in text.lower()
+    assert "Windows × x86-64 / arm64" not in text
+
+
 def test_readme_kernel_wrap_simd_bridge_diagrams():
     """Landing page must ship the four concept diagrams (GitHub-renderable mermaid)."""
     text = (ROOT / "README.md").read_text(encoding="utf-8")

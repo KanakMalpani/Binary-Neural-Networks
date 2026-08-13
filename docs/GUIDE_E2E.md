@@ -86,12 +86,34 @@ PyPI **`bnn-lab` is not live yet** (human Trusted Publisher — [`PYPI_PUBLISH.m
 Until then, install from Git or an editable clone. Do **not** treat `pip install bnn-lab`
 as a working PyPI command.
 
+A non-editable git-pip wheel does **not** include repo `scripts/`. Do **not** run
+`bnn repro` / `bnn optimise` / `bnn recommend` on the next line after that install —
+those CLIs need a clone. Library-only path:
+
 ```bat
 pip install "bnn-lab @ git+https://github.com/KanakMalpani/Binary-Neural-Networks.git@v1.0.0"
-bnn repro
 ```
 
-### 3.1 Clone and install
+```python
+import torch
+import torch.nn as nn
+from bnn.optimise import OptimiseConfig, optimise_model
+
+class Tiny(nn.Module):
+    def __init__(self):
+        super().__init__()
+        self.ffn_fc1 = nn.Linear(64, 256)
+        self.ffn_fc2 = nn.Linear(256, 64)
+
+    def forward(self, x):
+        return self.ffn_fc2(torch.relu(self.ffn_fc1(x)))
+
+x = torch.randn(8, 64)
+result = optimise_model(Tiny(), x, OptimiseConfig(policy="auto"))
+print(result.payload["compression_replaced_weights"], result.payload["status"])
+```
+
+### 3.1 Clone and install (CLI: `bnn repro` / `bnn optimise`)
 
 **Windows:**
 

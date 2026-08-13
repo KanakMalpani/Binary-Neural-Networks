@@ -78,23 +78,35 @@ It is **not** a claim that `sign()` is 32× faster on GPU. Compression **32×** 
 
 PyPI **`bnn-lab` is not live yet** (human [Trusted Publisher](docs/PYPI_PUBLISH.md) residual). Until that upload, install from Git. The short name `bnn` on PyPI is an unrelated package — import and CLI here stay `bnn`.
 
+A non-editable `pip install "bnn-lab @ git+…"` is a **library wheel**. It does **not** ship repo `scripts/`. `bnn repro`, `bnn optimise`, and `bnn recommend` call those scripts — use them only after a clone. Do **not** put `bnn repro` on the next line after a wheel install.
+
+### Git pip — Python API only
+
 ```bat
 pip install "bnn-lab @ git+https://github.com/KanakMalpani/Binary-Neural-Networks.git@v1.0.0"
-bnn repro
-bnn optimise --policy auto --report results\optimise_report.json
 ```
 
 ```python
+import torch
+import torch.nn as nn
 from bnn.optimise import OptimiseConfig, optimise_model
 
-result = optimise_model(model, calib_inputs, OptimiseConfig(policy="auto"))
+class Tiny(nn.Module):
+    def __init__(self):
+        super().__init__()
+        self.ffn_fc1 = nn.Linear(64, 256)
+        self.ffn_fc2 = nn.Linear(256, 64)
+
+    def forward(self, x):
+        return self.ffn_fc2(torch.relu(self.ffn_fc1(x)))
+
+x = torch.randn(8, 64)
+result = optimise_model(Tiny(), x, OptimiseConfig(policy="auto"))
 print(result.payload["compression_replaced_weights"])  # 32× pack — size, not latency
 print(result.payload["status"])                        # OK or REFUSE_DROP_IN_CLAIM
 ```
 
-Expect **`REPRO: PASS`** (exit 0). The report prints **compression**, **cosine**, **wall-clock**, and **REFUSE/OK**. Prefer **`bnn optimise`** over legacy `bnn wrap --ultra`.
-
-Dev clone (extras + constraints; optional native compile):
+### Clone — CLI (`bnn repro` / `bnn optimise` / `bnn recommend`)
 
 ```bat
 git clone https://github.com/KanakMalpani/Binary-Neural-Networks.git
@@ -102,7 +114,11 @@ cd Binary-Neural-Networks
 pip install -e ".[dev]" -c constraints.txt
 python -m bnn.kernels.compile_native
 bnn repro
+bnn optimise --policy auto --report results\optimise_report.json
+bnn recommend --goal edge-vision
 ```
+
+Expect **`REPRO: PASS`** (exit 0). The report prints **compression**, **cosine**, **wall-clock**, and **REFUSE/OK**. Prefer **`bnn optimise`** over legacy `bnn wrap --ultra`.
 
 No compiler? Install still succeeds — the NumPy packed path stays **correct**. Windows native needs **MSVC x64** (MinGW 32-bit → WinError 193). Full path: [`docs/GUIDE_E2E.md`](docs/GUIDE_E2E.md).
 
@@ -174,6 +190,8 @@ flowchart TD
 ```bat
 bnn recommend --goal edge-vision
 ```
+
+(`bnn recommend` needs the clone / editable install above — not a git-pip wheel.)
 
 Also skip (or hybrid-skip) **small GEMMs / attention projections** (packing overhead wins; auto leaves them FP) and **drop-in HF LLMs without QAT** (cold binary PTQ cosine often collapses — the report REFUSEs unless `--force`).
 
@@ -258,7 +276,7 @@ One C source. ISA is chosen at **run** time — never `-march=native` baking the
 
 ```mermaid
 flowchart TB
-  Call["binary_gemm"] --> Det{"cpuid / xgetbv<br/>or ARM features"}
+  Entry["binary_gemm"] --> Det{"cpuid / xgetbv<br/>or ARM features"}
   Det -->|"x86_64 + VPOPCNTDQ"| AVX512["AVX-512"]
   Det -->|"x86_64 else"| AVX2["AVX2 nibble LUT"]
   Det -->|"ARM64 / Apple Silicon"| NEON["NEON vcnt"]
@@ -270,7 +288,7 @@ flowchart TB
   Done --> Native{"native library loaded?"}
   Native -->|yes| Fast["Packed SIMD GEMM"]
   Native -->|no| NP["Portable NumPy fallback<br/>correct, not always fast"]
-  WASM["WASM SIMD128<br/>pedagogy only"] -.->|"not the production dispatch"| Call
+  WASM["WASM SIMD128<br/>pedagogy only"] -.->|"not the production dispatch"| Entry
   style AVX512 fill:#ddf4ff,stroke:#0969da
   style AVX2 fill:#ddf4ff,stroke:#0969da
   style NEON fill:#ddf4ff,stroke:#0969da
@@ -401,7 +419,7 @@ flowchart TB
   WRAP --> CODEC
 ```
 
-**Installing does not require a compiler.** `setup.py` builds the kernel when a toolchain is present and falls back to NumPy otherwise. Prebuilt wheels (Linux / macOS / Windows × x86-64 / arm64) ship via [`wheels.yml`](.github/workflows/wheels.yml). Live `pip install bnn-lab` from PyPI still needs [Trusted Publishing](docs/PYPI_PUBLISH.md).
+**Installing does not require a compiler.** `setup.py` builds the kernel when a toolchain is present and falls back to NumPy otherwise. Prebuilt wheels from [`wheels.yml`](.github/workflows/wheels.yml) are five cibuildwheel jobs — **linux-x86_64**, **linux-aarch64**, **windows-amd64**, **macos-arm64**, **macos-x86_64** — and land as Actions / `v*` tag artifacts until Trusted Publisher. There is **no Windows ARM64** wheel. Live `pip install bnn-lab` from PyPI still needs [Trusted Publishing](docs/PYPI_PUBLISH.md).
 
 ---
 
