@@ -277,10 +277,10 @@
     <node id="paper_litespark">
       <data key="label">Litespark Inference (2026)</data>
       <data key="type">Paper</data>
-      <data key="summary">SIMD ternary CPU kernels; survey cites ~18× Apple Silicon / extreme x86 vs naive PyTorch — not reproduced in this lab (OpenGap for local numbers).</data>
+      <data key="summary">Dade et al. arXiv:2605.06485 — SIMD ternary CPU kernels (Litespark-Inference). Paper claims large speedups vs naive PyTorch on Apple Silicon / x86. Not reproduced in this lab; local numbers stay OpenGap (gap_litespark_local). Do not copy paper × as goldens.</data>
       <data key="confidence">0.65</data>
       <data key="status">literature</data>
-      <data key="sources">arXiv:2605.06485 | docs/02_SOTA_SURVEY.md</data>
+      <data key="sources">arXiv:2605.06485 | https://arxiv.org/abs/2605.06485 | docs/02_SOTA_SURVEY.md</data>
     </node>
     <node id="paper_awq">
       <data key="label">AWQ: Activation-aware Weight Quantization</data>
@@ -1029,9 +1029,9 @@
     <node id="gap_fbi_llm_repro">
       <data key="label">OpenGap: FBI-LLM / Full Binary LLM Repro</data>
       <data key="type">OpenGap</data>
-      <data key="summary">Literature path for fully binary LLMs; not a lab gate; cite only.</data>
+      <data key="summary">Fully binary LLM path (FBI-LLM, arXiv:2407.07093) is literature / accepted non-goal — cite only; this lab does not reproduce it as a gate.</data>
       <data key="confidence">0.75</data>
-      <data key="status">open</data>
+      <data key="status">accepted_non_goal</data>
       <data key="sources">arXiv:2407.07093 | ROADMAP.md | docs/MOONSHOT_DEFERRALS.md</data>
     </node>
     <node id="tool_executorch">
@@ -1329,6 +1329,30 @@
       <data key="confidence">0.95</data>
       <data key="status">locked</data>
       <data key="sources">docs/imagenet_protocol.md | docs/MOONSHOT_DEFERRALS.md | ROADMAP.md</data>
+    </node>
+    <node id="paper_scaleq_158">
+      <data key="label">ScaleQ-1.58 / AYOT (Wang et al. 2026)</data>
+      <data key="type">Paper</data>
+      <data key="summary">Wang et al. arXiv:2608.01078 — ternary PTQ for reasoning LLMs: Attend to Your Own Thoughts (AYOT) calibration + CAT-Q. Paper reports Qwen3-1.7B ternary &gt;90.52% of BitNet b1.58 2B4T on 4 math/coding tasks with 4M calib tokens, and a Qwen3-4B absolute +8.97% vs that baseline; claims scaling to 235B. Literature only — this lab does not reproduce ScaleQ or treat those figures as goldens. Distinct from naive absmean PTQ wipe.</data>
+      <data key="confidence">0.78</data>
+      <data key="status">literature</data>
+      <data key="sources">arXiv:2608.01078 | https://arxiv.org/abs/2608.01078 | docs/TRANSFORMATION_PLAN.md</data>
+    </node>
+    <node id="paper_bitembed">
+      <data key="label">BitEmbed / BITEMBED (Li et al. 2026)</data>
+      <data key="type">Paper</data>
+      <data key="summary">Li et al. arXiv:2606.25674 — convert pretrained LLM backbones into BitNet-style text embedders (ternary weights, quantized activations) via contrastive CPT + teacher distillation; MMTEB (eng, v2) experiments on Qwen3-0.6B / Gemma3-270M. Literature only. docs/15 names BitEmbed as an embeddings routing hint — not a lab golden.</data>
+      <data key="confidence">0.78</data>
+      <data key="status">literature</data>
+      <data key="sources">arXiv:2606.25674 | https://arxiv.org/abs/2606.25674 | docs/15_MODEL_CLASSES_AND_DEPLOYMENT.md</data>
+    </node>
+    <node id="paper_vibeasr_bitnet">
+      <data key="label">VibeVoice-ASR-BitNet (Xu et al. 2026)</data>
+      <data key="type">Paper</data>
+      <data key="summary">Xu et al. arXiv:2607.21075 — VibeVoice-ASR-BitNet: INT8 VAE acoustic tokenizer + BitNet-style ternary AR LM; paper claims 1.6–2.3× vs Whisper.cpp at ~1.6 GB and RTF &lt; 1 on low-thread CPUs. Their stack, not this lab. Audio lane remains synthetic pedagogy (decision_nongoal_asr_whisper).</data>
+      <data key="confidence">0.75</data>
+      <data key="status">literature</data>
+      <data key="sources">arXiv:2607.21075 | https://arxiv.org/abs/2607.21075 | docs/TRANSFORMATION_PLAN.md</data>
     </node>
     <edge id="e0" source="thesis_lock" target="dual_metric_culture">
       <data key="relation">requires</data>
@@ -2759,6 +2783,56 @@
       <data key="relation">implements</data>
       <data key="evidence">bnn/wrap/sensitivity.py | docs/42_QAT_AND_LAYER_SEARCH.md | PR #19 merged</data>
       <data key="weight">1.0</data>
+    </edge>
+    <edge id="e286" source="paper_scaleq_158" target="paper_bitnet_b158">
+      <data key="relation">derived_from</data>
+      <data key="evidence">arXiv:2608.01078 — ternary 1.58-bit PTQ of existing LLMs</data>
+      <data key="weight">0.85</data>
+    </edge>
+    <edge id="e287" source="paper_scaleq_158" target="ptq_ternary_llm_wipe">
+      <data key="relation">improves</data>
+      <data key="evidence">arXiv:2608.01078 — AYOT calibration vs conventional PTQ collapse on math/code</data>
+      <data key="weight">0.8</data>
+    </edge>
+    <edge id="e288" source="paper_scaleq_158" target="paper_bitnet_2b4t">
+      <data key="relation">cites</data>
+      <data key="evidence">arXiv:2608.01078 compares ternary Qwen3 vs BitNet b1.58 2B4T</data>
+      <data key="weight">0.75</data>
+    </edge>
+    <edge id="e289" source="paper_scaleq_158" target="paper_bitdistill">
+      <data key="relation">alternative_to</data>
+      <data key="evidence">ScaleQ is PTQ+AYOT; BitDistill is CPT+distill — neither is a lab golden</data>
+      <data key="weight">0.7</data>
+    </edge>
+    <edge id="e290" source="paper_bitembed" target="paper_bitnet_b158">
+      <data key="relation">derived_from</data>
+      <data key="evidence">arXiv:2606.25674 — BitNet-style ternary embedders</data>
+      <data key="weight">0.85</data>
+    </edge>
+    <edge id="e291" source="paper_bitembed" target="decision_wrap_tree">
+      <data key="relation">recommends_for</data>
+      <data key="evidence">docs/15_MODEL_CLASSES_AND_DEPLOYMENT.md — embeddings → BitEmbed / INT8</data>
+      <data key="weight">0.7</data>
+    </edge>
+    <edge id="e292" source="paper_vibeasr_bitnet" target="paper_bitnet_b158">
+      <data key="relation">derived_from</data>
+      <data key="evidence">arXiv:2607.21075 — BitNet-style ternary AR LM for ASR</data>
+      <data key="weight">0.8</data>
+    </edge>
+    <edge id="e293" source="paper_vibeasr_bitnet" target="decision_nongoal_asr_whisper">
+      <data key="relation">blocked_by</data>
+      <data key="evidence">Production ASR is an accepted non-goal; do not treat VibeASR numbers as lab goldens</data>
+      <data key="weight">0.9</data>
+    </edge>
+    <edge id="e294" source="paper_vibeasr_bitnet" target="sys_audio_synth">
+      <data key="relation">alternative_to</data>
+      <data key="evidence">Lab audio lane is synthetic pedagogy; VibeASR-BitNet is their production-style stack</data>
+      <data key="weight">0.75</data>
+    </edge>
+    <edge id="e295" source="paper_litespark" target="paper_bitnet_b158">
+      <data key="relation">derived_from</data>
+      <data key="evidence">arXiv:2605.06485 — SIMD kernels for ternary 1.58-bit LMs</data>
+      <data key="weight">0.7</data>
     </edge>
   </graph>
 </graphml>

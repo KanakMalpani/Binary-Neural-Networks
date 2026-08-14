@@ -1,12 +1,12 @@
 {
   "meta": {
     "name": "Binary Neural Networks Lab Knowledge Graph",
-    "version": "1.2.0",
+    "version": "1.3.0",
     "repo": "https://github.com/KanakMalpani/Binary-Neural-Networks",
     "thesis_lock": "Packed CPU/edge XNOR-popcount + honest STE; never claim GPU 32× from sign(); 32× compression ≠ 32× latency.",
-    "generated_by": "scripts/build_bnn_kg.py + scripts/merge_kg_enrichment.py + scripts/apply_kg_integrity.py",
-    "node_count": 165,
-    "edge_count": 286,
+    "generated_by": "scripts/build_bnn_kg.py + scripts/merge_kg_enrichment.py + scripts/apply_kg_integrity.py + knowledge_graph/enrichment/literature_2026.json",
+    "node_count": 168,
+    "edge_count": 296,
     "node_types": [
       "Algorithm",
       "Claim",
@@ -59,7 +59,9 @@
         "lab_coverage_note": "Wave 1 lanes A–I remain open PRs #16–#24 — do not claim merged. Thesis lock unchanged.",
         "integrity_added_nodes": 11,
         "integrity_added_edges": 30,
-        "integrity_removed_same_as": 6
+        "integrity_removed_same_as": 6,
+        "archival": true,
+        "archival_note": "Superseded after v1.0.0 / PyPI 1.0.0 / 2026 literature overlay. See meta.lab_coverage_note."
       },
       {
         "generated": "2026-08-04T23:50:00+05:30",
@@ -71,7 +73,9 @@
         "integrity_added_edges": 0,
         "integrity_removed_same_as": 0,
         "integrity_removed_edges": 1,
-        "integrity_cleared_lab_alias": 3
+        "integrity_cleared_lab_alias": 3,
+        "archival": true,
+        "archival_note": "Superseded after v1.0.0 / PyPI 1.0.0 / 2026 literature overlay. See meta.lab_coverage_note."
       },
       {
         "generated": "2026-08-04T23:50:00+05:30",
@@ -84,7 +88,9 @@
         "integrity_removed_same_as": 0,
         "integrity_removed_edges": 2,
         "integrity_cleared_lab_alias": 0,
-        "integrity_stripped_abs_sources": 0
+        "integrity_stripped_abs_sources": 0,
+        "archival": true,
+        "archival_note": "Superseded after v1.0.0 / PyPI 1.0.0 / 2026 literature overlay. See meta.lab_coverage_note."
       },
       {
         "generated": "2026-08-04T23:50:00+05:30",
@@ -97,7 +103,9 @@
         "integrity_removed_same_as": 0,
         "integrity_removed_edges": 4,
         "integrity_cleared_lab_alias": 0,
-        "integrity_stripped_abs_sources": 0
+        "integrity_stripped_abs_sources": 0,
+        "archival": true,
+        "archival_note": "Superseded after v1.0.0 / PyPI 1.0.0 / 2026 literature overlay. See meta.lab_coverage_note."
       },
       {
         "generated": "2026-08-04T23:50:00+05:30",
@@ -111,9 +119,24 @@
         "integrity_removed_edges": 0,
         "integrity_cleared_lab_alias": 0,
         "integrity_stripped_abs_sources": 0
+      },
+      {
+        "generated": "2026-08-15T01:30:00+05:30",
+        "researcher": "kg-freshness-h3",
+        "schema_version": "1.0",
+        "purpose": "Post-v1.0 literature overlay: ScaleQ-1.58, BitEmbed, VibeASR-BitNet (literature-only). Confirm Litespark 2605.06485 already present. Canonical lab_coverage_note after PyPI 1.0.0. Do not invent local Litespark/Sparse-BitNet numbers.",
+        "lab_coverage_note": "v1.0.0 + bnn-lab 1.0.0 on PyPI (2026-08-14). Wave 1 lanes A–I merged (PRs #16–#24, #26). WASM / .bnnpack v2 / distill / layer search / bitnet pin / RAPL-proxy closed. Intentional OpenGaps: gap_litespark_local, gap_venue_submit, gap_reactnet_in_repo (open); gap_fbi_llm_repro (accepted_non_goal). 2026 literature overlay: ScaleQ-1.58, BitEmbed, VibeASR-BitNet, Litespark — no invented local numbers. Thesis lock unchanged.",
+        "integrity_added_nodes": 3,
+        "integrity_added_edges": 10,
+        "integrity_removed_same_as": 0,
+        "integrity_removed_edges": 0,
+        "integrity_cleared_lab_alias": 0,
+        "integrity_stripped_abs_sources": 0
       }
     ],
-    "integrity_patched_at": "2026-08-14T18:11:55.451640+00:00"
+    "integrity_patched_at": "2026-08-14T19:41:46.011724+00:00",
+    "lab_coverage_note": "v1.0.0 + bnn-lab 1.0.0 on PyPI (2026-08-14). Wave 1 lanes A–I merged (PRs #16–#24, #26). WASM / .bnnpack v2 / distill / layer search / bitnet pin / RAPL-proxy closed. Intentional OpenGaps: gap_litespark_local, gap_venue_submit, gap_reactnet_in_repo (open); gap_fbi_llm_repro (accepted_non_goal). 2026 literature overlay: ScaleQ-1.58, BitEmbed, VibeASR-BitNet, Litespark — no invented local numbers. Thesis lock unchanged.",
+    "literature_2026_patched_at": "2026-08-14T19:41:46.011774+00:00"
   },
   "nodes": [
     {
@@ -593,9 +616,10 @@
       "id": "paper_litespark",
       "label": "Litespark Inference (2026)",
       "type": "Paper",
-      "summary": "SIMD ternary CPU kernels; survey cites ~18× Apple Silicon / extreme x86 vs naive PyTorch — not reproduced in this lab (OpenGap for local numbers).",
+      "summary": "Dade et al. arXiv:2605.06485 — SIMD ternary CPU kernels (Litespark-Inference). Paper claims large speedups vs naive PyTorch on Apple Silicon / x86. Not reproduced in this lab; local numbers stay OpenGap (gap_litespark_local). Do not copy paper × as goldens.",
       "sources": [
         "arXiv:2605.06485",
+        "https://arxiv.org/abs/2605.06485",
         "docs/02_SOTA_SURVEY.md"
       ],
       "confidence": 0.65,
@@ -1775,14 +1799,14 @@
       "id": "gap_fbi_llm_repro",
       "label": "OpenGap: FBI-LLM / Full Binary LLM Repro",
       "type": "OpenGap",
-      "summary": "Literature path for fully binary LLMs; not a lab gate; cite only.",
+      "summary": "Fully binary LLM path (FBI-LLM, arXiv:2407.07093) is literature / accepted non-goal — cite only; this lab does not reproduce it as a gate.",
       "sources": [
         "arXiv:2407.07093",
         "ROADMAP.md",
         "docs/MOONSHOT_DEFERRALS.md"
       ],
       "confidence": 0.75,
-      "status": "open"
+      "status": "accepted_non_goal"
     },
     {
       "id": "tool_executorch",
@@ -2285,6 +2309,48 @@
       ],
       "confidence": 0.95,
       "status": "locked"
+    },
+    {
+      "id": "paper_scaleq_158",
+      "label": "ScaleQ-1.58 / AYOT (Wang et al. 2026)",
+      "type": "Paper",
+      "summary": "Wang et al. arXiv:2608.01078 — ternary PTQ for reasoning LLMs: Attend to Your Own Thoughts (AYOT) calibration + CAT-Q. Paper reports Qwen3-1.7B ternary >90.52% of BitNet b1.58 2B4T on 4 math/coding tasks with 4M calib tokens, and a Qwen3-4B absolute +8.97% vs that baseline; claims scaling to 235B. Literature only — this lab does not reproduce ScaleQ or treat those figures as goldens. Distinct from naive absmean PTQ wipe.",
+      "sources": [
+        "arXiv:2608.01078",
+        "https://arxiv.org/abs/2608.01078",
+        "docs/TRANSFORMATION_PLAN.md"
+      ],
+      "confidence": 0.78,
+      "status": "literature",
+      "arxiv": "2608.01078"
+    },
+    {
+      "id": "paper_bitembed",
+      "label": "BitEmbed / BITEMBED (Li et al. 2026)",
+      "type": "Paper",
+      "summary": "Li et al. arXiv:2606.25674 — convert pretrained LLM backbones into BitNet-style text embedders (ternary weights, quantized activations) via contrastive CPT + teacher distillation; MMTEB (eng, v2) experiments on Qwen3-0.6B / Gemma3-270M. Literature only. docs/15 names BitEmbed as an embeddings routing hint — not a lab golden.",
+      "sources": [
+        "arXiv:2606.25674",
+        "https://arxiv.org/abs/2606.25674",
+        "docs/15_MODEL_CLASSES_AND_DEPLOYMENT.md"
+      ],
+      "confidence": 0.78,
+      "status": "literature",
+      "arxiv": "2606.25674"
+    },
+    {
+      "id": "paper_vibeasr_bitnet",
+      "label": "VibeVoice-ASR-BitNet (Xu et al. 2026)",
+      "type": "Paper",
+      "summary": "Xu et al. arXiv:2607.21075 — VibeVoice-ASR-BitNet: INT8 VAE acoustic tokenizer + BitNet-style ternary AR LM; paper claims 1.6–2.3× vs Whisper.cpp at ~1.6 GB and RTF < 1 on low-thread CPUs. Their stack, not this lab. Audio lane remains synthetic pedagogy (decision_nongoal_asr_whisper).",
+      "sources": [
+        "arXiv:2607.21075",
+        "https://arxiv.org/abs/2607.21075",
+        "docs/TRANSFORMATION_PLAN.md"
+      ],
+      "confidence": 0.75,
+      "status": "literature",
+      "arxiv": "2607.21075"
     }
   ],
   "edges": [
@@ -4873,6 +4939,96 @@
         "PR #19 merged"
       ],
       "weight": 1.0
+    },
+    {
+      "source": "paper_scaleq_158",
+      "target": "paper_bitnet_b158",
+      "relation": "derived_from",
+      "evidence": [
+        "arXiv:2608.01078 — ternary 1.58-bit PTQ of existing LLMs"
+      ],
+      "weight": 0.85
+    },
+    {
+      "source": "paper_scaleq_158",
+      "target": "ptq_ternary_llm_wipe",
+      "relation": "improves",
+      "evidence": [
+        "arXiv:2608.01078 — AYOT calibration vs conventional PTQ collapse on math/code"
+      ],
+      "weight": 0.8
+    },
+    {
+      "source": "paper_scaleq_158",
+      "target": "paper_bitnet_2b4t",
+      "relation": "cites",
+      "evidence": [
+        "arXiv:2608.01078 compares ternary Qwen3 vs BitNet b1.58 2B4T"
+      ],
+      "weight": 0.75
+    },
+    {
+      "source": "paper_scaleq_158",
+      "target": "paper_bitdistill",
+      "relation": "alternative_to",
+      "evidence": [
+        "ScaleQ is PTQ+AYOT; BitDistill is CPT+distill — neither is a lab golden"
+      ],
+      "weight": 0.7
+    },
+    {
+      "source": "paper_bitembed",
+      "target": "paper_bitnet_b158",
+      "relation": "derived_from",
+      "evidence": [
+        "arXiv:2606.25674 — BitNet-style ternary embedders"
+      ],
+      "weight": 0.85
+    },
+    {
+      "source": "paper_bitembed",
+      "target": "decision_wrap_tree",
+      "relation": "recommends_for",
+      "evidence": [
+        "docs/15_MODEL_CLASSES_AND_DEPLOYMENT.md — embeddings → BitEmbed / INT8"
+      ],
+      "weight": 0.7
+    },
+    {
+      "source": "paper_vibeasr_bitnet",
+      "target": "paper_bitnet_b158",
+      "relation": "derived_from",
+      "evidence": [
+        "arXiv:2607.21075 — BitNet-style ternary AR LM for ASR"
+      ],
+      "weight": 0.8
+    },
+    {
+      "source": "paper_vibeasr_bitnet",
+      "target": "decision_nongoal_asr_whisper",
+      "relation": "blocked_by",
+      "evidence": [
+        "Production ASR is an accepted non-goal; do not treat VibeASR numbers as lab goldens"
+      ],
+      "weight": 0.9
+    },
+    {
+      "source": "paper_vibeasr_bitnet",
+      "target": "sys_audio_synth",
+      "relation": "alternative_to",
+      "evidence": [
+        "Lab audio lane is synthetic pedagogy; VibeASR-BitNet is their production-style stack"
+      ],
+      "weight": 0.75
+    },
+    {
+      "source": "paper_litespark",
+      "target": "paper_bitnet_b158",
+      "relation": "derived_from",
+      "evidence": [
+        "arXiv:2605.06485 — SIMD kernels for ternary 1.58-bit LMs"
+      ],
+      "weight": 0.7
     }
   ]
 }

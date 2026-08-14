@@ -32,6 +32,17 @@ Primary papers and tools used to fill under-cited gaps relative to `docs/` (esp.
 |-------|----------|----------|---------------|
 | BiBERT | Qin et al., 2022 | [arXiv:2203.06390](https://arxiv.org/abs/2203.06390) | Full W1A1E1; **56.3×** FLOPs / **31.2×** size; +20.4 pp vs BinaryBERT W1A1 avg GLUE |
 
+## 2026 literature overlay (cite only — not lab goldens)
+
+Added 2026-08-15 (`knowledge_graph/enrichment/literature_2026.json`). Paper figures stay **their** numbers.
+
+| Topic | Citation | ID / URL | Notes |
+|-------|----------|----------|-------|
+| ScaleQ-1.58 / AYOT | Wang et al., 2026 | [arXiv:2608.01078](https://arxiv.org/abs/2608.01078) | Ternary PTQ + reasoning-trace calibration. **Not reproduced here.** |
+| BitEmbed | Li et al., 2026 | [arXiv:2606.25674](https://arxiv.org/abs/2606.25674) | BitNet-style text embedders. Named in `docs/15`. **Not a lab golden.** |
+| VibeVoice-ASR-BitNet | Xu et al., 2026 | [arXiv:2607.21075](https://arxiv.org/abs/2607.21075) | Their ASR stack. Lab audio is synthetic; ASR is a non-goal. |
+| Litespark Inference | Dade et al., 2026 | [arXiv:2605.06485](https://arxiv.org/abs/2605.06485) | SIMD ternary vs naive PyTorch. Local numbers: `gap_litespark_local`. |
+
 ## Sparse + low-bit hybrids
 
 | Topic | Citation | ID / URL | Key number(s) |

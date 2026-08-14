@@ -187,7 +187,9 @@ Idea-vault folders under `C:\00 Research Papers\` are **maintainer-local** — c
 
 ---
 
-## 8. Roadmap: v0.3.0 vs v1.0 leftovers
+## 8. Roadmap: v1.0 shipped vs remaining OpenGaps
+
+Wave 1 is **not** still open. Lanes A–I merged (PRs #16–#24, #26); `bnn-lab` **1.0.0** is on PyPI.
 
 ```mermaid
 flowchart TB
@@ -200,9 +202,30 @@ flowchart TB
   V10 -.->|pedagogy shipped| G4[WASM SIMD]
   V10 -.->|proxy OK| G5[Windows RAPL / board Joules]
   V10 -.->|accepted non-goal| G6[Full ImageNet SOTA schedule]
+  V10 -.->|open on purpose| G7[Litespark local / venue / ReActNet-in-repo]
+  V10 -.->|accepted non-goal| G8[FBI-LLM repro]
 ```
 
-`gap_pypi_trusted` is **merged** (`bnn-lab` 1.0.0 on PyPI). Distill, `.bnnpack` v2, WASM pedagogy, layer search, and bitnet.cpp pin are **merged / closed-by-policy** — do not re-open them from stale `open_pr` fields.
+`gap_pypi_trusted` is **merged**. Distill, `.bnnpack` v2, WASM pedagogy, layer search, and bitnet.cpp pin are **merged / closed-by-policy** — do not re-open them from stale `open_pr` fields.
+
+**Still open on purpose:** `gap_litespark_local`, `gap_venue_submit`, `gap_reactnet_in_repo`. **`gap_fbi_llm_repro`** is `accepted_non_goal`.
+
+---
+
+## 8b. 2026 literature overlay (cite only — not lab goldens)
+
+```mermaid
+flowchart LR
+  B158[BitNet b1.58]
+  B158 --> SQ[ScaleQ-1.58 AYOT PTQ<br/>arXiv:2608.01078]
+  B158 --> BE[BitEmbed<br/>arXiv:2606.25674]
+  B158 --> VA[VibeASR-BitNet<br/>arXiv:2607.21075]
+  B158 --> LS[Litespark SIMD<br/>arXiv:2605.06485]
+  LS -.->|blocked_by| GAP[gap_litespark_local]
+  VA -.->|blocked_by| ASR[decision_nongoal_asr_whisper]
+```
+
+Paper speedups (Litespark vs naive PyTorch, VibeASR vs Whisper.cpp, ScaleQ vs 2B4T) stay **their** numbers. This lab does not reproduce them.
 
 ---
 
@@ -213,7 +236,7 @@ flowchart TB
 | Compression **32×** | E2E latency **32×** | `contradicts` — report both |
 | Theoretical **~64×** word ops | Measured `S_e2e` | `contradicts` — Amdahl |
 | `sign()` simulation | Packed kernel speedup | `alternative_to` / fake binary |
-| Absmean PTQ ternary LLM | BitDistill / CPT | `contradicts` quality path |
+| Absmean PTQ ternary LLM | BitDistill / CPT **or** ScaleQ-1.58 AYOT (lit.) | `contradicts` quality path |
 | Stock phone NPU 1-bit | Vendor INT8-first | `contradicts` drop-in hope |
 
 ---
@@ -232,6 +255,10 @@ flowchart TB
 | `decision_wc_o_gates` | WC-O1–O4 (established on main) |
 | `sys_kg` | Graph + CI integrity |
 | `paper_bitnet_b158` | Ternary LLM era pivot |
+| `paper_scaleq_158` | 2026 ternary PTQ (AYOT) — literature only |
+| `paper_bitembed` | 2026 BitNet-style embedders — literature only |
+| `paper_vibeasr_bitnet` | 2026 BitNet ASR — their stack; ASR non-goal |
+| `paper_litespark` | 2026 SIMD ternary — blocked by `gap_litespark_local` |
 | `paper_gptq` / `paper_bitdistiller` | INT4 distill disambiguation |
 | `sys_repro_gates` | `bnn repro` / goldens |
 | `paper_b1_honest_speedup` | Novel paper B1 |

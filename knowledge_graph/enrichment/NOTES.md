@@ -36,6 +36,13 @@
 - Add one sentence to `docs/03` pointing at BiBERT attention failure + BitDistill PTQ failure.
 - Link HF `microsoft/bitnet-b1.58-2B-4T` from `docs/23`.
 
+## 2026 literature overlay (2026-08-15)
+
+- **ScaleQ-1.58** (`2608.01078`), **BitEmbed** (`2606.25674`), **VibeASR-BitNet** (`2607.21075`) are first-class `Paper` nodes with `status: literature`.
+- **Litespark** (`2605.06485`) was already in the graph; keep `gap_litespark_local` **open** — do not invent local SIMD numbers.
+- **FBI-LLM** stays an OpenGap at `accepted_non_goal`.
+- Do not treat archival `enrichment_runs` notes that say Wave 1 PRs are still open as current after v1.0.0 + PyPI.
+
 ## Schema notes
 
 Nodes: `id, label, type, summary, sources, confidence, status`  
