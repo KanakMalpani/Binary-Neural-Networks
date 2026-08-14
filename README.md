@@ -11,7 +11,7 @@
 [![Repro](https://img.shields.io/badge/repro-PASS-22c55e)](REPRODUCIBILITY.md)
 [![Pack](https://img.shields.io/badge/pack-32x_uint64-0284c7)](#dual-metric-benchmarks)
 [![SIMD](https://img.shields.io/badge/SIMD-~24x_vs_NumPy_FP32-7c3aed)](#dual-metric-benchmarks)
-[![PyPI](https://img.shields.io/badge/PyPI-pending_Trusted_Publisher-9ca3af)](https://github.com/KanakMalpani/Binary-Neural-Networks/blob/main/docs/PYPI_PUBLISH.md)
+[![PyPI](https://img.shields.io/pypi/v/bnn-lab.svg)](https://pypi.org/project/bnn-lab/)
 
 **Binary Neural Networks** (`bnn` 1.0.0) is the honest optimiser toolkit for **packed binary / ternary** inference on **CPU and edge**. It bit-packs weights into `uint64`, runs **real** XNOR–popcount SIMD kernels, and prints **dual metrics** — pack math and wall-clock — as separate numbers.
 
@@ -76,11 +76,17 @@ It is **not** a claim that `sign()` is 32× faster on GPU. Compression **32×** 
 
 ## 60 seconds to a dual-metric report
 
-PyPI **`bnn-lab` is not live yet** (human [Trusted Publisher](docs/PYPI_PUBLISH.md) residual). Until that upload, install from Git. The short name `bnn` on PyPI is an unrelated package — import and CLI here stay `bnn`.
+Install from PyPI as **[`bnn-lab`](https://pypi.org/project/bnn-lab/)**. The short name `bnn` on PyPI is an unrelated package — import and CLI here stay `bnn`.
 
-A non-editable `pip install "bnn-lab @ git+…"` is a **library wheel**. It does **not** ship repo `scripts/`. `bnn repro`, `bnn optimise`, and `bnn recommend` call those scripts — use them only after a clone. Do **not** put `bnn repro` on the next line after a wheel install.
+A wheel install is a **library**. It does **not** ship repo `scripts/`. `bnn repro`, `bnn optimise`, and `bnn recommend` call those scripts — use them only after a clone. Do **not** put `bnn repro` on the next line after a wheel install.
 
-### Git pip — Python API only
+### PyPI — Python API only
+
+```bat
+pip install bnn-lab==1.0.0
+```
+
+Git fallback (same library-only contract):
 
 ```bat
 pip install "bnn-lab @ git+https://github.com/KanakMalpani/Binary-Neural-Networks.git@v1.0.0"
@@ -421,7 +427,7 @@ flowchart TB
   WRAP --> CODEC
 ```
 
-**Installing does not require a compiler.** `setup.py` builds the kernel when a toolchain is present and falls back to NumPy otherwise. Prebuilt wheels from [`wheels.yml`](.github/workflows/wheels.yml) are five cibuildwheel jobs — **linux-x86_64**, **linux-aarch64**, **windows-amd64**, **macos-arm64**, **macos-x86_64** — and land as Actions / `v*` tag artifacts until Trusted Publisher. There is **no Windows ARM64** wheel. Live `pip install bnn-lab` from PyPI still needs [Trusted Publishing](docs/PYPI_PUBLISH.md).
+**Installing does not require a compiler.** `setup.py` builds the kernel when a toolchain is present and falls back to NumPy otherwise. Prebuilt wheels from [`wheels.yml`](.github/workflows/wheels.yml) are five cibuildwheel jobs — **linux-x86_64**, **linux-aarch64**, **windows-amd64**, **macos-arm64**, **macos-x86_64** — and ship on [PyPI](https://pypi.org/project/bnn-lab/). There is **no Windows ARM64** wheel. **Python 3.13 on Windows** has no `cp313-win_amd64` wheel in 1.0.0 (numpy&lt;2 kernel smoke AV) — pip uses the sdist / NumPy path. Runbook: [`docs/PYPI_PUBLISH.md`](docs/PYPI_PUBLISH.md).
 
 ---
 
@@ -474,7 +480,7 @@ Public API: `import bnn` — [`docs/api/README.md`](docs/api/README.md). CLI: `b
 | Trainable BNN + BitLinear pedagogy + optimiser | Full BitNet LLM pretrain |
 | Dual-metric culture and repro gates | Bit-identical floats across OS/CPU |
 | Bridges toward INT4 / FP8 / bitnet.cpp | A cuDNN / TensorRT replacement |
-| Tagged **v1.0.0** lab (PyPI upload still human) | A fake-binary GPU 32× story |
+| Tagged **v1.0.0** lab (`bnn-lab` 1.0.0 on PyPI) | A fake-binary GPU 32× story |
 
 ---
 

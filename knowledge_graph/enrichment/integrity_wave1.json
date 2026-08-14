@@ -3,8 +3,8 @@
     "generated": "2026-08-04T23:50:00+05:30",
     "researcher": "lane-kg-enrich",
     "schema_version": "1.0",
-    "purpose": "Lab/product integrity enrichment: WC-O gates, CLI systems, GPTQ/Q-Sparse/BitDistiller, RAPL Result, moonshot non-goals, Wave 1 status honesty, broken source fixes, same_as repairs. 2026-08-13: flip stale open_pr after v1.0.0 / PR #26; PyPI still not live.",
-    "lab_coverage_note": "Lanes A–I merged via Wave 2 integrator (PRs #16–#24, #26). Stale open_pr statuses flipped to merged/closed_by_policy/established. gap_pypi_trusted remains open — bnn-lab is not on PyPI. Thesis lock unchanged."
+    "purpose": "Lab/product integrity enrichment: WC-O gates, CLI systems, GPTQ/Q-Sparse/BitDistiller, RAPL Result, moonshot non-goals, Wave 1 status honesty, broken source fixes, same_as repairs. 2026-08-13: flip stale open_pr after v1.0.0 / PR #26. 2026-08-14: gap_pypi_trusted merged — bnn-lab 1.0.0 on PyPI.",
+    "lab_coverage_note": "Lanes A–I merged via Wave 2 integrator (PRs #16–#24, #26). Stale open_pr statuses flipped to merged/closed_by_policy/established. gap_pypi_trusted merged — bnn-lab 1.0.0 on PyPI (OIDC Trusted Publisher). Thesis lock unchanged."
   },
   "source_fixes": {
     "algo_ternary_bitplane": [
@@ -102,8 +102,8 @@
       "summary": "search_layer_modes (binary/ternary/skip) + docs/42 on main (W3.T06 / PR #19). Do not invent search goldens."
     },
     "gap_pypi_trusted": {
-      "status": "open",
-      "summary": "wheels.yml + docs ready; OIDC dry-run/attestations shipped. First bnn-lab upload still needs human Trusted Publisher on pypi.org — not live (JSON 404)."
+      "status": "merged",
+      "summary": "bnn-lab 1.0.0 on PyPI via OIDC Trusted Publisher (wheels.yml publish=true on main, run 31825286443). Wheel is library-only; bnn repro needs clone+[dev]. No API-token path. No cp313-win_amd64 / cp313-macosx_x86_64 in 1.0.0."
     },
     "data_imagenet": {
       "status": "non_goal_gate",

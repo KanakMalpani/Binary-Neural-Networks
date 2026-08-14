@@ -29,11 +29,11 @@
 | Item | Suggestion |
 |------|------------|
 | Wave 2 KG sync after lane merges | Flip OpenGap statuses from `open_pr` → `established`/`closed` when A–I land |
-| PyPI Trusted Publisher | Remains human gate (`gap_pypi_trusted`) |
+| PyPI Trusted Publisher | **Shipped** — `gap_pypi_trusted` merged (`bnn-lab` 1.0.0) |
 | WC-O closed claim | Only after Lane A merge + measured dual metrics |
 
 ## Residuals (deliberately not done)
 
 - Do **not** invent golden floors / ImageNet SOTA / GPU 32× from `sign()`.
-- Do **not** claim PyPI `bnn-lab` is live (`gap_pypi_trusted` stays `open`).
+- `gap_pypi_trusted` is **merged** (`bnn-lab` 1.0.0 on PyPI). Recurring uploads stay OIDC-only.
 - BitDistill-scale KD and privileged RAPL Joules remain moonshots, not goldens.

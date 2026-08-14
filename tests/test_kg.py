@@ -90,10 +90,10 @@ def test_shipped_wave1_lanes_are_not_open_pr(graph):
         "gap_rapl_windows": ("closed_by_policy",),
         "decision_wc_o_gates": ("established",),
         "result_energy_rapl_spike": ("merged",),
+        "gap_pypi_trusted": ("merged",),
     }
     for nid, allowed in shipped.items():
         assert idx[nid]["status"] in allowed, (nid, idx[nid]["status"])
-    assert idx["gap_pypi_trusted"]["status"] == "open"
 
 
 def test_integrity_nodes_present(graph):

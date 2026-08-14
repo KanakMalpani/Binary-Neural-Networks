@@ -11,30 +11,29 @@ README packaging badge row, careful `pyproject.toml` packaging metadata,
 Packed CPU / edge XNOR–popcount; never claim GPU 32× from `sign()`; no invented
 golden shapes; dual-metric honesty.
 
-## Status (2026-08-13)
+## Status (2026-08-14)
 
 | Item | State |
 |------|--------|
 | W8.T06 SBOM docs | Examples use `bnn_lab-1.0.0-*` |
 | W8.T07 attestations in `wheels.yml` | Present on wheels + sdist |
 | W8.T08 workflow gates | `publish=false` dry-run + `package-check`; OIDC only |
-| README PyPI badge | Present (`pypi/v/bnn-lab`) — **404 until first upload** |
+| README PyPI badge | Live [`pypi/v/bnn-lab`](https://pypi.org/project/bnn-lab/) |
 | GitHub env `pypi` | **Exists** |
-| PyPI project `bnn-lab` | **Missing** (JSON API 404, 2026-08-13) |
-| Trusted Publisher | **Human blocker** — pending publisher not registered |
-| `publish=true` @ `v1.0.0` | [31031733046](https://github.com/KanakMalpani/Binary-Neural-Networks/actions/runs/31031733046) — **`invalid-publisher`** |
-| Retry `publish=true` @ `v1.0.0` | [31698000321](https://github.com/KanakMalpani/Binary-Neural-Networks/actions/runs/31698000321) — **Windows `cp313` AV**; publish skipped |
-| Probe `publish=true` @ this branch | [31700631120](https://github.com/KanakMalpani/Binary-Neural-Networks/actions/runs/31700631120) — wheels+check **PASS**; publish **`invalid-publisher`** |
+| PyPI project `bnn-lab` | **Live** 1.0.0 (JSON 200, 14 files) |
+| Trusted Publisher | **Used** — pending converted to **active** after first upload |
+| First OIDC upload | [31825286443](https://github.com/KanakMalpani/Binary-Neural-Networks/actions/runs/31825286443) `publish=true` @ **`main`** — **success** |
 | cibuildwheel skips | `*musllinux*`, `cp313-macosx_x86_64`, **`cp313-win_amd64`** (untested; numpy&lt;2 + py3.13 AV) |
 | API-token publish | **Forbidden / not invented** |
 
-## ROADMAP checkbox hints (do not flip until live)
+## ROADMAP checkbox hints
 
 - W8.T07 → keep `[x]`.
-- W8.T08 → remain `[~]` until human Trusted Publisher + first OIDC upload.
-- Do **not** claim `pip install bnn-lab` from PyPI.
+- W8.T08 → `[x]` after live 1.0.0 (`docs/PYPI_PUBLISH.md`).
+- Claim `pip install bnn-lab==1.0.0` from PyPI. Wheel is **library-only** — do
+  not put `bnn repro` on the next line.
 
-## Human steps left
+## Historical probes (pre-publisher)
 
 1. On https://pypi.org → **Publishing → Add a new pending publisher**:
    - Project: `bnn-lab`
@@ -43,9 +42,9 @@ golden shapes; dual-metric honesty.
    - Workflow: `wheels.yml`
    - Environment: `pypi`
 2. Optional: add required reviewers on GitHub env `pypi`.
-3. After this skip is on `main`: Actions → **wheels** → Run workflow →
+3. After the skip landed on `main`: Actions → **wheels** → Run workflow →
    ref **`main`** (not tag `v1.0.0`) → **publish = true**.
-4. Verify: `pip install bnn-lab==1.0.0` && `bnn repro` → `REPRO: PASS`.
+4. Verify: `pip install bnn-lab==1.0.0` + `import bnn`. (`bnn repro` needs clone + `[dev]`.)
 5. Confirm README PyPI badge resolves to `1.0.0`.
 
 ## Dispatch log
@@ -57,5 +56,6 @@ golden shapes; dual-metric honesty.
 | [31031733046](https://github.com/KanakMalpani/Binary-Neural-Networks/actions/runs/31031733046) | `publish=true` @ `v1.0.0` → **`invalid-publisher`** |
 | [31698000321](https://github.com/KanakMalpani/Binary-Neural-Networks/actions/runs/31698000321) | `publish=true` @ `v1.0.0` → Windows `cp313` crash; publish skipped |
 | [31700631120](https://github.com/KanakMalpani/Binary-Neural-Networks/actions/runs/31700631120) | `publish=true` @ this branch → wheels+check **PASS**; **`invalid-publisher`** |
+| [31825286443](https://github.com/KanakMalpani/Binary-Neural-Networks/actions/runs/31825286443) | `publish=true` @ **`main`** → **success**; `bnn-lab` 1.0.0 live |
 
-**Still blocked for upload:** PyPI Trusted Publisher for `bnn-lab` (project 404). Do not invent an API-token path.
+Recurring uploads stay OIDC Trusted Publishing. Do not invent an API-token path.

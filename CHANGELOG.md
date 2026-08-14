@@ -2,10 +2,11 @@
 
 ## Unreleased
 
-- Landing: pip-first README (Git install until PyPI Trusted Publisher; no live `pip install bnn-lab` claim), above-the-fold When-to-use / When-NOT callout (issue #1), kernel/wrap/SIMD/bridge mermaid diagrams, dual-metric hero. Git-pip is **library-only** (`optimise_model` with `hybrid_ffn` / `min_in_features=64` so FFN wrap is **32×** pack); `bnn repro` / `bnn optimise` / `bnn recommend` need a clone. Wheel matrix names the five cibuildwheel jobs (no Windows ARM64).
+- **PyPI:** [`bnn-lab` 1.0.0](https://pypi.org/project/bnn-lab/1.0.0/) is live (OIDC Trusted Publisher, Actions run 31825286443 on `main`). W8.T08 `[x]`. Wheel install is library-only (`import bnn`); `bnn repro` / `bnn optimise` / `bnn recommend` still need a clone + `[dev]`. No `cp313-win_amd64` / `cp313-macosx_x86_64` wheels in 1.0.0 (documented skips). Pending publisher should show **active** after first upload. No API-token publish path.
+- Landing: pip-first README (`pip install bnn-lab==1.0.0`), above-the-fold When-to-use / When-NOT callout (issue #1), kernel/wrap/SIMD/bridge mermaid diagrams, dual-metric hero. Git-pip remains a library-only fallback. Wheel matrix names the five cibuildwheel jobs (no Windows ARM64).
 - Docs: GitHub Pages workflow deploys the existing MkDocs `--strict` site to `kanakmalpani.github.io/Binary-Neural-Networks`.
-- Knowledge graph: flip stale Wave-1 `open_pr` statuses to merged/closed-by-policy/established after v1.0.0; `gap_pypi_trusted` stays open.
-- Docs: first-principles 90-day transformation plan (`docs/TRANSFORMATION_PLAN.md`) — proposal only; does not flip ROADMAP WC checkboxes or invent goldens. Review patch: Wave 3 = lever 4 AND (hybrid/binary 0.85 cosine **and** 1.5× e2e); issue #1 is implement-then-close, not paperwork.
+- Knowledge graph: flip stale Wave-1 `open_pr` statuses to merged/closed-by-policy/established after v1.0.0; `gap_pypi_trusted` is **merged** after the 1.0.0 upload.
+- Docs: first-principles 90-day transformation plan (`docs/TRANSFORMATION_PLAN.md`) — proposal only; does not flip ROADMAP WC checkboxes or invent goldens. Review patch: Wave 3 = lever 4 AND (hybrid/binary 0.85 cosine **and** 1.5× e2e); issue #1 is implement-then-close, not paperwork. Wave 0 (PyPI) shipped 2026-08-14.
 
 ## [1.0.0] — 2026-08-05
 

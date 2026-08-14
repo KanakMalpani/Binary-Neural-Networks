@@ -3,7 +3,7 @@
 | Field | Value |
 |-------|-------|
 | **Status** | Canonical living plan (agents: follow when lost) |
-| **Version** | 1.0.0 (lab optimiser; PyPI upload human residual) |
+| **Version** | 1.0.0 (lab optimiser; `bnn-lab` 1.0.0 on PyPI) |
 | **Created** | 2026-07-25 |
 | **Canonical paths** | `/ROADMAP.md` (this file) · identical twin `docs/37_WORLD_CLASS_BNN_OPTIMISER_ROADMAP.md` |
 | **Supersedes (execution)** | `docs/21` remains historical COMPLETE lab plan; **this file** is the forward “world-class optimiser” plan |
@@ -160,7 +160,7 @@ Audit date: **2026-07-28** (SIMD/portability refresh). Status legend: `[x] DONE`
 
 | Area | Status | Evidence (paths) | Gap to world-class |
 |------|--------|------------------|--------------------|
-| Packaging / version | `[x]` | `pyproject.toml` **`bnn-lab`** 1.0.0 (import/CLI `bnn`), console script | Trusted Publisher on pypi.org still human (env `pypi` exists) |
+| Packaging / version | `[x]` | `pyproject.toml` **`bnn-lab`** 1.0.0 on PyPI (import/CLI `bnn`), console script | Recurring releases; no Windows ARM64 / no `cp313-win_amd64` in 1.0.0 |
 | CLI surface | `[x]` | `bnn optimise` + wrap/encode/bridge/… | HF load verb optional |
 | STE layers / models | `[x]` | `bnn/ste.py`, `layers.py`, `models.py` | Broader zoo polish optional |
 | Native binary GEMM | `[x]` | Win/Linux/macOS/ARM native + runtime SIMD (`docs/41`); NumPy fallback | Arena declined; WASM pedagogy shipped |
@@ -181,9 +181,9 @@ Audit date: **2026-07-28** (SIMD/portability refresh). Status legend: `[x] DONE`
 | Tutorials | `[x]` | `docs/tutorials/01`–`08` | Keep green |
 | Bridges GPU/BitNet | `[x]` | `bnn bridge …` + pinned bitnet recipe (no giant submodule) | Full upstream build stays local |
 | HF integration | `[x]` | tutorial 08 + optional hf tests | deeper calib recipes |
-| Community OSS | `[x]` | LICENSE, templates, COC, SECURITY, CODEOWNERS, CONTRIBUTING, launch checklist, Discussions, branch protection | Finish PyPI Trusted Publisher (human) |
+| Community OSS | `[x]` | LICENSE, templates, COC, SECURITY, CODEOWNERS, CONTRIBUTING, launch checklist, Discussions, branch protection | Venue / Hub collection optional |
 | Security | `[x]` | SECURITY.md + SBOM + hard pip-audit + attestations | — |
-| Releases | `[x]` | `v1.0.0` + SBOM + `wheels.yml` (OIDC) | First `bnn-lab` upload via Trusted Publishing |
+| Releases | `[x]` | `v1.0.0` + SBOM + `wheels.yml` OIDC → **`bnn-lab` 1.0.0 on PyPI** | Recurring tags; skip frozen `v1.0.0` wheel matrix |
 | Papers / research series | `[x]` | `docs/32`, publication plan, figure pipeline, CITATION.cff | Venue submit optional |
 | Compatibility matrix | `[x]` | docs + CI matrix 3.11–3.13 + portability | Keep matrix honest |
 | Memory arena / thread pool API | `[x]` | OpenMP thread setter + footprint report | Arena measured & declined (docs/43) |
@@ -425,7 +425,7 @@ Acceptance: every task that touches metrics must keep `bnn repro` green unless e
 | W8.T05 | Tagged GitHub Releases | M | W1 | `[x]` v1.0.0 |
 | W8.T06 | SBOM (e.g. cyclonedx) on release | M | W8.T05 | `[x]` script + docs |
 | W8.T07 | Artifact attestations | L | W8.T05 | `[x]` `attest-build-provenance` on wheels + sdist |
-| W8.T08 | PyPI publish workflow (Trusted Publishing) | L | W8.T05 | `[~]` workflow ready; **human** Trusted Publisher pending (`docs/PYPI_PUBLISH.md`) |
+| W8.T08 | PyPI publish workflow (Trusted Publishing) | L | W8.T05 | `[x]` `bnn-lab` 1.0.0 on PyPI (OIDC Trusted Publisher; `docs/PYPI_PUBLISH.md`) |
 | W8.T09 | constraints.txt discipline | S | — | `[x]` |
 | W8.T10 | Native compile in CI not `continue-on-error` when possible | M | W2.T03 | `[x]` Linux hard; Win soft |
 
@@ -669,7 +669,7 @@ As of 2026-07-25 (updated): **Phases A–D substantially complete at v0.3.0**; r
 
 - [ ] All **WC-*** gates in §1 green
 - [ ] Phases A–D complete; E at least tech-report ready
-- [ ] PyPI or documented “why not yet”
+- [x] PyPI: [`bnn-lab` 1.0.0](https://pypi.org/project/bnn-lab/1.0.0/) (OIDC Trusted Publisher)
 - [ ] Public launch checklist (§10 W11) complete
 - [ ] README badges: repro, CI, license, version
 - [ ] Tag `v1.0.0` with attestation
@@ -785,16 +785,16 @@ Pre-checked from 2026-07-25 audit. **Agents: flip `[ ]` → `[x]` or `[~]` in PR
 - [x] WC-K4 dual-metric (Pareto + fair protocol)
 - [x] WC-O1–O4 (calib/auto/drop-in honesty/QAT+distill demo; search yes)
 - [x] WC-R1 repro
-- [~] WC-R2–R4 (matrix+SBOM+LICENSE+attestations; **PyPI Trusted Publisher upload** human residual)
+- [x] WC-R2–R4 (matrix+SBOM+LICENSE+attestations; **`bnn-lab` 1.0.0 on PyPI**)
 - [x] WC-D1–D5 (tutorials+cards+community+Discussions; v1.0.0 tag)
 - [x] WC-D1 tutorials + GUIDE_E2E master path
 - [x] WC-P1–P2 (`bnn bridge` + pinned bitnet recipe)
 
 ### 10.9 Remaining after v1.0.0
 
-See `docs/MOONSHOT_DEFERRALS.md`. Honest residuals: human PyPI Trusted Publisher
-registration + first `bnn-lab` upload; venue paper submit; privileged wrap-workload
-RAPL; BitDistill-scale KD; ORT custom op (stays deferred).
+See `docs/MOONSHOT_DEFERRALS.md`. Honest residuals: venue paper submit; privileged wrap-workload
+RAPL; BitDistill-scale KD; ORT custom op (stays deferred). PyPI **`bnn-lab` 1.0.0** shipped
+(OIDC Trusted Publisher; no API-token path).
 
 ---
 
@@ -822,8 +822,8 @@ RAPL; BitDistill-scale KD; ORT custom op (stays deferred).
 
 1. ~~Wave 2 integrator (lanes A–I + KG)~~ **DONE**
 2. Tag `v1.0.0` + GitHub Release when `bnn repro` is green on the integrator tip
-3. **Human:** register Trusted Publisher for **`bnn-lab`** on pypi.org (GitHub env `pypi` exists; see `docs/PYPI_PUBLISH.md`), then Actions → wheels → `publish=true`
-4. Clean-venv smoke: `pip install bnn-lab` + `bnn repro` after first upload
+3. ~~**Human:** register Trusted Publisher for **`bnn-lab`** on pypi.org, then Actions → wheels → `publish=true`~~ **DONE** — [`bnn-lab` 1.0.0](https://pypi.org/project/bnn-lab/1.0.0/) (OIDC; run [31825286443](https://github.com/KanakMalpani/Binary-Neural-Networks/actions/runs/31825286443); `docs/PYPI_PUBLISH.md`)
+4. ~~Clean-venv smoke after first upload~~ **DONE** for library import (`pip install bnn-lab==1.0.0`); `bnn repro` still needs a clone + `[dev]`
 5. Optional: venue paper submit from `docs/PUBLICATION_PLAN.md`; privileged Linux wrap-workload RAPL
 
 ---
