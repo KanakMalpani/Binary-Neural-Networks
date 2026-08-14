@@ -1,0 +1,373 @@
+{
+  "schema": "wrap_hybrid_085_spike_v1",
+  "and_gate": {
+    "cosine_min": 0.85,
+    "e2e_min": 1.5,
+    "force": false
+  },
+  "shape": "ultra_wrap TinyBlock d=512 ff=2048 batch=64 (committed)",
+  "passed": false,
+  "note": "Ultra sweep only. Several rows show e2e>=1.5 from short noisy reps; isolated median was 1.25x. AND-gate win is wrap_demo (results/wrap_demo.json), not this ultra table.",
+  "rows": [
+    {
+      "recipe": "ptq_hybrid",
+      "cosine": 0.6987784504890442,
+      "cosine_prewrap": 1.0,
+      "kl_div": 0.030751163139939308,
+      "top1_agreement": 0.34375,
+      "drop_in_ok": false,
+      "e2e_speedup": 0.41982850623565404,
+      "and_gate": false,
+      "forced": false,
+      "seconds": 0.24792309999611462,
+      "qat": null,
+      "distill": null,
+      "replaced_expected": [
+        "ffn_fc1",
+        "ffn_fc2"
+      ],
+      "shape": {
+        "d_model": 512,
+        "ff": 2048,
+        "batch": 64
+      },
+      "thesis_note": "Packed CPU XNOR; cosine and e2e are measured. Never GPU 32x from sign()."
+    },
+    {
+      "recipe": "legacy_kd_nofold_200",
+      "cosine": 0.5212613344192505,
+      "cosine_prewrap": 0.42459654808044434,
+      "kl_div": 0.0817854106426239,
+      "top1_agreement": 0.328125,
+      "drop_in_ok": false,
+      "e2e_speedup": 1.2680154671274562,
+      "and_gate": false,
+      "forced": false,
+      "seconds": 9.391155700002855,
+      "qat": {
+        "steps": 200,
+        "skipped": false,
+        "last_loss": 6.018206477165222e-06,
+        "restored_linears": [
+          "ffn_fc1",
+          "ffn_fc2"
+        ],
+        "logit_loss": "kd",
+        "fold_alpha": false,
+        "binarize_activations": true,
+        "sign_mode": "ste",
+        "note": "Light STE only; production needs BitDistill-scale QAT on real data"
+      },
+      "distill": null,
+      "replaced_expected": [
+        "ffn_fc1",
+        "ffn_fc2"
+      ],
+      "shape": {
+        "d_model": 512,
+        "ff": 2048,
+        "batch": 64
+      },
+      "thesis_note": "Packed CPU XNOR; cosine and e2e are measured. Never GPU 32x from sign()."
+    },
+    {
+      "recipe": "mse_fold_200",
+      "cosine": 0.9996882081031799,
+      "cosine_prewrap": 0.9326345920562744,
+      "kl_div": 1.67028047144413e-05,
+      "top1_agreement": 0.984375,
+      "drop_in_ok": true,
+      "e2e_speedup": 2.0916772227323452,
+      "and_gate": true,
+      "forced": false,
+      "seconds": 7.879426399995282,
+      "qat": {
+        "steps": 200,
+        "skipped": false,
+        "last_loss": 3.388382538105361e-05,
+        "restored_linears": [
+          "ffn_fc1",
+          "ffn_fc2"
+        ],
+        "logit_loss": "mse",
+        "fold_alpha": true,
+        "binarize_activations": true,
+        "sign_mode": "ste",
+        "note": "Light STE only; production needs BitDistill-scale QAT on real data"
+      },
+      "distill": null,
+      "replaced_expected": [
+        "ffn_fc1",
+        "ffn_fc2"
+      ],
+      "shape": {
+        "d_model": 512,
+        "ff": 2048,
+        "batch": 64
+      },
+      "thesis_note": "Packed CPU XNOR; cosine and e2e are measured. Never GPU 32x from sign()."
+    },
+    {
+      "recipe": "cosine_fold_200",
+      "cosine": 0.9998512268066406,
+      "cosine_prewrap": 0.9916587471961975,
+      "kl_div": 3.9825379848480225,
+      "top1_agreement": 0.96875,
+      "drop_in_ok": true,
+      "e2e_speedup": 1.64942371418891,
+      "and_gate": true,
+      "forced": false,
+      "seconds": 4.713435199999367,
+      "qat": {
+        "steps": 200,
+        "skipped": false,
+        "last_loss": 0.0001427019014954567,
+        "restored_linears": [
+          "ffn_fc1",
+          "ffn_fc2"
+        ],
+        "logit_loss": "cosine",
+        "fold_alpha": true,
+        "binarize_activations": true,
+        "sign_mode": "ste",
+        "note": "Light STE only; production needs BitDistill-scale QAT on real data"
+      },
+      "distill": null,
+      "replaced_expected": [
+        "ffn_fc1",
+        "ffn_fc2"
+      ],
+      "shape": {
+        "d_model": 512,
+        "ff": 2048,
+        "batch": 64
+      },
+      "thesis_note": "Packed CPU XNOR; cosine and e2e are measured. Never GPU 32x from sign()."
+    },
+    {
+      "recipe": "mse_fold_approx_200",
+      "cosine": 0.9999313950538635,
+      "cosine_prewrap": 0.9193587303161621,
+      "kl_div": 3.9460137486457825e-06,
+      "top1_agreement": 0.984375,
+      "drop_in_ok": true,
+      "e2e_speedup": 1.5466527565551893,
+      "and_gate": true,
+      "forced": false,
+      "seconds": 7.713305199999013,
+      "qat": {
+        "steps": 200,
+        "skipped": false,
+        "last_loss": 9.331383807875682e-06,
+        "restored_linears": [
+          "ffn_fc1",
+          "ffn_fc2"
+        ],
+        "logit_loss": "mse",
+        "fold_alpha": true,
+        "binarize_activations": true,
+        "sign_mode": "approx",
+        "note": "Light STE only; production needs BitDistill-scale QAT on real data"
+      },
+      "distill": null,
+      "replaced_expected": [
+        "ffn_fc1",
+        "ffn_fc2"
+      ],
+      "shape": {
+        "d_model": 512,
+        "ff": 2048,
+        "batch": 64
+      },
+      "thesis_note": "Packed CPU XNOR; cosine and e2e are measured. Never GPU 32x from sign()."
+    },
+    {
+      "recipe": "mse_fold_hidden_200",
+      "cosine": 0.9992210865020752,
+      "cosine_prewrap": 0.9759302139282227,
+      "kl_div": 4.349788650870323e-05,
+      "top1_agreement": 0.96875,
+      "drop_in_ok": true,
+      "e2e_speedup": 1.6319073120843333,
+      "and_gate": true,
+      "forced": false,
+      "seconds": 6.835585499997251,
+      "qat": {
+        "steps": 200,
+        "skipped": false,
+        "last_loss": 0.007385227829217911,
+        "restored_linears": [
+          "ffn_fc1",
+          "ffn_fc2"
+        ],
+        "logit_loss": "mse",
+        "fold_alpha": true,
+        "binarize_activations": true,
+        "sign_mode": "ste",
+        "note": "Light STE only; production needs BitDistill-scale QAT on real data"
+      },
+      "distill": null,
+      "replaced_expected": [
+        "ffn_fc1",
+        "ffn_fc2"
+      ],
+      "shape": {
+        "d_model": 512,
+        "ff": 2048,
+        "batch": 64
+      },
+      "thesis_note": "Packed CPU XNOR; cosine and e2e are measured. Never GPU 32x from sign()."
+    },
+    {
+      "recipe": "mse_fold_wonly_200",
+      "cosine": 0.5609610080718994,
+      "cosine_prewrap": 1.0,
+      "kl_div": 0.8335549831390381,
+      "top1_agreement": 0.21875,
+      "drop_in_ok": false,
+      "e2e_speedup": 1.3606850129052646,
+      "and_gate": false,
+      "forced": false,
+      "seconds": 5.673205799997959,
+      "qat": {
+        "steps": 200,
+        "skipped": false,
+        "last_loss": 2.0670191253069348e-11,
+        "restored_linears": [
+          "ffn_fc1",
+          "ffn_fc2"
+        ],
+        "logit_loss": "mse",
+        "fold_alpha": true,
+        "binarize_activations": false,
+        "sign_mode": "ste",
+        "note": "Light STE only; production needs BitDistill-scale QAT on real data"
+      },
+      "distill": null,
+      "replaced_expected": [
+        "ffn_fc1",
+        "ffn_fc2"
+      ],
+      "shape": {
+        "d_model": 512,
+        "ff": 2048,
+        "batch": 64
+      },
+      "thesis_note": "Packed CPU XNOR; cosine and e2e are measured. Never GPU 32x from sign()."
+    },
+    {
+      "recipe": "mse_fold_500",
+      "cosine": 0.9999953508377075,
+      "cosine_prewrap": 0.9328494668006897,
+      "kl_div": 2.759043127298355e-07,
+      "top1_agreement": 0.984375,
+      "drop_in_ok": true,
+      "e2e_speedup": 0.6421034864641129,
+      "and_gate": false,
+      "forced": false,
+      "seconds": 10.048291099999915,
+      "qat": {
+        "steps": 500,
+        "skipped": false,
+        "last_loss": 9.695568223833106e-07,
+        "restored_linears": [
+          "ffn_fc1",
+          "ffn_fc2"
+        ],
+        "logit_loss": "mse",
+        "fold_alpha": true,
+        "binarize_activations": true,
+        "sign_mode": "ste",
+        "note": "Light STE only; production needs BitDistill-scale QAT on real data"
+      },
+      "distill": null,
+      "replaced_expected": [
+        "ffn_fc1",
+        "ffn_fc2"
+      ],
+      "shape": {
+        "d_model": 512,
+        "ff": 2048,
+        "batch": 64
+      },
+      "thesis_note": "Packed CPU XNOR; cosine and e2e are measured. Never GPU 32x from sign()."
+    },
+    {
+      "recipe": "mse_fold_approx_hidden_400",
+      "cosine": 0.9987027645111084,
+      "cosine_prewrap": 0.9748829007148743,
+      "kl_div": 8.000433444976807e-05,
+      "top1_agreement": 0.9375,
+      "drop_in_ok": true,
+      "e2e_speedup": 1.6163854279700869,
+      "and_gate": true,
+      "forced": false,
+      "seconds": 12.669130499998573,
+      "qat": {
+        "steps": 400,
+        "skipped": false,
+        "last_loss": 0.005256241653114557,
+        "restored_linears": [
+          "ffn_fc1",
+          "ffn_fc2"
+        ],
+        "logit_loss": "mse",
+        "fold_alpha": true,
+        "binarize_activations": true,
+        "sign_mode": "approx",
+        "note": "Light STE only; production needs BitDistill-scale QAT on real data"
+      },
+      "distill": null,
+      "replaced_expected": [
+        "ffn_fc1",
+        "ffn_fc2"
+      ],
+      "shape": {
+        "d_model": 512,
+        "ff": 2048,
+        "batch": 64
+      },
+      "thesis_note": "Packed CPU XNOR; cosine and e2e are measured. Never GPU 32x from sign()."
+    },
+    {
+      "recipe": "distill_mse_fold_200",
+      "cosine": 0.9996537566184998,
+      "cosine_prewrap": 0.9673464298248291,
+      "kl_div": 2.1025771275162697e-05,
+      "top1_agreement": 0.984375,
+      "drop_in_ok": true,
+      "e2e_speedup": 0.37629211650482347,
+      "and_gate": false,
+      "forced": false,
+      "seconds": 8.92405940000026,
+      "qat": null,
+      "distill": {
+        "steps": 200,
+        "skipped": false,
+        "cosine_before": 1.0,
+        "cosine_after": 0.9673464298248291,
+        "cosine_uplift": -0.0326535701751709,
+        "last_loss": 6.527752702822909e-05,
+        "restored_linears": [
+          "ffn_fc1",
+          "ffn_fc2"
+        ],
+        "drop_in_ok_before": true,
+        "drop_in_ok_after": true,
+        "notes": "Multi-batch STE KD into BinaryLinear FFN targets; restored to nn.Linear for packing. Toy/demo scale \u2014 not BitDistill. Dual-metric: cosine is measured; compression stays theoretical elsewhere.",
+        "reason": null
+      },
+      "replaced_expected": [
+        "ffn_fc1",
+        "ffn_fc2"
+      ],
+      "shape": {
+        "d_model": 512,
+        "ff": 2048,
+        "batch": 64
+      },
+      "thesis_note": "Packed CPU XNOR; cosine and e2e are measured. Never GPU 32x from sign()."
+    }
+  ],
+  "thesis_lock": "CPU packed XNOR; no GPU 32x from sign(); no new golden shapes."
+}

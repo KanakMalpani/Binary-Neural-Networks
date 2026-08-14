@@ -107,8 +107,18 @@ def compare_goldens() -> tuple[str, int]:
 
     # Wrap
     wrap = json.loads((ROOT / "results" / "wrap_demo.json").read_text(encoding="utf-8"))
-    if abs(wrap["weight_compression_replaced_layers"] - floors["wrap_demo"]["weight_compression_exact"]) > 1e-9:
+    wg = floors["wrap_demo"]
+    if abs(wrap["weight_compression_replaced_layers"] - wg["weight_compression_exact"]) > 1e-9:
         failures.append("wrap compression != 32")
+    if wrap.get("qat"):
+        if float(wrap.get("output_cosine_vs_fp") or 0) < wg["cosine_min"]:
+            failures.append("wrap_demo QAT cosine below 0.85")
+        if float(wrap.get("e2e_speedup") or 0) < wg["e2e_speedup_min"]:
+            failures.append("wrap_demo e2e below 1.5×")
+        if wrap.get("forced"):
+            failures.append("wrap_demo AND-gate used --force")
+        if wrap.get("drop_in_ok") is not True:
+            failures.append("wrap_demo drop_in_ok is not true")
 
     ultra_path = ROOT / "results" / "ultra_wrap.json"
     ug = floors.get("ultra_wrap")
