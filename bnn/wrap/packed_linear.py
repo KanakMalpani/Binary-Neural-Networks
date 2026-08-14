@@ -11,7 +11,7 @@ from torch import Tensor
 from ..kernels.packed import (
     binary_gemm_native_prepacked,
     binary_gemm_native_scaled,
-    binary_gemm_numpy_prepacked,
+    binary_gemm_numpy_or_blas,
     native_kernel_available,
     pack_binary_pm1,
 )
@@ -144,7 +144,7 @@ class PackedBinaryXNORLinear(nn.Module):
                 y = binary_gemm_native_prepacked(xp, self._wp_np, self._n)
                 assert y is not None
             else:
-                y = binary_gemm_numpy_prepacked(xp, self._wp_np, self._n)
+                y = binary_gemm_numpy_or_blas(xp, self._wp_np, self._n)
             # Unfused fallback: scale (+ bias) in-place on numpy
             y *= self._alpha_np
             if self._bias_np is not None:
@@ -164,7 +164,7 @@ class PackedBinaryXNORLinear(nn.Module):
             y = binary_gemm_native_prepacked(xp, self._wp_np, self._n)
             assert y is not None
         else:
-            y = binary_gemm_numpy_prepacked(xp, self._wp_np, self._n)
+            y = binary_gemm_numpy_or_blas(xp, self._wp_np, self._n, x_pm1=x_pm1)
         return y * self._alpha_np
 
 

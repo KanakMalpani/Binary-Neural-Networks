@@ -69,11 +69,16 @@ python scripts/validate_native.py
 
 ### P1. The NumPy fallback is slower than doing nothing
 
-**Status:** measured, unfixed. **Impact:** high — it affects every user without a
-compiler, and it undercuts a claim the README makes.
+**Status:** fixed (dispatch in `binary_gemm_packed` / wrap XNOR forward when
+native is absent). **Impact:** high for the no-native-load audience
+(`BNN_FORCE_NUMPY`, failed ctypes load, exotic platform) — typical Win/mac pip
+wheels already ship native SIMD. README *correct* ≠ *fast* copy is owned by the
+docs/scorecard lane, not this kernel PR.
 
-`binary_gemm_numpy_prepacked` is the fallback when no native library loads. For
-batched shapes it is **5–11× slower than simply calling FP32 BLAS**:
+`binary_gemm_numpy_prepacked` remains the **unchanged** ISA-parity reference.
+It is no longer the default no-native *runtime* path for large batch. For
+batched shapes the Python popcount loop is **5–11× slower than FP32 BLAS**
+(measurement below, before the dispatch):
 
 | shape | numpy packed | plain fp32 | |
 |---|---|---|---|
@@ -96,21 +101,28 @@ correctness." True — but a reader reasonably infers it is also the *fast* path
 For B > 8 it is the slow path, and slower than not packing at all. The 32×
 memory saving is untouched; only the speed story inverts.
 
-**Suggested fix.** In `binary_gemm_packed` (and the wrap forward), when no native
-library is loaded, dispatch on shape: use the packed NumPy path below the
-crossover, else dequantise to ±1 and call BLAS. Both give `err = 0` — the packed
-weights stay packed in memory, so compression is preserved either way.
+**Fix (shipped).** In `binary_gemm_packed` and wrap `PackedBinaryXNORLinear`
+(which bypasses `binary_gemm_packed`), when `_try_load_native()` is `None`:
 
-Guard rails for whoever does this:
+- packed NumPy if `B < NUMPY_PACKED_BLAS_CROSSOVER_BATCH` (default **8**)
+- else dequantise to ±1 and `fp32_gemm`
+
+Both give `err = 0`. Packed weights stay packed in memory (32× compression
+unchanged). Override the cutoff with `BNN_NUMPY_BLAS_BATCH` (0 = always BLAS).
+`BNN_FORCE_NUMPY=1` skips a loaded native library so this path is testable.
+Tests: `tests/test_numpy_blas_fallback.py` (B=64 never worse than FP32 by more
+than 2×; both dispatch legs `err = 0`).
+
+Guard rails:
 - Keep `binary_gemm_numpy_prepacked` public and unchanged; it is the reference
   implementation the ISA-parity tests compare against.
-- The threshold is machine-dependent (see above). Make it a named constant with
-  the measurement in a comment, overridable by env var, and pick it
-  conservatively — being wrong toward BLAS costs little, being wrong toward
-  the packed path costs 5x.
-- Add a test asserting the fallback is never worse than FP32 by more than a small
+- The threshold is machine-dependent (see above). Named constant with the
+  measurement in a comment, overridable by env var, biased toward BLAS —
+  being wrong toward BLAS costs little, being wrong toward the packed path
+  costs 5x.
+- Test asserting the fallback is never worse than FP32 by more than a small
   margin at B = 64.
-- Update the README line so it distinguishes *correct* from *fast*.
+- README *correct* ≠ *fast* is a docs-lane sentence (not this kernel PR).
 
 ---
 
