@@ -98,7 +98,7 @@ Positioning: **Binary Neural Network Optimiser lab/product**, not “another MNI
 
 ## 1. Definition of World-Class (acceptance bar)
 
-A future agent may claim **“world-class BNN optimiser (v1.0)”** only when **all** gates below pass. Until then, say **lab / beta optimiser**.
+**v1.0.0 (2026-08):** all gates below are `[x]` in §10.8. Claim **world-class BNN optimiser (v1.0)** only for those gates. Post-v1 wrap AND-gate (hybrid/binary cosine **≥0.85 and** e2e **≥1.5×**, no `--force`) is a product lever in `docs/TRANSFORMATION_PLAN.md` — **not** a WC reopen and **not** shipped.
 
 ### 1.1 Product & API
 
@@ -382,12 +382,12 @@ Acceptance: every task that touches metrics must keep `bnn repro` green unless e
 | W6.T02 | CIFAR HF/proxy path | M | — | `[x]` |
 | W6.T03 | Audio synthetic lane | M | — | `[x]` |
 | W6.T04 | Dataset cards (MNIST/CIFAR/synth audio) | M | — | `[x]` |
-| W6.T05 | Seq reverse-task card | S | — | `[~]` in docs/36 |
+| W6.T05 | Seq reverse-task card | S | — | `[x]` `docs/DATASET_CARDS.md` |
 | W6.T06 | Training recipes index | M | W4, W9 | `[x]` |
 | W6.T07 | ImageNet folder protocol only | S | — | `[x]` runner (`scripts/imagenet_protocol.py`) |
 | W6.T08 | Never commit datasets | S | — | `[x]` policy |
 
-**Follow when lost:** W6.T04 → W6.T06 → W6.T05.
+**Follow when lost:** W6.T04 → W6.T06 (T05 card shipped).
 
 ---
 
@@ -642,7 +642,7 @@ flowchart TD
 
 ### 7.4 Default active phase
 
-As of 2026-07-25 (updated): **Phases A–D substantially complete at v0.3.0**; remaining = WC-§1 leftovers + moonshots (see `docs/MOONSHOT_DEFERRALS.md` / `docs/40_ROADMAP_E2E_SESSION.md`).
+As of 2026-08-15: **v1.0.0 WC bar met** (§8 / §10.8). Remaining = post-v1 product levers (HF Space, wrap AND-gate, NumPy BLAS fallback, Hub packs, B1) + moonshots (`docs/MOONSHOT_DEFERRALS.md` / `docs/40_ROADMAP_E2E_SESSION.md`).
 
 ---
 
@@ -663,16 +663,18 @@ As of 2026-07-25 (updated): **Phases A–D substantially complete at v0.3.0**; r
 - [x] Compat matrix doc + py3.11–3.13 CI
 - [x] Pareto report v0 (`bnn_pareto_report_v1`)
 - [x] SECURITY.md + MODEL_CARD
-- [~] Tag `v0.4.0` deferred — folded into v0.3.0 preview; ARM/macOS native **landed** (`docs/41` + portability CI); next tag on v1.0 gate progress
+- [~] Tag `v0.4.0` deferred — folded into v0.3.0 preview; ARM/macOS native **landed** (`docs/41` + portability CI); **v1.0.0** tagged 2026-08-04
 
 ### v1.0 — World-class bar
 
-- [ ] All **WC-*** gates in §1 green
-- [ ] Phases A–D complete; E at least tech-report ready
+- [x] All **WC-*** gates in §1 green (§10.8)
+- [x] Phases A–D complete; E at least tech-report ready (publication plan + figures-from-JSON + `CITATION.cff`)
 - [x] PyPI: [`bnn-lab` 1.0.0](https://pypi.org/project/bnn-lab/1.0.0/) (OIDC Trusted Publisher)
-- [ ] Public launch checklist (§10 W11) complete
-- [ ] README badges: repro, CI, license, version
-- [ ] Tag `v1.0.0` with attestation
+- [x] Public launch checklist (§10 W11) complete (`docs/LAUNCH_CHECKLIST.md`)
+- [x] README badges: repro, CI, license, version (plus PyPI / Pages)
+- [x] Tag `v1.0.0` with attestation (`attest-build-provenance` on wheels + sdist)
+
+Post-v1 product residual (**not** a WC / §8 gate): wrap AND-gate — hybrid/binary cosine **≥0.85 and** e2e **≥1.5×** on `wrap_demo` / `ultra_wrap` without `--force`. Today: hybrid cosine **~0.70**, e2e **~1.61×**. Do **not** mark this done; ternary 0.991 / 0.73× does not count.
 
 ---
 
@@ -792,8 +794,10 @@ Pre-checked from 2026-07-25 audit. **Agents: flip `[ ]` → `[x]` or `[~]` in PR
 
 ### 10.9 Remaining after v1.0.0
 
-See `docs/MOONSHOT_DEFERRALS.md`. Honest residuals: venue paper submit; privileged wrap-workload
-RAPL; BitDistill-scale KD; ORT custom op (stays deferred). PyPI **`bnn-lab` 1.0.0** shipped
+See `docs/MOONSHOT_DEFERRALS.md` and `docs/TRANSFORMATION_PLAN.md`. Honest residuals:
+venue paper submit; **wrap AND-gate unclaimed** (hybrid/binary cosine **≥0.85 and** e2e
+**≥1.5×** without `--force` — not a WC reopen); privileged wrap-workload RAPL;
+BitDistill-scale KD; ORT custom op (stays deferred). PyPI **`bnn-lab` 1.0.0** shipped
 (OIDC Trusted Publisher; no API-token path).
 
 ---
@@ -821,10 +825,11 @@ RAPL; BitDistill-scale KD; ORT custom op (stays deferred). PyPI **`bnn-lab` 1.0.
 ### 11.2 Top next actions (post v1.0.0)
 
 1. ~~Wave 2 integrator (lanes A–I + KG)~~ **DONE**
-2. Tag `v1.0.0` + GitHub Release when `bnn repro` is green on the integrator tip
+2. ~~Tag `v1.0.0` + GitHub Release~~ **DONE** (2026-08-04; attestations on wheels + sdist)
 3. ~~**Human:** register Trusted Publisher for **`bnn-lab`** on pypi.org, then Actions → wheels → `publish=true`~~ **DONE** — [`bnn-lab` 1.0.0](https://pypi.org/project/bnn-lab/1.0.0/) (OIDC; run [31825286443](https://github.com/KanakMalpani/Binary-Neural-Networks/actions/runs/31825286443); `docs/PYPI_PUBLISH.md`)
 4. ~~Clean-venv smoke after first upload~~ **DONE** for library import (`pip install bnn-lab==1.0.0`); `bnn repro` still needs a clone + `[dev]`
-5. Optional: venue paper submit from `docs/PUBLICATION_PLAN.md`; privileged Linux wrap-workload RAPL
+5. Post-v1 product (do **not** invent goldens): HF Space wrap-paradox demo; wrap AND-gate spike (0.85 cosine **and** 1.5× e2e); NumPy vs BLAS fallback when native is absent (`docs/45` P1)
+6. Optional: venue paper submit from `docs/PUBLICATION_PLAN.md`; privileged Linux wrap-workload RAPL
 
 ---
 
