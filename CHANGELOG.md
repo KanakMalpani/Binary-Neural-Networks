@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- **Wave H (2026-08-15):** issue **#2 closed** — every public CLI verb is in `bnn --help` epilog (PR #34); Larq-vacuum positioning + ROADMAP §8 v1.0 scorecard aligned with §10.8 (PR #35); KG 2026 literature overlay (PR #36); NumPy vs BLAS fallback when native is absent (`docs/45` P1, PR #37). Both GEMM paths `err = 0`; 32× remains uint64 pack compression, not GPU from `sign()`.
+- **Wave S (2026-08-15):** in-repo Gradio wrap-paradox demo (`demo/space/`, PR #38) — **Space not live** (Hugging Face Gradio `cpu-basic` returns HTTP 402 without Pro). Wrap AND-gate on committed `wrap_demo` hidden=4096: cosine **0.999** and e2e **2.65×** without `--force` (PR #39). Ultra TinyBlock hybrid still ~0.70 `REFUSE`. Ternary 0.991 / 0.73× e2e does **not** count. No live Hub packs; no B1 arXiv submit; no GPU 32× from `sign()`.
 - **PyPI:** [`bnn-lab` 1.0.0](https://pypi.org/project/bnn-lab/1.0.0/) is live (OIDC Trusted Publisher, Actions run 31825286443 on `main`). W8.T08 `[x]`. Wheel install is library-only (`import bnn`); `bnn repro` / `bnn optimise` / `bnn recommend` still need a clone + `[dev]`. No `cp313-win_amd64` / `cp313-macosx_x86_64` wheels in 1.0.0 (documented skips). Pending publisher should show **active** after first upload. No API-token publish path.
 - Landing: pip-first README (`pip install bnn-lab==1.0.0`), above-the-fold When-to-use / When-NOT callout (issue #1), kernel/wrap/SIMD/bridge mermaid diagrams, dual-metric hero. Git-pip remains a library-only fallback. Wheel matrix names the five cibuildwheel jobs (no Windows ARM64).
 - Docs: GitHub Pages workflow deploys the existing MkDocs `--strict` site to `kanakmalpani.github.io/Binary-Neural-Networks`.
