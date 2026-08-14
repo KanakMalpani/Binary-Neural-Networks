@@ -442,11 +442,9 @@ Repo: [Binary-Neural-Networks](https://github.com/KanakMalpani/Binary-Neural-Net
 
 
 try:
-    import gradio as gr  # noqa: F401
+    demo = _build_demo()
 except ImportError:
     demo = None
-else:
-    demo = _build_demo()
 
 
 if __name__ == "__main__":
