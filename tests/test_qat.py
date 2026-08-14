@@ -147,6 +147,65 @@ def test_swap_preserves_weights_and_bias_presence():
     assert _swap_linear_to_binary(nobias).bias is None
 
 
+def test_swap_inits_alpha_from_per_channel_absmean():
+    """Xavier leftover alpha was a wrap-calib mismatch; copy must set per-out scale."""
+    torch.manual_seed(0)
+    lin = nn.Linear(8, 4, bias=True)
+    with torch.no_grad():
+        lin.weight.mul_(3.0)
+        lin.weight[0].mul_(2.0)
+    bl = _swap_linear_to_binary(lin)
+    expected = lin.weight.detach().abs().mean(dim=1).clamp(min=1e-4)
+    assert torch.allclose(bl.alpha, expected)
+    assert torch.allclose(bl.weight, lin.weight)
+
+
+def test_fold_alpha_bakes_scale_into_restored_row_absmean():
+    from bnn.wrap.qat import _restore_binary_to_linear
+
+    torch.manual_seed(1)
+    lin = nn.Linear(6, 3, bias=True)
+    bl = _swap_linear_to_binary(lin)
+    with torch.no_grad():
+        bl.alpha.copy_(torch.tensor([0.2, 0.5, 1.5], dtype=bl.alpha.dtype))
+    restored = _restore_binary_to_linear(bl, fold_alpha=True)
+    row_mean = restored.weight.detach().abs().mean(dim=1)
+    assert torch.allclose(row_mean, bl.alpha.detach(), atol=1e-5)
+    # Signs match STE packing convention (>=0 → +1).
+    signs = bl.weight.detach().ge(0).to(bl.weight.dtype).mul(2).sub(1)
+    assert torch.allclose(restored.weight, signs * bl.alpha.detach().reshape(-1, 1))
+
+
+def test_mse_logit_loss_runs_and_folds_alpha():
+    torch.manual_seed(0)
+    student, teacher = Tiny(), Tiny()
+    x = torch.randn(4, 16)
+    report = light_qat_recover(
+        student,
+        x,
+        teacher=teacher,
+        steps=3,
+        logit_loss="mse",
+        fold_alpha=True,
+    )
+    assert report["skipped"] is False
+    assert report["logit_loss"] == "mse"
+    assert report["fold_alpha"] is True
+    assert set(report["restored_linears"]) == {"ffn_fc1", "ffn_fc2"}
+
+
+def test_weight_only_ste_swap_does_not_sign_activations():
+    from bnn.wrap.qat import WeightOnlySTELinear, _swap_linear_to_binary
+
+    lin = nn.Linear(4, 3, bias=True)
+    ste = _swap_linear_to_binary(lin, binarize_activations=False)
+    assert isinstance(ste, WeightOnlySTELinear)
+    x = torch.randn(2, 4)
+    y = ste(x)
+    assert y.shape == (2, 3)
+    assert torch.isfinite(y).all()
+
+
 def test_report_carries_production_caveat():
     """The note keeps callers from reading a toy recovery as production QAT."""
     report = light_qat_recover(Tiny(), torch.randn(4, 16), steps=1, loss_fn=_mse_to_self)

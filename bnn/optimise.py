@@ -50,6 +50,11 @@ class OptimiseConfig:
     calib: CalibConfig | None = field(default_factory=CalibConfig)
     qat_steps: int = 0
     qat_layer_names: list[str] | None = None
+    qat_logit_loss: str = "mse"
+    qat_fold_alpha: bool = True
+    qat_hidden_mse: float = 0.0
+    qat_binarize_activations: bool = True
+    qat_sign_mode: str | None = None
     drop_in_threshold: float = 0.85
     force: bool = False
     accuracy_first: bool = False
@@ -154,6 +159,8 @@ def optimise_model(
                     temperature=cfg.distill_temperature,
                     layer_names=cfg.distill_layer_names,
                     drop_in_threshold=cfg.drop_in_threshold,
+                    logit_loss="mse",
+                    fold_alpha=True,
                 ),
             )
             distill_info = d_report.to_dict()
@@ -173,6 +180,11 @@ def optimise_model(
             steps=cfg.qat_steps,
             lr=1e-3,
             layer_names=layer_names,
+            logit_loss=cfg.qat_logit_loss,  # type: ignore[arg-type]
+            fold_alpha=cfg.qat_fold_alpha,
+            hidden_mse=cfg.qat_hidden_mse,
+            binarize_activations=cfg.qat_binarize_activations,
+            sign_mode=cfg.qat_sign_mode,  # type: ignore[arg-type]
         )
 
     sensitivity_payload: dict[str, Any] | None = None
