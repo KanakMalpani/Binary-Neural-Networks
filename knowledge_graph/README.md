@@ -13,7 +13,7 @@ candidates, and open gaps.
 | Merge enrichment | `python scripts/merge_kg_enrichment.py` |
 | Integrity overlay | `python scripts/apply_kg_integrity.py` |
 | Validate | `bnn kg validate` · `python scripts/kg_validate.py` · `pytest tests/test_kg.py` |
-| Enrichment provenance | [`enrichment/`](enrichment/) (gap-parallel + integrity_wave1; do not delete) |
+| Enrichment provenance | [`enrichment/`](enrichment/) (gap-parallel + integrity_wave1 + literature_2026; do not delete) |
 
 ## Thesis lock (immutable)
 
@@ -97,7 +97,8 @@ Import `bnn_kg.graphml` directly in Gephi (File → Open) or Neo4j (`apoc.import
 5. **Wrap decision tree** — BitNet / GGUF / torchao / AWQ / NPU INT8-first
 6. **Modalities** — MNIST / CIFAR Bi-Real / audio synth / seq enc-dec
 7. **Novel papers B1–B3** — see `docs/32_NOVEL_PAPER_CANDIDATES.md` (maintainer-local idea vault is optional and not required to clone)
-8. **Roadmap gaps** — v0.3.0 vs v1.0 leftovers (`OpenGap` nodes)
+8. **Roadmap gaps** — v1.0 shipped (PyPI / WASM / `.bnnpack` v2 / distill); remaining `OpenGap`s are intentional
+9. **2026 literature** — ScaleQ-1.58, BitEmbed, VibeASR-BitNet, Litespark (`status: literature`; no local invented ×)
 
 ## Gap fill policy
 
