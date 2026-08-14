@@ -2,7 +2,7 @@
 
 | Field | Value |
 |-------|-------|
-| **Status** | Proposal (does **not** flip `ROADMAP.md` / `docs/37` checkboxes) |
+| **Status** | Proposal (does **not** flip `ROADMAP.md` / `docs/37` checkboxes). **2026-08-14:** Wave 0 / lever 1 shipped — [`bnn-lab` 1.0.0](https://pypi.org/project/bnn-lab/1.0.0/) is live (OIDC). |
 | **Date** | 2026-08-13 |
 | **HEAD at writing** | `bc4aa7e` (`v1.0.0-3-gbc4aa7e`) |
 | **Tag** | `v1.0.0` (2026-08-04) |
@@ -29,7 +29,7 @@ Audit: **2026-08-13**. Score is honesty vs a *public category-leading repo*, not
 | **CI / OSS** | **7/10** | Win+Linux native, py3.11–3.13, portability, CodeQL, OpenSSF Scorecard, LICENSE, templates, Discussions, branch protection. | **0 stars / 0 forks**. 2 stale good-first issues. 7+ Dependabot PRs. No Pages. |
 | **Research / KG** | **7/10** | 165 nodes / 288 edges, `validate PASS`, claims whitelist, B1–B3 vault. | KG still marks Wave 1 lanes as `open_pr` after merge #26. No venue submit. Survey last reviewed 2026-08-04 (misses ScaleQ-1.58, BitEmbed, VibeASR-BitNet). |
 | **Moonshots** | **8/10** | WASM pedagogy, RAPL proxy, ImageNet *protocol* (no SOTA gate), bitnet.cpp pin (no submodule). | Privileged RAPL, ORT custom op, BitDistill-scale KD — correctly deferred. |
-| **PyPI** | **2/10** | `wheels.yml` + OIDC + attestations ready. | **`bnn-lab` not on PyPI** (human Trusted Publisher). Badge is a 404. Name `bnn` taken by Adrian Bulat. |
+| **PyPI** | **8/10** | `bnn-lab` **1.0.0** on PyPI (OIDC Trusted Publisher, 2026-08-14). | Recurring releases; no Windows ARM64 / no `cp313-win_amd64` in 1.0.0. Name `bnn` taken by Adrian Bulat. |
 
 **Headline:** this is a **world-class *lab*** (repro, kernels, honesty) that is **not yet a public product**. The WC bar in ROADMAP §1 is mostly met; the *exponential* gap is distribution, conversion, wrap quality, and category occupancy after **Larq archived 2026-06-15**.
 
@@ -37,8 +37,8 @@ Audit: **2026-08-13**. Score is honesty vs a *public category-leading repo*, not
 
 | Item | Kind |
 |------|------|
-| W8.T08 / WC-R2–R4 `[~]` | **Human:** PyPI Trusted Publisher + first upload |
-| v1.0 checklist rows in §8 | Stale vs tagged `v1.0.0` — tag exists; PyPI line still open |
+| W8.T08 / WC-R2–R4 | **Shipped 2026-08-14:** `bnn-lab` 1.0.0 on PyPI (OIDC) |
+| v1.0 checklist rows in §8 | Stale vs tagged `v1.0.0` — tag exists; PyPI line now `[x]` |
 | Ternary kernels / audio / ONNX / leaderboard `[~]` | Polish or deferred-by-policy, not blockers |
 | Non-goals in §0.3 | Stay `[ ]` forever (GPU 32×, ImageNet SOTA gate, Whisper product, NPU 1-bit) |
 
@@ -46,7 +46,7 @@ Audit: **2026-08-13**. Score is honesty vs a *public category-leading repo*, not
 
 - **Git:** `main` = `bc4aa7e` (3 commits after `v1.0.0` / Wave 2 integrator `49de25b`: packing 2.5–10×, handoff doc, popcount signedness test).
 - **Release:** `v1.0.0` 2026-08-04, **no attached wheel assets** (wheels live in Actions, unpublished).
-- **KG OpenGaps still `open`:** `gap_pypi_trusted`, `gap_venue_submit`, `gap_reactnet_in_repo`, `gap_litespark_local`, `gap_fbi_llm_repro`. Several `open_pr` gaps are **stale** (WASM, bnnpack v2, distill, RAPL, layer search, bitnet submodule — shipped or closed-by-policy).
+- **KG OpenGaps still `open`:** `gap_venue_submit`, `gap_reactnet_in_repo`, `gap_litespark_local`, `gap_fbi_llm_repro`. **`gap_pypi_trusted` merged** 2026-08-14. Several `open_pr` gaps are **stale** (WASM, bnnpack v2, distill, RAPL, layer search, bitnet submodule — shipped or closed-by-policy).
 
 ---
 
@@ -68,7 +68,7 @@ It is **not** a fake-binary GPU story, not llama.cpp, not bitnet.cpp, not ImageN
 
 | # | Constraint | Why it dominates |
 |---|------------|------------------|
-| **1. Discoverability / install physics** | A stranger cannot `pip install bnn-lab`. Search for “binary neural networks pytorch” hits archived Larq, Adrian Bulat’s `bnn` 0.1.2, and student MNIST repos — **not this lab**. 0 stars after a complete v1.0. | OSS “best in category” is a **funnel**. Uninstallable + unfindable = zero compounding, regardless of kernel quality. |
+| **1. Discoverability / install physics** | A stranger **can** `pip install bnn-lab==1.0.0` (library). Search for “binary neural networks pytorch” still hits archived Larq, Adrian Bulat’s `bnn` 0.1.2, and student MNIST repos — **not this lab**. 0 stars after a complete v1.0. | OSS “best in category” is a **funnel**. Indexable install is shipped; category occupancy and conversion remain the gap. |
 | **2. Wrap quality vs speed (Amdahl + STE)** | Default `bnn optimise --policy auto`: **hybrid cosine ~0.70**, e2e modest, `REFUSE_DROP_IN`. Legacy `wrap_demo.json` binary_xnor: cosine **0.31** / **~4.8×** e2e (no QAT). Ternary+QAT: cosine **0.991**, e2e **0.73×**. | The 10× product gap is **hybrid/binary ≥0.85 cosine and still ≥1.5× e2e**. Auto already refuses honestly — that is not the missing 10×. Ternary already meets cosine and **loses** wall-clock. |
 | **3. Memory bandwidth vs popcount throughput** | Large GEMMs are DRAM-bound; packing wins by shrinking the stream. Small GEMMs / Python loops / act-pack overhead eat Amdahl. NumPy packed path **loses to BLAS** for batched shapes **when native is absent**. | Physics: 32× fewer bytes only helps if the runtime **streams packed bits**. Typical pip (Win/mac wheels) already loads native SIMD. The 5–11× inversion is the **no-native-load** audience (failed/`BNN_FORCE_NUMPY`/exotic platform), not “most `pip install` users.” |
 | **4. STE / architecture gap vs literature** | Lab CIFAR Bi-Real **61% vs FP 71%** (10 pp). Literature ImageNet ladder: BinaryNet 42% → ReActNet-A **69.4%**. RSign/RPReLU is documented, not default (`gap_reactnet_in_repo`). | Training recipe, not kernel, sets whether wrap/train is a toy. Closing 10 pp on the **canary** is allowed; ImageNet SOTA as a **gate** is not. |
@@ -95,15 +95,15 @@ Each item: **what / why 10× not 1.1× / first principles / evidence / effort / 
 
 **Kind (rank order unchanged):** **funnel 10×** = adoption/discoverability (levers **1–3, 6–8**) — not a measured kernel/wrap ratio. **Measured 10×** = wall-clock or cosine on committed shapes (levers **4, 5**). Lever 9 is agent-memory; lever 10 is bounded/bridge.
 
-### 1. Ship `bnn-lab` on PyPI (Trusted Publisher) — *funnel 10×*
+### 1. Ship `bnn-lab` on PyPI (Trusted Publisher) — *funnel 10×* — **SHIPPED 2026-08-14**
 
-- **What:** Human registers pending publisher for `bnn-lab` / `wheels.yml` / env `pypi`; dispatch `publish=true`; clean-venv `pip install bnn-lab && bnn repro`.
+- **What:** Pending publisher for `bnn-lab` / `wheels.yml` / env `pypi`; dispatch `publish=true` on **`main`**; clean-venv `pip install bnn-lab==1.0.0` + `import bnn`. (`bnn repro` remains clone + `[dev]`.)
 - **Why 10×:** Converts the lab from “clone a 3-week-old repo” to **the installable PyTorch BNN toolkit** the week Larq is archived. Zero → indexable on PyPI, Cursor, pip, HF snippets.
 - **First principles:** Distribution is the scarce resource, not another SIMD path.
-- **Evidence:** `docs/PYPI_PUBLISH.md`; KG `gap_pypi_trusted` + `world_class_v1 blocked_by` it; PyPI name `bnn` taken; wheels workflow already attested.
+- **Evidence:** `docs/PYPI_PUBLISH.md`; KG `gap_pypi_trusted` **merged**; PyPI name `bnn` taken; run [31825286443](https://github.com/KanakMalpani/Binary-Neural-Networks/actions/runs/31825286443).
 - **Effort:** **S** (human, ~30 min) + **S** post-upload README (`pip install bnn-lab` first).
 - **Thesis risk:** **None** if dual-metric README stays.
-- **Next PR:** After upload: README/GUIDE lead with pip; pin release assets; close W8.T08 in ROADMAP twins.
+- **Next PR:** This docs/ROADMAP/KG flip (W8.T08 `[x]`). Recurring releases stay OIDC-only.
 
 ### 2. Landing conversion: 60-second dual-metric demo, not clone+MSVC — *funnel 10×*
 
@@ -246,7 +246,7 @@ flowchart LR
 
 | Wave | Days | Owner | Exit | Depends |
 |------|------|-------|------|---------|
-| **0** | 0–3 | **Human** | `pip install bnn-lab` + `bnn repro` on clean venv; PyPI JSON 200 | Publisher on pypi.org |
+| **0** | 0–3 | **Human** | `pip install bnn-lab==1.0.0` + `import bnn` on clean venv; PyPI JSON 200 | **Shipped 2026-08-14** |
 | **1** | 1–14 | Agent | Pip-first README; Pages live; **issue #1 implemented** as an above-the-fold “When NOT to use BNN” callout under the thesis (then close), **or** rewrite #1 — not a paperwork close of the bottom table; KG `open_pr` drift fixed | Wave 0 preferred, can draft README anyway |
 | **2** | 7–28 | Agent | HF Space shows wrap paradox on **existing** shapes (label auto ~0.70 REFUSE vs legacy wrap_demo 0.31) | Wave 0 (install story) |
 | **3** | 14–45 | Agent | **Same as lever 4 (AND, not OR):** hybrid/binary cosine **≥0.85 and** e2e **≥1.5×** on committed `wrap_demo` / `ultra_wrap` shapes, without `--force`. Ternary 0.991 / 0.73× does **not** count. Auto-never-first-run-REFUSE is a **1.1×** side quest (already nearly true today) — **not** this exit. If `wrap_demo` is the target, update `golden_floors.json` `cosine_max_without_qat: 0.5` on **that same shape**. | Wave 2 (demo must match recipe) |

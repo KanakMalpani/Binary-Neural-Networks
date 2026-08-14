@@ -31,6 +31,7 @@ is *left* and what was *learned*.
 | Gates | `REPRO: PASS`, `export_check: PASS`, cross-ISA `err = 0` |
 | Static | ruff clean, mypy clean (62 files), actionlint clean |
 | Kernel here | `avx512` of `[scalar, avx2, avx512]` |
+| PyPI | **`bnn-lab` 1.0.0 live** (2026-08-14, OIDC Trusted Publisher) |
 
 Re-verify everything with:
 
@@ -169,7 +170,6 @@ Do **not** do this at the same time as any behavioural change.
 
 | Item | Blocker |
 |---|---|
-| **W8.T08 PyPI Trusted Publishing** | Human: configure the PyPI trusted publisher and the `pypi` GitHub environment. Workflow is already wired and gated behind a manual dispatch (`.github/workflows/wheels.yml`). See `docs/PYPI_PUBLISH.md`. |
 | **W3.T08 distill integration** | Needs a real corpus and training budget; `scripts/distill_sketch.py` is a sketch. |
 | **W4.T05 ResNet-BiReal reference** | Multi-hour CIFAR training to produce a golden. |
 | Dependabot backlog | Several open PRs. **Note:** merging the `setuptools >= 83` bump means the `PYSEC-2026-3447` ignore in `.github/workflows/ci.yml` should be *removed*, or the gate silently carries a stale exemption. The `codeql-action` v3→v4 bumps rewrite the SHA pins. |

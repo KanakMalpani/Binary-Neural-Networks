@@ -38,8 +38,8 @@ gh attestation verify bnn_lab-1.0.0.tar.gz --repo KanakMalpani/Binary-Neural-Net
 ```
 
 Filenames use the normalised dist name `bnn_lab` (PyPI project `bnn-lab`).
-Publish to PyPI remains OIDC Trusted Publishing only — see
-[`PYPI_PUBLISH.md`](PYPI_PUBLISH.md).
+Publish to PyPI is OIDC Trusted Publishing only — see
+[`PYPI_PUBLISH.md`](PYPI_PUBLISH.md). First upload: `bnn-lab` 1.0.0 live.
 
 ## Related
 

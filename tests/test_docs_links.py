@@ -150,14 +150,14 @@ def test_readme_when_not_callout_is_above_the_fold():
     assert "int4" in callout.lower() or "fp8" in callout.lower()
 
 
-def test_readme_does_not_claim_live_pypi_install():
-    """Wave 0 residual: do not advertise `pip install bnn-lab` as a working PyPI command."""
+def test_readme_claims_live_pypi_install():
+    """W8.T08: advertise `pip install bnn-lab` now that 1.0.0 is on PyPI."""
     text = (ROOT / "README.md").read_text(encoding="utf-8")
-    assert "pypi.org/project/bnn-lab" not in text.lower()
-    for line in text.splitlines():
-        stripped = line.strip()
-        if stripped.startswith("pip install bnn-lab") and "@ git+" not in stripped:
-            raise AssertionError(f"README claims live PyPI install: {stripped}")
+    assert "pypi.org/project/bnn-lab" in text.lower()
+    assert any(
+        line.strip().startswith("pip install bnn-lab") and "@ git+" not in line
+        for line in text.splitlines()
+    ), "README should lead with pip install bnn-lab from PyPI"
 
 
 def _git_pip_fences(text: str) -> list[str]:

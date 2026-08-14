@@ -22,27 +22,24 @@ Honest leftovers after Wave 2 integration. Delivered moonshots are listed as
 | — | bitnet.cpp submodule | **CLOSED-BY-POLICY** — recipe + SHA pin (`third_party/BITNET_PIN.md`) |
 | W9.T06 | Autodoc API site | MkDocs mkdocstrings (CI `--strict`) |
 | W12.T02–T05 | Publication / figures / triage | docs/32 + `bnn bridge figures` |
+| W8.T08 | PyPI Trusted Publishing upload | [`bnn-lab` 1.0.0](https://pypi.org/project/bnn-lab/1.0.0/) OIDC (run 31825286443); no API-token path |
 
 ## Still open / residual
 
 | ID | Item | Blocker | Acceptance leftover |
 |----|------|---------|---------------------|
-| W8.T08 | PyPI Trusted Publishing upload | **Human** pending publisher on pypi.org | See [`PYPI_PUBLISH.md`](PYPI_PUBLISH.md) — no API-token path |
 | M5+ | Privileged wrap-workload RAPL | OS / powercap permissions | Spike loop pedagogy only; energy-proxy remains default |
 | M3+ | ORT custom op revisit | Consumer demand + dual metrics | Keep bridge recommendation |
 | — | BitDistill-scale KD | Recipe time / data | Toy STE KD demo is enough for WC-O4 |
 | — | Venue paper submit | Author time | Plan exists; not a repro gate |
 | M4 | Community leaderboard submissions | External contributors | Template + fair protocol shipped |
 
-## Human blocker (PyPI)
+## PyPI (shipped)
 
-1. On [pypi.org](https://pypi.org) → Publishing → Add pending publisher for project
-   `bnn-lab`, owner `KanakMalpani`, repo `Binary-Neural-Networks`, workflow
-   `wheels.yml`, environment `pypi`.
-2. Actions → Wheels → Run workflow with `publish=true`.
-3. Clean venv: `pip install bnn-lab` && `bnn repro`.
-
-Do **not** invent long-lived API tokens.
+Pending Trusted Publisher for `bnn-lab` / `wheels.yml` / env `pypi` was used for
+the first OIDC upload on **`main`**. After that upload the publisher should show
+as **active** on pypi.org Publishing. Recurring releases stay OIDC-only — do
+**not** invent long-lived API tokens. See [`PYPI_PUBLISH.md`](PYPI_PUBLISH.md).
 
 ## Thesis lock (unchanged)
 

@@ -733,9 +733,9 @@
     <node id="gap_pypi_trusted">
       <data key="label">OpenGap: First PyPI Trusted Publisher Upload</data>
       <data key="type">OpenGap</data>
-      <data key="summary">wheels.yml + docs ready; OIDC dry-run/attestations shipped. First bnn-lab upload still needs human Trusted Publisher on pypi.org — not live (JSON 404).</data>
+      <data key="summary">bnn-lab 1.0.0 on PyPI via OIDC Trusted Publisher (wheels.yml publish=true on main, run 31825286443). Wheel is library-only; bnn repro needs clone+[dev]. No API-token path. No cp313-win_amd64 / cp313-macosx_x86_64 in 1.0.0.</data>
       <data key="confidence">0.9</data>
-      <data key="status">open</data>
+      <data key="status">merged</data>
       <data key="sources">docs/PYPI_PUBLISH.md | ROADMAP.md</data>
     </node>
     <node id="gap_litespark_local">

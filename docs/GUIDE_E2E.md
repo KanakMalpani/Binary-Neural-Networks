@@ -82,13 +82,19 @@ Needed only for [tutorial 08](tutorials/08_HF_OPTIMISER.md) (Hugging Face).
 
 ## 3. Install & verify
 
-PyPI **`bnn-lab` is not live yet** (human Trusted Publisher — [`PYPI_PUBLISH.md`](PYPI_PUBLISH.md)).
-Until then, install from Git or an editable clone. Do **not** treat `pip install bnn-lab`
-as a working PyPI command.
+Install from PyPI as **[`bnn-lab`](https://pypi.org/project/bnn-lab/)** (Trusted Publisher —
+[`PYPI_PUBLISH.md`](PYPI_PUBLISH.md)). The short name `bnn` on PyPI is unrelated —
+import and CLI here stay `bnn`.
 
-A non-editable git-pip wheel does **not** include repo `scripts/`. Do **not** run
+A wheel install does **not** include repo `scripts/`. Do **not** run
 `bnn repro` / `bnn optimise` / `bnn recommend` on the next line after that install —
 those CLIs need a clone. Library-only path:
+
+```bat
+pip install bnn-lab==1.0.0
+```
+
+Git fallback (same library-only contract):
 
 ```bat
 pip install "bnn-lab @ git+https://github.com/KanakMalpani/Binary-Neural-Networks.git@v1.0.0"

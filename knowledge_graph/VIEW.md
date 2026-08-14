@@ -194,7 +194,7 @@ flowchart TB
   V03[v0.3.0 lab<br/>portable SIMD, optimise API, repro]
   V10[World-class v1.0 bar<br/>ROADMAP WC-* gates]
   V03 --> V10
-  V10 -.->|blocked_by| G1[PyPI Trusted Publisher first upload]
+  V10 -.->|shipped| G1[PyPI Trusted Publisher first upload]
   V10 -.->|shipped| G2[Distill integration W3.T08]
   V10 -.->|shipped| G3[.bnnpack v2 + safetensors]
   V10 -.->|pedagogy shipped| G4[WASM SIMD]
@@ -202,7 +202,7 @@ flowchart TB
   V10 -.->|accepted non-goal| G6[Full ImageNet SOTA schedule]
 ```
 
-`gap_pypi_trusted` is the remaining human blocker. Distill, `.bnnpack` v2, WASM pedagogy, layer search, and bitnet.cpp pin are **merged / closed-by-policy** — do not re-open them from stale `open_pr` fields.
+`gap_pypi_trusted` is **merged** (`bnn-lab` 1.0.0 on PyPI). Distill, `.bnnpack` v2, WASM pedagogy, layer search, and bitnet.cpp pin are **merged / closed-by-policy** — do not re-open them from stale `open_pr` fields.
 
 ---
 

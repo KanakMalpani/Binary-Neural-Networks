@@ -98,9 +98,22 @@
         "integrity_removed_edges": 4,
         "integrity_cleared_lab_alias": 0,
         "integrity_stripped_abs_sources": 0
+      },
+      {
+        "generated": "2026-08-04T23:50:00+05:30",
+        "researcher": "lane-kg-enrich",
+        "schema_version": "1.0",
+        "purpose": "Lab/product integrity enrichment: WC-O gates, CLI systems, GPTQ/Q-Sparse/BitDistiller, RAPL Result, moonshot non-goals, Wave 1 status honesty, broken source fixes, same_as repairs. 2026-08-13: flip stale open_pr after v1.0.0 / PR #26. 2026-08-14: gap_pypi_trusted merged — bnn-lab 1.0.0 on PyPI.",
+        "lab_coverage_note": "Lanes A–I merged via Wave 2 integrator (PRs #16–#24, #26). Stale open_pr statuses flipped to merged/closed_by_policy/established. gap_pypi_trusted merged — bnn-lab 1.0.0 on PyPI (OIDC Trusted Publisher). Thesis lock unchanged.",
+        "integrity_added_nodes": 0,
+        "integrity_added_edges": 0,
+        "integrity_removed_same_as": 0,
+        "integrity_removed_edges": 0,
+        "integrity_cleared_lab_alias": 0,
+        "integrity_stripped_abs_sources": 0
       }
     ],
-    "integrity_patched_at": "2026-08-13T18:13:07.563987+00:00"
+    "integrity_patched_at": "2026-08-14T18:11:55.451640+00:00"
   },
   "nodes": [
     {
@@ -1296,13 +1309,13 @@
       "id": "gap_pypi_trusted",
       "label": "OpenGap: First PyPI Trusted Publisher Upload",
       "type": "OpenGap",
-      "summary": "wheels.yml + docs ready; OIDC dry-run/attestations shipped. First bnn-lab upload still needs human Trusted Publisher on pypi.org — not live (JSON 404).",
+      "summary": "bnn-lab 1.0.0 on PyPI via OIDC Trusted Publisher (wheels.yml publish=true on main, run 31825286443). Wheel is library-only; bnn repro needs clone+[dev]. No API-token path. No cp313-win_amd64 / cp313-macosx_x86_64 in 1.0.0.",
       "sources": [
         "docs/PYPI_PUBLISH.md",
         "ROADMAP.md"
       ],
       "confidence": 0.9,
-      "status": "open"
+      "status": "merged"
     },
     {
       "id": "gap_litespark_local",
