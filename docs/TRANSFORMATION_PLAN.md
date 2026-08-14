@@ -2,9 +2,9 @@
 
 | Field | Value |
 |-------|-------|
-| **Status** | Living post-v1 product plan (WC gates stay in `ROADMAP.md` / `docs/37`). **2026-08-15:** Waves 0–1 shipped. Wave H: issue #2 CLI epilog, Larq/§8, KG overlay, NumPy BLAS (PRs #34–#37). Wave S: `demo/space/` in-repo (PR #38, **Space not live** — HF Pro 402); `wrap_demo` AND-gate (PR #39). Ultra TinyBlock hybrid still ~0.70 `REFUSE`. Hub packs / B1 submit **unclaimed**. |
+| **Status** | Living post-v1 product plan (WC gates stay in `ROADMAP.md` / `docs/37`). **2026-08-15:** Waves 0–1 shipped. Wave H: issue #2 CLI epilog, Larq/§8, KG overlay, NumPy BLAS (PRs #34–#37). Wave S: `demo/space/` in-repo (PR #38, **Space not live** — HF Pro 402); `wrap_demo` AND-gate (PR #39). Hub `.bnnpack` **canaries live** (PR #42, not SOTA; wrap pack is PTQ bytes, not the QAT checkpoint). Ultra TinyBlock hybrid still ~0.70 `REFUSE`. Space still not live. B1/arXiv still human. |
 | **Date** | 2026-08-13 (integrator refresh 2026-08-15) |
-| **HEAD at writing** | `a03c5b4` (`main` after wrap AND-gate `#39`) |
+| **HEAD at writing** | `725b7ac` (`main` after Hub canaries `#42`) |
 | **Tag** | `v1.0.0` (2026-08-04) |
 | **Package** | `bnn-lab` (import/CLI `bnn`) |
 | **Thesis lock** | Packed CPU/edge XNOR–popcount + honest STE; **32× is uint64 pack compression, not GPU from `sign()`**; no invented goldens |
@@ -17,21 +17,21 @@ Related: [`45_IMPROVEMENT_ROADMAP_HANDOFF.md`](45_IMPROVEMENT_ROADMAP_HANDOFF.md
 
 ## A. Current state (1 screen)
 
-Audit: **2026-08-13** (integrator refresh **2026-08-15** vs `a03c5b4`). Score is honesty vs a *public category-leading repo*, not vs the lab’s own WC gates (those are largely green).
+Audit: **2026-08-13** (integrator refresh **2026-08-15** vs `725b7ac`). Score is honesty vs a *public category-leading repo*, not vs the lab’s own WC gates (those are largely green).
 
 | Area | Score | State | Residual |
 |------|------:|-------|----------|
 | **Kernels** | **9/10** | Portable SIMD (AVX-512 → AVX2 → NEON → scalar), OpenMP, `err = 0` bit-identity, 4-row blocking. Aggregate **5.1×** vs prior kernel; **~24×** vs NumPy FP32 at 64×4096×4096. When native is **absent**, large-B dispatch uses dequant+BLAS (`docs/45` P1, PR #37). | Typical Win/mac pip wheels already ship native SIMD. `binary_gemm_numpy_prepacked` stays the `err = 0` reference. 32× is pack size, not GPU from `sign()`. |
 | **Wrap / WC-O** | **8/10** | `bnn optimise` + schema v1, auto policy, BN fuse, distill, drop-in **REFUSE**. **`wrap_demo` hidden=4096 AND-gate shipped** (PR #39): cosine **0.999**, e2e **2.65×**, `forced: false`. Default `--policy auto` on Ultra TinyBlock still **hybrid cosine ~0.70** + `REFUSE_DROP_IN`. Ternary+QAT cosine **0.991**, drop-in OK — but e2e **0.73×** (does **not** count). WC-O4 is **[x]**. | Residual is TinyBlock hybrid still below 0.85 — not “QAT is a sketch,” and not a live-everywhere drop-in claim. |
-| **Codec** | **8/10** | `.bnnpack` v2 + hashes + safetensors. | ONNX = bridge-only (policy). No Hub collection of packs. |
+| **Codec** | **9/10** | `.bnnpack` v2 + hashes + safetensors. Hub canaries **live** (PR #42; not SOTA). Wrap pack is PTQ bytes, not the QAT checkpoint. | ONNX = bridge-only (policy). |
 | **CLI** | **8/10** | Rich (`optimise`, `repro`, `bridge`, `kg`, `energy-bound`, …). Issue **#2 closed** (epilog inventory, PR #34). | Clone-first; `bnn/cli.py` ~1k lines (split is 1.1×). |
-| **Docs** | **9/10** | `GUIDE_E2E`, tutorials 01–08, MkDocs autodoc `--strict`, dual-metric pip-first README, **GitHub Pages live**, issue **#1 closed**, Larq-vacuum competitor table (PR #35). In-repo Gradio wrap paradox (`demo/space/`, PR #38). | **Space not live** (HF Pro 402). No Hub packs / B1 submit. |
+| **Docs** | **9/10** | `GUIDE_E2E`, tutorials 01–08, MkDocs autodoc `--strict`, dual-metric pip-first README, **GitHub Pages live**, issue **#1 closed**, Larq-vacuum competitor table (PR #35). In-repo Gradio wrap paradox (`demo/space/`, PR #38). Hub `.bnnpack` canaries live (PR #42). | **Space not live** (HF Pro 402). B1/arXiv still human. Canaries, not SOTA. |
 | **CI / OSS** | **8/10** | Win+Linux native, py3.11–3.13, portability, CodeQL, OpenSSF Scorecard, LICENSE, templates, Discussions, branch protection, **Pages deployed**. Issue **#2 closed**. | **0 stars / 0 forks**. Dependabot hygiene. |
 | **Research / KG** | **7/10** | 168 nodes / 296 edges, `validate PASS`, claims whitelist, B1–B3 vault, 2026 literature overlay (PR #36). | No venue submit. Intentional OpenGaps stay open (`gap_litespark_local`, `gap_venue_submit`, `gap_reactnet_in_repo`, `gap_fbi_llm_repro`). |
 | **Moonshots** | **8/10** | WASM pedagogy, RAPL proxy, ImageNet *protocol* (no SOTA gate), bitnet.cpp pin (no submodule). | Privileged RAPL, ORT custom op, BitDistill-scale KD — correctly deferred. |
 | **PyPI** | **8/10** | `bnn-lab` **1.0.0** on PyPI (OIDC Trusted Publisher, 2026-08-14). | Recurring releases; no Windows ARM64 / no `cp313-win_amd64` in 1.0.0. Name `bnn` taken by Adrian Bulat. |
 
-**Headline:** this is a **world-class *lab*** (repro, kernels, honesty) with **v1.0 WC gates + PyPI + Pages** shipped. Wave H/S in-repo: NumPy BLAS fallback, `wrap_demo` AND-gate, `demo/space/` (not live). The *exponential* gap left is **live** conversion (HF Space / Hub packs), B1 cite, TinyBlock hybrid still ~0.70 `REFUSE`, and category occupancy after **Larq archived 2026-06-15**. No GPU 32× from `sign()`.
+**Headline:** this is a **world-class *lab*** (repro, kernels, honesty) with **v1.0 WC gates + PyPI + Pages** shipped. Wave H/S in-repo: NumPy BLAS fallback, `wrap_demo` AND-gate, `demo/space/` (not live). Hub `.bnnpack` **canaries live** (not SOTA). The *exponential* gap left is **live** HF Space (Pro), B1 cite (arXiv still human), TinyBlock hybrid still ~0.70 `REFUSE`, and category occupancy after **Larq archived 2026-06-15**. No GPU 32× from `sign()`.
 
 ### Remaining ROADMAP `[ ]` / `[~]` (honest)
 
@@ -39,14 +39,14 @@ Audit: **2026-08-13** (integrator refresh **2026-08-15** vs `a03c5b4`). Score is
 |------|------|
 | W8.T08 / WC-R2–R4 | **Shipped 2026-08-14:** `bnn-lab` 1.0.0 on PyPI (OIDC) |
 | v1.0 checklist rows in §8 | **Aligned 2026-08-15:** WC gates, launch checklist, README badges, `v1.0.0` tag, PyPI all `[x]`. Wrap AND-gate is **not** a §8 row. `wrap_demo` AND-gate **shipped** (PR #39); Ultra TinyBlock hybrid still unclaimed. |
-| Wave H / S in-repo | **Shipped 2026-08-15:** PRs #34–#39. Space **not live**. Hub packs / B1 submit unclaimed. |
+| Wave H / S in-repo | **Shipped 2026-08-15:** PRs #34–#39. Space **not live**. Hub canaries **live** (PR #42, not SOTA). B1/arXiv still human. |
 | W6.T05 seq reverse-task card | **`[x]`** — `docs/DATASET_CARDS.md` |
 | Ternary kernels / audio / ONNX / leaderboard `[~]` | Polish or deferred-by-policy, not blockers |
 | Non-goals in §0.3 | Stay `[ ]` forever (GPU 32×, ImageNet SOTA gate, Whisper product, NPU 1-bit) |
 
 ### Inventory snapshot
 
-- **Git:** `main` @ `a03c5b4` after PRs #32–#39 (PyPI, landing, Wave H/S). Issue #1 and #2 closed. Pages live. Space **not live**.
+- **Git:** `main` @ `725b7ac` after PRs #32–#42 (PyPI, landing, Wave H/S, Hub canaries). Issue #1 and #2 closed. Pages live. Hub `.bnnpack` canaries **live** (not SOTA). Space **not live**.
 - **Release:** `v1.0.0` 2026-08-04; **`bnn-lab` 1.0.0** on PyPI 2026-08-14 (OIDC). Frozen `v1.0.0` tag has no attached wheel assets (wheels live in Actions / PyPI).
 - **KG OpenGaps still `open`:** `gap_venue_submit`, `gap_reactnet_in_repo`, `gap_litespark_local`, `gap_fbi_llm_repro`. **`gap_pypi_trusted` merged** 2026-08-14. 2026 literature overlay shipped (PR #36).
 
@@ -74,7 +74,7 @@ It is **not** a fake-binary GPU story, not llama.cpp, not bitnet.cpp, not ImageN
 | **2. Wrap quality vs speed (Amdahl + STE)** | Default `bnn optimise --policy auto` on Ultra TinyBlock: **hybrid cosine ~0.70**, e2e modest, `REFUSE_DROP_IN`. Committed `wrap_demo.json` (hidden=4096, QAT 200 steps): cosine **0.999** / **2.65×** e2e, `forced: false` (PR #39). Ternary+QAT: cosine **0.991**, e2e **0.73×**. | The remaining 10× product gap is **TinyBlock hybrid ≥0.85 cosine and still ≥1.5× e2e**. Auto already refuses honestly. Ternary already meets cosine and **loses** wall-clock. `wrap_demo` Sequential AND-gate is **shipped** — do not retarget a new bench. |
 | **3. Memory bandwidth vs popcount throughput** | Large GEMMs are DRAM-bound; packing wins by shrinking the stream. Small GEMMs / Python loops / act-pack overhead eat Amdahl. When native is **absent**, batched packed NumPy **used to** lose to BLAS; PR #37 dispatches dequant+BLAS above a batch cutoff (`docs/45` P1). | Physics: 32× fewer bytes only helps if the runtime **streams packed bits**. Typical pip (Win/mac wheels) already loads native SIMD. The fallback is for failed/`BNN_FORCE_NUMPY`/exotic platform, not “most `pip install` users.” |
 | **4. STE / architecture gap vs literature** | Lab CIFAR Bi-Real **61% vs FP 71%** (10 pp). Literature ImageNet ladder: BinaryNet 42% → ReActNet-A **69.4%**. RSign/RPReLU is documented, not default (`gap_reactnet_in_repo`). | Training recipe, not kernel, sets whether wrap/train is a toy. Closing 10 pp on the **canary** is allowed; ImageNet SOTA as a **gate** is not. |
-| **5. OSS trust / conversion** | Pip-first README + above-the-fold When-NOT (**issue #1 closed** 2026-08-13). MkDocs **Pages live**. In-repo Space app (`demo/space/`, PR #38); **not live** on Hugging Face (Pro 402). KG 2026 overlay shipped (PR #36). | llama.cpp / bitnet.cpp / transformers still win on **60-second try-before-clone**. Residual is a **public** Space, not clone+MSVC or Pages 404. |
+| **5. OSS trust / conversion** | Pip-first README + above-the-fold When-NOT (**issue #1 closed** 2026-08-13). MkDocs **Pages live**. In-repo Space app (`demo/space/`, PR #38); **not live** on Hugging Face (Pro 402). Hub `.bnnpack` **canaries live** (PR #42; not SOTA). KG 2026 overlay shipped (PR #36). | llama.cpp / bitnet.cpp / transformers still win on **60-second try-before-clone**. Residual is a **public** Space, not clone+MSVC or Pages 404. |
 | **6. Category confusion (BitNet era)** | 2026 mindshare is **1.58-bit LLMs** (bitnet.cpp **~40k★**, 2B4T, BitEmbed, ScaleQ-1.58 PTQ, Litespark SIMD). Classic CNN BNN tooling (**Larq archived**) is vacant. | Competing with bitnet.cpp on LLM tok/s is suicide. Occupying **PyTorch packed BNN optimiser + honest routing** is the wedge. |
 
 ### Invert: what world-class looks like in 2026
@@ -170,15 +170,16 @@ Each item: **what / why 10× not 1.1× / first principles / evidence / effort / 
 - **Thesis risk:** **High** if the paper advertises 32× latency. Whitelist C1–C7 only.
 - **Next PR:** `docs(W12): B1 preprint skeleton + PwC code link` (no invented figures).
 
-### 8. Hub artifacts: `.bnnpack` + tiny zoo on Hugging Face — *funnel 10×*
+### 8. Hub artifacts: `.bnnpack` + tiny zoo on Hugging Face — *funnel 10×* — **SHIPPED 2026-08-15** (canaries, not SOTA)
 
-- **What:** Upload 1–3 **tiny** packed artifacts (MNIST MLP, CIFAR Bi-Real canary weights if license-clean, wrap-demo pack) with model cards that quote floors, not SOTA. `from_pretrained`-style load in tutorial 08.
-- **Why 10×:** llama.cpp won because GGUF is a **noun** on the Hub. `.bnnpack` is a format without a public object. Formats without objects don’t get copied.
+- **What:** Upload 1–3 **tiny** packed artifacts (MNIST MLP, wrap-demo pack; CIFAR Bi-Real skipped — checkpoints gitignored) with model cards that quote floors, not SOTA. `hf_hub_download` load path in tutorial 08.
+- **Shipped (PR #42):** collection [bnn-lab `.bnnpack` canaries](https://huggingface.co/collections/KanakMalpani/bnn-lab-bnnpack-canaries-6a7f84448bdcaba4b5950eba) — [`wrap-demo`](https://huggingface.co/KanakMalpani/bnn-lab-wrap-demo), [`mnist-mlp-canary`](https://huggingface.co/KanakMalpani/bnn-lab-mnist-mlp-canary), [`codec-canary`](https://huggingface.co/KanakMalpani/bnn-lab-codec-canary). Wrap pack is **PTQ bytes**, not the QAT checkpoint. Ultra TinyBlock still `REFUSE`.
+- **Why 10×:** llama.cpp won because GGUF is a **noun** on the Hub. `.bnnpack` is now a downloadable object (canary), not only an in-repo format.
 - **First principles:** A codec is a product only if strangers can download a file.
-- **Evidence:** W5.T03–T06 done in-tree; no HF collection; bitnet.cpp ships `BitNet-b1.58-2B-4T-gguf`.
-- **Effort:** **M**.
+- **Evidence:** live Hub collection + three repos; `docs/HUB_BNNPACK.md`; `cards/`; `scripts/encode_hf_canaries.py`. 32× is uint64 pack compression, not GPU from `sign()`.
+- **Effort:** **M** (done for canaries).
 - **Thesis risk:** **Low** if cards say canary, not ImageNet.
-- **Next PR:** `feat(W5): HF collection + bnnpack model card`.
+- **Next PR:** none for the collection. Show HN / r/MachineLearning remain human. Space still lever 3 (HF Pro). arXiv still human.
 
 ### 9. KG freshness + agent-facing honesty (compounding for AI users) — **SHIPPED 2026-08-15**
 
@@ -255,7 +256,7 @@ flowchart LR
 | **3** | 14–45 | Agent | **Same as lever 4 (AND, not OR):** hybrid/binary cosine **≥0.85 and** e2e **≥1.5×** on committed `wrap_demo` / `ultra_wrap` shapes, without `--force`. Ternary 0.991 / 0.73× does **not** count. | **`wrap_demo` hidden=4096 shipped** (PR #39: 0.999 / 2.65×). Ultra TinyBlock hybrid still ~0.70 `REFUSE`. |
 | **4** | 21–45 | Agent | When native is **absent**, NumPy fallback never 5× slower than BLAS at B=64 (docs/45 P1). Typical Win/mac pip wheels already have native SIMD. | **Shipped 2026-08-15** (PR #37). Independent of 3. |
 | **5** | 30–75 | Author | B1 arXiv from goldens; PwC code link | **Unclaimed.** Waves 1–2 (public artifact). |
-| **6** | 45–90 | Mixed | HF `.bnnpack` collection; Show HN / r/MachineLearning with **honest** title. In-repo Larq-vacuum copy **shipped 2026-08-15**. | **Hub packs unclaimed.** Waves 0–2. |
+| **6** | 45–90 | Mixed | HF `.bnnpack` collection; Show HN / r/MachineLearning with **honest** title. In-repo Larq-vacuum copy **shipped 2026-08-15**. | **Collection shipped 2026-08-15** (PR #42; canaries, not SOTA; wrap pack PTQ not QAT). Show HN remains human. Waves 0–2. |
 
 **Optional after day 60 (not on the critical path):** ReActNet RSign/RPReLU in `bnn.ste` as a CIFAR canary improvement (`gap_reactnet_in_repo`); ternary row-blocking (P2); bitnet.cpp 2B4T bridge smoke.
 
@@ -263,7 +264,7 @@ flowchart LR
 
 1. `pip install bnn-lab` works.
 2. A stranger gets a dual-metric report in <5 minutes without MSVC.
-3. One Hub or Space artifact exists. (**Partial:** in-repo `demo/space/`; **no live Space**, no Hub packs.)
+3. One Hub or Space artifact exists. (**Hub yes:** `.bnnpack` canaries live, not SOTA; **no live Space** — HF Pro 402.)
 4. Hybrid/binary wrap on a committed shape is **drop-in (≥0.85) and faster (≥1.5× e2e)** — **`wrap_demo` hidden=4096 yes**; Ultra TinyBlock hybrid still `REFUSE`. Honest skip/REFUSE is already shipped and is **not** this bar. Ternary 0.73× e2e does **not** count.
 5. Paper or tech report cites committed goldens only. (**Unclaimed** — no B1 arXiv submit.)
 6. Search “pytorch binary neural network packed” can find this repo.
@@ -297,3 +298,4 @@ Stars follow those; they are not the input.
 - When a wave ships, update ROADMAP twins **in that PR**.
 - If a wave conflicts with a WC gate, **WC gate wins**.
 - Wrap AND-gate (Wave 3 / lever 4): **`wrap_demo` hidden=4096 shipped** (PR #39 — cosine **0.999** and e2e **2.65×** without `--force`). Ultra TinyBlock hybrid still ~0.70 `REFUSE`. Ternary 0.991 / 0.73× e2e does **not** count. Not a WC reopen. 32× is uint64 pack compression, not GPU from `sign()`.
+- Wave 6 / lever 8: Hub `.bnnpack` **canaries live** (PR #42; not SOTA; wrap pack is PTQ bytes, not the QAT checkpoint). Space still not live (HF Pro). arXiv still human.
