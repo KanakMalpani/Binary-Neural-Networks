@@ -15,13 +15,45 @@ from bnn._version import __version__
 
 ROOT = Path(__file__).resolve().parents[1]
 
+# Top-level verbs printed in ``bnn --help`` epilog (issue #2). Keep in sync
+# with ``build_parser()`` subparsers; ``tests/test_cli_surface.py`` fails if a
+# registered verb is missing here (unless listed in that test's INTERNAL_COMMANDS).
+PUBLIC_CLI_VERBS: tuple[str, ...] = (
+    "bench",
+    "bridge",
+    "compile-native",
+    "decode",
+    "encode",
+    "energy-bound",
+    "eval-suite",
+    "export-check",
+    "kg",
+    "memory",
+    "optimise",
+    "pareto",
+    "profile",
+    "recommend",
+    "repro",
+    "train",
+    "train-audio",
+    "train-cifar",
+    "train-image",
+    "train-seq2seq",
+    "validate-native",
+    "version",
+    "wrap",
+    "wrap-transformer",
+)
+
 EPILOG = """
 Thesis: packed binary/ternary kernels for CPU/edge inference.
 Training (STE) is simulation — not a GPU 32× claim.
 Reproduce:  bnn repro
 Agents:     see AGENTS.md
 Docs:       REPRODUCIBILITY.md
-""".strip()
+
+Commands: {verbs}
+""".strip().format(verbs=", ".join(PUBLIC_CLI_VERBS))
 
 
 def _script_path(script: str) -> Path:

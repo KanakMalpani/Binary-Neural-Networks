@@ -128,7 +128,7 @@ bnn recommend --goal edge-vision
 
 Expect **`REPRO: PASS`** (exit 0). The report prints **compression**, **cosine**, **wall-clock**, and **REFUSE/OK**. Prefer **`bnn optimise`** over legacy `bnn wrap --ultra`.
 
-No compiler? Install still succeeds — the NumPy packed path stays **correct**. Windows native needs **MSVC x64** (MinGW 32-bit → WinError 193). Full path: [`docs/GUIDE_E2E.md`](docs/GUIDE_E2E.md).
+No compiler? Install still succeeds — the NumPy packed path stays **correct** (`err = 0`), not always **fast**. When the native library is absent, packed NumPy can lose to FP32 BLAS on batched GEMMs; this release does **not** auto-dispatch that path to BLAS. Windows native needs **MSVC x64** (MinGW 32-bit → WinError 193). Full path: [`docs/GUIDE_E2E.md`](docs/GUIDE_E2E.md).
 
 ---
 
@@ -387,7 +387,15 @@ Details: [`docs/41_PORTABLE_SIMD_KERNEL.md`](docs/41_PORTABLE_SIMD_KERNEL.md).
 
 ## Ecosystem & bridges
 
-This lab occupies **packed PyTorch BNN optimisation** now that **Larq (TF/Keras) is archived**. It does **not** compete with bitnet.cpp on LLM tok/s, or with torchao/vLLM on GPU INT4/FP8. When those win, `bnn bridge` / `bnn recommend` say so.
+This lab occupies **packed PyTorch BNN optimisation** now that **[Larq](https://github.com/larq/larq) (TF/Keras) is archived (2026-06-15)**. It is the PyTorch toolkit for wrap / policy / QAT + uint64 XNOR–popcount + dual-metric REFUSE. It does **not** compete with bitnet.cpp on LLM tok/s, or with torchao/vLLM on GPU INT4/FP8. When those win, `bnn bridge` / `bnn recommend` say so. Do **not** quote Larq Compute Engine FPS. Do **not** claim GPU 32× from `sign()`.
+
+| Project | Stack | Occupies | This lab’s stance |
+|---------|-------|----------|-------------------|
+| **Larq + LCE** | TF/Keras | Classic CNN BNN train + packed ARM deploy | Archived **2026-06-15**. Vacancy we occupy in **PyTorch**. No LCE FPS claimed here. |
+| **Brevitas** | PyTorch | Flexible QAT, including 1-bit | Training / export — not a packed XNOR runtime |
+| **bitnet.cpp** | C++ / CUDA | Ternary **LLM** inference (tok/s) | Bridge when local CPU LLM chat wins |
+| **torchao** | PyTorch | GPU INT4 / FP8 / INT8 | Bridge for datacenter GPU quality — not 1-bit BNN |
+| **This lab (`bnn-lab`)** | PyTorch + packed CPU kernels | Packed BNN **optimiser** (wrap, `.bnnpack`, XNOR–popcount, dual metrics) | Not llama.cpp; not ImageNet SOTA; not GPU 32× |
 
 ```mermaid
 flowchart TB

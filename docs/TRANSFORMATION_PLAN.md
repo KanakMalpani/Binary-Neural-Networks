@@ -2,9 +2,9 @@
 
 | Field | Value |
 |-------|-------|
-| **Status** | Proposal (does **not** flip `ROADMAP.md` / `docs/37` checkboxes). **2026-08-14:** Wave 0 / lever 1 shipped — [`bnn-lab` 1.0.0](https://pypi.org/project/bnn-lab/1.0.0/) is live (OIDC). |
-| **Date** | 2026-08-13 |
-| **HEAD at writing** | `bc4aa7e` (`v1.0.0-3-gbc4aa7e`) |
+| **Status** | Living post-v1 product plan (WC gates stay in `ROADMAP.md` / `docs/37`). **2026-08-15:** Wave 0 (PyPI) and Wave 1 (pip-first README, issue **#1 closed**, Pages live) shipped. ROADMAP §8 v1.0 rows aligned with §10.8. Wrap AND-gate (Wave 3) remains **unclaimed**. |
+| **Date** | 2026-08-13 (scorecard refresh 2026-08-15) |
+| **HEAD at writing** | `bc4aa7e` (`v1.0.0-3-gbc4aa7e`); refresh against `main` after PyPI `#33` / landing `#32` |
 | **Tag** | `v1.0.0` (2026-08-04) |
 | **Package** | `bnn-lab` (import/CLI `bnn`) |
 | **Thesis lock** | Packed CPU/edge XNOR–popcount + honest STE; **32× is uint64 pack compression, not GPU from `sign()`**; no invented goldens |
@@ -25,28 +25,29 @@ Audit: **2026-08-13**. Score is honesty vs a *public category-leading repo*, not
 | **Wrap / WC-O** | **7/10** | `bnn optimise` + schema v1, auto policy, BN fuse, distill, drop-in **REFUSE**. Default `--policy auto` lands **hybrid cosine ~0.70** + `REFUSE_DROP_IN`. Legacy `wrap_demo.json` binary_xnor cosine **0.31** (no QAT). Ternary+QAT cosine **0.991**, drop-in OK — but e2e **0.73×** (slower than FP). WC-O4 is **[x]** in ROADMAP (short QAT vs cold PTQ on the documented demo). | Gap is **binary/hybrid still below 0.85 drop-in** while staying fast — not “QAT is a sketch.” |
 | **Codec** | **8/10** | `.bnnpack` v2 + hashes + safetensors. | ONNX = bridge-only (policy). No Hub collection of packs. |
 | **CLI** | **8/10** | Rich (`optimise`, `repro`, `bridge`, `kg`, `energy-bound`, …). | Clone-first; `bnn/cli.py` ~1k lines (split is 1.1×). |
-| **Docs** | **8/10** | `GUIDE_E2E`, tutorials 01–08, MkDocs autodoc `--strict`, dual-metric README. | **GitHub Pages 404**. README conversion is clone+MSVC. Issue **#1 is still open for a reason**: it wants an **above-the-fold** “When NOT to use BNN” callout under the thesis; the README only has an Is/is not table **at the bottom**. |
-| **CI / OSS** | **7/10** | Win+Linux native, py3.11–3.13, portability, CodeQL, OpenSSF Scorecard, LICENSE, templates, Discussions, branch protection. | **0 stars / 0 forks**. 2 stale good-first issues. 7+ Dependabot PRs. No Pages. |
-| **Research / KG** | **7/10** | 165 nodes / 288 edges, `validate PASS`, claims whitelist, B1–B3 vault. | KG still marks Wave 1 lanes as `open_pr` after merge #26. No venue submit. Survey last reviewed 2026-08-04 (misses ScaleQ-1.58, BitEmbed, VibeASR-BitNet). |
+| **Docs** | **9/10** | `GUIDE_E2E`, tutorials 01–08, MkDocs autodoc `--strict`, dual-metric pip-first README, **GitHub Pages live**, issue **#1 closed** (above-the-fold When-NOT under the thesis). | HF Space still missing. Larq-vacuum competitor table lands with this refresh. |
+| **CI / OSS** | **8/10** | Win+Linux native, py3.11–3.13, portability, CodeQL, OpenSSF Scorecard, LICENSE, templates, Discussions, branch protection, **Pages deployed**. | **0 stars / 0 forks**. Issue **#2** still open (CLI inventory). Dependabot hygiene. |
+| **Research / KG** | **7/10** | 165 nodes / 288 edges, `validate PASS`, claims whitelist, B1–B3 vault. | KG Wave-1 `open_pr` drift is a separate freshness lane. No venue submit. Survey competitor table refreshed 2026-08-15 (Larq archived 2026-06-15). |
 | **Moonshots** | **8/10** | WASM pedagogy, RAPL proxy, ImageNet *protocol* (no SOTA gate), bitnet.cpp pin (no submodule). | Privileged RAPL, ORT custom op, BitDistill-scale KD — correctly deferred. |
 | **PyPI** | **8/10** | `bnn-lab` **1.0.0** on PyPI (OIDC Trusted Publisher, 2026-08-14). | Recurring releases; no Windows ARM64 / no `cp313-win_amd64` in 1.0.0. Name `bnn` taken by Adrian Bulat. |
 
-**Headline:** this is a **world-class *lab*** (repro, kernels, honesty) that is **not yet a public product**. The WC bar in ROADMAP §1 is mostly met; the *exponential* gap is distribution, conversion, wrap quality, and category occupancy after **Larq archived 2026-06-15**.
+**Headline:** this is a **world-class *lab*** (repro, kernels, honesty) with **v1.0 WC gates + PyPI + Pages** shipped. The *exponential* gap left is conversion (HF Space), wrap quality (AND-gate), no-native BLAS honesty, and category occupancy after **Larq archived 2026-06-15**.
 
 ### Remaining ROADMAP `[ ]` / `[~]` (honest)
 
 | Item | Kind |
 |------|------|
 | W8.T08 / WC-R2–R4 | **Shipped 2026-08-14:** `bnn-lab` 1.0.0 on PyPI (OIDC) |
-| v1.0 checklist rows in §8 | Stale vs tagged `v1.0.0` — tag exists; PyPI line now `[x]` |
+| v1.0 checklist rows in §8 | **Aligned 2026-08-15:** WC gates, launch checklist, README badges, `v1.0.0` tag, PyPI all `[x]`. Wrap AND-gate is **not** a §8 row and stays unclaimed. |
+| W6.T05 seq reverse-task card | **`[x]`** — `docs/DATASET_CARDS.md` |
 | Ternary kernels / audio / ONNX / leaderboard `[~]` | Polish or deferred-by-policy, not blockers |
 | Non-goals in §0.3 | Stay `[ ]` forever (GPU 32×, ImageNet SOTA gate, Whisper product, NPU 1-bit) |
 
 ### Inventory snapshot
 
-- **Git:** `main` = `bc4aa7e` (3 commits after `v1.0.0` / Wave 2 integrator `49de25b`: packing 2.5–10×, handoff doc, popcount signedness test).
-- **Release:** `v1.0.0` 2026-08-04, **no attached wheel assets** (wheels live in Actions, unpublished).
-- **KG OpenGaps still `open`:** `gap_venue_submit`, `gap_reactnet_in_repo`, `gap_litespark_local`, `gap_fbi_llm_repro`. **`gap_pypi_trusted` merged** 2026-08-14. Several `open_pr` gaps are **stale** (WASM, bnnpack v2, distill, RAPL, layer search, bitnet submodule — shipped or closed-by-policy).
+- **Git:** `main` after landing `#32` + PyPI `#33` (PyPI live, pip-first README, issue #1 closed, Pages live).
+- **Release:** `v1.0.0` 2026-08-04; **`bnn-lab` 1.0.0** on PyPI 2026-08-14 (OIDC). Frozen `v1.0.0` tag has no attached wheel assets (wheels live in Actions / PyPI).
+- **KG OpenGaps still `open`:** `gap_venue_submit`, `gap_reactnet_in_repo`, `gap_litespark_local`, `gap_fbi_llm_repro`. **`gap_pypi_trusted` merged** 2026-08-14. Several `open_pr` gaps are **stale** (WASM, bnnpack v2, distill, RAPL, layer search, bitnet submodule — shipped or closed-by-policy); KG freshness is a separate lane.
 
 ---
 
@@ -72,7 +73,7 @@ It is **not** a fake-binary GPU story, not llama.cpp, not bitnet.cpp, not ImageN
 | **2. Wrap quality vs speed (Amdahl + STE)** | Default `bnn optimise --policy auto`: **hybrid cosine ~0.70**, e2e modest, `REFUSE_DROP_IN`. Legacy `wrap_demo.json` binary_xnor: cosine **0.31** / **~4.8×** e2e (no QAT). Ternary+QAT: cosine **0.991**, e2e **0.73×**. | The 10× product gap is **hybrid/binary ≥0.85 cosine and still ≥1.5× e2e**. Auto already refuses honestly — that is not the missing 10×. Ternary already meets cosine and **loses** wall-clock. |
 | **3. Memory bandwidth vs popcount throughput** | Large GEMMs are DRAM-bound; packing wins by shrinking the stream. Small GEMMs / Python loops / act-pack overhead eat Amdahl. NumPy packed path **loses to BLAS** for batched shapes **when native is absent**. | Physics: 32× fewer bytes only helps if the runtime **streams packed bits**. Typical pip (Win/mac wheels) already loads native SIMD. The 5–11× inversion is the **no-native-load** audience (failed/`BNN_FORCE_NUMPY`/exotic platform), not “most `pip install` users.” |
 | **4. STE / architecture gap vs literature** | Lab CIFAR Bi-Real **61% vs FP 71%** (10 pp). Literature ImageNet ladder: BinaryNet 42% → ReActNet-A **69.4%**. RSign/RPReLU is documented, not default (`gap_reactnet_in_repo`). | Training recipe, not kernel, sets whether wrap/train is a toy. Closing 10 pp on the **canary** is allowed; ImageNet SOTA as a **gate** is not. |
-| **5. OSS trust / conversion** | README’s first action is `git clone` + `compile_native`. MkDocs builds in CI; **Pages not deployed**. HF Space: none. Issue #1 still needs the above-the-fold callout (not a paperwork close). KG `open_pr` after merge. | llama.cpp / bitnet.cpp / transformers win on **60-second success**. This lab currently onboards like a research archive. |
+| **5. OSS trust / conversion** | Pip-first README + above-the-fold When-NOT (**issue #1 closed** 2026-08-13). MkDocs **Pages live**. HF Space: none. KG `open_pr` drift is a separate freshness lane. | llama.cpp / bitnet.cpp / transformers still win on **60-second try-before-clone**. Residual is Space, not clone+MSVC or Pages 404. |
 | **6. Category confusion (BitNet era)** | 2026 mindshare is **1.58-bit LLMs** (bitnet.cpp **~40k★**, 2B4T, BitEmbed, ScaleQ-1.58 PTQ, Litespark SIMD). Classic CNN BNN tooling (**Larq archived**) is vacant. | Competing with bitnet.cpp on LLM tok/s is suicide. Occupying **PyTorch packed BNN optimiser + honest routing** is the wedge. |
 
 ### Invert: what world-class looks like in 2026
@@ -105,15 +106,15 @@ Each item: **what / why 10× not 1.1× / first principles / evidence / effort / 
 - **Thesis risk:** **None** if dual-metric README stays.
 - **Next PR:** This docs/ROADMAP/KG flip (W8.T08 `[x]`). Recurring releases stay OIDC-only.
 
-### 2. Landing conversion: 60-second dual-metric demo, not clone+MSVC — *funnel 10×*
+### 2. Landing conversion: 60-second dual-metric demo, not clone+MSVC — *funnel 10×* — **SHIPPED 2026-08-13**
 
-- **What:** README above-the-fold = one-liner install + one command that prints **compression 32×, cosine, wall-clock, REFUSE/OK**. Move thesis mermaid down. **Implement issue #1** as a short **above-the-fold** “When NOT to use BNN” callout **under the thesis** (GPU/INT4/bitnet.cpp/NPU INT8) — the bottom Is/is not table does **not** satisfy #1; do **not** paperwork-close it. Then close #1, or rewrite the issue if the callout is rejected. Deploy **GitHub Pages** from existing MkDocs CI artifact.
-- **Why 10×:** llama.cpp/HF conversion is “first screen success.” Current first screen is a research manifesto. Pages 404 wastes a `--strict` docs job.
+- **What:** README above-the-fold = one-liner install + one command that prints **compression 32×, cosine, wall-clock, REFUSE/OK**. Thesis mermaid sits under the thesis. Issue **#1 implemented** as an above-the-fold “When NOT to use BNN” callout under the thesis (GPU/INT4/bitnet.cpp/NPU INT8) and **closed**. **GitHub Pages** deploys from MkDocs CI to [kanakmalpani.github.io/Binary-Neural-Networks](https://kanakmalpani.github.io/Binary-Neural-Networks/).
+- **Why 10×:** llama.cpp/HF conversion is “first screen success.”
 - **First principles:** Attention is bandwidth-limited; the README is the only kernel most visitors run.
-- **Evidence:** Exa fetch of GitHub README; `gh api .../pages` 404; issue #1 still open because the callout is missing above the fold, not because nobody wrote “when not to use” anywhere.
-- **Effort:** **M**.
-- **Thesis risk:** **Low** — do not drop dual-metric warnings to look punchier.
-- **Next PR:** `docs(W9): pip-first README + above-the-fold When-NOT callout (#1) + Pages workflow`.
+- **Evidence:** PR [#32](https://github.com/KanakMalpani/Binary-Neural-Networks/pull/32); issue [#1](https://github.com/KanakMalpani/Binary-Neural-Networks/issues/1) closed 2026-08-13; Pages HTML 200.
+- **Effort:** **M** (done).
+- **Thesis risk:** **Low** — dual-metric warnings stayed.
+- **Next PR:** none for this lever. Residual conversion is lever 3 (HF Space).
 
 ### 3. One killer demo (HF Space): the wrap paradox, visualized — *funnel 10×*
 
@@ -147,15 +148,15 @@ Each item: **what / why 10× not 1.1× / first principles / evidence / effort / 
 - **Thesis risk:** **Low** if `err = 0` both ways and compression of stored weights is unchanged.
 - **Next PR:** `perf(kernels): BLAS fallback when NumPy packed loses` + test at B=64.
 
-### 6. Occupy the Larq vacuum, explicitly — *funnel 10×*
+### 6. Occupy the Larq vacuum, explicitly — *funnel 10×* — **SHIPPED 2026-08-15** (copy)
 
-- **What:** Positioning sentence: *PyTorch packed BNN optimiser now that Larq (TF/Keras) is archived (2026-06-15).* Comparison table: Larq / Brevitas / bitnet.cpp / torchao / this lab. Do **not** claim LCE FPS.
+- **What:** Positioning sentence: *PyTorch packed BNN optimiser now that Larq (TF/Keras) is archived (2026-06-15).* Comparison table: Larq / Brevitas / bitnet.cpp / torchao / this lab. Do **not** claim LCE FPS or GPU 32×.
 - **Why 10×:** Category leadership is **who inherits the search query**. 732★ Larq is read-only; LCE last release 2024. PyTorch users have no default BNN toolkit with packed kernels + honesty.
 - **First principles:** Markets have one default. Vacancy is a larger delta than another tutorial.
-- **Evidence:** larq/larq archived; docs/02 already notes it; Tavily/Exa did not surface this GitHub repo for generic BNN queries.
-- **Effort:** **S–M** (README + `docs/02` row + maybe a blog/Show HN).
-- **Thesis risk:** **Low** if we don’t claim Larq Zoo ImageNet numbers as ours.
-- **Next PR:** `docs: Larq-archive positioning + competitor table`.
+- **Evidence:** larq/larq archived 2026-06-15; README + `docs/02_SOTA_SURVEY.md` competitor table.
+- **Effort:** **S–M** (done for in-repo copy). Show HN / blog remain human.
+- **Thesis risk:** **Low** — we don’t claim Larq Zoo ImageNet numbers as ours.
+- **Next PR:** none for in-repo copy. Optional later: Show HN with an honest title.
 
 ### 7. B1 tech report from goldens + Papers with Code — *funnel 10×*
 
@@ -216,7 +217,7 @@ Impressive-looking work that **violates the thesis** or **does not compound**:
 | `ruff format` whole-repo / CLI split / more tutorials 09–20 | 1.1× maintainability, merge pain. |
 | Competing with bitnet.cpp on tok/s using this GEMM | Wrong product; route. |
 | Dependabot firehose as the roadmap | Hygiene, not 10×. |
-| Paperwork-close of issue #1 | Bottom “When not to use” table ≠ above-the-fold callout under the thesis. Implement or rewrite; don’t close as completed. |
+| Paperwork-close of issue #1 | **Closed 2026-08-13** after the above-the-fold callout landed (PR #32). Do not reopen as paperwork. |
 | Counting ternary 0.991 / 0.73× e2e, or auto-REFUSE, as Wave 3 | Ternary already meets cosine and loses speed; auto already refuses. The 10× is hybrid/binary **0.85 and 1.5×**. |
 | WASM as a native-kernel substitute | Pedagogy only. |
 
@@ -247,12 +248,12 @@ flowchart LR
 | Wave | Days | Owner | Exit | Depends |
 |------|------|-------|------|---------|
 | **0** | 0–3 | **Human** | `pip install bnn-lab==1.0.0` + `import bnn` on clean venv; PyPI JSON 200 | **Shipped 2026-08-14** |
-| **1** | 1–14 | Agent | Pip-first README; Pages live; **issue #1 implemented** as an above-the-fold “When NOT to use BNN” callout under the thesis (then close), **or** rewrite #1 — not a paperwork close of the bottom table; KG `open_pr` drift fixed | Wave 0 preferred, can draft README anyway |
+| **1** | 1–14 | Agent | Pip-first README; Pages live; **issue #1 implemented** as an above-the-fold “When NOT to use BNN” callout under the thesis (then close); KG `open_pr` drift | **Shipped 2026-08-13** (PR [#32](https://github.com/KanakMalpani/Binary-Neural-Networks/pull/32); issue #1 closed; Pages live). KG freshness is a separate lane. |
 | **2** | 7–28 | Agent | HF Space shows wrap paradox on **existing** shapes (label auto ~0.70 REFUSE vs legacy wrap_demo 0.31) | Wave 0 (install story) |
 | **3** | 14–45 | Agent | **Same as lever 4 (AND, not OR):** hybrid/binary cosine **≥0.85 and** e2e **≥1.5×** on committed `wrap_demo` / `ultra_wrap` shapes, without `--force`. Ternary 0.991 / 0.73× does **not** count. Auto-never-first-run-REFUSE is a **1.1×** side quest (already nearly true today) — **not** this exit. If `wrap_demo` is the target, update `golden_floors.json` `cosine_max_without_qat: 0.5` on **that same shape**. | Wave 2 (demo must match recipe) |
 | **4** | 21–45 | Agent | When native is **absent**, NumPy fallback never 5× slower than BLAS at B=64 (docs/45 P1). Typical Win/mac pip wheels already have native SIMD. | Independent of 3 |
 | **5** | 30–75 | Author | B1 arXiv from goldens; PwC code link | Waves 1–2 (public artifact) |
-| **6** | 45–90 | Mixed | HF `.bnnpack` collection; Show HN / r/MachineLearning with **honest** title; Larq-vacuum positioning | Waves 0–2 |
+| **6** | 45–90 | Mixed | HF `.bnnpack` collection; Show HN / r/MachineLearning with **honest** title. In-repo Larq-vacuum copy **shipped 2026-08-15**. | Waves 0–2 |
 
 **Optional after day 60 (not on the critical path):** ReActNet RSign/RPReLU in `bnn.ste` as a CIFAR canary improvement (`gap_reactnet_in_repo`); ternary row-blocking (P2); bitnet.cpp 2B4T bridge smoke.
 
@@ -291,5 +292,6 @@ Stars follow those; they are not the input.
 
 - Do **not** treat this file as a new WC gate.
 - Do **not** invent benches or flip §10 boxes here.
-- When a wave ships, update ROADMAP twins **in that PR** (W8.T08, KG, docs).
+- When a wave ships, update ROADMAP twins **in that PR**.
 - If a wave conflicts with a WC gate, **WC gate wins**.
+- Wrap AND-gate (Wave 3 / lever 4) stays **unclaimed** until hybrid/binary cosine **≥0.85 and** e2e **≥1.5×** on committed shapes without `--force`.
