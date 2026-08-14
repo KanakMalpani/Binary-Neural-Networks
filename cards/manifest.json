@@ -1,0 +1,46 @@
+{
+  "schema": "bnn_hub_canaries_v1",
+  "honesty": "Lab canaries, not ImageNet SOTA. 32× is uint64 pack compression, not GPU from sign().",
+  "floors_source": [
+    "tests/golden_floors.json",
+    "results/wrap_demo.json",
+    "results/ultra_wrap.json",
+    "results/train_results.json"
+  ],
+  "collection_title": "bnn-lab .bnnpack canaries",
+  "collection_url": "https://huggingface.co/collections/KanakMalpani/bnn-lab-bnnpack-canaries-6a7f84448bdcaba4b5950eba",
+  "namespace": "KanakMalpani",
+  "encode": "python scripts/encode_hf_canaries.py --out-dir results/hf_canaries",
+  "docs": "docs/HUB_BNNPACK.md",
+  "models": [
+    {
+      "id": "wrap-demo",
+      "repo_id": "KanakMalpani/bnn-lab-wrap-demo",
+      "filename": "model.bnnpack",
+      "card": "cards/wrap-demo/README.md",
+      "hidden": 4096,
+      "layers": ["3", "5"],
+      "kind": "binary_xnor",
+      "note": "Shape/codec canary for wrap_demo. AND-gate numbers live in results/wrap_demo.json (QAT), not in this file's bytes."
+    },
+    {
+      "id": "mnist-mlp",
+      "repo_id": "KanakMalpani/bnn-lab-mnist-mlp-canary",
+      "filename": "model.bnnpack",
+      "card": "cards/mnist-mlp/README.md",
+      "hidden": 512,
+      "kind": "binary_xnor",
+      "note": "Codec canary of BinaryMLP hidden BinaryLinear layers. Published MNIST floors are from train_results.json, not this untrained pack."
+    },
+    {
+      "id": "codec",
+      "repo_id": "KanakMalpani/bnn-lab-codec-canary",
+      "filename": "model.bnnpack",
+      "card": "cards/codec/README.md",
+      "in_features": 256,
+      "out_features": 256,
+      "kind": "binary_xnor",
+      "note": "Tiny random Linear encode for codec round-trip (GEMM err=0, 32× pack)."
+    }
+  ]
+}

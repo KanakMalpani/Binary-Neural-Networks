@@ -19,6 +19,7 @@ nav:
   - End-to-end guide: GUIDE_E2E.md
   - Optimiser quickstart: tutorials/07_OPTIMISER_QUICKSTART.md
   - HF optimiser: tutorials/08_HF_OPTIMISER.md
+  - Hub .bnnpack canaries: HUB_BNNPACK.md
   - Demos: demos/README.md
   - API reference:
       - Overview: api/README.md
