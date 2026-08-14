@@ -74,8 +74,53 @@ Encoding an arbitrary HF tree into `.bnnpack` is still evolving (`.bnnpack` v2 =
 W5.T05). Today: encode BinaryLinear / PackedBinaryXNORLinear layers that the
 wrap path produced when names are Linear-shaped.
 
+## Hub `.bnnpack` canaries (load path)
+
+Tiny **canaries / lab demos — not ImageNet SOTA.** 32× is uint64 pack
+compression, not GPU from `sign()`. Collection:
+[bnn-lab `.bnnpack` canaries](https://huggingface.co/collections/KanakMalpani/bnn-lab-bnnpack-canaries-6a7f84448bdcaba4b5950eba)
+([`../HUB_BNNPACK.md`](../HUB_BNNPACK.md)).
+
+Wrap AND-gate is true on **wrap_demo hidden=4096** (cosine ≥ 0.85 **and** e2e
+≥ 1.5× after MSE+fold_α QAT — `results/wrap_demo.json`). Ultra TinyBlock hybrid
+still **REFUSE** (~0.70 cosine) in `results/ultra_wrap.json`. Do not overclaim.
+
+```python
+from huggingface_hub import hf_hub_download
+from bnn.codec import decode_file, packed_module_fp_err
+
+path = hf_hub_download(
+    "KanakMalpani/bnn-lab-wrap-demo",
+    filename="model.bnnpack",
+)
+modules, meta = decode_file(path)
+layer = modules["3"]  # PackedBinaryXNORLinear, 4096×4096
+print(meta["note"])
+print("GEMM err", packed_module_fp_err(layer))  # 0
+```
+
+Also published:
+
+- [`KanakMalpani/bnn-lab-mnist-mlp-canary`](https://huggingface.co/KanakMalpani/bnn-lab-mnist-mlp-canary)
+  — hidden BinaryLinear codec canary; MNIST floors stay in
+  `tests/golden_floors.json` / `results/train_results.json` (binary_mlp ≥ 95.0,
+  recorded 96.36).
+- [`KanakMalpani/bnn-lab-codec-canary`](https://huggingface.co/KanakMalpani/bnn-lab-codec-canary)
+  — random 256×256 Linear, GEMM err = 0.
+
+Offline encode (no Hub; packs gitignored):
+
+```bat
+python scripts/encode_hf_canaries.py --out-dir results/hf_canaries
+```
+
+`hf_hub_download` needs `pip install -e ".[hf]"`. `load_bnnpack` uses
+`weights_only=True` and may soft-warn when the cache path sits outside lab
+`results/` / `checkpoints/` / `data/` — treat Hub files as untrusted inputs.
+
 ## Honesty checklist
 
 - [ ] Did not claim e2e 32× from compression alone
 - [ ] Documented skipped attn / embed layers
 - [ ] Pointed GPU users to INT4/FP8 bridges when appropriate
+- [ ] Hub cards quoted floors; canary not ImageNet SOTA; Ultra wrap still REFUSE
