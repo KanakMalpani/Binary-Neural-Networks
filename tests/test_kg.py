@@ -77,6 +77,30 @@ def test_graphml_nonempty():
     assert text.count("<node ") >= 100
 
 
+# ROADMAP W-task id → KG node that must not stay open_pr after the row is [x].
+_ROADMAP_SHIPPED_GAPS = {
+    "gap_pypi_trusted": ("W8.T08", ("merged",)),
+    "gap_wasm": ("W2.T06", ("merged",)),
+    "hw_wasm": ("W2.T06", ("merged",)),
+    "gap_bnnpack_v2": ("W5.T05", ("merged",)),
+    "gap_distill_integration": ("W3.T08", ("merged",)),
+}
+
+_INTENTIONAL_OPEN_GAPS = {
+    "gap_litespark_local": ("open",),
+    "gap_venue_submit": ("open",),
+    "gap_reactnet_in_repo": ("open",),
+    "gap_fbi_llm_repro": ("open", "accepted_non_goal"),
+}
+
+_LITERATURE_2026 = {
+    "paper_scaleq_158": "2608.01078",
+    "paper_bitembed": "2606.25674",
+    "paper_vibeasr_bitnet": "2607.21075",
+    "paper_litespark": "2605.06485",
+}
+
+
 def test_shipped_wave1_lanes_are_not_open_pr(graph):
     """v1.0.0 / Wave 2 integrator merged lanes A–I — do not leave open_pr drift."""
     idx = {n["id"]: n for n in graph["nodes"]}
@@ -94,6 +118,53 @@ def test_shipped_wave1_lanes_are_not_open_pr(graph):
     }
     for nid, allowed in shipped.items():
         assert idx[nid]["status"] in allowed, (nid, idx[nid]["status"])
+    stale = [n["id"] for n in graph["nodes"] if n.get("status") == "open_pr"]
+    assert stale == [], stale
+
+
+def test_kg_status_matches_shipped_roadmap(graph):
+    """Node status must not claim Wave 1 / PyPI still open after ROADMAP [x]."""
+    roadmap = (ROOT / "ROADMAP.md").read_text(encoding="utf-8")
+    idx = {n["id"]: n for n in graph["nodes"]}
+    assert "bnn-lab" in roadmap and "1.0.0" in roadmap and "PyPI" in roadmap
+    for nid, (task, allowed) in _ROADMAP_SHIPPED_GAPS.items():
+        rows = [ln for ln in roadmap.splitlines() if task in ln]
+        assert rows, f"missing ROADMAP row for {task}"
+        assert any("[x]" in ln for ln in rows), (task, rows[0])
+        assert idx[nid]["status"] in allowed, (nid, idx[nid]["status"], task)
+    note = str(graph.get("meta", {}).get("lab_coverage_note") or "")
+    assert note, "meta.lab_coverage_note must be the current coverage string"
+    assert "remain open PRs" not in note
+    assert "PyPI" in note
+    view = (ROOT / "knowledge_graph" / "VIEW.md").read_text(encoding="utf-8")
+    assert "Wave 1 is **not** still open" in view or "Wave 1 is shipped" in (
+        ROOT / "knowledge_graph" / "GAPS_FILLED.md"
+    ).read_text(encoding="utf-8")
+    assert "remain open PRs" not in view
+
+
+def test_intentional_opengaps_stay_open_or_nongoal(graph):
+    idx = {n["id"]: n for n in graph["nodes"]}
+    for nid, allowed in _INTENTIONAL_OPEN_GAPS.items():
+        assert idx[nid]["type"] == "OpenGap", nid
+        assert idx[nid]["status"] in allowed, (nid, idx[nid]["status"])
+
+
+def test_literature_2026_overlay(graph):
+    """ScaleQ / BitEmbed / VibeASR / Litespark are literature-only — no lab goldens."""
+    idx = {n["id"]: n for n in graph["nodes"]}
+    for nid, arxiv in _LITERATURE_2026.items():
+        assert nid in idx, nid
+        n = idx[nid]
+        assert n["type"] == "Paper", nid
+        assert n["status"] == "literature", (nid, n["status"])
+        blob = " ".join(str(s) for s in n.get("sources") or []) + " " + str(n.get("arxiv") or "")
+        assert arxiv in blob, (nid, arxiv)
+        assert float(n["confidence"]) < 0.9, (nid, n["confidence"])
+    ids = {n["id"] for n in graph["nodes"]}
+    assert "paper_scaleq_158" in ids
+    assert "paper_bitembed" in ids
+    assert "paper_vibeasr_bitnet" in ids
 
 
 def test_integrity_nodes_present(graph):
