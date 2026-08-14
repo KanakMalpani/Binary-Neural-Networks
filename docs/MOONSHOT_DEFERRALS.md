@@ -34,6 +34,8 @@ Honest leftovers after Wave 2 integration. Delivered moonshots are listed as
 | — | Venue paper submit | Author time | Plan exists; not a repro gate |
 | M4 | Community leaderboard submissions | External contributors | Template + fair protocol shipped |
 
+Post-v1 product leftovers (not moonshots): live HF Space, Hub `.bnnpack` canaries, and B1 submit — see [`TRANSFORMATION_PLAN.md`](TRANSFORMATION_PLAN.md). In-repo 2026-08-15: `wrap_demo` AND-gate, NumPy BLAS fallback, `demo/space/` (Space not live).
+
 ## PyPI (shipped)
 
 Pending Trusted Publisher for `bnn-lab` / `wheels.yml` / env `pypi` was used for

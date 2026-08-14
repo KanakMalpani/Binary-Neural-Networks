@@ -1,8 +1,8 @@
 # Novel paper candidates (local research vault)
 
-**Date:** 2026-08-04  
+**Date:** 2026-08-15  
 **Policy:** Selective — only credible novel systems contributions from this lab; not XNOR-Net/BitNet surveys.  
-**Tasks:** W12.T01 (vault links) · W12.T05 (triage → ship or defer)
+**Tasks:** W12.T01 (vault links) · W12.T05 (triage → ship or defer) · W12 B1 skeleton (in-repo)
 
 ## Local vault links (W12.T01)
 
@@ -17,6 +17,7 @@
 Each folder contains: `README.md`, `01_idea.md`, `00_source/` (`SOURCES.md` + extracted notes).
 
 Lab publication plan + claims whitelist: [`docs/PUBLICATION_PLAN.md`](PUBLICATION_PLAN.md).  
+B1 in-repo skeleton: [`docs/papers/B1_STOP_CLAIMING_32X.md`](papers/B1_STOP_CLAIMING_32X.md).  
 Figure / claims machine check: `bnn bridge figures`.
 
 ## Created folders (3)
@@ -46,7 +47,7 @@ Figure / claims machine check: `bnn bridge figures`.
 
 | Candidate | Decision | Rationale |
 |-----------|----------|-----------|
-| **B1** Honest speedup accounting | **SHIP** (tech-report primary) | Unique dual-metric + fake-binary control; evidence already in committed `results/benchmark.json` |
+| **B1** Honest speedup accounting | **SHIP** (tech-report primary) | Unique dual-metric + fake-binary control; evidence already in committed `results/benchmark.json`. **In-repo skeleton:** [`docs/papers/B1_STOP_CLAIMING_32X.md`](papers/B1_STOP_CLAIMING_32X.md). arXiv / PwC remain **human**. |
 | **B2** Packed XNOR productization | **SHIP** (companion / systems note) | Matches repo thesis + `bnn repro` / golden floors; citable artifact path |
 | **B3** When not to binarize | **SHIP** (short companion) | Decision tree + bridges CLI; prevents false BNN wins vs INT4/bitnet.cpp |
 | Literature-only BNN survey | **DEFER permanently** | No novel systems claim |
@@ -65,4 +66,10 @@ Drafting must preserve thesis lock: packed CPU/edge kernels + honest STE simulat
 
 ## Status
 
-Vault linked + triage closed for v1.0 narrative. Venue LaTeX still optional; claims must pass `bnn bridge figures` against goldens.
+| Paper | In-repo | Next (human) |
+|-------|---------|--------------|
+| **B1** | Markdown skeleton [`docs/papers/B1_STOP_CLAIMING_32X.md`](papers/B1_STOP_CLAIMING_32X.md) — C1–C7 only | arXiv submit + Papers with Code official-code registration |
+| **B2** | Vault + triage only | Companion after B1 |
+| **B3** | Vault + triage only | Companion after B1 |
+
+Vault linked + triage closed for v1.0 narrative. Venue LaTeX still optional; claims must pass `bnn bridge figures` against goldens. **This PR does not submit arXiv.**
