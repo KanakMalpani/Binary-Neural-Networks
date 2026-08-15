@@ -2,7 +2,7 @@
 
 | Field | Value |
 |-------|-------|
-| **Status** | **PASS on `wrap_demo`** (same hidden=4096 / layers 3+5). Ultra TinyBlock cosine passes; e2e not stably ≥1.5× on this host |
+| **Status** | **PASS on `wrap_demo`** (same hidden=4096 / layers 3+5). Ultra TinyBlock still **FAIL-CLOSED** on e2e (see [`TINYBLOCK_HYBRID_085.md`](TINYBLOCK_HYBRID_085.md)) |
 | **Date** | 2026-08-15 |
 | **AND-gate** | cosine ≥ 0.85 **and** e2e ≥ 1.5× vs FP, hybrid/binary, **without `--force`** |
 | **Ternary** | 0.991 cosine / 0.73× e2e — **does not count** |
@@ -38,14 +38,17 @@ Same calib/eval batch as the demo protocol (`torch.randn` after `set_repro_seed(
 | **wrap_demo 4096** | **MSE + fold α, 200** | **0.999** | **2.65×** (golden regen) | **true** | **false** | **yes** |
 | ultra TinyBlock 512/2048 | PTQ hybrid | 0.699 | committed 1.61×; this host median 1.10× | false | false | no |
 | ultra TinyBlock | legacy KL, no fold, 200 | 0.521 | noisy | false | false | no |
-| ultra TinyBlock | MSE + fold α, 200 | 0.9997 | spike-script 2.09× (short reps); isolated median **1.25×** | true | false | **no** (e2e) |
+| ultra TinyBlock | MSE + fold α, 200 | 0.9997 | in-process median **1.386×**; isolated median **1.207×** (was ~1.25×) | true | false | **no** (e2e) |
 | ultra TinyBlock | cosine loss + fold, 200 | 0.9999 | noisy | true | false | no* |
 | ultra TinyBlock | weight-only STE + XNOR wrap | 0.561 | noisy | false | false | no |
 | ultra TinyBlock | ternary + FP distill | 0.991 | 0.73× | true | true | **no** |
 
-\*Ultra e2e on this host was not stably ≥1.5× even for the published PTQ wrap
-(median 1.10×, 3 isolated trials, warmup 40 / reps 80). QAT does not change the
-packed kernel; do not treat a noisy 2× from 12-rep timings as the win.
+\*Ultra e2e on this host was not stably ≥1.5× even for the published PTQ wrap.
+2026-08-15 recheck (AVX-512, torch=8): PTQ paired median 1.398×; MSE+fold paired
+median 1.386× (range 1.350–1.390); isolated subprocess median 1.207× (2/7 ≥1.5).
+QAT does not change the packed kernel; do not treat a noisy 2× from 12-rep
+timings as the win. TinyBlock write-up:
+[`TINYBLOCK_HYBRID_085.md`](TINYBLOCK_HYBRID_085.md).
 
 Raw ultra sweep: [`WRAP_HYBRID_085_MEASURED.json`](WRAP_HYBRID_085_MEASURED.json).
 
