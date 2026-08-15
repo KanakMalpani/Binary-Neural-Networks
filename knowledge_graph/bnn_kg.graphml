@@ -1256,7 +1256,7 @@
       <data key="summary">CLI over recommend_stack.py — goal→hardware routing aligned with the wrap decision tree; bridges when BNN is the wrong tool.</data>
       <data key="confidence">0.95</data>
       <data key="status">established</data>
-      <data key="sources">scripts/recommend_stack.py | bnn/cli.py | docs/18_DECISION_TREE_AND_COMPLETE_ROADMAP.md</data>
+      <data key="sources">scripts/recommend_stack.py | bnn/cli/__init__.py | docs/18_DECISION_TREE_AND_COMPLETE_ROADMAP.md</data>
     </node>
     <node id="sys_eval_suite">
       <data key="label">bnn eval-suite</data>
@@ -1264,7 +1264,7 @@
       <data key="summary">Published-shape eval runner; dual-metric / fair-protocol companion to repro gates — no new golden shapes.</data>
       <data key="confidence">0.95</data>
       <data key="status">established</data>
-      <data key="sources">scripts/run_eval_suite.py | bnn/cli.py | docs/FAIR_EVAL_PROTOCOL.md | results/SUMMARY.md</data>
+      <data key="sources">scripts/run_eval_suite.py | bnn/cli/__init__.py | docs/FAIR_EVAL_PROTOCOL.md | results/SUMMARY.md</data>
     </node>
     <node id="sys_kg">
       <data key="label">Knowledge Graph (bnn.kg + CI)</data>
@@ -2651,7 +2651,7 @@
     </edge>
     <edge id="e259" source="sys_recommend_stack" target="bnn_lab_system">
       <data key="relation">part_of</data>
-      <data key="evidence">bnn/cli.py</data>
+      <data key="evidence">bnn/cli/__init__.py</data>
       <data key="weight">1.0</data>
     </edge>
     <edge id="e260" source="sys_eval_suite" target="decision_fair_eval">

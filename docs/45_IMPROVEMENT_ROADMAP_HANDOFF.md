@@ -166,15 +166,11 @@ for how to test it without network or big fixtures: `tests/test_pack_layout_cont
 RAPL is hardware-dependent; test the parsing and unit conversion with synthetic
 counter files rather than trying to read real MSRs in CI.
 
-### P4. `bnn/cli.py` is 1060 lines
+### P4. `bnn/cli.py` is 1060 lines — **shipped** (`bnn/cli/` package)
 
-Every subcommand handler plus the parser in one module. It works and is tested at
-the surface level, but it is the file most likely to cause merge pain. A
-mechanical split (`bnn/cli/__init__.py` + a module per command group) is low risk
-if `build_parser()` keeps its current shape — `tests/test_cli_surface.py`
-enumerates subcommands from the parser, so it will catch a dropped command.
-
-Do **not** do this at the same time as any behavioural change.
+Mechanical split: `bnn/cli/__init__.py` + `_dispatch.py` + `_commands.py` + `_parser.py`.
+`build_parser()` shape is unchanged (`tests/test_cli_surface.py`). No behavioural
+change in the same PR (encode/decode still CLI-side; no wrap/golden edits).
 
 ---
 
