@@ -11,17 +11,44 @@
   "packed_weight_bytes_reported": 4194304,
   "model_total_bytes_fp": 147275816,
   "model_total_bytes_wrapped": 17285160,
-  "e2e_latency_ms_fp": 34.13500333360086,
-  "e2e_latency_ms_wrapped": 7.088746665976942,
-  "e2e_speedup": 4.815379211876027,
+  "e2e_latency_ms_fp": 50.236073333265566,
+  "e2e_latency_ms_wrapped": 18.94221666661906,
+  "e2e_speedup": 2.652069407578583,
   "layer_microbench": {
-    "linear_fp_ms": 14.12006999986867,
-    "linear_wrapped_forward_ms": 1.5635533335929117,
-    "linear_gemm_only_prepacked_acts_ms": 2.04715666671594,
-    "speedup_gemm_only_vs_torch_linear": 6.897405669747869,
-    "speedup_wrapped_linear_vs_torch": 9.030756864188291
+    "linear_fp_ms": 19.20550333355398,
+    "linear_wrapped_forward_ms": 4.905413333472097,
+    "linear_gemm_only_prepacked_acts_ms": 3.716766666669476,
+    "speedup_gemm_only_vs_torch_linear": 5.167260970612306,
+    "speedup_wrapped_linear_vs_torch": 3.9151651508151604
   },
-  "output_cosine_vs_fp": 0.31023794412612915,
+  "output_cosine_vs_fp": 0.9989897012710571,
+  "effectiveness": {
+    "cosine": 0.998989999294281,
+    "kl_div": 1.718057319521904e-06,
+    "top1_agreement": 0.953125,
+    "n_samples": 64,
+    "drop_in_threshold": 0.85,
+    "drop_in_ok": true,
+    "notes": "Meets drop-in cosine threshold",
+    "measured": true
+  },
+  "drop_in_ok": true,
+  "forced": false,
+  "status": "OK",
+  "qat": {
+    "steps": 200,
+    "skipped": false,
+    "last_loss": 3.893838766089175e-06,
+    "restored_linears": [
+      "3",
+      "5"
+    ],
+    "logit_loss": "mse",
+    "fold_alpha": true,
+    "binarize_activations": true,
+    "sign_mode": "ste",
+    "note": "Light STE only; production needs BitDistill-scale QAT on real data"
+  },
   "native_kernel": true,
-  "interpretation": "E2E may lose to torch when stem/head/ReLU dominate or Python pack overhead is large; layer gemm_only shows true kernel ROI. Cosine<<1 for binary_xnor without QAT is expected (not a transparent accuracy-preserving wrap)."
+  "interpretation": "MSE STE QAT (fold learned alpha into Linear magnitudes) on Sequential middles 3/5, then packed binary_xnor. Cosine and e2e are measured; compression is theoretical pack ratio. Never claim GPU 32\u00d7 from sign()/STE."
 }

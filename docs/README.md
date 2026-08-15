@@ -7,6 +7,7 @@ Start here if you are new to the repo.
 | Doc | Why |
 |-----|-----|
 | [`GUIDE_E2E.md`](GUIDE_E2E.md) | **Primary User Guide** — zero → optimiser results (follow this) |
+| [GitHub Pages](https://kanakmalpani.github.io/Binary-Neural-Networks/) | Browsable MkDocs site (API autodoc) |
 | [`../REPRODUCIBILITY.md`](../REPRODUCIBILITY.md) | Exact repro commands, goldens, troubleshooting |
 | [`../AGENTS.md`](../AGENTS.md) | Ordered steps for coding agents |
 | [`25_ONEPAGER.md`](25_ONEPAGER.md) | Executive decision tree (honest) |
@@ -30,6 +31,7 @@ Ordered path (also nested inside [`GUIDE_E2E.md`](GUIDE_E2E.md)):
 | 06 | [`tutorials/06_encoder_decoder.md`](tutorials/06_encoder_decoder.md) |
 | 07 | [`tutorials/07_OPTIMISER_QUICKSTART.md`](tutorials/07_OPTIMISER_QUICKSTART.md) |
 | 08 | [`tutorials/08_HF_OPTIMISER.md`](tutorials/08_HF_OPTIMISER.md) |
+| Hub | [`HUB_BNNPACK.md`](HUB_BNNPACK.md) — tiny `.bnnpack` canaries (not SOTA) |
 
 ## Latest lane
 
@@ -42,11 +44,13 @@ Ordered path (also nested inside [`GUIDE_E2E.md`](GUIDE_E2E.md)):
 | [`LAUNCH_CHECKLIST.md`](LAUNCH_CHECKLIST.md) | Public launch checklist |
 | [`FAIR_EVAL_PROTOCOL.md`](FAIR_EVAL_PROTOCOL.md) | Dual-metric fair eval |
 | [`MOONSHOT_DEFERRALS.md`](MOONSHOT_DEFERRALS.md) | Explicit v1.0 leftovers (W2.T04/T05 removed — delivered) |
+| [`TRANSFORMATION_PLAN.md`](TRANSFORMATION_PLAN.md) | First-principles 90-day exponential plan (proposal; does not flip ROADMAP boxes) |
 | [`37_WORLD_CLASS_BNN_OPTIMISER_ROADMAP.md`](37_WORLD_CLASS_BNN_OPTIMISER_ROADMAP.md) | Canonical world-class plan (twin of root `ROADMAP.md`) |
 | [`38_ROADMAP_EXECUTION_LOG.md`](38_ROADMAP_EXECUTION_LOG.md) | Session execution log |
 | [`SEMVER_AND_DEPRECATION.md`](SEMVER_AND_DEPRECATION.md) | Public API semver policy |
 | [`adr/README.md`](adr/README.md) | Architecture Decision Records |
 | [`DATASET_CARDS.md`](DATASET_CARDS.md) | MNIST / CIFAR / synth audio cards |
+| [`HUB_BNNPACK.md`](HUB_BNNPACK.md) | Hub `.bnnpack` canaries (cards + encode; not SOTA) |
 | [`COMPATIBILITY_MATRIX.md`](COMPATIBILITY_MATRIX.md) | OS × Python × torch matrix |
 | [`TORCH_PIN_POLICY.md`](TORCH_PIN_POLICY.md) | Why `torch<2.13` (W14.T03) |
 | [`OPTIONAL_EXTRAS_MATRIX.md`](OPTIONAL_EXTRAS_MATRIX.md) | transformers / torchao smoke (W14.T06) |
@@ -126,6 +130,12 @@ thesis — previously unlinked from this index.
 | [`44_KNOWLEDGE_GRAPH.md`](44_KNOWLEDGE_GRAPH.md) | Pointer to `knowledge_graph/` (JSON + GraphML + VIEW); CLI `bnn kg` |
 | [`../knowledge_graph/README.md`](../knowledge_graph/README.md) | How to query / merge enrichment / integrity overlay / thesis lock |
 | [`lanes/kg.md`](lanes/kg.md) | KG integrity lane note (Wave 1 open-PR honesty) |
+
+## Handoff
+
+| Doc | Topic |
+|-----|-------|
+| [`45_IMPROVEMENT_ROADMAP_HANDOFF.md`](45_IMPROVEMENT_ROADMAP_HANDOFF.md) | Prioritised improvements, invariants, and measured-and-declined ideas |
 
 ## Thesis lock (never reopen as a “win”)
 

@@ -22,7 +22,7 @@ lab docs (`docs/21`) preferred plain Markdown; we revisit for the optimiser prod
 ## Consequences
 
 - Stub config lands in repo root: `mkdocs.yml` (nav: Home, Tutorials, API, Roadmap).
-- CI publish of gh-pages is **deferred** until W9.T06 (optional workflow).
+- GitHub Pages deploys from `.github/workflows/pages.yml` (`mkdocs build --strict`, same `mkdocs.yml`). First live URL needs Settings → Pages → Source = GitHub Actions.
 - No requirement that agents build the site for `bnn repro`.
 
 ## Alternatives
