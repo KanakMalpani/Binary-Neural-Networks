@@ -175,8 +175,8 @@ Hybrid/binary wrap + short STE QAT on the **committed** `wrap_demo` shape
 |---|---|---|---|---|
 | PTQ `binary_xnor` (legacy golden) | 0.31 | ~4.8× | n/a | no (cosine) |
 | **MSE STE + fold α, 200 steps** | **0.999** | **2.65×** | **true** | **yes** |
-| Ultra TinyBlock PTQ hybrid | ~0.70 | host-noisy; committed ~1.61× | false | no |
-| Ultra TinyBlock MSE+fold 200 | ~0.999 | host-noisy (median ~1.25× here) | true | no (e2e) |
+| Ultra TinyBlock PTQ hybrid | ~0.70 | host-noisy; committed ~1.61×; recheck paired median 1.40× | false | no |
+| Ultra TinyBlock MSE+fold 200 | **0.9997** | paired median **1.386×**; isolated median **1.207×** | true | no (e2e) |
 | Ternary + FP distill | 0.991 | 0.73× | true (forced) | **no** (e2e) |
 
 Recipe (same shape; do not invent a new bench):
@@ -190,6 +190,8 @@ STE `alpha` into restored Linear magnitudes so wrap absmean calib matches QAT.
 Packed path stays CPU XNOR — never GPU 32× from `sign()`.
 
 Full table: [`docs/spikes/WRAP_HYBRID_085.md`](spikes/WRAP_HYBRID_085.md).
+TinyBlock fail-closed recheck: [`docs/spikes/TINYBLOCK_HYBRID_085.md`](spikes/TINYBLOCK_HYBRID_085.md).
+Do not update `results/ultra_wrap.json` until **both** gates hold without `--force`.
 
 ---
 
