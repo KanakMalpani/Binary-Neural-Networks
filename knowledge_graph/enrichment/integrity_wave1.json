@@ -194,7 +194,7 @@
       "label": "bnn recommend (stack router)",
       "type": "System",
       "summary": "CLI over recommend_stack.py — goal→hardware routing aligned with the wrap decision tree; bridges when BNN is the wrong tool.",
-      "sources": ["scripts/recommend_stack.py", "bnn/cli.py", "docs/18_DECISION_TREE_AND_COMPLETE_ROADMAP.md"],
+      "sources": ["scripts/recommend_stack.py", "bnn/cli/__init__.py", "docs/18_DECISION_TREE_AND_COMPLETE_ROADMAP.md"],
       "confidence": 0.95,
       "status": "established"
     },
@@ -203,7 +203,7 @@
       "label": "bnn eval-suite",
       "type": "System",
       "summary": "Published-shape eval runner; dual-metric / fair-protocol companion to repro gates — no new golden shapes.",
-      "sources": ["scripts/run_eval_suite.py", "bnn/cli.py", "docs/FAIR_EVAL_PROTOCOL.md", "results/SUMMARY.md"],
+      "sources": ["scripts/run_eval_suite.py", "bnn/cli/__init__.py", "docs/FAIR_EVAL_PROTOCOL.md", "results/SUMMARY.md"],
       "confidence": 0.95,
       "status": "established"
     },
@@ -340,7 +340,7 @@
       "source": "sys_recommend_stack",
       "target": "bnn_lab_system",
       "relation": "part_of",
-      "evidence": ["bnn/cli.py"]
+      "evidence": ["bnn/cli/__init__.py"]
     },
     {
       "source": "sys_eval_suite",

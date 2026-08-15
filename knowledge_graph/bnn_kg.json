@@ -2182,7 +2182,7 @@
       "summary": "CLI over recommend_stack.py — goal→hardware routing aligned with the wrap decision tree; bridges when BNN is the wrong tool.",
       "sources": [
         "scripts/recommend_stack.py",
-        "bnn/cli.py",
+        "bnn/cli/__init__.py",
         "docs/18_DECISION_TREE_AND_COMPLETE_ROADMAP.md"
       ],
       "confidence": 0.95,
@@ -2195,7 +2195,7 @@
       "summary": "Published-shape eval runner; dual-metric / fair-protocol companion to repro gates — no new golden shapes.",
       "sources": [
         "scripts/run_eval_suite.py",
-        "bnn/cli.py",
+        "bnn/cli/__init__.py",
         "docs/FAIR_EVAL_PROTOCOL.md",
         "results/SUMMARY.md"
       ],
@@ -4697,7 +4697,7 @@
       "target": "bnn_lab_system",
       "relation": "part_of",
       "evidence": [
-        "bnn/cli.py"
+        "bnn/cli/__init__.py"
       ],
       "weight": 1.0
     },
