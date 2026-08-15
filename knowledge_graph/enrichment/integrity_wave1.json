@@ -3,8 +3,8 @@
     "generated": "2026-08-04T23:50:00+05:30",
     "researcher": "lane-kg-enrich",
     "schema_version": "1.0",
-    "purpose": "Lab/product integrity enrichment: WC-O gates, CLI systems, GPTQ/Q-Sparse/BitDistiller, RAPL Result, moonshot non-goals, Wave 1 open-PR status honesty, broken source fixes, same_as repairs.",
-    "lab_coverage_note": "Wave 1 lanes A–I remain open PRs #16–#24 — do not claim merged. Thesis lock unchanged."
+    "purpose": "Lab/product integrity enrichment: WC-O gates, CLI systems, GPTQ/Q-Sparse/BitDistiller, RAPL Result, moonshot non-goals, Wave 1 status honesty, broken source fixes, same_as repairs. 2026-08-13: flip stale open_pr after v1.0.0 / PR #26. 2026-08-14: gap_pypi_trusted merged — bnn-lab 1.0.0 on PyPI.",
+    "lab_coverage_note": "Lanes A–I merged via Wave 2 integrator (PRs #16–#24, #26). Stale open_pr statuses flipped to merged/closed_by_policy/established. gap_pypi_trusted merged — bnn-lab 1.0.0 on PyPI (OIDC Trusted Publisher). Thesis lock unchanged."
   },
   "source_fixes": {
     "algo_ternary_bitplane": [
@@ -77,46 +77,55 @@
   },
   "status_patches": {
     "gap_wasm": {
-      "status": "open_pr",
-      "summary": "Optional browser pedagogy (W2.T06); Lane F open PR #24 — spike/WASM tree not on main yet; not a v1.0 core gate."
+      "status": "merged",
+      "summary": "WASM SIMD pedagogy shipped (wasm/, tests/test_wasm_parity.py, PR #24). Not a native-kernel substitute and not a golden gate."
     },
     "hw_wasm": {
-      "status": "open_pr",
-      "summary": "Browser pedagogy target; Lane F PR #24 in progress. Not shipped as a golden gate."
+      "status": "merged",
+      "label": "WebAssembly SIMD (pedagogy)",
+      "summary": "Browser pedagogy target shipped with Lane F / PR #24. Not a production GEMM path."
     },
     "gap_bitnet_submodule": {
-      "status": "open_pr",
-      "summary": "Prefer thin pin + bridge recipes over full BitNet submodule. Lane I PR #17 hardens pins; BITNET_PIN.md lands with that PR."
+      "status": "closed_by_policy",
+      "summary": "Thin pin + bridge recipes instead of a giant submodule. third_party/BITNET_PIN.md + docs/23; PR #17 merged."
     },
     "gap_bnnpack_v2": {
-      "status": "open_pr",
-      "summary": "Schema ADR + hashes + ternary meta + safetensors — Lane B open PR #18; not merged to main yet."
+      "status": "merged",
+      "summary": "Schema ADR + hashes + ternary meta + safetensors on main (Lane B / PR #18)."
     },
     "gap_distill_integration": {
-      "status": "open_pr",
-      "summary": "distill_sketch.py on main; Lane A PR #19 extends distill/BN-fuse/WC-O — full BitDistill-scale still not a golden."
+      "status": "merged",
+      "summary": "bnn.wrap.distill + OptimiseConfig.distill_steps on main (Lane A / PR #19). Full BitDistill-scale KD is still not a golden."
     },
     "gap_layer_search_full": {
-      "status": "open_pr",
-      "summary": "Sensitivity (W3.T05) on main; full binary/ternary/skip search W3.T06 in Lane A PR #19 — do not invent search goldens."
+      "status": "merged",
+      "summary": "search_layer_modes (binary/ternary/skip) + docs/42 on main (W3.T06 / PR #19). Do not invent search goldens."
     },
     "gap_pypi_trusted": {
-      "status": "open",
-      "summary": "wheels.yml + docs ready; Lane C PR #16 dry-run/attestations. First bnn-lab upload still needs human Trusted Publisher on pypi.org."
+      "status": "merged",
+      "summary": "bnn-lab 1.0.0 on PyPI via OIDC Trusted Publisher (wheels.yml publish=true on main, run 31825286443). Wheel is library-only; bnn repro needs clone+[dev]. No API-token path. No cp313-win_amd64 / cp313-macosx_x86_64 in 1.0.0."
     },
     "data_imagenet": {
       "status": "non_goal_gate",
       "summary": "Full ImageNet SOTA is an explicit non-goal. Protocol stub/docs on main; Lane G PR #21 adds runner — protocol ≠ SOTA claim."
     },
     "sys_vision_cifar": {
-      "summary": "CIFAR-10 Bi-Real CNN canary on main; Lane G PR #21 extends ResNet-BiReal + ImageNet protocol runner. No ImageNet SOTA golden."
+      "summary": "CIFAR-10 Bi-Real CNN canary on main; ResNet-BiReal + ImageNet protocol runner shipped (PR #21). Protocol ≠ SOTA golden."
     },
     "sys_energy_module": {
-      "summary": "Energy bound from wrap latency (E=P×t) on main; Lane H PR #22 adds RAPL probe + Windows CLOSED-BY-PROXY honesty. Not a golden floor."
+      "summary": "Energy bound from wrap latency (E=P×t) plus RAPL probe on Linux; Windows CLOSED-BY-PROXY (PR #22). Not a golden floor."
     },
     "gap_rapl_windows": {
-      "status": "open_pr",
-      "summary": "Windows has no portable RAPL — proxy only. Linux RAPL lands with Lane H PR #22; spike pointer doc is stub until that merge."
+      "status": "closed_by_policy",
+      "summary": "Windows has no portable RAPL — proxy only (CLOSED-BY-PROXY). Linux RAPL probe shipped with PR #22. Privileged wrap-workload RAPL remains a moonshot."
+    },
+    "decision_wc_o_gates": {
+      "status": "established",
+      "summary": "WC-O1–O4 on main: calib, auto policy, drop-in honesty, short QAT vs cold PTQ (ROADMAP [x]; PR #19 / Wave 2 integrator). Hybrid/binary 0.85 AND 1.5× e2e is a later lever, not a missing O-gate."
+    },
+    "result_energy_rapl_spike": {
+      "status": "merged",
+      "summary": "RAPL when powercap is available; Windows CLOSED-BY-PROXY (PR #22). Latency energy_bound remains the default; do not invent board Joules."
     }
   },
   "remove_same_as_pairs": [
@@ -130,6 +139,26 @@
     "concept.mobile_npu_quant_reality"
   ],
   "remove_edges": [
+    {
+      "source": "world_class_v1",
+      "target": "gap_distill_integration",
+      "relation": "blocked_by"
+    },
+    {
+      "source": "world_class_v1",
+      "target": "gap_bnnpack_v2",
+      "relation": "blocked_by"
+    },
+    {
+      "source": "decision_wc_o_gates",
+      "target": "gap_distill_integration",
+      "relation": "blocked_by"
+    },
+    {
+      "source": "decision_wc_o_gates",
+      "target": "gap_layer_search_full",
+      "relation": "blocked_by"
+    },
     {
       "source": "paper_bitnet_2b4t",
       "target": "artifact.hf_bitnet_2b",
@@ -151,14 +180,14 @@
       "id": "decision_wc_o_gates",
       "label": "WC-O Optimiser Quality Gates (O1–O4)",
       "type": "Decision",
-      "summary": "Calibration metrics, auto binary/ternary/skip policy, drop-in honesty thresholds, and short QAT vs cold PTQ — ROADMAP §1.3. Partial on main; Lane A PR #19 hardens — do not claim WC-O closed until integrator merges.",
+      "summary": "WC-O1–O4 on main: calib, auto policy, drop-in honesty, short QAT vs cold PTQ (ROADMAP [x]; PR #19 / Wave 2 integrator). Hybrid/binary 0.85 AND 1.5× e2e is a later lever, not a missing O-gate.",
       "sources": [
         "ROADMAP.md",
         "docs/42_QAT_AND_LAYER_SEARCH.md",
         "https://github.com/KanakMalpani/Binary-Neural-Networks/pull/19"
       ],
       "confidence": 0.9,
-      "status": "open_pr"
+      "status": "established"
     },
     {
       "id": "sys_recommend_stack",
@@ -231,7 +260,7 @@
       "id": "result_energy_rapl_spike",
       "label": "RAPL Spike Result (Linux measure / Windows proxy)",
       "type": "Result",
-      "summary": "Lane H PR #22: RAPL when powercap available; Windows CLOSED-BY-PROXY. Main tip still has latency energy_bound only — not a golden floor; do not invent board Joules.",
+      "summary": "RAPL when powercap is available; Windows CLOSED-BY-PROXY (PR #22). Latency energy_bound remains the default; do not invent board Joules.",
       "sources": [
         "results/energy_bound.json",
         "docs/14_HARDWARE_AND_ENERGY.md",
@@ -240,7 +269,7 @@
         "https://github.com/KanakMalpani/Binary-Neural-Networks/pull/22"
       ],
       "confidence": 0.85,
-      "status": "open_pr"
+      "status": "merged"
     },
     {
       "id": "decision_nongoal_asr_whisper",
@@ -292,14 +321,14 @@
     {
       "source": "decision_wc_o_gates",
       "target": "gap_distill_integration",
-      "relation": "blocked_by",
-      "evidence": ["docs/MOONSHOT_DEFERRALS.md W3.T08", "PR #19"]
+      "relation": "implements",
+      "evidence": ["bnn/wrap/distill.py", "PR #19 merged"]
     },
     {
       "source": "decision_wc_o_gates",
       "target": "gap_layer_search_full",
-      "relation": "blocked_by",
-      "evidence": ["docs/42_QAT_AND_LAYER_SEARCH.md", "PR #19"]
+      "relation": "implements",
+      "evidence": ["bnn/wrap/sensitivity.py", "docs/42_QAT_AND_LAYER_SEARCH.md", "PR #19 merged"]
     },
     {
       "source": "sys_recommend_stack",

@@ -1,9 +1,9 @@
 # Public launch checklist (W11.T07)
 
-GitHub **v1.0.0** is tagged (2026-08-04). This is **not** a v0.3 preview
-checklist. **`bnn-lab` is still not on PyPI** — Trusted Publisher remains a
-human gate (`docs/PYPI_PUBLISH.md`). Do not treat the tag as `pip install
-bnn-lab`.
+GitHub **v1.0.0** is tagged (2026-08-04). **`bnn-lab` 1.0.0 is on PyPI**
+(OIDC Trusted Publisher — [`PYPI_PUBLISH.md`](PYPI_PUBLISH.md)). Import/CLI
+remain `bnn`. A pip wheel is library-only; `bnn repro` still needs a clone +
+`[dev]`.
 
 ## Done in-repo
 
@@ -26,22 +26,24 @@ bnn-lab`.
 - [x] Repo **About** description + topics (binary-neural-networks, xnor, quantization, …)
 - [x] Branch protection on `main`: required checks `quality` / `windows` / `linux-native`, no force-push/deletes, resolve conversations
 - [x] Label good first issues (`good first issue`) — W11.T08 (#1, #2)
-- [~] PyPI Trusted Publishing — W8.T08
+- [x] PyPI Trusted Publishing — W8.T08
   - [x] Distribution name **`bnn-lab`** (`bnn` taken on PyPI); GitHub env **`pypi`**; `wheels.yml` publish job (OIDC only)
-  - [ ] Register pending Trusted Publisher on pypi.org (`bnn-lab` / `wheels.yml` / env `pypi`)
-  - [ ] Then Actions → wheels → **publish=true** on **`main`** (not frozen tag `v1.0.0`; see `PYPI_PUBLISH.md`)
+  - [x] Trusted Publisher on pypi.org (`bnn-lab` / `wheels.yml` / env `pypi`) — pending converted to **active** after first upload
+  - [x] Actions → wheels → **publish=true** on **`main`** (run [31825286443](https://github.com/KanakMalpani/Binary-Neural-Networks/actions/runs/31825286443); not frozen tag `v1.0.0`)
 - [x] Repository is **public** — free Code Scanning + Scorecard public badge API work
-- [x] README shields for CI / CodeQL / Scorecard / wheels (PyPI `bnn-lab` badge stays 404 until first upload)
+- [x] README shields for CI / CodeQL / Scorecard / wheels / Pages; live [`pypi/v/bnn-lab`](https://pypi.org/project/bnn-lab/) badge
 
 ## Not required to claim the v1.0.0 GitHub tag
 
-- Live `pip install bnn-lab` from PyPI (human Trusted Publisher)
 - Venue paper submit
 - ImageNet SOTA, privileged RAPL Joules — see [`MOONSHOT_DEFERRALS.md`](MOONSHOT_DEFERRALS.md)
+- ~~Live `pip install bnn-lab` from PyPI~~ — **shipped** 2026-08-14 (`bnn-lab` 1.0.0)
 - ~~WASM SIMD / Bi-Real CIFAR ref / bitnet recipe~~ — **delivered** (moonshot residuals documented)
 - ~~AVX-512 / ARM NEON native~~ — **delivered** (`docs/41`; AVX-512 used when present, never required)
 
-## Post-tag verify (from Git, not PyPI)
+## Post-tag verify
+
+From Git (CLI / `bnn repro`):
 
 ```bat
 git checkout v1.0.0
@@ -49,5 +51,9 @@ pip install -e ".[dev]" -c constraints.txt
 bnn repro
 ```
 
-Expect `REPRO: PASS`. After Trusted Publisher upload, the clean-venv check is
-`pip install bnn-lab==1.0.0` + `bnn repro`.
+From PyPI (library import only — no `bnn repro` on the next line):
+
+```bat
+pip install bnn-lab==1.0.0
+python -c "import bnn; print(bnn.__version__)"
+```

@@ -101,6 +101,8 @@ def run_one(
             steps=qat_steps,
             lr=1e-3,
             layer_names=["ffn_fc1", "ffn_fc2"],
+            logit_loss="mse",
+            fold_alpha=True,
         )
     elif qat_steps > 0 and (policy == "ternary_wo" or mode == "ternary_weight_only"):
         # Light FP distill toward teacher before ternary snap (no BinaryLinear)

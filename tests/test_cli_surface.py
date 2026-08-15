@@ -7,22 +7,47 @@ where CLI regressions actually happen (a renamed dest silently breaks a flag).
 from __future__ import annotations
 
 import json
+import re
 from pathlib import Path
 
 import pytest
 
-from bnn.cli import build_parser, main
+from bnn.cli import EPILOG, build_parser, main
 
 # Every subcommand registered on the parser.
 SUBCOMMANDS = sorted(
     build_parser()._subparsers._group_actions[0].choices  # type: ignore[union-attr]
 )
 
+# Hidden argparse verbs that must not appear in ``bnn --help`` epilog.
+# Prefer documenting a new public verb in ``bnn.cli.PUBLIC_CLI_VERBS`` instead.
+INTERNAL_COMMANDS: frozenset[str] = frozenset()
+
 
 def test_subcommand_inventory_is_non_trivial():
     assert len(SUBCOMMANDS) >= 15
     for expected in ("repro", "optimise", "bench", "encode", "decode", "profile", "kg"):
         assert expected in SUBCOMMANDS
+
+
+def _token_in_epilog(cmd: str, epilog: str) -> bool:
+    """True when *cmd* appears as a hyphen-aware token (not a substring of Training)."""
+    return re.search(rf"(?<![\w-]){re.escape(cmd)}(?![\w-])", epilog) is not None
+
+
+def test_every_subcommand_is_in_help_epilog_or_marked_internal():
+    """Issue #2: a new argparse verb must be in the --help epilog or INTERNAL_COMMANDS."""
+    help_text = build_parser().format_help()
+    assert EPILOG in help_text, "EPILOG must be attached to ``bnn --help``"
+    undocumented = [
+        cmd
+        for cmd in SUBCOMMANDS
+        if cmd not in INTERNAL_COMMANDS and not _token_in_epilog(cmd, EPILOG)
+    ]
+    assert undocumented == [], (
+        "CLI verbs registered but missing from bnn.cli.EPILOG "
+        f"(and not INTERNAL_COMMANDS): {undocumented}"
+    )
 
 
 @pytest.mark.parametrize("cmd", SUBCOMMANDS)
