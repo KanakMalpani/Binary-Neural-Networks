@@ -40,11 +40,11 @@ dependencies = [
 
 [project.optional-dependencies]
 dev = [
-  "pytest>=7.4,<9",
+  "pytest>=7.4,<10",
   "pytest-timeout>=2.2,<3",
   "pytest-cov>=4.1,<8",
   "ruff>=0.6,<1",
-  "mypy>=1.10,<2",
+  "mypy>=1.10,<3",
 ]
 vision = []  # CIFAR/MNIST loaders are stdlib+torch; reserved for future torchvision
 audio = []   # Synthetic audio is NumPy-only; reserved for real ASR deps
@@ -59,7 +59,7 @@ hf = [
 docs = [
   "mkdocs>=1.6,<2",
   "mkdocs-material>=9.5,<10",
-  "mkdocstrings[python]>=0.26,<1",
+  "mkdocstrings[python]>=0.26,<2",
 ]
 all = ["bnn-lab[dev,hf,docs]"]
 
