@@ -102,9 +102,15 @@ def test_wrap_demo_compression_gate():
     data = _load_results("wrap_demo.json")
     comp = data["weight_compression_replaced_layers"]
     assert abs(comp - g["weight_compression_exact"]) < 1e-9
-    # Without QAT, cosine is low; gate only bounds "not accidentally perfect"
     cos = data.get("output_cosine_vs_fp")
-    if cos is not None:
+    assert cos is not None
+    if data.get("qat"):
+        assert cos >= g["cosine_min"]
+        assert float(data.get("e2e_speedup") or 0) >= g["e2e_speedup_min"]
+        assert data.get("drop_in_ok") is True
+        assert data.get("forced") is False
+    else:
+        # PTQ-only snapshot: low cosine is expected.
         assert cos <= g["cosine_max_without_qat"]
 
 

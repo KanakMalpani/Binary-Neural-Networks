@@ -1,10 +1,13 @@
 # PyPI publish (W8.T08)
 
-**Status (2026-08-04, Lane C):** packaging + `wheels.yml` (build / attest /
-dry-run summary / OIDC publish) are ready. **`bnn-lab` is not on PyPI yet**
-(`https://pypi.org/pypi/bnn-lab/json` → **404**). Live upload is blocked on a
-**human Trusted Publisher** registration — see [Human blocker](#human-blocker)
-below. This repo does **not** use long-lived PyPI API tokens.
+**Status (2026-08-14):** **`bnn-lab` 1.0.0 is live** on PyPI
+([project](https://pypi.org/project/bnn-lab/) ·
+[JSON](https://pypi.org/pypi/bnn-lab/json) · version **1.0.0**, non-empty
+`urls`). First OIDC upload:
+[Actions run 31825286443](https://github.com/KanakMalpani/Binary-Neural-Networks/actions/runs/31825286443)
+(`wheels.yml` `workflow_dispatch` on **`main`**, `publish=true`). This repo does
+**not** use long-lived PyPI API tokens. After the first upload, the pending
+Trusted Publisher on pypi.org should show as **active** (refresh Publishing).
 
 ## Why the distribution name is `bnn-lab`
 
@@ -20,13 +23,20 @@ under that name would fail or collide.
 | **CLI** | `bnn` console script (unchanged) |
 
 ```bat
-pip install bnn-lab
-bnn repro
+pip install bnn-lab==1.0.0
+```
+
+That is a **library** install. `bnn repro` / `bnn optimise` / `bnn recommend`
+need a clone + `pip install -e ".[dev]"` because they call repo `scripts/`.
+See [GUIDE_E2E](GUIDE_E2E.md). Git fallback:
+
+```bat
+pip install "bnn-lab @ git+https://github.com/KanakMalpani/Binary-Neural-Networks.git@v1.0.0"
 ```
 
 ## Checklist
 
-- [x] `pyproject.toml` distribution name `bnn-lab`, version synced with `bnn/_version.py`
+- [x] `pyproject.toml` distribution name `bnn-lab`, version synced with `bnn/_version.py` (**1.0.0**)
 - [x] `readme`, `license`, classifiers (3.11–3.13), `project.urls` (incl. PyPI + publish runbook)
 - [x] Console script `bnn` (import package remains `bnn`)
 - [x] `constraints.txt` for reproducible installs
@@ -34,37 +44,45 @@ bnn repro
 - [x] `wheels.yml` `package-check` dry-run job (artifacts present; no upload)
 - [x] `wheels.yml` publish job gated on `workflow_dispatch` + `publish=true` + `environment: pypi`
 - [x] GitHub Environment `pypi` created on the repo (Settings → Environments)
-- [ ] **PyPI.org pending Trusted Publisher** for `bnn-lab` / `wheels.yml` / env `pypi`
-- [ ] First production publish via Actions (`publish=true`) after publisher is linked
-- [ ] Post-upload: `pip install bnn-lab` + `bnn repro` on a clean venv
+- [x] **PyPI.org Trusted Publisher** for `bnn-lab` / `wheels.yml` / env `pypi` (pending → **active** after first upload)
+- [x] First production publish via Actions (`publish=true` on **`main`**, run 31825286443)
+- [x] Post-upload: `pip install bnn-lab==1.0.0` on a clean venv; `import bnn` works. (`bnn repro` is clone + `[dev]`, not a pip-only gate.)
 
-## Human blocker
+## How it shipped (history)
 
-Trusted Publishing is **not** configured for this project yet:
+Trusted Publishing was **not** configured until 2026-08-14. Earlier probes:
 
 1. GitHub env **`pypi`** exists on `KanakMalpani/Binary-Neural-Networks`.
-2. PyPI project **`bnn-lab` does not exist** (JSON API 404 as of Lane C).
-3. Therefore OIDC publish would fail if `publish=true` were dispatched now.
-4. **Do not** add a PyPI API token secret or invent a token-based publish path.
-5. Lane C stops before any failing upload: only `publish=false` dry-runs are
-   dispatched until a maintainer completes the steps below.
+2. PyPI project **`bnn-lab` did not exist** (JSON API **404** as of 2026-08-13).
+3. OIDC `publish=true` on tag `v1.0.0` failed with `invalid-publisher`
+   ([run 31031733046](https://github.com/KanakMalpani/Binary-Neural-Networks/actions/runs/31031733046),
+   2026-08-05): valid GitHub OIDC token, **no matching pending publisher**.
+4. Retry on 2026-08-13:
+   - [31698000321](https://github.com/KanakMalpani/Binary-Neural-Networks/actions/runs/31698000321)
+     (`v1.0.0`): never reached publish — `windows-amd64` `cp313` wheel test
+     crashed (`check_wheel_kernel.py` exit **3221225477** / `0xC0000005`).
+   - [31700631120](https://github.com/KanakMalpani/Binary-Neural-Networks/actions/runs/31700631120)
+     (`lane/c-pypi-honesty`, `cp313-win_amd64` skipped): matrix + `package-check`
+     **success**; publish **`invalid-publisher`** again. Win+3.13 is skipped
+     (see [Wheel matrix notes](#wheel-matrix-notes-lane-c-dry-run)).
+5. Maintainer added the pending publisher (`bnn-lab` / `wheels.yml` / env
+   `pypi`). Dispatch on **`main`** (not frozen tag `v1.0.0`) succeeded:
+   [31825286443](https://github.com/KanakMalpani/Binary-Neural-Networks/actions/runs/31825286443).
+6. **Do not** add a PyPI API token secret or invent a token-based publish path.
+   `wheels.yml` is OIDC-only (`id-token: write`, `pypa/gh-action-pypi-publish`).
 
-### Trusted Publishing (maintainer, once)
+### Recurring releases (maintainer)
 
-1. Create a free account on https://pypi.org (or log in).
-2. Confirm GitHub Environment named **`pypi`** on
-   `KanakMalpani/Binary-Neural-Networks` (already created). Optional:
+1. Confirm GitHub Environment named **`pypi`** (already created). Optional:
    add required reviewers on that environment for public-repo safety.
-3. On PyPI: **Publishing → Add a new pending publisher**:
-   - PyPI project name: `bnn-lab`
-   - Owner: `KanakMalpani`
-   - Repository: `Binary-Neural-Networks`
-   - Workflow: `wheels.yml`
-   - Environment: `pypi`
-4. In GitHub Actions → **wheels** → *Run workflow* → set **publish = true**
-   (only after the pending publisher is saved).
-5. First successful OIDC upload creates the PyPI project and unblocks the
-   README PyPI badge.
+2. Bump version in `bnn/_version.py` + `pyproject.toml`; tag when ready.
+3. GitHub Actions → **wheels** → *Run workflow*:
+   - Use ref **`main`** (skip for `cp313-win_amd64` is on main via PR #31) —
+     **not** tag `v1.0.0`. The frozen tag still builds crashing `cp313-win_amd64`.
+   - Set **publish = true**.
+4. After upload: `pip install bnn-lab==<version>` on a clean venv; confirm
+   `import bnn`. Refresh pypi.org **Publishing** if the publisher still shows
+   pending (first upload converts it to active).
 
 The publish job uses OIDC (`id-token: write`); no long-lived API token in the repo.
 
@@ -78,17 +96,25 @@ scaling. `BNN_NO_OPENMP` is the wheel-build kill switch in `setup.py`;
 `BNN_FORCE_OPENMP=1` (or `compile_native --openmp`) is the local macOS opt-in
 when you knowingly want OpenMP despite the default-off policy.
 
-**Skipped targets:** `*musllinux*` and `cp313-macosx_x86_64` — PyTorch has no
-wheels there, so a `bnn-lab` install (hard-deps `torch`) cannot succeed; we do
-not publish unloadable artifacts. Use manylinux / Win / macOS arm64 (and
-cp311–312 on Intel Mac).
+**Skipped targets:**
 
+| Pattern | Why |
+|---------|-----|
+| `*musllinux*` | PyTorch has no musl wheels — `bnn-lab` (hard-deps `torch`) cannot install |
+| `cp313-macosx_x86_64` | No torch wheel — do not publish unloadable artifacts |
+| `cp313-win_amd64` | numpy 1.26.x (`numpy>=1.24,<2`) + CPython 3.13.14: kernel smoke access-violates; do not ship an untested Win+3.13 wheel until numpy 2 is allowed |
+
+Use manylinux / Win **cp311–312** / macOS arm64 (and cp311–312 on Intel Mac).
 `hf` optional extra includes `safetensors` for Lane B packed export.
+
+**1.0.0 files on PyPI:** 13 wheels + sdist (14 files). Missing vs a full
+3.11–3.13 × 5-platform matrix: `cp313-win_amd64` and `cp313-macosx_x86_64`
+(skipped as above).
 
 ## Dry-run (Actions, preferred)
 
 ```bat
-gh workflow run wheels.yml --ref <branch-or-main> -f publish=false
+gh workflow run wheels.yml --ref main -f publish=false
 gh run watch
 ```
 
@@ -103,7 +129,7 @@ python -m build
 twine check dist/*
 ```
 
-Expect: `bnn_lab-0.3.0` sdist + wheel, **PASSED**.
+Expect: `bnn_lab-1.0.0` sdist + wheel, **PASSED**.
 
 ### Historical note
 
@@ -112,8 +138,10 @@ the rename is required solely because of the PyPI name collision.
 
 ## Interim install (Git / Release)
 
+Prefer PyPI. Git remains valid:
+
 ```bat
-pip install "bnn-lab @ git+https://github.com/KanakMalpani/Binary-Neural-Networks.git@v0.3.0"
+pip install "bnn-lab @ git+https://github.com/KanakMalpani/Binary-Neural-Networks.git@v1.0.0"
 ```
 
 Or editable:
@@ -136,5 +164,5 @@ See also [`SBOM.md`](SBOM.md).
 ## Public-repo note
 
 This repository is **public**. OpenSSF Scorecard’s public badge API and free
-Code Scanning apply. Trusted Publishing for **`bnn-lab`** remains the only
-maintainer gate for a live `pip install bnn-lab`.
+Code Scanning apply. Recurring `bnn-lab` uploads stay **OIDC Trusted Publishing
+only** — no API-token path.

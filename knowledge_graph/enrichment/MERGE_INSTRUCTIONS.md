@@ -7,6 +7,8 @@ Use when `knowledge_graph/bnn_kg.json` exists (owned by another agent/human). **
 | File | Role |
 |------|------|
 | `enrichment/gap_research_nodes.json` | Nodes + edges + meta (`researcher: gap-parallel`) |
+| `enrichment/integrity_wave1.json` | Status honesty + WC-O / CLI systems (`apply_kg_integrity.py`) |
+| `enrichment/literature_2026.json` | ScaleQ / BitEmbed / VibeASR overlay (same patch schema as integrity_wave1) |
 | `enrichment/SOURCES.md` | Bibliography |
 | `enrichment/NOTES.md` | Gap rationale |
 

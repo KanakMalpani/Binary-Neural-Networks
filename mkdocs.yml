@@ -1,5 +1,6 @@
 site_name: Binary Neural Network Optimiser
 site_description: Honest packed binary/ternary CPU/edge optimiser lab
+site_url: https://kanakmalpani.github.io/Binary-Neural-Networks/
 repo_url: https://github.com/KanakMalpani/Binary-Neural-Networks
 repo_name: Binary-Neural-Networks
 
@@ -15,8 +16,10 @@ theme:
 
 nav:
   - Docs index: README.md
+  - End-to-end guide: GUIDE_E2E.md
   - Optimiser quickstart: tutorials/07_OPTIMISER_QUICKSTART.md
   - HF optimiser: tutorials/08_HF_OPTIMISER.md
+  - Hub .bnnpack canaries: HUB_BNNPACK.md
   - Demos: demos/README.md
   - API reference:
       - Overview: api/README.md
@@ -36,6 +39,8 @@ nav:
   - QAT + layer search: 42_QAT_AND_LAYER_SEARCH.md
   - Memory footprint: 43_MEMORY_FOOTPRINT.md
   - Knowledge graph: 44_KNOWLEDGE_GRAPH.md
+  - Improvement handoff: 45_IMPROVEMENT_ROADMAP_HANDOFF.md
+  - Transformation plan: TRANSFORMATION_PLAN.md
   - World-class roadmap: 37_WORLD_CLASS_BNN_OPTIMISER_ROADMAP.md
 
 docs_dir: docs

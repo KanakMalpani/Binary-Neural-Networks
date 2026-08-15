@@ -32,8 +32,9 @@ Stack routing (decision tree companion): `bnn recommend --goal cpu-llm` (see
 [`scripts/recommend_stack.py`](../scripts/recommend_stack.py)). Fair published-shape
 eval: `bnn eval-suite` → [`docs/FAIR_EVAL_PROTOCOL.md`](FAIR_EVAL_PROTOCOL.md).
 
-Lane progress: [`docs/lanes/kg.md`](lanes/kg.md). Wave 1 product lanes (A–I) remain
-open PRs — KG statuses say `open_pr` rather than claiming merged.
+Lane progress: [`docs/lanes/kg.md`](lanes/kg.md). Lanes A–I are merged; KG
+`open_pr` fields were stale and are flipped to `merged` / `closed_by_policy` /
+`established`. **`gap_pypi_trusted` is `merged`** — [`bnn-lab` 1.0.0](https://pypi.org/project/bnn-lab/1.0.0/) is on PyPI.
 
 Maintainer-local only (not required to clone/build): optional external mirror index at
 `C:\00 Research Papers\BINARY_NEURAL_KG_INDEX.md` on the primary maintainer machine.

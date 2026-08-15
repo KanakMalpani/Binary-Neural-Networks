@@ -20,9 +20,16 @@ import torch.nn.functional as F
 from torch import Tensor
 
 from ..layers import BinaryLinear
-from ..ste import clip_weights_
+from ..ste import SignMode, clip_weights_
 from .metrics import measure_agreement
-from .qat import _restore_binary_to_linear, _swap_linear_to_binary
+from .qat import (
+    LogitLoss,
+    WeightOnlySTELinear,
+    _restore_binary_to_linear,
+    _swap_linear_to_binary,
+    agreement_loss,
+    temporary_sign_mode,
+)
 
 
 @dataclass
@@ -33,6 +40,12 @@ class DistillConfig:
     alpha_ce: float = 0.0  # 0 → pure KD; >0 mixes CE when labels provided
     layer_names: list[str] | None = None
     drop_in_threshold: float = 0.85
+    logit_loss: LogitLoss = "kd"
+    fold_alpha: bool = True
+    train_targets_only: bool = False
+    hidden_mse: float = 0.0
+    binarize_activations: bool = True
+    sign_mode: SignMode | None = None
 
 
 @dataclass
@@ -150,49 +163,93 @@ def distill_binary_student(
         s0 = student(x0)
         before = measure_agreement(t0, s0, drop_in_threshold=cfg.drop_in_threshold)
 
+    target_names = [n for n, _ in targets]
     for name, lin in targets:
-        _set_module(student, name, _swap_linear_to_binary(lin))
+        _set_module(
+            student,
+            name,
+            _swap_linear_to_binary(lin, binarize_activations=cfg.binarize_activations),
+        )
 
     student.train()
-    opt = torch.optim.Adam(
-        [p for p in student.parameters() if p.requires_grad],
-        lr=cfg.lr,
-    )
-    T = float(cfg.temperature)
+    if cfg.train_targets_only:
+        name_set = set(target_names)
+        params = []
+        for n, p in student.named_parameters():
+            owner = n.rsplit(".", 1)[0] if "." in n else n
+            if owner in name_set or n in name_set:
+                params.append(p)
+            else:
+                p.requires_grad_(False)
+        opt = torch.optim.Adam(params, lr=cfg.lr)
+    else:
+        opt = torch.optim.Adam(
+            [p for p in student.parameters() if p.requires_grad],
+            lr=cfg.lr,
+        )
     last_loss = 0.0
     n_steps = 0
     cursor = 0
-    while n_steps < cfg.steps:
-        x, y = batch_list[cursor % len(batch_list)]
-        cursor += 1
-        opt.zero_grad(set_to_none=True)
-        s_logits = student(x)
-        with torch.no_grad():
-            t_logits = teacher(x)
-        kd = F.kl_div(
-            F.log_softmax(s_logits / T, dim=-1),
-            F.softmax(t_logits / T, dim=-1),
-            reduction="batchmean",
-        ) * (T * T)
-        if cfg.alpha_ce > 0 and y is not None:
-            ce = F.cross_entropy(s_logits.reshape(-1, s_logits.shape[-1]), y.reshape(-1))
-            loss = cfg.alpha_ce * ce + (1.0 - cfg.alpha_ce) * kd
-        else:
-            loss = kd
-        loss.backward()
-        opt.step()
-        clip_weights_(student)
-        last_loss = float(loss.detach().item())
-        n_steps += 1
+    s_hooks: list = []
+    t_hooks: list = []
+    s_cache: dict = {}
+    t_cache: dict = {}
+    if cfg.hidden_mse > 0:
+        from .qat import _hidden_hooks
+
+        s_cache, s_hooks = _hidden_hooks(student, target_names)
+        t_cache, t_hooks = _hidden_hooks(teacher, target_names)
+    try:
+        with temporary_sign_mode(cfg.sign_mode):
+            while n_steps < cfg.steps:
+                x, y = batch_list[cursor % len(batch_list)]
+                cursor += 1
+                opt.zero_grad(set_to_none=True)
+                s_logits = student(x)
+                with torch.no_grad():
+                    t_logits = teacher(x)
+                loss = agreement_loss(
+                    s_logits,
+                    t_logits,
+                    kind=cfg.logit_loss,
+                    temperature=cfg.temperature,
+                )
+                if cfg.alpha_ce > 0 and y is not None:
+                    ce = F.cross_entropy(
+                        s_logits.reshape(-1, s_logits.shape[-1]), y.reshape(-1)
+                    )
+                    loss = cfg.alpha_ce * ce + (1.0 - cfg.alpha_ce) * loss
+                if cfg.hidden_mse > 0 and s_cache and t_cache:
+                    hid = torch.zeros((), device=s_logits.device, dtype=s_logits.dtype)
+                    n_h = 0
+                    for key in target_names:
+                        if key in s_cache and key in t_cache:
+                            hid = hid + F.mse_loss(s_cache[key], t_cache[key].detach())
+                            n_h += 1
+                    if n_h:
+                        loss = loss + cfg.hidden_mse * (hid / n_h)
+                loss.backward()
+                opt.step()
+                clip_weights_(student)
+                last_loss = float(loss.detach().item())
+                n_steps += 1
+    finally:
+        for h in s_hooks + t_hooks:
+            h.remove()
+        if cfg.train_targets_only:
+            for p in student.parameters():
+                p.requires_grad_(True)
 
     student.eval()
     restored: list[str] = []
     named = dict(student.named_modules())
     for name, _ in targets:
         bl = named.get(name)
-        if not isinstance(bl, BinaryLinear):
+        if not isinstance(bl, (BinaryLinear, WeightOnlySTELinear)):
             continue
-        _set_module(student, name, _restore_binary_to_linear(bl))
+        _set_module(
+            student, name, _restore_binary_to_linear(bl, fold_alpha=cfg.fold_alpha)
+        )
         restored.append(name)
 
     with torch.no_grad():

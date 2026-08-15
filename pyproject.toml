@@ -108,12 +108,16 @@ build = ["cp311-*", "cp312-*", "cp313-*"]
 # PyPy: no torch (and not in build=). i686/win32: 32-bit WinError 193 trap.
 # Free-threaded (t): unreliable NumPy. musllinux: PyTorch has no musl wheels, so
 # `pip install bnn-lab` cannot succeed. cp313 macOS x86_64: same (no torch wheel).
+# cp313 Windows: numpy 1.26.x (project pin <2) + CPython 3.13.14 on
+# windows-latest: check_wheel_kernel.py exits 3221225477 (0xC0000005).
+# Do not ship an untested Win+3.13 wheel until numpy 2 is allowed.
 skip = [
   "*_i686",
   "*-win32",
   "*t-*",
   "*musllinux*",
   "cp313-macosx_x86_64",
+  "cp313-win_amd64",
 ]
 test-requires = ["numpy"]
 test-command = "python {project}/scripts/check_wheel_kernel.py"

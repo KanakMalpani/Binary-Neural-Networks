@@ -3,7 +3,7 @@
 | Field | Value |
 |-------|-------|
 | **Status** | Canonical living plan (agents: follow when lost) |
-| **Version** | 1.0.0 (lab optimiser; PyPI upload human residual) |
+| **Version** | 1.0.0 (lab optimiser; `bnn-lab` 1.0.0 on PyPI) |
 | **Created** | 2026-07-25 |
 | **Canonical paths** | `/ROADMAP.md` (this file) · identical twin `docs/37_WORLD_CLASS_BNN_OPTIMISER_ROADMAP.md` |
 | **Supersedes (execution)** | `docs/21` remains historical COMPLETE lab plan; **this file** is the forward “world-class optimiser” plan |
@@ -98,7 +98,7 @@ Positioning: **Binary Neural Network Optimiser lab/product**, not “another MNI
 
 ## 1. Definition of World-Class (acceptance bar)
 
-A future agent may claim **“world-class BNN optimiser (v1.0)”** only when **all** gates below pass. Until then, say **lab / beta optimiser**.
+**v1.0.0 (2026-08):** all gates below are `[x]` in §10.8. Claim **world-class BNN optimiser (v1.0)** only for those gates. Post-v1 wrap AND-gate (hybrid/binary cosine **≥0.85 and** e2e **≥1.5×**, no `--force`) is a product lever in `docs/TRANSFORMATION_PLAN.md` — **not** a WC reopen. **Shipped on committed `wrap_demo` hidden=4096** (PR #39: cosine **0.999**, e2e **2.65×**, `forced: false`). Ultra TinyBlock hybrid (`ultra_wrap` primary) is still cosine **~0.70** `REFUSE`. Ternary 0.991 / 0.73× e2e does **not** count. 32× is uint64 pack compression, not GPU from `sign()`.
 
 ### 1.1 Product & API
 
@@ -160,7 +160,7 @@ Audit date: **2026-07-28** (SIMD/portability refresh). Status legend: `[x] DONE`
 
 | Area | Status | Evidence (paths) | Gap to world-class |
 |------|--------|------------------|--------------------|
-| Packaging / version | `[x]` | `pyproject.toml` **`bnn-lab`** 1.0.0 (import/CLI `bnn`), console script | Trusted Publisher on pypi.org still human (env `pypi` exists) |
+| Packaging / version | `[x]` | `pyproject.toml` **`bnn-lab`** 1.0.0 on PyPI (import/CLI `bnn`), console script | Recurring releases; no Windows ARM64 / no `cp313-win_amd64` in 1.0.0 |
 | CLI surface | `[x]` | `bnn optimise` + wrap/encode/bridge/… | HF load verb optional |
 | STE layers / models | `[x]` | `bnn/ste.py`, `layers.py`, `models.py` | Broader zoo polish optional |
 | Native binary GEMM | `[x]` | Win/Linux/macOS/ARM native + runtime SIMD (`docs/41`); NumPy fallback | Arena declined; WASM pedagogy shipped |
@@ -168,7 +168,7 @@ Audit date: **2026-07-28** (SIMD/portability refresh). Status legend: `[x] DONE`
 | Wrap / ultra wrap | `[x]` | `bnn/wrap/*` + sensitivity/search + distill + BN fuse | Richer HW detect |
 | Calibrate / QAT | `[x]` | `wrap/calibrate.py`, `wrap/qat.py`, `wrap/distill.py`, docs/42 | BitDistill-scale optional |
 | Auto policy | `[x]` | `wrap/policy.py` + `search_layer_modes` (W3.T06) | Richer HW detect |
-| Codec `.bnnpack` | `[x]` | v2 + hashes + safetensors export; ONNX bridge-only | ORT custom op stays deferred |
+| Codec `.bnnpack` | `[x]` | v2 + hashes + safetensors export; Hub canaries live (not SOTA) | ONNX/ORT custom op stays deferred |
 | Seq enc/dec | `[x]` | `bnn/seq/`, `train_seq2seq`, tutorial 06 | Scale / real NLP tasks optional |
 | Vision | `[x]` | CIFAR Bi-Real + ResNet-BiReal ref; ImageNet protocol runner | Full ImageNet SOTA non-gate |
 | Audio | `[~]` | `bnn/audio/` synthetic tones | Real dataset optional; keep ASR non-goal |
@@ -180,10 +180,10 @@ Audit date: **2026-07-28** (SIMD/portability refresh). Status legend: `[x] DONE`
 | API reference | `[x]` | docs/api autodoc (mkdocstrings) | — |
 | Tutorials | `[x]` | `docs/tutorials/01`–`08` | Keep green |
 | Bridges GPU/BitNet | `[x]` | `bnn bridge …` + pinned bitnet recipe (no giant submodule) | Full upstream build stays local |
-| HF integration | `[x]` | tutorial 08 + optional hf tests | deeper calib recipes |
-| Community OSS | `[x]` | LICENSE, templates, COC, SECURITY, CODEOWNERS, CONTRIBUTING, launch checklist, Discussions, branch protection | Finish PyPI Trusted Publisher (human) |
+| HF integration | `[x]` | tutorial 08 + Hub `.bnnpack` canaries (collection live, not SOTA) | deeper calib recipes; Space not live (HF Pro) |
+| Community OSS | `[x]` | LICENSE, templates, COC, SECURITY, CODEOWNERS, CONTRIBUTING, launch checklist, Discussions, branch protection | Venue optional; Hub canaries live |
 | Security | `[x]` | SECURITY.md + SBOM + hard pip-audit + attestations | — |
-| Releases | `[x]` | `v1.0.0` + SBOM + `wheels.yml` (OIDC) | First `bnn-lab` upload via Trusted Publishing |
+| Releases | `[x]` | `v1.0.0` + SBOM + `wheels.yml` OIDC → **`bnn-lab` 1.0.0 on PyPI** | Recurring tags; skip frozen `v1.0.0` wheel matrix |
 | Papers / research series | `[x]` | `docs/32`, publication plan, figure pipeline, CITATION.cff | Venue submit optional |
 | Compatibility matrix | `[x]` | docs + CI matrix 3.11–3.13 + portability | Keep matrix honest |
 | Memory arena / thread pool API | `[x]` | OpenMP thread setter + footprint report | Arena measured & declined (docs/43) |
@@ -367,7 +367,8 @@ Acceptance: every task that touches metrics must keep `bnn repro` green unless e
 | W5.T09 | Wrap Conv2d packed path polish | M | — | `[x]` |
 
 **Acceptance tests:** encode→decode err=0; HF demo optional marker `slow`; schema version field.  
-**Follow when lost:** W5.T04 → W5.T05 → W5.T06.
+**Follow when lost:** W5.T04 → W5.T05 → W5.T06.  
+**Hub collection (2026-08-15):** `.bnnpack` **canaries live** on Hugging Face (PR #42) — not SOTA; wrap pack is PTQ bytes, not the QAT checkpoint; Ultra TinyBlock still `REFUSE`.
 
 ---
 
@@ -382,12 +383,12 @@ Acceptance: every task that touches metrics must keep `bnn repro` green unless e
 | W6.T02 | CIFAR HF/proxy path | M | — | `[x]` |
 | W6.T03 | Audio synthetic lane | M | — | `[x]` |
 | W6.T04 | Dataset cards (MNIST/CIFAR/synth audio) | M | — | `[x]` |
-| W6.T05 | Seq reverse-task card | S | — | `[~]` in docs/36 |
+| W6.T05 | Seq reverse-task card | S | — | `[x]` `docs/DATASET_CARDS.md` |
 | W6.T06 | Training recipes index | M | W4, W9 | `[x]` |
 | W6.T07 | ImageNet folder protocol only | S | — | `[x]` runner (`scripts/imagenet_protocol.py`) |
 | W6.T08 | Never commit datasets | S | — | `[x]` policy |
 
-**Follow when lost:** W6.T04 → W6.T06 → W6.T05.
+**Follow when lost:** W6.T04 → W6.T06 (T05 card shipped).
 
 ---
 
@@ -425,7 +426,7 @@ Acceptance: every task that touches metrics must keep `bnn repro` green unless e
 | W8.T05 | Tagged GitHub Releases | M | W1 | `[x]` v1.0.0 |
 | W8.T06 | SBOM (e.g. cyclonedx) on release | M | W8.T05 | `[x]` script + docs |
 | W8.T07 | Artifact attestations | L | W8.T05 | `[x]` `attest-build-provenance` on wheels + sdist |
-| W8.T08 | PyPI publish workflow (Trusted Publishing) | L | W8.T05 | `[~]` workflow ready; **human** Trusted Publisher pending (`docs/PYPI_PUBLISH.md`) |
+| W8.T08 | PyPI publish workflow (Trusted Publishing) | L | W8.T05 | `[x]` `bnn-lab` 1.0.0 on PyPI (OIDC Trusted Publisher; `docs/PYPI_PUBLISH.md`) |
 | W8.T09 | constraints.txt discipline | S | — | `[x]` |
 | W8.T10 | Native compile in CI not `continue-on-error` when possible | M | W2.T03 | `[x]` Linux hard; Win soft |
 
@@ -642,7 +643,7 @@ flowchart TD
 
 ### 7.4 Default active phase
 
-As of 2026-07-25 (updated): **Phases A–D substantially complete at v0.3.0**; remaining = WC-§1 leftovers + moonshots (see `docs/MOONSHOT_DEFERRALS.md` / `docs/40_ROADMAP_E2E_SESSION.md`).
+As of 2026-08-15: **v1.0.0 WC bar met** (§8 / §10.8). Wave H/S in-repo (PRs #34–#39): CLI epilog (issue #2), Larq + §8 scorecard, KG 2026 overlay, NumPy BLAS fallback when native absent, `demo/space/` wrap paradox (**Space not live** — HF Pro 402), `wrap_demo` AND-gate. Hub `.bnnpack` **canaries live** (PR #42; not SOTA; wrap pack is PTQ bytes, not the QAT checkpoint). Remaining = live HF Space (human Pro), B1 preprint/submit (arXiv still human), Ultra TinyBlock hybrid still ~0.70 `REFUSE` + moonshots (`docs/MOONSHOT_DEFERRALS.md` / `docs/40_ROADMAP_E2E_SESSION.md`). Thesis lock: 32× is uint64 pack compression, not GPU from `sign()`.
 
 ---
 
@@ -663,16 +664,18 @@ As of 2026-07-25 (updated): **Phases A–D substantially complete at v0.3.0**; r
 - [x] Compat matrix doc + py3.11–3.13 CI
 - [x] Pareto report v0 (`bnn_pareto_report_v1`)
 - [x] SECURITY.md + MODEL_CARD
-- [~] Tag `v0.4.0` deferred — folded into v0.3.0 preview; ARM/macOS native **landed** (`docs/41` + portability CI); next tag on v1.0 gate progress
+- [~] Tag `v0.4.0` deferred — folded into v0.3.0 preview; ARM/macOS native **landed** (`docs/41` + portability CI); **v1.0.0** tagged 2026-08-04
 
 ### v1.0 — World-class bar
 
-- [ ] All **WC-*** gates in §1 green
-- [ ] Phases A–D complete; E at least tech-report ready
-- [ ] PyPI or documented “why not yet”
-- [ ] Public launch checklist (§10 W11) complete
-- [ ] README badges: repro, CI, license, version
-- [ ] Tag `v1.0.0` with attestation
+- [x] All **WC-*** gates in §1 green (§10.8)
+- [x] Phases A–D complete; E at least tech-report ready (publication plan + figures-from-JSON + `CITATION.cff`)
+- [x] PyPI: [`bnn-lab` 1.0.0](https://pypi.org/project/bnn-lab/1.0.0/) (OIDC Trusted Publisher)
+- [x] Public launch checklist (§10 W11) complete (`docs/LAUNCH_CHECKLIST.md`)
+- [x] README badges: repro, CI, license, version (plus PyPI / Pages)
+- [x] Tag `v1.0.0` with attestation (`attest-build-provenance` on wheels + sdist)
+
+Post-v1 wrap AND-gate (**not** a WC / §8 gate): **shipped on `wrap_demo` hidden=4096** (PR #39 — cosine **0.999**, e2e **2.65×**, `forced: false`). Ultra TinyBlock hybrid (`ultra_wrap` primary) remains cosine **~0.70**, e2e **~1.61×**, `REFUSE`. Ternary 0.991 / 0.73× e2e does **not** count. Hub `.bnnpack` canaries **live** (PR #42; not SOTA; wrap pack is PTQ bytes, not the QAT checkpoint). Space still not live (HF Pro). arXiv still human. 32× is pack compression, not GPU from `sign()`.
 
 ---
 
@@ -775,6 +778,7 @@ Pre-checked from 2026-07-25 audit. **Agents: flip `[ ]` → `[x]` or `[~]` in PR
 - [x] W7.T07 Leaderboard template
 - [x] M5 RAPL / energy-proxy spike (Windows CLOSED-BY-PROXY)
 - [x] M6 ImageNet protocol runner (smoke/proxy; no SOTA gate)
+- [x] Hub `.bnnpack` canaries live (PR #42; not SOTA; wrap pack PTQ not QAT)
 
 ### 10.8 World-class gates (§1)
 
@@ -785,16 +789,27 @@ Pre-checked from 2026-07-25 audit. **Agents: flip `[ ]` → `[x]` or `[~]` in PR
 - [x] WC-K4 dual-metric (Pareto + fair protocol)
 - [x] WC-O1–O4 (calib/auto/drop-in honesty/QAT+distill demo; search yes)
 - [x] WC-R1 repro
-- [~] WC-R2–R4 (matrix+SBOM+LICENSE+attestations; **PyPI Trusted Publisher upload** human residual)
+- [x] WC-R2–R4 (matrix+SBOM+LICENSE+attestations; **`bnn-lab` 1.0.0 on PyPI**)
 - [x] WC-D1–D5 (tutorials+cards+community+Discussions; v1.0.0 tag)
 - [x] WC-D1 tutorials + GUIDE_E2E master path
 - [x] WC-P1–P2 (`bnn bridge` + pinned bitnet recipe)
 
 ### 10.9 Remaining after v1.0.0
 
-See `docs/MOONSHOT_DEFERRALS.md`. Honest residuals: human PyPI Trusted Publisher
-registration + first `bnn-lab` upload; venue paper submit; privileged wrap-workload
-RAPL; BitDistill-scale KD; ORT custom op (stays deferred).
+See `docs/MOONSHOT_DEFERRALS.md` and `docs/TRANSFORMATION_PLAN.md`.
+
+**Shipped in-repo 2026-08-15 (not WC reopen):** issue #2 CLI epilog (PR #34); Larq + §8
+scorecard (PR #35); KG 2026 overlay (PR #36); NumPy BLAS fallback when native absent
+(PR #37 / `docs/45` P1); `demo/space/` wrap paradox (PR #38); `wrap_demo` hidden=4096
+AND-gate cosine **0.999** and e2e **2.65×** without `--force` (PR #39); Hub `.bnnpack`
+**canaries live** (PR #42; not SOTA; wrap pack is PTQ bytes, not the QAT checkpoint).
+PyPI **`bnn-lab` 1.0.0** shipped (OIDC Trusted Publisher; no API-token path).
+
+**Honest residuals:** live HF Space (in-repo demo exists; HF Gradio `cpu-basic` is
+HTTP 402 without Pro); B1 preprint / arXiv submit (human); Ultra TinyBlock hybrid
+still ~0.70 `REFUSE` (ternary 0.991 / 0.73× e2e does **not** count); venue paper
+submit; privileged wrap-workload RAPL; BitDistill-scale KD; ORT custom op (stays
+deferred). No GPU 32× from `sign()`.
 
 ---
 
@@ -821,10 +836,12 @@ RAPL; BitDistill-scale KD; ORT custom op (stays deferred).
 ### 11.2 Top next actions (post v1.0.0)
 
 1. ~~Wave 2 integrator (lanes A–I + KG)~~ **DONE**
-2. Tag `v1.0.0` + GitHub Release when `bnn repro` is green on the integrator tip
-3. **Human:** register Trusted Publisher for **`bnn-lab`** on pypi.org (GitHub env `pypi` exists; see `docs/PYPI_PUBLISH.md`), then Actions → wheels → `publish=true`
-4. Clean-venv smoke: `pip install bnn-lab` + `bnn repro` after first upload
-5. Optional: venue paper submit from `docs/PUBLICATION_PLAN.md`; privileged Linux wrap-workload RAPL
+2. ~~Tag `v1.0.0` + GitHub Release~~ **DONE** (2026-08-04; attestations on wheels + sdist)
+3. ~~**Human:** register Trusted Publisher for **`bnn-lab`** on pypi.org, then Actions → wheels → `publish=true`~~ **DONE** — [`bnn-lab` 1.0.0](https://pypi.org/project/bnn-lab/1.0.0/) (OIDC; run [31825286443](https://github.com/KanakMalpani/Binary-Neural-Networks/actions/runs/31825286443); `docs/PYPI_PUBLISH.md`)
+4. ~~Clean-venv smoke after first upload~~ **DONE** for library import (`pip install bnn-lab==1.0.0`); `bnn repro` still needs a clone + `[dev]`
+5. ~~Post-v1 in-repo (do **not** invent goldens): `demo/space/` wrap paradox; `wrap_demo` AND-gate; NumPy vs BLAS fallback (`docs/45` P1)~~ **DONE** 2026-08-15 (PRs #34–#39). Space **not live** (HF Pro 402). Ultra TinyBlock hybrid still ~0.70 `REFUSE`. No GPU 32×.
+6. ~~Hub `.bnnpack` canaries~~ **DONE** 2026-08-15 (PR #42). Collection **live**; canaries not SOTA; wrap pack is PTQ bytes, not the QAT checkpoint. Ultra TinyBlock still `REFUSE`. Space **not live**. arXiv still human. No GPU 32×.
+7. Remaining product: live HF Space (human Pro); B1 preprint from goldens (`docs/PUBLICATION_PLAN.md` C1–C7 only; arXiv still human). Optional: venue submit; privileged Linux wrap-workload RAPL
 
 ---
 

@@ -22,6 +22,8 @@ from bnn.wrapper import (  # noqa: E402
     PackedBinaryXNORLinear,
     TernaryWeightOnlyLinear,
     WrapReport,
+    light_qat_recover,
+    measure_agreement,
     model_param_bytes,
 )
 
@@ -81,6 +83,13 @@ def main() -> None:
     )
     p.add_argument("--hidden", type=int, default=4096)
     p.add_argument("--batch", type=int, default=64)
+    p.add_argument(
+        "--qat-steps",
+        type=int,
+        default=200,
+        help="STE recovery on middles 3/5 before pack (0 = PTQ only)",
+    )
+    p.add_argument("--drop-in-threshold", type=float, default=0.85)
     p.add_argument("--out", type=Path, default=ROOT / "results" / "wrap_demo.json")
     args = p.parse_args()
 
@@ -89,9 +98,21 @@ def main() -> None:
     set_repro_seed(0, deterministic=True, force_cpu=True)
     fp_model = make_wide_mlp(args.hidden)
     wrapped = copy.deepcopy(fp_model)
+    x = torch.randn(args.batch, 1, 28, 28)
+    qat_info = None
+    if args.qat_steps > 0 and args.mode == "binary_xnor":
+        qat_info = light_qat_recover(
+            wrapped,
+            x,
+            teacher=fp_model,
+            steps=args.qat_steps,
+            lr=1e-3,
+            layer_names=["3", "5"],
+            logit_loss="mse",
+            fold_alpha=True,
+        )
     report = replace_middles(wrapped, args.mode)
 
-    x = torch.randn(args.batch, 1, 28, 28)
     t_fp = time_fn(lambda: fp_model(x))
     t_wrap = time_fn(lambda: wrapped(x))
 
@@ -125,14 +146,23 @@ def main() -> None:
         }
 
     with torch.no_grad():
+        t_logits = fp_model(x)
+        s_logits = wrapped(x)
         cos = float(
             torch.nn.functional.cosine_similarity(
-                fp_model(x).flatten(), wrapped(x).float().cpu().flatten(), dim=0
+                t_logits.flatten(), s_logits.float().cpu().flatten(), dim=0
             ).item()
         )
+        eff = measure_agreement(
+            t_logits, s_logits, drop_in_threshold=args.drop_in_threshold
+        )
+    drop_ok = bool(eff.drop_in_ok)
+    forced = False
+    status = "OK" if drop_ok else "REFUSE_DROP_IN_CLAIM"
 
     size_fp = model_param_bytes(fp_model)
     size_w = model_param_bytes(wrapped)
+    e2e = (t_fp / t_wrap) if t_wrap else 0.0
     result = {
         "mode": args.mode,
         "hidden": args.hidden,
@@ -145,14 +175,25 @@ def main() -> None:
         "model_total_bytes_wrapped": size_w["total_bytes"],
         "e2e_latency_ms_fp": t_fp * 1e3,
         "e2e_latency_ms_wrapped": t_wrap * 1e3,
-        "e2e_speedup": (t_fp / t_wrap) if t_wrap else None,
+        "e2e_speedup": e2e,
         "layer_microbench": layer_micro,
         "output_cosine_vs_fp": cos,
+        "effectiveness": eff.to_dict(),
+        "drop_in_ok": drop_ok,
+        "forced": forced,
+        "status": status,
+        "qat": qat_info,
         "native_kernel": report.native_kernel,
         "interpretation": (
-            "E2E may lose to torch when stem/head/ReLU dominate or Python pack overhead "
-            "is large; layer gemm_only shows true kernel ROI. Cosine<<1 for binary_xnor "
-            "without QAT is expected (not a transparent accuracy-preserving wrap)."
+            "MSE STE QAT (fold learned alpha into Linear magnitudes) on Sequential "
+            "middles 3/5, then packed binary_xnor. Cosine and e2e are measured; "
+            "compression is theoretical pack ratio. Never claim GPU 32× from sign()/STE."
+            if qat_info
+            else (
+                "E2E may lose to torch when stem/head/ReLU dominate or Python pack overhead "
+                "is large; layer gemm_only shows true kernel ROI. Cosine<<1 for binary_xnor "
+                "without QAT is expected (not a transparent accuracy-preserving wrap)."
+            )
         ),
     }
 
@@ -162,13 +203,13 @@ def main() -> None:
     md_lines = [
         "# Wrap existing model demo",
         "",
-        f"- Mode: `{args.mode}` hidden={args.hidden} batch={args.batch}",
+        f"- Mode: `{args.mode}` hidden={args.hidden} batch={args.batch} qat_steps={args.qat_steps}",
         f"- Replaced: {report.replaced}",
         f"- Weight compression (replaced): **{report.compression:.2f}×**",
         f"- Model bytes: {size_fp['total_bytes']} → {size_w['total_bytes']}",
         f"- E2E latency: {t_fp*1e3:.2f} ms → {t_wrap*1e3:.2f} ms "
-        f"(**{(t_fp/t_wrap) if t_wrap else 0:.2f}×**)",
-        f"- Output cosine vs FP: **{cos:.4f}**",
+        f"(**{e2e:.2f}×**)",
+        f"- Output cosine vs FP: **{cos:.4f}** (drop_in_ok={drop_ok}, forced={forced})",
     ]
     if "speedup_gemm_only_vs_torch_linear" in lm:
         md_lines += [
@@ -182,6 +223,14 @@ def main() -> None:
     args.out.with_suffix(".md").write_text("\n".join(md_lines), encoding="utf-8")
     print(json.dumps(result, indent=2))
     print(f"Wrote {args.out}")
+    if qat_info and args.mode == "binary_xnor":
+        and_ok = drop_ok and e2e >= 1.5 and not forced
+        print(
+            f"AND-gate cosine>=0.85 and e2e>=1.5x without --force: {and_ok}",
+            flush=True,
+        )
+        if not and_ok:
+            raise SystemExit(2)
 
 
 if __name__ == "__main__":
