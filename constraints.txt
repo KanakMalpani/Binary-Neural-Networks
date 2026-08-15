@@ -10,7 +10,7 @@ torch>=2.1,<2.13
 # Elsewhere NumPy 2 is fine with current torch; keep the same upper bound so
 # one constraints file works on every runner in the portability matrix.
 numpy>=1.24,<2
-pytest>=7.4,<9
+pytest>=7.4,<10
 pytest-timeout>=2.2,<3
 # Optional HF lane:
 # transformers>=4.40,<5
