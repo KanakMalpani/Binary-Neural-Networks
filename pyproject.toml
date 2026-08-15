@@ -53,7 +53,7 @@ audio = []   # Synthetic audio is NumPy-only; reserved for real ASR deps
 hf = [
   "transformers>=4.40,<5",
   "datasets>=2.18,<4",
-  "huggingface_hub>=0.22,<1",
+  "huggingface_hub>=0.22,<2",
   "safetensors>=0.4,<1",
 ]
 docs = [
