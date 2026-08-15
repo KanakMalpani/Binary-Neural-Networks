@@ -57,8 +57,10 @@
   "wrap_demo": {
     "source": "results/wrap_demo.json",
     "weight_compression_exact": 32.0,
+    "cosine_min": 0.85,
+    "e2e_speedup_min": 1.5,
     "cosine_max_without_qat": 0.5,
-    "note": "Low cosine without QAT is expected; gate checks compression + non-crash quality bound"
+    "note": "Same hidden=4096 / layers 3+5 shape. QAT (mse+fold_alpha, 200 steps) meets drop-in cosine and 1.5× e2e without --force. cosine_max_without_qat remains the PTQ-only bound (legacy 0.31)."
   },
   "ultra_wrap": {
     "source": "results/ultra_wrap.json",

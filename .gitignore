@@ -46,6 +46,7 @@ Thumbs.db
 
 # Local packs / repro logs
 *.bnnpack
+results/hf_canaries/
 results/_*.txt
 results/_repro_smoke_*.json
 results/_repro_run.log

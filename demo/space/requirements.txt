@@ -1,0 +1,7 @@
+# CPU Space only. Do not list gradio / spaces / huggingface_hub (platform-managed).
+# Pin an exact +cpu torch so pip does not pull a CUDA wheel on rebuild.
+# bnn-lab 1.0.0 requires torch>=2.1,<2.13 — stay inside that range.
+--extra-index-url https://download.pytorch.org/whl/cpu
+torch==2.5.1+cpu
+bnn-lab==1.0.0
+numpy>=1.24,<2

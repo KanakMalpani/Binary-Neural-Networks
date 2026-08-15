@@ -6,7 +6,9 @@ Dot: <a,b> = N - 2 * popcount(a XOR b)
 Includes:
   - NumPy reference (correct, may lose to BLAS without SIMD popcnt)
   - Optional native C kernel (OpenMP + hardware popcnt when compiled)
+  - When native is absent: packed NumPy below a batch crossover, else dequant+BLAS
   - Thread control via BNN_NUM_THREADS / set_num_threads()
+  - BNN_FORCE_NUMPY=1 skips a loaded native library (failed-load / no-compiler audience)
 """
 
 from __future__ import annotations
@@ -31,6 +33,13 @@ _NATIVE_TRIED: bool = False
 _NATIVE_PATH = Path(__file__).with_name("_binary_gemm_native")
 _THREADS_APPLIED: int | None = None
 
+# docs/45 P1, N=M=4096: packed NumPy wins at B=1 and B=4, is ~tied at B=8
+# (11.3 vs 12.6 ms), and loses 5–11× by B=64. Bias toward BLAS — a too-low
+# threshold wastes ~1.1×; a too-high threshold costs 5×. B >= this uses
+# dequant + fp32_gemm when native is absent. Override: BNN_NUMPY_BLAS_BATCH.
+NUMPY_PACKED_BLAS_CROSSOVER_BATCH = 8
+_BLAS_BATCH_ENV = "BNN_NUMPY_BLAS_BATCH"
+
 # Keep embedded source in sync with binary_gemm.c for non-Windows auto-build.
 _C_SOURCE = (Path(__file__).with_name("binary_gemm.c")).read_text(encoding="utf-8") if (
     Path(__file__).with_name("binary_gemm.c").exists()
@@ -46,6 +55,31 @@ def _env_num_threads() -> int | None:
     except ValueError:
         return None
     return n if n > 0 else None
+
+
+def _env_flag(name: str) -> bool:
+    return os.environ.get(name, "").strip().lower() in {"1", "true", "yes"}
+
+
+def numpy_packed_blas_crossover_batch() -> int:
+    """Batch at which the no-native path switches from packed NumPy to BLAS.
+
+    ``BNN_NUMPY_BLAS_BATCH=0`` means always BLAS; a large value keeps packed NumPy.
+    Invalid values fall back to :data:`NUMPY_PACKED_BLAS_CROSSOVER_BATCH`.
+    """
+    raw = os.environ.get(_BLAS_BATCH_ENV)
+    if raw is None or raw.strip() == "":
+        return NUMPY_PACKED_BLAS_CROSSOVER_BATCH
+    try:
+        n = int(raw)
+    except ValueError:
+        return NUMPY_PACKED_BLAS_CROSSOVER_BATCH
+    return n if n >= 0 else NUMPY_PACKED_BLAS_CROSSOVER_BATCH
+
+
+def prefer_numpy_blas_fallback(batch: int) -> bool:
+    """True when the no-native path should dequant+BLAS instead of packed NumPy."""
+    return int(batch) >= numpy_packed_blas_crossover_batch()
 
 
 def set_num_threads(n: int | None) -> None:
@@ -174,6 +208,11 @@ def _native_library_candidates(exact: Path) -> list[Path]:
 
 def _try_load_native() -> ctypes.CDLL | None:
     global _NATIVE, _NATIVE_TRIED
+    # Process-level escape for the no-native-load audience (failed ctypes load,
+    # exotic platform, or tests). Checked first so a wheel-shipped DLL does not
+    # hide the NumPy/BLAS fallback.
+    if _env_flag("BNN_FORCE_NUMPY"):
+        return None
     if _NATIVE is not None:
         return _NATIVE
     if _NATIVE_TRIED:
@@ -290,6 +329,25 @@ def pack_binary_pm1(x: np.ndarray, axis: int = -1) -> tuple[np.ndarray, int]:
     return pack_bits_u64(np.less_equal(x, 0)), n
 
 
+def unpack_binary_pm1(packed: np.ndarray, n: int) -> np.ndarray:
+    """Inverse of :func:`pack_binary_pm1`: ``(rows, words)`` uint64 → ``(rows, n)`` ±1.
+
+    Temporary dequant for the BLAS fallback. Callers keep the packed buffer as
+    the stored weights (32× compression is unchanged).
+    """
+    packed = np.ascontiguousarray(packed, dtype=np.uint64)
+    if packed.ndim != 2:
+        raise ValueError(f"expected 2D packed, got ndim={packed.ndim}")
+    rows, words = packed.shape
+    expected = (n + 63) // 64
+    if words != expected:
+        raise ValueError(f"n={n} implies {expected} words, got {words}")
+    u8 = packed.astype("<u8", copy=False).view(np.uint8).reshape(rows, words, 8)
+    bits = np.unpackbits(u8, axis=-1, bitorder="little")
+    bits = bits.reshape(rows, words * 64)[:, :n]
+    return np.where(bits.astype(bool), np.float32(-1.0), np.float32(1.0))
+
+
 def _validate_prepacked(xp: np.ndarray, wp: np.ndarray, n: int) -> tuple[int, int, int]:
     if xp.dtype != np.uint64 or wp.dtype != np.uint64:
         raise TypeError(
@@ -320,6 +378,38 @@ def binary_gemm_numpy_prepacked(
         dist = bitwise_count(xor).sum(axis=1).astype(np.int32)
         out[b] = n - 2 * dist
     return out
+
+
+def binary_gemm_numpy_or_blas(
+    xp: np.ndarray,
+    wp: np.ndarray,
+    n: int,
+    *,
+    x_pm1: np.ndarray | None = None,
+    w_pm1: np.ndarray | None = None,
+) -> np.ndarray:
+    """No-native GEMM: packed NumPy below the batch crossover, else dequant+BLAS.
+
+    :func:`binary_gemm_numpy_prepacked` stays the ISA-parity reference. This
+    wrapper only chooses a faster ``err = 0`` equivalent when the Python
+    popcount loop would lose to FP32 BLAS. Packed ``wp`` is not mutated.
+    """
+    B, _m, _words = _validate_prepacked(xp, wp, n)
+    if not prefer_numpy_blas_fallback(B):
+        return binary_gemm_numpy_prepacked(xp, wp, n)
+    if x_pm1 is None:
+        x_bin = unpack_binary_pm1(xp, n)
+    else:
+        x_bin = np.asarray(x_pm1, dtype=np.float32)
+        if x_bin.shape != (B, n):
+            raise ValueError(f"x_pm1 shape {x_bin.shape} != ({B}, {n})")
+    if w_pm1 is None:
+        w_bin = unpack_binary_pm1(wp, n)
+    else:
+        w_bin = np.asarray(w_pm1, dtype=np.float32)
+        if w_bin.shape[1] != n or w_bin.shape[0] != _m:
+            raise ValueError(f"w_pm1 shape {w_bin.shape} != ({_m}, {n})")
+    return fp32_gemm(x_bin, w_bin)
 
 
 def binary_gemm_native_prepacked(
@@ -398,20 +488,51 @@ def binary_gemm_packed(
     *,
     prepacked_w: tuple[np.ndarray, int] | None = None,
 ) -> np.ndarray:
-    """Compute Y = X @ W.T for ±1 matrices using packed XNOR-popcount."""
+    """Compute Y = X @ W.T for ±1 matrices using packed XNOR-popcount.
+
+    Native SIMD when the library loads. Otherwise packed NumPy for small batch
+    and dequant+BLAS at/above :func:`numpy_packed_blas_crossover_batch` so the
+    no-native path is never 5–11× slower than FP32 at B=64 (docs/45 P1).
+    """
     x_pm1 = np.asarray(x_pm1)
     if x_pm1.ndim != 2:
         raise ValueError(f"x_pm1 must be 2D, got shape {x_pm1.shape}")
+    n_feat = int(x_pm1.shape[1])
+    batch = int(x_pm1.shape[0])
+
+    w_arr: np.ndarray | None
+    wp: np.ndarray | None
+    if prepacked_w is None:
+        w_arr = np.asarray(w_pm1)
+        if w_arr.ndim != 2:
+            raise ValueError(f"w_pm1 must be 2D, got shape {w_arr.shape}")
+        if w_arr.shape[1] != n_feat:
+            raise ValueError(
+                f"in_features mismatch: x {n_feat} vs w {w_arr.shape[1]}"
+            )
+        wp = None
+    else:
+        wp, n2 = prepacked_w
+        if n_feat != n2:
+            raise ValueError(f"packed n mismatch: {n_feat} vs {n2}")
+        w_arr = None
+
+    # Skip packing when native is absent and BLAS wins. Inputs are ±1 (same
+    # contract as fp32_gemm); do not copy through _as_pm1 — a 4096×4096 where()
+    # is ~3× the GEMM. Non-±1 values are used as-is here; the packed path still
+    # signs via pack_binary_pm1.
+    if _try_load_native() is None and prefer_numpy_blas_fallback(batch):
+        if w_arr is not None:
+            return fp32_gemm(x_pm1, w_arr)
+        if wp is None:
+            raise ValueError("prepacked_w missing packed weights")
+        return fp32_gemm(x_pm1, unpack_binary_pm1(np.asarray(wp), n_feat))
+
     xp, n = pack_binary_pm1(x_pm1, axis=1)
     if prepacked_w is None:
-        w_pm1 = np.asarray(w_pm1)
-        if w_pm1.ndim != 2:
-            raise ValueError(f"w_pm1 must be 2D, got shape {w_pm1.shape}")
-        if w_pm1.shape[1] != x_pm1.shape[1]:
-            raise ValueError(
-                f"in_features mismatch: x {x_pm1.shape[1]} vs w {w_pm1.shape[1]}"
-            )
-        wp, n2 = pack_binary_pm1(w_pm1, axis=1)
+        if w_arr is None:
+            raise ValueError("w_pm1 is required when prepacked_w is omitted")
+        wp, n2 = pack_binary_pm1(w_arr, axis=1)
         if n != n2:
             raise ValueError(f"packed n mismatch: {n} vs {n2}")
     else:

@@ -1,6 +1,6 @@
 # State of the Art Survey (2016 → 2026)
 
-**Last reviewed (W12.T04):** 2026-08-04 — positioning row for this lab + bridge CLI; no invented goldens.
+**Last reviewed (W12.T04):** 2026-08-15 — Larq archived 2026-06-15; competitor table vs Brevitas / bitnet.cpp / torchao / this lab. No LCE FPS. No invented goldens. No GPU 32×.
 
 ## Classic CNN BNNs (vision)
 
@@ -59,21 +59,26 @@ Ternary (not pure ±1) matters: the **0** enables feature filtering and closes t
 
 **2026 industry truth:** For NVIDIA datacenter GPUs, **INT4/FP8 via torchao / vLLM / TensorRT** usually beats “research BNN simulation.” For **CPU / mobile / NPU / custom silicon**, **1-bit / 1.58-bit** is the frontier for extreme latency/energy.
 
-## Tooling landscape
+## Tooling landscape (2026)
 
-| Tool | Stack | Role | Caveat |
-|------|-------|------|--------|
-| **Larq + Larq Compute Engine** | TF/Keras | Train BNNs + deploy packed ARM kernels | Larq repo archived 2026; still usable |
-| **Brevitas** | PyTorch | Flexible QAT including 1-bit | Need export path for real speed |
-| **torchao** | PyTorch | FP8/INT4/INT8, QAT, sparsity | Not a full 1-bit BNN stack; best for 4–8 bit GPU |
-| **bitnet.cpp** | C++/CUDA | Ternary LLM inference | Best open path for BitNet-style LLMs |
-| **This repo (`bnn-lab`)** | Pure PyTorch + NumPy packed kernels | Teach + measure real CPU XNOR speedups; `bnn bridge` → GPU INT4 / bitnet.cpp | Educational / research scaffold — not a llama.cpp replacement |
+**Larq vacuum:** [larq/larq](https://github.com/larq/larq) (TF/Keras BNN training) was **archived 2026-06-15** and is read-only. This lab occupies **packed PyTorch BNN optimisation** — wrap / policy / QAT + uint64 XNOR–popcount + dual metrics — not TF/Keras and not LLM tok/s.
+
+Do **not** quote Larq Compute Engine FPS as ours. Do **not** claim GPU 32× from `sign()`.
+
+| Tool | Stack | Occupies | Honest caveat |
+|------|-------|----------|---------------|
+| **Larq + Larq Compute Engine** | TF/Keras | Classic CNN BNN train + packed ARM deploy (while alive) | **Archived 2026-06-15.** Still readable; not a PyTorch default. No LCE FPS claimed here. |
+| **Brevitas** | PyTorch | Flexible QAT including 1-bit | Training / export library — needs a separate runtime for real packed speed |
+| **torchao** | PyTorch | FP8 / INT4 / INT8, QAT, sparsity on GPU | Not a 1-bit BNN stack; default for datacenter GPU quality |
+| **bitnet.cpp** | C++ / CUDA | Ternary LLM inference (tok/s, energy) | Best open path for BitNet-style **CPU LLM chat** — we **bridge**, we do not compete |
+| **This lab (`bnn-lab`)** | PyTorch + packed CPU kernels | **PyTorch packed BNN optimiser** after Larq’s archive: `bnn.optimise`, `.bnnpack`, XNOR–popcount, dual-metric REFUSE | Lab/product for CPU/edge wrap — **not** llama.cpp, **not** ImageNet SOTA, **not** GPU 32× |
 
 ## Related-work maintenance (W12.T04)
 
 | Axis | This lab’s honest position | Cite / do not claim |
 |------|----------------------------|---------------------|
 | Classic BNN accuracy | Canaries (MNIST / CIFAR proxy / synth audio) within `tests/golden_floors.json` | Not ImageNet SOTA; not production ASR |
+| Classic BNN DX | Larq (TF/Keras) was the default; **archived 2026-06-15** | This lab occupies **PyTorch packed BNN optimiser** + honest routing. Not LCE FPS. |
 | Packed CPU speedup | Wall-clock from `results/benchmark.json`; dual-metric vs theory 32× | Never advertise theory pack ratio as latency |
 | LLM serve | Bridge to bitnet.cpp / GGUF (`bnn bridge cpu-llm`) | Not sign()+torch chat models |
 | GPU datacenter | Bridge to torchao / AWQ / vLLM (`bnn bridge gpu`) | Classic BNN XNOR is a non-goal on Tensor Cores |
@@ -88,7 +93,7 @@ Need faster NN?
 │   └─ Prefer FP8 / INT4 (torchao, vLLM, TensorRT). Binary rarely wins on CUDA TC.
 ├─ CPU / edge / mobile / NPU?
 │   ├─ LLM → BitNet b1.58 + bitnet.cpp (or Litespark-class ternary kernels)
-│   └─ CNN → Bi-Real / ReActNet recipe + Larq CE or custom packed XNOR
+│   └─ CNN → Bi-Real / ReActNet recipe + this lab (`bnn-lab`) packed XNOR (Larq/LCE archived 2026-06-15)
 └─ New silicon / max energy efficiency?
     └─ Design for binary/ternary datapath from day one (LUT / CIM / BGEMM)
 ```

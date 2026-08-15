@@ -166,6 +166,33 @@ Eval-only fold. Does not change the thesis compression story.
 
 ---
 
+### Measured AND-gate (W3 / Wave S2)
+
+Hybrid/binary wrap + short STE QAT on the **committed** `wrap_demo` shape
+(hidden=4096, Sequential middles `3`/`5`, batch=64, no `--force`):
+
+| Recipe | cosine | e2e vs FP | `drop_in_ok` | AND |
+|---|---|---|---|---|
+| PTQ `binary_xnor` (legacy golden) | 0.31 | ~4.8× | n/a | no (cosine) |
+| **MSE STE + fold α, 200 steps** | **0.999** | **2.65×** | **true** | **yes** |
+| Ultra TinyBlock PTQ hybrid | ~0.70 | host-noisy; committed ~1.61× | false | no |
+| Ultra TinyBlock MSE+fold 200 | ~0.999 | host-noisy (median ~1.25× here) | true | no (e2e) |
+| Ternary + FP distill | 0.991 | 0.73× | true (forced) | **no** (e2e) |
+
+Recipe (same shape; do not invent a new bench):
+
+```bash
+python scripts/wrap_existing_demo.py --mode binary_xnor --hidden 4096 --batch 64 --qat-steps 200
+```
+
+`light_qat_recover(..., logit_loss="mse", fold_alpha=True)` bakes per-out-channel
+STE `alpha` into restored Linear magnitudes so wrap absmean calib matches QAT.
+Packed path stays CPU XNOR — never GPU 32× from `sign()`.
+
+Full table: [`docs/spikes/WRAP_HYBRID_085.md`](spikes/WRAP_HYBRID_085.md).
+
+---
+
 ## Non-claims
 
 - Toy numbers demonstrate mechanisms, not production accuracy.

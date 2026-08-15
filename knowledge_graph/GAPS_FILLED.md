@@ -13,7 +13,10 @@ or `OpenGap`.
 | G-LCE | Larq Compute Engine primary cite | arXiv `2011.09398` | `paper_larq_ce`, `tool_larq`, `org_plumerai_larq` | measured_on ARM; implements tool | 0.95 |
 | G-BITNET-LINE | 2024–2026 BitNet family incomplete | academia `arxiv_search` + Tavily | `paper_bitnet`, `paper_bitnet_b158`, `paper_bitnet_cpp`, `paper_bitnet_a48`, `paper_bitnet_2b4t`, `paper_bitnet_v2`, `paper_bitdistill` | improves / requires / mitigates PTQ wipe | 0.9–1.0 |
 | G-SPARSE | Sparse-BitNet mentioned in survey only | Tavily → arXiv `2603.05168` | `paper_sparse_bitnet`, `gap_litespark_local` | improves b1.58; blocked_by local repro gap | 0.7 |
-| G-LITESPARK | Extreme SIMD claims | Survey arXiv `2605.06485` | `paper_litespark` → `gap_litespark_local` | **no local speedups claimed** | 0.65 |
+| G-LITESPARK | Extreme SIMD claims | Survey + arXiv `2605.06485` | `paper_litespark` → `gap_litespark_local` | **no local speedups claimed** | 0.65 |
+| G-SCALEQ | 2026 ternary PTQ of reasoning LLMs | academia `arxiv_search` `2608.01078` | `paper_scaleq_158` | derived_from b1.58; improves PTQ wipe; **literature only** | 0.78 |
+| G-BITEMBED | BitNet-style embedders unnamed as first-class node | arXiv `2606.25674` + `docs/15` | `paper_bitembed` | derived_from b1.58; recommends_for wrap tree | 0.78 |
+| G-VIBEASR | BitNet ASR paper missing from graph | arXiv `2607.21075` | `paper_vibeasr_bitnet` | blocked_by ASR non-goal; **their stack** | 0.75 |
 | G-BITDISTILL | “Need distill” without paper ID | arXiv `2510.13998` (BitNet Distillation) | `paper_bitdistill`, `method_absmean_ptq`, `dataset_glue_downstream` | contradicts absmean PTQ; recommends_for decision tree | 0.95 |
 | G-FBI | Fully binary LLM path | arXiv `2407.07093` | `paper_fbi_llm`, `gap_fbi_llm_repro` | alternative_to BitNet; non-goal | 0.8 / 0.75 |
 | G-FINN | FPGA node without paper handle | Docs `14` + classic FINN FPGA'17 | `paper_finn`, `tool_brevitas_finn`, `hw_fpga_finn` | recommends_for FPGA | 0.9 |
@@ -66,12 +69,14 @@ Provenance folder `knowledge_graph/enrichment/` is **kept** (not deleted).
 
 See `OpenGap` nodes in the JSON. Highest leverage leftovers:
 
-1. Venue drafting for B1–B3 (`gap_venue_submit`)
-2. Distill / WC-O hardening (`gap_distill_integration`, `decision_wc_o_gates`) — **Lane A PR #19**
-3. `.bnnpack` v2 + safetensors (`gap_bnnpack_v2`) — **Lane B PR #18**
-4. Local Litespark / Sparse-BitNet benches (`gap_litespark_local`) — **do not invent**
-5. Full ReActNet activations in `bnn.ste` (`gap_reactnet_in_repo`)
-6. Wave 1 moonshots still on open PRs: WASM (#24), energy/RAPL (#22), bitnet pin (#17), ImageNet protocol (#21)
+1. Venue drafting for B1–B3 (`gap_venue_submit`) — **open**
+2. Local Litespark / Sparse-BitNet benches (`gap_litespark_local`) — **open**; **do not invent**
+3. Full ReActNet activations in `bnn.ste` (`gap_reactnet_in_repo`) — **open**
+4. FBI-LLM repro (`gap_fbi_llm_repro`) — **`accepted_non_goal`** (cite only)
+
+Wave 1 is shipped. Do **not** treat archival `enrichment_runs[].lab_coverage_note` strings that still say “lanes A–I remain open PRs” as current — those runs are dated 2026-08-04. Canonical note is `meta.lab_coverage_note`.
+
+Shipped or closed-by-policy (do **not** leave as `open_pr`): WASM pedagogy (#24), `.bnnpack` v2 (#18), distill/search (#19), RAPL/proxy (#22), bitnet.cpp pin (#17), ImageNet protocol (#21), **PyPI Trusted Publisher** (`gap_pypi_trusted` — `bnn-lab` 1.0.0, 2026-08-14).
 
 ## Integrity enrichment (2026-08-04, `lane/kg-enrich`)
 
@@ -81,7 +86,17 @@ See `OpenGap` nodes in the JSON. Highest leverage leftovers:
 | Tool | `python scripts/apply_kg_integrity.py` |
 | Adds | WC-O gates, `sys_recommend_stack`, `sys_eval_suite`, `sys_kg`, BitDistiller/GPTQ/Q-Sparse, RAPL Result, moonshot non-goals |
 | Fixes | Broken sources; over-aliased `same_as` → `implements`/`part_of`/`derived_from` |
-| Honesty | Wave 1 statuses `open_pr` — **not** claimed merged |
+| Honesty | Wave 1 statuses `open_pr` at write time — **flipped 2026-08-13** after v1.0.0 / PR #26; **`gap_pypi_trusted` merged 2026-08-14** (`bnn-lab` 1.0.0) |
+
+## 2026 literature overlay (2026-08-15, `chore/kg-freshness`)
+
+| Step | Result |
+|------|--------|
+| Overlay | `knowledge_graph/enrichment/literature_2026.json` |
+| Apply | Union via `scripts/apply_kg_integrity.py` `apply_patch` (same schema as integrity_wave1) |
+| Adds | `paper_scaleq_158` (`2608.01078`), `paper_bitembed` (`2606.25674`), `paper_vibeasr_bitnet` (`2607.21075`); Litespark already present |
+| Status | `gap_fbi_llm_repro` → `accepted_non_goal`; no `open_pr` nodes |
+| Honesty | Paper speedups stay literature-grade. **No invented Litespark / Sparse-BitNet local numbers.** |
 
 ## Rebuild after edits
 

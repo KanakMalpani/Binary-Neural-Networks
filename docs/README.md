@@ -7,6 +7,7 @@ Start here if you are new to the repo.
 | Doc | Why |
 |-----|-----|
 | [`GUIDE_E2E.md`](GUIDE_E2E.md) | **Primary User Guide** — zero → optimiser results (follow this) |
+| [GitHub Pages](https://kanakmalpani.github.io/Binary-Neural-Networks/) | Browsable MkDocs site (API autodoc) |
 | [`../REPRODUCIBILITY.md`](../REPRODUCIBILITY.md) | Exact repro commands, goldens, troubleshooting |
 | [`../AGENTS.md`](../AGENTS.md) | Ordered steps for coding agents |
 | [`25_ONEPAGER.md`](25_ONEPAGER.md) | Executive decision tree (honest) |
@@ -30,6 +31,7 @@ Ordered path (also nested inside [`GUIDE_E2E.md`](GUIDE_E2E.md)):
 | 06 | [`tutorials/06_encoder_decoder.md`](tutorials/06_encoder_decoder.md) |
 | 07 | [`tutorials/07_OPTIMISER_QUICKSTART.md`](tutorials/07_OPTIMISER_QUICKSTART.md) |
 | 08 | [`tutorials/08_HF_OPTIMISER.md`](tutorials/08_HF_OPTIMISER.md) |
+| Hub | [`HUB_BNNPACK.md`](HUB_BNNPACK.md) — tiny `.bnnpack` canaries (not SOTA) |
 
 ## Latest lane
 
@@ -48,6 +50,7 @@ Ordered path (also nested inside [`GUIDE_E2E.md`](GUIDE_E2E.md)):
 | [`SEMVER_AND_DEPRECATION.md`](SEMVER_AND_DEPRECATION.md) | Public API semver policy |
 | [`adr/README.md`](adr/README.md) | Architecture Decision Records |
 | [`DATASET_CARDS.md`](DATASET_CARDS.md) | MNIST / CIFAR / synth audio cards |
+| [`HUB_BNNPACK.md`](HUB_BNNPACK.md) | Hub `.bnnpack` canaries (cards + encode; not SOTA) |
 | [`COMPATIBILITY_MATRIX.md`](COMPATIBILITY_MATRIX.md) | OS × Python × torch matrix |
 | [`TORCH_PIN_POLICY.md`](TORCH_PIN_POLICY.md) | Why `torch<2.13` (W14.T03) |
 | [`OPTIONAL_EXTRAS_MATRIX.md`](OPTIONAL_EXTRAS_MATRIX.md) | transformers / torchao smoke (W14.T06) |
