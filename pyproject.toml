@@ -51,7 +51,7 @@ audio = []   # Synthetic audio is NumPy-only; reserved for real ASR deps
 # safetensors: soft dep for Lane B packed export (`bnn.codec.safetensors_export`);
 # import is optional at runtime — listed here so `pip install bnn-lab[hf]` has it.
 hf = [
-  "transformers>=4.40,<5",
+  "transformers>=4.40,<6",
   "datasets>=2.18,<4",
   "huggingface_hub>=0.22,<1",
   "safetensors>=0.4,<1",
